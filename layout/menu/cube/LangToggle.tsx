@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { TranslationOutlined } from '@ant-design/icons';
 import { FormattedMessage } from 'react-intl';
-import { LangContext } from '@fa-admin-pages/layout/lang/LangLayout';
+import { LangContext } from '@fa-admin-pages/layout';
 
 /**
  * 语言国际化切换组件

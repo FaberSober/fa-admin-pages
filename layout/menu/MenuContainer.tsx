@@ -1,9 +1,8 @@
 import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
-import { ApiEffectLayout, MenuLayout, PageLoading } from '@fa/ui';
-import LangLayout from '@fa-admin-pages/layout/lang/LangLayout';
-import { LangToggle, HelpCube, UserAvatar } from './cube';
-import { UserLayout } from "@fa-admin-pages/layout";
+import { ApiEffectLayout, PageLoading } from '@fa/ui';
+import { LangLayout, UserLayout } from "@fa-admin-pages/layout";
+import MenuLayout from "./MenuLayout";
 
 
 export default function MenuContainer() {
@@ -11,15 +10,7 @@ export default function MenuContainer() {
     <LangLayout>
       <ApiEffectLayout>
         <UserLayout>
-          <MenuLayout
-            rightDom={
-              <>
-                <LangToggle />
-                <HelpCube />
-                <UserAvatar />
-              </>
-            }
-          >
+          <MenuLayout>
             <Suspense fallback={<PageLoading />}>
               <Outlet />
             </Suspense>
