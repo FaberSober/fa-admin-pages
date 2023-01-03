@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Card } from 'antd';
 import { BaseSelect } from '@fa/ui';
-import studentApi from '@/../../../../services/demo/student';
-import StudentSearchSelect from '@/../../demo/student/helper/StudentSearchSelect';
+import { studentApi } from '@/services';
+import StudentSearchSelect from "@fa-admin-pages/pages/admin/demo/student/helper/StudentSearchSelect";
+
 
 /**
  * 远程数据选择

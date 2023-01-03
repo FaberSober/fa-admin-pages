@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
 import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import modelService from '@/../../../../../services/demo/tree';
+import { treeApi } from '@/services';
 import { Admin } from '@/types';
 import TreeCascade from '../helper/TreeCascade';
 
@@ -25,7 +25,7 @@ export default function TreeModal({ children, parentId, title, record, ...props 
 
   /** 新增Item */
   function invokeInsertTask(params: any) {
-    modelService.save(params).then((res) => {
+    treeApi.save(params).then((res) => {
       FaUtils.showResponse(res, `新增${serviceName}`);
       setOpen(false);
       if (props.onCancel) props.onCancel(params);
@@ -34,7 +34,7 @@ export default function TreeModal({ children, parentId, title, record, ...props 
 
   /** 更新Item */
   function invokeUpdateTask(params: any) {
-    modelService.update(params.id, params).then((res) => {
+    treeApi.update(params.id, params).then((res) => {
       FaUtils.showResponse(res, `更新${serviceName}`);
       setOpen(false);
       if (props.onCancel) props.onCancel(params);
@@ -69,7 +69,7 @@ export default function TreeModal({ children, parentId, title, record, ...props 
     form.setFieldsValue(getInitialValues());
   }, [props.open]);
 
-  const loading = loadingEffect[modelService.getUrl('save')] || loadingEffect[modelService.getUrl('update')];
+  const loading = loadingEffect[treeApi.getUrl('save')] || loadingEffect[treeApi.getUrl('update')];
   return (
     <span>
       <span onClick={showModal}>{children}</span>

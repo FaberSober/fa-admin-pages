@@ -1,9 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Alert, Button, Card, Form, Input } from 'antd';
-import redisTestApi from '@/../../../../../services/demo/redisTest';
-import studentApi from '@/../../../../../services/demo/student';
-import { ApiEffectLayoutContext, FaFlexRestLayout, FaUtils } from '@fa/ui';
-import { UserLayoutContext } from '@fa/ui';
+import { ApiEffectLayoutContext, FaFlexRestLayout, FaUtils, UserLayoutContext } from '@fa/ui';
+import { redisTestApi, studentApi } from '@/services';
 import { Demo } from '@/types';
 
 /**

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Card} from "antd";
-import TreeCascade from "@/../../demo/tree/helper/TreeCascade";
+import TreeCascade from "@fa-admin-pages/pages/admin/demo/tree/helper/TreeCascade";
 
 
 /**

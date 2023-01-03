@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseSearchSelect, BaseSearchSelectProps } from '@fa/ui';
-import api from '@/../../../../../services/demo/student';
+import { studentApi } from '@/services';
 import { Demo } from '@/types';
 
 export interface IProps extends Omit<BaseSearchSelectProps<Demo.Student, number>, 'serviceApi'> {}
@@ -15,9 +15,9 @@ export default function StudentSearchSelect(props: IProps) {
       valueKey="id"
       labelKey="name"
       serviceApi={{
-        search: (searchValue) => api.page({ current: 1, pageSize: 20, query: { name: searchValue } }),
-        getById: (value) => api.getById(value),
-        findList: (ids) => api.list({ 'id#$in': [...ids] }),
+        search: (searchValue) => studentApi.page({ current: 1, pageSize: 20, query: { name: searchValue } }),
+        getById: (value) => studentApi.getById(value),
+        findList: (ids) => studentApi.list({ 'id#$in': [...ids] }),
       }}
       placeholder="请输入学生名称进行搜索"
       {...props}

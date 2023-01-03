@@ -3,8 +3,7 @@ import { get } from 'lodash';
 import { Button, DatePicker, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiSelector, DragModal, FaHref, FaUtils } from '@fa/ui';
-// import { formItemFullLayout, getDateStr000, getInitialKeyTimeValue, showResponse } from '@/utils/utils';
-import api from '@/../../../../../../services/demo/student';
+import { studentApi } from '@/services';
 import { Demo } from '@/types';
 
 /**
@@ -18,7 +17,7 @@ export default function StudentModal({ children, title, record, fetchFinish, add
 
   /** 新增Item */
   function invokeInsertTask(params: any) {
-    api.save(params).then((res) => {
+    studentApi.save(params).then((res) => {
       FaUtils.showResponse(res, '新增学生');
       setOpen(false);
       if (fetchFinish) fetchFinish();
@@ -27,7 +26,7 @@ export default function StudentModal({ children, title, record, fetchFinish, add
 
   /** 更新Item */
   function invokeUpdateTask(params: any) {
-    api.update(params.id, params).then((res) => {
+    studentApi.update(params.id, params).then((res) => {
       FaUtils.showResponse(res, '更新学生');
       setOpen(false);
       if (fetchFinish) fetchFinish();
@@ -63,7 +62,7 @@ export default function StudentModal({ children, title, record, fetchFinish, add
     form.setFieldsValue(getInitialValues());
   }
 
-  const loading = loadingEffect[api.getUrl('save')] || loadingEffect[api.getUrl('update')];
+  const loading = loadingEffect[studentApi.getUrl('save')] || loadingEffect[studentApi.getUrl('update')];
   return (
     <span>
       <span onClick={showModal}>

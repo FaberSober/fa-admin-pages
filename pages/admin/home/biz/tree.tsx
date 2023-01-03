@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Card, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import treeApi from '@/../../../../services/demo/tree';
+import { treeApi } from '@/services';
 import { BaseTree } from '@fa/ui';
 import { Demo } from '@/types';
-import TreeModal from '@/../../demo/tree/modal/TreeModal';
+import TreeModal from "@fa-admin-pages/pages/admin/demo/tree/modal/TreeModal";
 
 /**
  * 远程数据Tree

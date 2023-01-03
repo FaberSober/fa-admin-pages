@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import authTestApi from '@/../../../../services/demo/authTest';
 import { Button, Card, message, Space } from 'antd';
 import { ApiEffectLayoutContext, ShiroPermissionContainer } from '@fa/ui';
+import { authTestApi } from '@/services';
+
 
 /**
  * @author xu.pengfei
