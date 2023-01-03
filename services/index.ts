@@ -1,1 +1,1 @@
-export * from './demo'
+export const Hello = '1';
