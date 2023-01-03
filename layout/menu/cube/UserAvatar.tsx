@@ -2,9 +2,9 @@ import React, { useContext, useMemo } from 'react';
 import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Popover } from 'antd';
 import { useIntl } from 'react-intl';
-import { fileSaveApi, UserLayoutContext } from '@fa/ui';
+import { fileSaveApi } from '@fa/ui';
 import { useNavigate } from 'react-router-dom';
-import { LangContext } from '@fa-admin-pages/layout/lang/LangLayout';
+import { LangContext, UserLayoutContext } from "@fa-admin-pages/layout";
 
 const UserPopoverContent = () => {
   const intl = useIntl();

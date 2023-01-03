@@ -1,8 +1,9 @@
 import React, { useContext, useEffect } from 'react';
 import { CheckOutlined, SearchOutlined } from '@ant-design/icons';
 import { Badge, Button, Form, Input, Space } from 'antd';
-import { ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, msgApi, UserLayoutContext, useTableQueryParams } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, msgApi, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
+import { UserLayoutContext } from "@fa-admin-pages/layout";
 
 const serviceName = '消息';
 const biz = 'base_msg';
