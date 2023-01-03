@@ -1,1 +1,1 @@
-export const Hello = '1';
+export * from './base'
