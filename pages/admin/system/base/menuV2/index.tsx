@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaHref, rbacMenuApi, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, BaseTreeContext, Fa, FaEnums, FaHref, rbacMenuApi, useDelete } from '@fa/ui';
 import RbacMenuModal from '@fa-admin-pages/pages/admin/system/base/menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
 import styles from './index.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
-import { BaseTreeContext } from "@fa/ui";
+import { useCounter } from "react-use";
 
 
 /**
@@ -18,11 +18,11 @@ export default function index() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [edit, setEdit] = useState<Fa.TreeNode<Rbac.RbacMenu, string>>();
   const [open, setOpen] = useState(false);
-  const [renderCount, setRenderCount] = useState(1);
+  const [current, { inc }] = useCounter(0);
 
   function refreshData() {
     setOpen(false);
-    setRenderCount(renderCount + 1)
+    inc()
   }
 
   const [handleDelete] = useDelete<string>(rbacMenuApi.remove, refreshData, '菜单');
@@ -34,7 +34,7 @@ export default function index() {
 
   const loadingTree = loadingEffect[rbacMenuApi.getUrl('allTree')];
   return (
-    <BaseTreeContext.Provider value={{ renderCount }}>
+    <BaseTreeContext.Provider value={{ renderCount: current, updateRenderCount: inc }}>
       <div className={['fa-full-content', 'fa-flex-column', styles.menuDiv].join(' ')}>
         <Space style={{ margin: 12 }}>
           <Button onClick={refreshData} loading={loadingTree}>
