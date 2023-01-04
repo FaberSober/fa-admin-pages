@@ -6,7 +6,7 @@ import styles from './index.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
-import { dispatch } from 'use-bus';
+import { BaseTreeContext } from "@fa/ui";
 
 
 /**
@@ -18,10 +18,11 @@ export default function index() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [edit, setEdit] = useState<Fa.TreeNode<Rbac.RbacMenu, string>>();
   const [open, setOpen] = useState(false);
+  const [renderCount, setRenderCount] = useState(1);
 
   function refreshData() {
     setOpen(false);
-    dispatch({ type: '@@api/BASE_TREE_REFRESH' });
+    setRenderCount(renderCount + 1)
   }
 
   const [handleDelete] = useDelete<string>(rbacMenuApi.remove, refreshData, '菜单');
@@ -33,48 +34,50 @@ export default function index() {
 
   const loadingTree = loadingEffect[rbacMenuApi.getUrl('allTree')];
   return (
-    <div className={['fa-full-content', 'fa-flex-column', styles.menuDiv].join(' ')}>
-      <Space style={{ margin: 12 }}>
-        <Button onClick={refreshData} loading={loadingTree}>
-          刷新
-        </Button>
-        <RbacMenuModal title="新增菜单" fetchFinish={refreshData}>
-          <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
-            新增菜单
+    <BaseTreeContext.Provider value={{ renderCount }}>
+      <div className={['fa-full-content', 'fa-flex-column', styles.menuDiv].join(' ')}>
+        <Space style={{ margin: 12 }}>
+          <Button onClick={refreshData} loading={loadingTree}>
+            刷新
           </Button>
-        </RbacMenuModal>
-      </Space>
+          <RbacMenuModal title="新增菜单" fetchFinish={refreshData}>
+            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
+              新增菜单
+            </Button>
+          </RbacMenuModal>
+        </Space>
 
-      <BaseTree
-        // showRoot
-        showOprBtn
-        onSelect={(keys) => console.log('onSelect', keys)}
-        onAfterDelItem={() => {}}
-        // 自定义配置
-        serviceName="Tree"
-        ServiceModal={RbacMenuModal}
-        serviceApi={rbacMenuApi}
-        bodyStyle={{ width: '100%', height: '100%' }}
-        showTips={false}
-        showTopBtn={false}
-        // @ts-ignore
-        titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
-          <div className={styles.item}>
-            <div style={{ flex: 1 }}>{item.name}</div>
-            <div style={{ width: 100 }}>{item.sourceData.icon ? <FontAwesomeIcon icon={item.sourceData.icon as any} /> : null}</div>
-            <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
-            <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
-            <Space>
-              <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
-              <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
-            </Space>
-          </div>
-        )}
-        showLine={false}
-        draggable
-      />
+        <BaseTree
+          // showRoot
+          showOprBtn
+          onSelect={(keys) => console.log('onSelect', keys)}
+          onAfterDelItem={() => {}}
+          // 自定义配置
+          serviceName="Tree"
+          ServiceModal={RbacMenuModal}
+          serviceApi={rbacMenuApi}
+          bodyStyle={{ width: '100%', height: '100%' }}
+          showTips={false}
+          showTopBtn={false}
+          // @ts-ignore
+          titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
+            <div className={styles.item}>
+              <div style={{ flex: 1 }}>{item.name}</div>
+              <div style={{ width: 100 }}>{item.sourceData.icon ? <FontAwesomeIcon icon={item.sourceData.icon as any} /> : null}</div>
+              <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
+              <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
+              <Space>
+                <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
+                <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
+              </Space>
+            </div>
+          )}
+          showLine={false}
+          draggable
+        />
 
-      <RbacMenuModal title="编辑菜单" record={edit?.sourceData} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
-    </div>
+        <RbacMenuModal title="编辑菜单" record={edit?.sourceData} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
+      </div>
+    </BaseTreeContext.Provider>
   );
 }
