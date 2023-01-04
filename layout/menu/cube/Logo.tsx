@@ -12,7 +12,7 @@ export default function Logo() {
   const { systemConfig } = useContext(UserLayoutContext);
   return (
     <Link to="/admin" className="fa-menu-logo">
-      <img src={fileSaveApi.genLocalGetFile(systemConfig.logo)} alt="logo" className="fa-menu-logo-img" />
+      <img src={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} alt="logo" className="fa-menu-logo-img" />
       <span className="fa-menu-logo-title">{systemConfig.title}</span>
     </Link>
   );
