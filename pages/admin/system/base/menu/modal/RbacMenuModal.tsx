@@ -4,6 +4,8 @@ import { Form, Input, Select } from 'antd';
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils, FontAwesomeSelect, rbacMenuApi } from '@fa/ui';
 import { Rbac } from '@/types';
 import RbacMenuCascader from '../helper/RbacMenuCascader';
+import { RouteCascader } from "@fa-admin-pages/components";
+import RbacMenuLevelEnum = FaEnums.RbacMenuLevelEnum;
 
 const serviceName = '菜单';
 
@@ -16,6 +18,9 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
 
   const [open, setOpen] = useState(false);
   const [parentItem, setParentItem] = useState<Rbac.RbacMenu | undefined>();
+  const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
+    return record ? record.level : undefined;
+  });
 
   /** 新增Item */
   function invokeInsertTask(params: any) {
@@ -63,10 +68,12 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
 
   function showModal() {
     setOpen(true);
+    setLevel(record ? record.level : undefined)
     form.setFieldsValue(getInitialValues());
   }
 
   useEffect(() => {
+    setLevel(record ? record.level : undefined)
     form.setFieldsValue(getInitialValues());
   }, [record]);
 
@@ -83,11 +90,22 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
         width={700}
         {...props}
       >
-        <Form form={form} onFinish={onFinish}>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          onValuesChange={(cv:any) => {
+            if (cv.level) {
+              setLevel(cv.level)
+            }
+          }}
+        >
           <Form.Item name="parentId" label="上级菜单" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <RbacMenuCascader
               showRoot
-              onChangeWithItem={(_: any, raw: any) => setParentItem(raw)}
+              onChangeWithItem={(_: any, raw: Rbac.RbacMenu|undefined) => {
+                setParentItem(raw)
+                form.setFieldValue('linkUrl', raw ? raw.linkUrl : '');
+              }}
               disabledIds={record ? [record.id] : undefined}
             />
           </Form.Item>
@@ -106,9 +124,11 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
               <Select.Option value={FaEnums.RbacLinkTypeEnum.OUT}>外部链接</Select.Option>
             </Select>
           </Form.Item>
+
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {record ? <Input /> : <Input addonBefore={parentItem ? parentItem.linkUrl : undefined} />}
+            {level === RbacMenuLevelEnum.BUTTON ? <Input /> : <RouteCascader />}
           </Form.Item>
+
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
             <FontAwesomeSelect />
           </Form.Item>

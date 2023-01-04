@@ -50,7 +50,7 @@ export default function index() {
         <BaseTree
           // showRoot
           showOprBtn
-          onSelect={(keys) => console.log('onSelect', keys)}
+          // onSelect={(keys) => console.log('onSelect', keys)}
           onAfterDelItem={() => {}}
           // 自定义配置
           serviceName="Tree"
