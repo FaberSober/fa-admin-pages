@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import { Menu } from 'antd';
 import { isNil } from 'lodash';
-import { Fa, FaEnums, SiderLayout } from '@fa/ui';
+import { Fa, FaEnums, FaIcon, SiderLayout } from '@fa/ui';
 import { Rbac } from '@/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import MenuLayoutContext from "../context/MenuLayoutContext";
 
 
@@ -25,7 +24,7 @@ export default function SideMenu() {
       children: loop(i.children),
       icon: i.sourceData.icon ? (
         <div className="fa-flex-column-center" style={{ width: 14, display: 'inline-block' }}>
-          <FontAwesomeIcon icon={i.sourceData.icon as any} />
+          <FaIcon icon={i.sourceData.icon} />
         </div>
       ) : null,
     }));

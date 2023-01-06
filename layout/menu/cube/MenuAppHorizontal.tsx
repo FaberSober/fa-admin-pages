@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Menu } from 'antd';
-import { FaEnums } from '@fa/ui';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FaEnums, FaIcon } from '@fa/ui';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 
 /**
@@ -18,7 +17,7 @@ export default function MenuAppHorizontal() {
     label: i.name,
     icon: i.sourceData.icon ? (
       <div className="fa-flex-column-center" style={{ width: 20, display: 'inline-block' }}>
-        <FontAwesomeIcon icon={i.sourceData.icon as any} />
+        <FaIcon icon={i.sourceData.icon} />
       </div>
     ) : null,
   }));

@@ -3,9 +3,8 @@ import { Rbac } from '@/types';
 import { Button, Modal, Space, Table } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { ColumnsType } from 'antd/es/table';
-import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, rbacMenuApi, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaIcon, FaUtils, rbacMenuApi, useDelete } from '@fa/ui';
 import RbacMenuModal from './modal/RbacMenuModal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 /**
@@ -56,7 +55,7 @@ export default function RbacMenuTreeList() {
     {
       title: '图标',
       dataIndex: ['sourceData', 'icon'],
-      render: (val: any) => (val ? <FontAwesomeIcon icon={val} /> : null),
+      render: (val: any) => (val ? <FaIcon icon={val} /> : null),
       width: 100,
     },
     {

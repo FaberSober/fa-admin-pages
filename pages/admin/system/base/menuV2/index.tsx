@@ -1,9 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, BaseTreeContext, Fa, FaEnums, FaHref, rbacMenuApi, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, BaseTreeContext, Fa, FaEnums, FaHref, FaIcon, rbacMenuApi, useDelete } from '@fa/ui';
 import RbacMenuModal from '@fa-admin-pages/pages/admin/system/base/menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
 import styles from './index.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import { useCounter } from "react-use";
@@ -63,7 +62,7 @@ export default function index() {
           titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
             <div className={styles.item}>
               <div style={{ flex: 1 }}>{item.name}</div>
-              <div style={{ width: 100 }}>{item.sourceData.icon ? <FontAwesomeIcon icon={item.sourceData.icon as any} /> : null}</div>
+              <div style={{ width: 100 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
               <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
               <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
               <Space>
