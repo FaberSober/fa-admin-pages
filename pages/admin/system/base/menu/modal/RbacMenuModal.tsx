@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils, FontAwesomeSelect, rbacMenuApi } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils, rbacMenuApi } from '@fa/ui';
 import { Rbac } from '@/types';
 import RbacMenuCascader from '../helper/RbacMenuCascader';
 import { RouteCascader } from "@fa-admin-pages/components";
-import RbacMenuLevelEnum = FaEnums.RbacMenuLevelEnum;
+import { IconSelect } from "@/components";
 
 const serviceName = '菜单';
 
@@ -126,11 +126,11 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
           </Form.Item>
 
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {level === RbacMenuLevelEnum.BUTTON ? <Input /> : <RouteCascader />}
+            {level === FaEnums.RbacMenuLevelEnum.BUTTON ? <Input /> : <RouteCascader />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
-            <FontAwesomeSelect />
+            <IconSelect />
           </Form.Item>
         </Form>
       </DragModal>
