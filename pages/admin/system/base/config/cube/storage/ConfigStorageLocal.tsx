@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, configSysApi, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
 import { Button, Form, Input, Space } from 'antd';
 import { Admin } from '@/types';
+import { configSysApi } from '@/services';
 import { SaveOutlined } from '@ant-design/icons';
 
 

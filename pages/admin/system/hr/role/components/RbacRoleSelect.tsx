@@ -1,6 +1,7 @@
 import React from 'react';
-import { BaseSelect, BaseSelectProps, rbacRoleApi } from '@fa/ui';
+import { BaseSelect, BaseSelectProps } from '@fa/ui';
 import { Rbac } from '@/types';
+import { rbacRoleApi } from '@/services';
 
 /**
  * @author xu.pengfei

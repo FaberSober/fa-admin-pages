@@ -1,8 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Image, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, FaUtils, noticeApi, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
 import { Admin } from '@/types';
+import { noticeApi } from '@/services';
 import NoticeModal from './modal/NoticeModal';
 
 

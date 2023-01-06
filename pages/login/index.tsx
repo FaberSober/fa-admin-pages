@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import { trim } from 'lodash';
-import { ApiEffectLayoutContext, authApi, Captcha, configSysApi, setToken } from '@fa/ui';
+import { ApiEffectLayoutContext, Captcha, setToken } from '@fa/ui';
+import { authApi, configSysApi } from '@/services'
 import { SITE_INFO } from '@/configs/server.config';
 import styles from './login.module.scss';
 import { Admin } from '@/types';

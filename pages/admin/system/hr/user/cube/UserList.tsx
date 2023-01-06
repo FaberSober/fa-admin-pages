@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { get } from 'lodash';
 import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, userApi, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
+import { userApi } from '@/services';
 import UserModal from '../modal/UserModal';
 import DepartmentCascade from '../helper/DepartmentCascade';
 

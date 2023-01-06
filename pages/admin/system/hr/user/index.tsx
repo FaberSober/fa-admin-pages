@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { BaseTree, departmentApi } from '@fa/ui';
+import { BaseTree } from '@fa/ui';
 import { Admin } from '@/types';
+import { departmentApi } from '@/services';
 import DepartmentModal from './modal/DepartmentModal';
 import UserList from './cube/UserList';
 import { dispatch } from 'use-bus';

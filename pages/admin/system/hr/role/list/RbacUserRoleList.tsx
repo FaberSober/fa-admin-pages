@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, FaberTable, FaUtils, rbacUserRoleApi, SelectedUser, useDelete, useTableQueryParams, } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, FaberTable, FaUtils, SelectedUser, useDelete, useTableQueryParams, } from '@fa/ui';
 import { Rbac } from '@/types';
+import { rbacUserRoleApi } from '@/services';
 
 const serviceName = '角色用户';
 const biz = 'RbacUserRoleList';

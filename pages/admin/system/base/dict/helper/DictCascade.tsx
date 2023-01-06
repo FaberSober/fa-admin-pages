@@ -1,6 +1,7 @@
 import React from 'react';
-import { BaseCascader, BaseCascaderProps, dictApi } from '@fa/ui';
+import { BaseCascader, BaseCascaderProps } from '@fa/ui';
 import { Admin } from '@/types';
+import { dictApi } from '@/services';
 
 export interface DictCascadeProps extends Omit<BaseCascaderProps<Admin.Dict>, 'serviceApi'> {}
 

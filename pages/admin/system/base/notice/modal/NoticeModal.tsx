@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
 import { Admin, BaseBoolRadio, DragModal, DragModalProps, FaUtils, UploadImgLocal } from '@fa/ui';
-import { noticeApi } from '@fa/ui';
+import { noticeApi } from '@/services';
 import { ApiEffectLayoutContext } from '@fa/ui';
 
 const serviceName = '通知与公告';

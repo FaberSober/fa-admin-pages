@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Popover } from 'antd';
 import { useIntl } from 'react-intl';
-import { fileSaveApi } from '@fa/ui';
+import { fileSaveApi } from '@/services';
 import { useNavigate } from 'react-router-dom';
 import { LangContext, UserLayoutContext } from "@fa-admin-pages/layout";
 

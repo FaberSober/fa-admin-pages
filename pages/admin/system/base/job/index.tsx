@@ -1,8 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined, PlusOutlined, SearchOutlined, ThunderboltOutlined, } from '@ant-design/icons';
 import { Badge, Button, Form, Input, Popconfirm, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, jobApi, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
+import { jobApi } from '@/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
 

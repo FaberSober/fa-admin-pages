@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Empty } from 'antd';
 import { Admin } from '@/types';
-import { BaseTree, dictApi, FaFlexRestLayout, FaLabel, FaSortList, FaUtils } from '@fa/ui';
+import { BaseTree, FaFlexRestLayout, FaLabel, FaSortList, FaUtils } from '@fa/ui';
 import DictModal from './modal/DictModal';
 import DictForm from '@fa-admin-pages/pages/admin/system/base/dict/cube/DictForm';
+import { dictApi } from '@/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 

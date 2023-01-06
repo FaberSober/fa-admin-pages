@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { DragModal, DragModalProps, departmentApi, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
+import { departmentApi } from '@/services';
 import DepartmentCascade from '../helper/DepartmentCascade';
 import UserSearchSelect from '../helper/UserSearchSelect';
-import { ApiEffectLayoutContext } from '@fa/ui';
 
 const serviceName = '部门';
 

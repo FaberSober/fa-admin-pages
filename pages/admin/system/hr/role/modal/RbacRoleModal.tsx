@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaUtils, rbacRoleApi } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaUtils } from '@fa/ui';
 import { Rbac } from '@/types';
+import { rbacRoleApi } from '@/services';
 
 const serviceName = '角色';
 

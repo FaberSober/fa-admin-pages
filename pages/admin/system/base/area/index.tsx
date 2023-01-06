@@ -1,8 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { areaApi, AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
+import { areaApi } from '@/services';
 import AreaModal from './modal/AreaModal';
 
 const serviceName = '中国行政地区表';

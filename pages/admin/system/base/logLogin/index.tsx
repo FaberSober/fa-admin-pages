@@ -1,8 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, logLoginApi, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
+import { logLoginApi } from '@/services';
 
 const serviceName = '登录日志';
 const biz = 'base_log_login_v1';

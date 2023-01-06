@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, areaApi, DictEnumApiSelector, DragModal, DragModalProps, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, DictEnumApiSelector, DragModal, DragModalProps, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
+import { areaApi } from '@/services';
 
 const serviceName = '中国行政地区表';
 

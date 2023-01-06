@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { find, get } from 'lodash';
 import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, CronModal, DragModal, DragModalProps, FaUtils, jobApi } from '@fa/ui';
+import { ApiEffectLayoutContext, CronModal, DragModal, DragModalProps, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
+import { jobApi } from '@/services';
 
 const serviceName = '系统定时任务';
 
