@@ -3,7 +3,8 @@ import { Rbac } from '@/types';
 import { Button, Modal, Space, Table } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { ColumnsType } from 'antd/es/table';
-import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaIcon, FaUtils, rbacMenuApi, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, rbacMenuApi, useDelete } from '@fa/ui';
+import { FaIcon } from '@fa/icons';
 import RbacMenuModal from './modal/RbacMenuModal';
 
 

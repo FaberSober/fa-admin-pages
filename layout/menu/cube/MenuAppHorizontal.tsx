@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Menu } from 'antd';
-import { FaEnums, FaIcon } from '@fa/ui';
+import { FaEnums } from '@fa/ui';
+import { FaIcon } from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 
 /**

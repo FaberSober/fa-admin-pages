@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, BaseTreeContext, Fa, FaEnums, FaHref, FaIcon, rbacMenuApi, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, BaseTreeContext, Fa, FaEnums, FaHref, rbacMenuApi, useDelete } from '@fa/ui';
+import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '@fa-admin-pages/pages/admin/system/base/menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
 import styles from './index.module.scss';
