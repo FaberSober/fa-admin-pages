@@ -1,10 +1,11 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { ConfigProvider } from 'antd';
 // dayjs国际化
-import 'dayjs/locale/zh-cn';
+import dayjs from 'dayjs'
+import 'dayjs/esm/locale/zh-cn';
 // antd国际化配置
-import zhCN from 'antd/locale/zh_CN';
-import enUS from 'antd/locale/en_US';
+import zhCN from 'antd/es/locale/zh_CN';
+import enUS from 'antd/es/locale/en_US';
 // i18n国际化
 import { IntlProvider } from 'react-intl';
 import zhCNMessage from '@/lang/zh_CN';
@@ -12,6 +13,8 @@ import enCNMessage from '@/lang/en_US';
 import { SmileOutlined } from '@ant-design/icons';
 import { Fa } from '@fa/ui';
 import { useLocalStorage } from 'react-use';
+
+dayjs.locale('zh-cn');
 
 function handleAntdMessages(lang: string) {
   switch (lang) {
