@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils, rbacMenuApi } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
+import { IconSelect, RouteCascader } from "@/components";
 import { Rbac } from '@/types';
+import { rbacMenuApi } from "@/services";
 import RbacMenuCascader from '../helper/RbacMenuCascader';
-import { RouteCascader } from "@fa-admin-pages/components";
-import { IconSelect } from "@/components";
 
 const serviceName = '菜单';
 
@@ -17,7 +17,6 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
-  const [parentItem, setParentItem] = useState<Rbac.RbacMenu | undefined>();
   const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
     return record ? record.level : undefined;
   });
@@ -44,8 +43,6 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
   function onFinish(fieldsValue: any) {
     const values = {
       ...fieldsValue,
-      linkUrl: record ? fieldsValue.linkUrl : `${parentItem ? parentItem.linkUrl : ''}${fieldsValue.linkUrl}`,
-      // birthday: getDateStr000(fieldsValue.birthday),
     };
     if (record) {
       invokeUpdateTask({ ...record, ...values });
@@ -103,7 +100,6 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
             <RbacMenuCascader
               showRoot
               onChangeWithItem={(_: any, raw: Rbac.RbacMenu|undefined) => {
-                setParentItem(raw)
                 form.setFieldValue('linkUrl', raw ? raw.linkUrl : '');
               }}
               disabledIds={record ? [record.id] : undefined}
