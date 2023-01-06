@@ -1,4 +1,4 @@
-import {GATE_APP} from '@fa-admin-pages/configs';
+import {GATE_APP} from '@/configs';
 import {BaseApi} from '@fa/ui';
 import {Admin} from '@/types';
 

@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Form, Input, Switch } from 'antd';
 import { ApiEffectLayoutContext, DictEnumApiRadio, DragModal, DragModalProps, FaUtils, UploadImgLocal } from '@fa/ui';
 import DepartmentCascade from '../helper/DepartmentCascade';
-import RbacRoleSelect from '@fa-admin-pages/pages/admin/system/hr/role/components/RbacRoleSelect';
+import RbacRoleSelect from '@features/fa-admin-pages/pages/admin/system/hr/role/components/RbacRoleSelect';
 import useBus from 'use-bus';
 import { Admin } from '@/types';
 import { rbacUserRoleApi, userApi } from '@/services';

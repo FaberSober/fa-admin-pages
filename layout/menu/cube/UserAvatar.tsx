@@ -4,7 +4,7 @@ import { Avatar, Menu, Popover } from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
 import { useNavigate } from 'react-router-dom';
-import { LangContext, UserLayoutContext } from "@fa-admin-pages/layout";
+import { LangContext, UserLayoutContext } from "@/layout";
 
 const UserPopoverContent = () => {
   const intl = useIntl();

@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ApiEffectLayout, PageLoading } from '@fa/ui';
-import { LangLayout, UserLayout } from "@fa-admin-pages/layout";
+import { LangLayout, UserLayout } from "@/layout";
 import MenuLayout from "./MenuLayout";
 
 

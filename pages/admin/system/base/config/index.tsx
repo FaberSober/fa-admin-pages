@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Segmented } from 'antd';
-import ConfigSystem from '@fa-admin-pages/pages/admin/system/base/config/cube/ConfigSystem';
-import ConfigStorage from '@fa-admin-pages/pages/admin/system/base/config/cube/storage/ConfigStorage';
+import ConfigSystem from './cube/ConfigSystem';
+import ConfigStorage from './cube/storage/ConfigStorage';
 import { DatabaseOutlined, SettingOutlined } from '@ant-design/icons';
 
 /**

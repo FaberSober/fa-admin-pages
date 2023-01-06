@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { useSocketIO } from '@/hooks';
 import SocketLayoutContext, { SocketLayoutContextProps } from './context/SocketLayoutContext';
-import { UserLayoutContext } from "@fa-admin-pages/layout";
+import { UserLayoutContext } from "@/layout";
 
 export interface SocketLayoutProps {
   children?: ReactNode | Element;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { SITE_INFO } from '@/configs/server.config';
+import { SITE_INFO } from '@/configs';
 
 /**
  * @author xu.pengfei

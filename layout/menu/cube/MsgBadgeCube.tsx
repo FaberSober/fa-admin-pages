@@ -5,7 +5,7 @@ import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';
 import { BellOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { UserLayoutContext } from "@fa-admin-pages/layout";
+import { UserLayoutContext } from "@/layout";
 
 function MsgList() {
   const { unreadCount, refreshUnreadCount } = useContext(UserLayoutContext);

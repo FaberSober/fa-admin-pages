@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
-import { UserLayoutContext } from "@fa-admin-pages/layout";
-import { userApi } from "@fa-admin-pages/services";
+import { UserLayoutContext } from "@/layout";
+import { userApi } from "@/services";
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };

@@ -6,7 +6,7 @@ import { Rbac } from '@/types';
 import { rbacRoleApi } from '@/services';
 import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
-import RbacUserRoleList from '@fa-admin-pages/pages/admin/system/hr/role/list/RbacUserRoleList';
+import RbacUserRoleList from './list/RbacUserRoleList';
 
 const serviceName = '角色';
 const biz = 'base_rbac_role';

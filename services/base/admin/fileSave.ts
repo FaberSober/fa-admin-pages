@@ -1,4 +1,4 @@
-import {GATE_APP} from '@fa-admin-pages/configs';
+import {GATE_APP} from '@/configs';
 import {BaseApi, Fa} from '@fa/ui';
 import {trim} from 'lodash';
 import {Admin} from '@/types';

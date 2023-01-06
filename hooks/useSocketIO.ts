@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { trim } from 'lodash';
 import { message } from 'antd';
 import { getToken } from '@fa/ui';
-import { UserLayoutContext } from '@fa-admin-pages/layout';
+import { UserLayoutContext } from '@/layout';
 
 export interface Props {
   query?: any;

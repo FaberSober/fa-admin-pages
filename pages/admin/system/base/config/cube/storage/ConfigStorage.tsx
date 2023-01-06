@@ -1,6 +1,6 @@
 import React from 'react';
 import {Tabs} from "antd";
-import ConfigStorageLocal from "@fa-admin-pages/pages/admin/system/base/config/cube/storage/ConfigStorageLocal";
+import ConfigStorageLocal from "./ConfigStorageLocal";
 
 /**
  * @author xu.pengfei
