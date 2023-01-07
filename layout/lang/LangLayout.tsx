@@ -2,8 +2,8 @@ import React, { createContext, useEffect, useState } from 'react';
 import { ConfigProvider } from 'antd';
 
 // antd国际化配置
-import zhCN from 'antd/locale/zh_CN';
-import enUS from 'antd/locale/en_US';
+import zhCN from 'antd/es/locale/zh_CN';
+import enUS from 'antd/es/locale/en_US';
 
 // i18n国际化
 import { IntlProvider } from 'react-intl';
