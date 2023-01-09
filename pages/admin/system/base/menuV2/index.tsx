@@ -77,6 +77,7 @@ export default function index() {
         extraEffectArgs={[current]}
       />
 
+      <RbacMenuModal title="编辑菜单" record={edit?.sourceData} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
     </div>
   );
 }
