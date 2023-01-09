@@ -9,7 +9,8 @@ export function HelloBanner() {
 }
 
 HelloBanner.displayName = "HelloBanner";
-HelloBanner.title = "组件HelloBanner";
+HelloBanner.title = "欢迎组件";
+HelloBanner.description = "欢迎组件";
 HelloBanner.showTitle = false; // 是否展示Card的Title
 HelloBanner.permission = ""; // 需要的权限
 HelloBanner.w = 16; // 宽度

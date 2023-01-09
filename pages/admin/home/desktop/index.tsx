@@ -137,8 +137,8 @@ export default function index() {
                   )}
                 >
                   <List.Item.Meta
-                    title={<a href="https://ant.design">{Component.title}</a>}
-                    description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                    title={<a onClick={() => handleAdd(item.i)}>{Component.title}</a>}
+                    description={Component.description}
                   />
                 </List.Item>
               )
