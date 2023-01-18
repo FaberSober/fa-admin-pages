@@ -188,7 +188,6 @@ namespace Admin {
   export interface FileSave extends Fa.BaseDelEntity {
     /** ID */
     id: string;
-
     /** 文件访问地址 */
     url: string;
     /** 文件大小，单位字节 */
@@ -221,6 +220,8 @@ namespace Admin {
     objectType: string;
     /** 附加属性 */
     attr: string;
+    /** md5 */
+    md5: string;
   }
 
   // -------------------------------------------- 系统-通知与公告 --------------------------------------------
