@@ -184,6 +184,18 @@ namespace Admin {
     roleNames: string;
   }
 
+  /** BASE-用户token */
+  export interface UserToken extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 用户ID */
+    userId: string;
+    /** 是否有效 */
+    valid: string;
+    /** 备注 */
+    remark: string;
+  }
+
   // -------------------------------------------- 系统-上传文件 --------------------------------------------
   export interface FileSave extends Fa.BaseDelEntity {
     /** ID */
