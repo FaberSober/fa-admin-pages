@@ -350,8 +350,14 @@ namespace Admin {
     os: string;
     /** 浏览器 */
     browser: string;
-    /** 浏览器版本 */
+    /** 浏览浏览器版本器版本 */
     version: string;
+    /** 客户端来源 */
+    faFrom: string;
+    /** 客户端版本号 */
+    versionCode: string;
+    /** 客户端版本名 */
+    versionName: string;
     /** 是否为移动终端 */
     mobile: boolean;
     /** 请求花费时间 */

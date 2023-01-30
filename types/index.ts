@@ -28,5 +28,8 @@ declare global {
     globalData: any;
     /** VANTA */
     VANTA: any;
+    FaFrom: any;
+    FaVersionCode: any;
+    FaVersionName: any;
   }
 }

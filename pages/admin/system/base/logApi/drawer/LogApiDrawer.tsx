@@ -23,11 +23,18 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="URL">{record.url}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
+          <Descriptions.Item label="操作系统">{record.os}</Descriptions.Item>
+          <Descriptions.Item label="浏览器">{record.browser}</Descriptions.Item>
+          <Descriptions.Item label="浏览器版本">{record.version}</Descriptions.Item>
           <Descriptions.Item label="IP">{record.crtHost}</Descriptions.Item>
           <Descriptions.Item label="请求花费时间">{record.duration}ms</Descriptions.Item>
           <Descriptions.Item label="省">{record.pro}</Descriptions.Item>
           <Descriptions.Item label="市">{record.city}</Descriptions.Item>
           <Descriptions.Item label="地址">{record.addr}</Descriptions.Item>
+          <Descriptions.Item label="客户端来源">{record.faFrom}</Descriptions.Item>
+          <Descriptions.Item label="客户端版本号">{record.versionCode}</Descriptions.Item>
+          <Descriptions.Item label="客户端版本名">{record.versionName}</Descriptions.Item>
+          <Descriptions.Item label="否为移动终端">{record.mobile ? '是' : '否'}</Descriptions.Item>
           <Descriptions.Item label="请求内容">
             {open && FaUtils.isJson(record.request) ? (
               <ReactJson

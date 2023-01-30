@@ -1,7 +1,7 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
 import { logApiApi } from '@/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
@@ -43,7 +43,10 @@ export default function LogApiList() {
       BaseTableUtils.genSimpleSorterColumn('操作系统', 'os', 100, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('浏览器', 'browser', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('浏览器版本', 'version', 120, sorter),
-      BaseTableUtils.genEnumSorterColumn('手机', 'mobile', 60, sorter, dicts, false),
+      BaseTableUtils.genBoolSorterColumn('手机', 'mobile', 60, sorter),
+      BaseTableUtils.genSimpleSorterColumn('来源', 'faFrom', 80, sorter),
+      BaseTableUtils.genSimpleSorterColumn('版本号', 'versionCode', 80, sorter),
+      BaseTableUtils.genSimpleSorterColumn('版本名', 'versionName', 80, sorter),
       {
         ...BaseTableUtils.genSimpleSorterColumn('请求大小', 'reqSize', 90, sorter),
         render: (val) => FaUtils.sizeToHuman(val / 8, 0),
@@ -64,10 +67,7 @@ export default function LogApiList() {
         render: (_, record) => (
           <Space>
             <LogApiDrawer record={record}>
-              <a>
-                <EyeOutlined />
-                查看
-              </a>
+              <FaHref icon={<EyeOutlined />} text="查看" />
             </LogApiDrawer>
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
