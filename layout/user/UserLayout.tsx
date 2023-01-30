@@ -1,8 +1,10 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { Admin, Rbac } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
-import { userApi, configSysApi, msgApi, rbacUserRoleApi } from '@/services';
+import { userApi, configSysApi, msgApi, rbacUserRoleApi, fileSaveApi } from '@/services';
+
 
 export interface UserLayoutContextProps {
   user: Admin.User;
@@ -79,5 +81,10 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
     refreshUnreadCount,
   };
 
-  return <UserLayoutContext.Provider value={contextValue}>{children}</UserLayoutContext.Provider>;
+  return (
+    <UserLayoutContext.Provider value={contextValue}>
+      {systemConfig && systemConfig.logo && <Favicon url={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} />}
+      {children}
+    </UserLayoutContext.Provider>
+  );
 }

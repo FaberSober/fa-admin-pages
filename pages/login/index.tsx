@@ -4,10 +4,11 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Button, Form, Input } from 'antd';
 import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, setToken } from '@fa/ui';
-import { authApi, configSysApi } from '@/services'
+import { authApi, configSysApi, fileSaveApi } from '@/services'
 import { SITE_INFO } from '@/configs';
 import styles from './login.module.scss';
 import { Admin } from '@/types';
+import Favicon from "react-favicon";
 
 
 export default function Login() {
@@ -61,6 +62,8 @@ export default function Login() {
   const loading = loadingEffect[authApi.getUrl('login')];
   return (
     <div ref={vantaRef} className={styles['main-container']}>
+      {systemConfig && systemConfig.logo && <Favicon url={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} />}
+
       <div className={styles.bannerDiv}>
         <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
         <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
