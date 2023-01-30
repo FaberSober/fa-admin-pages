@@ -55,7 +55,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
     return {
       parentId: get(record, 'parentId'),
       name: get(record, 'name'),
-      level: get(record, 'level'),
+      level: get(record, 'level', FaEnums.RbacMenuLevelEnum.MENU),
       icon: get(record, 'icon'),
       status: get(record, 'status', true),
       linkType: get(record, 'linkType', FaEnums.RbacLinkTypeEnum.INNER),
@@ -96,6 +96,9 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
             }
           }}
         >
+          <Form.Item name="level" label="菜单等级" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <DictEnumApiRadio enumName="RbacMenuLevelEnum" />
+          </Form.Item>
           <Form.Item name="parentId" label="上级菜单" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <RbacMenuCascader
               showRoot
@@ -107,9 +110,6 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
           </Form.Item>
           <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input />
-          </Form.Item>
-          <Form.Item name="level" label="菜单等级" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DictEnumApiRadio enumName="RbacMenuLevelEnum" />
           </Form.Item>
           <Form.Item name="status" label="是否启用" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />
