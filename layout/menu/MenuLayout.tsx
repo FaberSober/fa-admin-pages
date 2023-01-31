@@ -4,7 +4,7 @@ import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList } from "@fa/ui";
-import MenuLayoutContext, { MenuLayoutContextProps } from './context/MenuLayoutContext';
+import MenuLayoutContext, { MenuLayoutContextProps, OpenTabsItem } from './context/MenuLayoutContext';
 import { HelpCube, LangToggle, Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar } from "./cube";
 import { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@/services';
@@ -31,7 +31,8 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [menuSelPath, setMenuSelPath] = useState<string[]>([]); // 当前选中的菜单ID数组（不包含顶部block菜单）
   const [collapse, setCollapse] = useLocalStorage<boolean>('MenuLayout.collapse', false); // 是否折叠左侧菜单
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
-  const [openTabs, setOpenTabs] = useState<Rbac.RbacMenu[]>([]); // 受控-打开的标签页数组
+  const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
+  const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
 
   useEffect(() => {
     rbacUserRoleApi.getMyMenusTree().then((res) => {
@@ -51,6 +52,15 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   useEffect(() => {
     syncOpenMenuById(menuSelMenuId, menuFullTree);
   }, [collapse]);
+
+  function transMenuToTabItem(menu: Rbac.RbacMenu): OpenTabsItem {
+    return {
+      key: menu.id,
+      path: menu.linkUrl,
+      name: menu.name,
+      closeable: true,
+    }
+  }
 
   /**
    * 同步打开的菜单到页面布局
@@ -86,9 +96,9 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     setOpenSideMenuKeys(collapse ? [] : menuIds);
 
     // 加入已经打开的tabs
-    const tab = find(openTabs, (i) => i.id === menu.id);
+    const tab = find(openTabs, (i) => i.key === menu.id);
     if (isNil(tab)) {
-      setOpenTabs([...openTabs, menu]);
+      setOpenTabs([...openTabs, transMenuToTabItem(menu)]);
     }
   }
 
@@ -114,7 +124,18 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     openSideMenuKeys,
     setOpenSideMenuKeys,
     openTabs,
+    curTab,
+    setCurTab,
     setOpenTabs,
+    addTab: (tab: OpenTabsItem) => {
+      console.log('add tab', tab)
+      setOpenTabs([ ...openTabs, tab ])
+      setCurTab(tab);
+    },
+    removeTab: (tabKey: string) => {
+      console.log('close tab', tabKey)
+      setOpenTabs(openTabs.filter(i => i.key !== tabKey))
+    },
   };
 
   const faUiContextValue: FaUiContextProps = {

@@ -1,5 +1,14 @@
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 import { Fa, Rbac } from '@/types';
+
+export interface OpenTabsItem {
+  key: string; // 唯一key
+  path: string; // 页面URL
+  name: string; // 名称
+  type?: 'iframe' | 'inner'; // 打开页面类型，默认为inner
+  closeable?: boolean; // 是否可以关闭/** 图标标识 */
+  icon?: string;
+}
 
 export interface MenuLayoutContextProps {
   menuList: Rbac.RbacMenu[]; // 当前展示的菜单树
@@ -15,18 +24,22 @@ export interface MenuLayoutContextProps {
   setCollapse: (v: boolean) => void;
   openSideMenuKeys: string[];
   setOpenSideMenuKeys: (v: string[]) => void;
-  openTabs: Rbac.RbacMenu[]; // 打开的菜单历史记录
-  setOpenTabs: (v: Rbac.RbacMenu[]) => void;
+  openTabs: OpenTabsItem[]; // 打开的菜单历史记录
+  curTab: OpenTabsItem | undefined; // 当前选中的tab
+  setCurTab: (v: OpenTabsItem|undefined) => void;
+  setOpenTabs: (v: OpenTabsItem[]) => void;
+  addTab: (tab: OpenTabsItem) => void; // 添加新的tab
+  removeTab: (key: string) => void; // 添加新的tab
 }
 
-const MenuLayoutContext = createContext<MenuLayoutContextProps>({
+const MenuLayoutContext: React.Context<MenuLayoutContextProps> = createContext<MenuLayoutContextProps>({
   menuList: [],
   menuFullTree: [],
   menuTree: [],
   menuSelAppId: undefined,
+  menuSelPath: [],
   menuSelMenuId: undefined,
   setMenuSelMenuId: () => {},
-  menuSelPath: [],
   setMenuSelPath: () => {},
   setMenuSelAppId: () => {},
   collapse: false,
@@ -34,7 +47,11 @@ const MenuLayoutContext = createContext<MenuLayoutContextProps>({
   openSideMenuKeys: [],
   setOpenSideMenuKeys: () => {},
   openTabs: [],
+  curTab: undefined,
+  setCurTab: () => {},
   setOpenTabs: () => {},
+  addTab: () => {},
+  removeTab: () => {},
 });
 
 export default MenuLayoutContext;
