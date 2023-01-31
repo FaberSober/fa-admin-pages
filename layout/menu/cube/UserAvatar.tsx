@@ -3,27 +3,38 @@ import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } f
 import { Avatar, Menu, Popover } from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
-import { useNavigate } from 'react-router-dom';
-import { LangContext, UserLayoutContext } from "@/layout";
+import { LangContext, MenuLayoutContext, UserLayoutContext } from "@/layout";
 
 const UserPopoverContent = () => {
   const intl = useIntl();
-  const navigate = useNavigate();
   const { setColorPrimary } = useContext(LangContext);
   const { logout } = useContext(UserLayoutContext);
+  const { addTab } = useContext(MenuLayoutContext);
 
   // 头像下拉弹框-菜单点击
-  function handleHeadDropdownClick(key: string) {
-    // FIXME: 这里打开个人中心菜单后，需要在tabBar中打开对于的标签页
+  function handleHeadDropdownClick(key: any) {
+    // FIX-ME: 这里打开个人中心菜单后，需要在tabBar中打开对于的标签页
     switch (key) {
       case 'base':
-        navigate('/admin/system/account/base');
+        addTab({
+          key: key,
+          path: '/admin/system/account/base',
+          name: intl.formatMessage({ id: 'menu.account.center' }),
+        })
         break;
       case 'security':
-        navigate('/admin/system/account/security');
+        addTab({
+          key: key,
+          path: '/admin/system/account/security',
+          name: intl.formatMessage({ id: 'menu.account.security' }),
+        })
         break;
       case 'msg':
-        navigate('/admin/system/account/msg');
+        addTab({
+          key: key,
+          path: '/admin/system/account/msg',
+          name: intl.formatMessage({ id: 'menu.account.msg' }),
+        })
         break;
       case 'logout':
         logout();
