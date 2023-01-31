@@ -72,7 +72,17 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
 
     const menuArr = flatTreeList(tree);
     const menu = find(menuArr, (i) => i.id === openMenuId) as Rbac.RbacMenu;
+    if (menu === undefined) {
+      // 未找到对应的菜单，说明不是菜单页，是新开的自定义tab，无需同步菜单
+      const tabItem = find(openTabs, i => i.key === openMenuId);
+      setCurTab(tabItem)
+      if (tabItem) {
+        navigateTab(tabItem)
+      }
+      return;
+    }
 
+    // 设置选中的menuId，
     setMenuSelMenuId(openMenuId);
     // 打开页面
     navigate(menu.linkUrl);
@@ -98,7 +108,21 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     // 加入已经打开的tabs
     const tab = find(openTabs, (i) => i.key === menu.id);
     if (isNil(tab)) {
-      setOpenTabs([...openTabs, transMenuToTabItem(menu)]);
+      const tabItem = transMenuToTabItem(menu);
+      setOpenTabs([...openTabs, tabItem]);
+      setCurTab(tabItem)
+    } else {
+      setCurTab(tab)
+    }
+  }
+
+  function navigateTab(tabItem: OpenTabsItem|undefined) {
+    if (tabItem === undefined) return;
+    if (tabItem.type === 'iframe') {
+      window.FaIframeUrl = tabItem.path
+      navigate(`/admin/iframe`)
+    } else {
+      navigate(tabItem.path)
     }
   }
 
@@ -125,16 +149,27 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     setOpenSideMenuKeys,
     openTabs,
     curTab,
-    setCurTab,
+    setCurTab: (tab: OpenTabsItem|undefined) => {
+      syncOpenMenuById(tab?.key, menuFullTree)
+    },
     setOpenTabs,
     addTab: (tab: OpenTabsItem) => {
       console.log('add tab', tab)
-      setOpenTabs([ ...openTabs, tab ])
-      setCurTab(tab);
+      const tabFind = find(openTabs, i => i.key === tab.key);
+      if (tabFind) {
+        syncOpenMenuById(tabFind.key, menuFullTree)
+      } else {
+        setOpenTabs([ ...openTabs, tab ])
+        setCurTab(tab)
+        navigateTab(tab)
+      }
     },
     removeTab: (tabKey: string) => {
       console.log('close tab', tabKey)
       setOpenTabs(openTabs.filter(i => i.key !== tabKey))
+    },
+    selTab: (tabKey: string) => {
+      syncOpenMenuById(tabKey, menuFullTree)
     },
   };
 

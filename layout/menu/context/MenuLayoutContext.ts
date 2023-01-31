@@ -30,6 +30,7 @@ export interface MenuLayoutContextProps {
   setOpenTabs: (v: OpenTabsItem[]) => void;
   addTab: (tab: OpenTabsItem) => void; // 添加新的tab
   removeTab: (key: string) => void; // 添加新的tab
+  selTab: (key: string) => void; // 选中tab
 }
 
 const MenuLayoutContext: React.Context<MenuLayoutContextProps> = createContext<MenuLayoutContextProps>({
@@ -52,6 +53,7 @@ const MenuLayoutContext: React.Context<MenuLayoutContextProps> = createContext<M
   setOpenTabs: () => {},
   addTab: () => {},
   removeTab: () => {},
+  selTab: () => {},
 });
 
 export default MenuLayoutContext;

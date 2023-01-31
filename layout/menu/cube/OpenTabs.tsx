@@ -1,14 +1,13 @@
 import React, { useContext } from 'react';
 import { Tabs } from 'antd';
 import MenuLayoutContext from "../context/MenuLayoutContext";
-import { find } from "lodash";
 
 /**
  * @author xu.pengfei
  * @date 2022/9/23
  */
 export default function OpenTabs() {
-  const { openTabs, curTab, setOpenTabs, setCurTab } = useContext(MenuLayoutContext);
+  const { openTabs, curTab, setOpenTabs, selTab } = useContext(MenuLayoutContext);
 
   const remove = (targetKey: string) => {
     // 0. remove key
@@ -21,14 +20,14 @@ export default function OpenTabs() {
     const newPanes = openTabs.filter((item) => item.key !== targetKey);
 
     // 1. decide slide to new tab
-    let newActiveKey = curTab;
-    if (newPanes.length && newPanes.length > 0 && newActiveKey?.key === targetKey) {
+    let newActiveKey = curTab?.key;
+    if (newPanes.length && newPanes.length > 0 && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex];
+        newActiveKey = newPanes[lastIndex].key;
       } else {
-        newActiveKey = newPanes[0];
+        newActiveKey = newPanes[0].key;
       }
-      setCurTab(newActiveKey);
+      selTab(newActiveKey);
     }
     setOpenTabs(newPanes);
   };
@@ -42,10 +41,7 @@ export default function OpenTabs() {
       hideAdd
       type="editable-card"
       activeKey={curTab?.key}
-      onChange={(key:string) => {
-        const tabItem = find(openTabs, i => i.key === key);
-        setCurTab(tabItem)
-      }}
+      onChange={(key:string) => selTab(key)}
       onEdit={(targetKey:any) => remove(targetKey)}
       items={items}
     />
