@@ -9,6 +9,7 @@ import { SITE_INFO } from '@/configs';
 import styles from './login.module.scss';
 import { Admin } from '@/types';
 import Favicon from "react-favicon";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 
 export default function Login() {
@@ -61,36 +62,40 @@ export default function Login() {
 
   const loading = loadingEffect[authApi.getUrl('login')];
   return (
-    <div ref={vantaRef} className={styles['main-container']}>
-      {systemConfig && systemConfig.logo && <Favicon url={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} />}
+    <HelmetProvider>
+      <Helmet title={`登录 | ${systemConfig?.title}`} />
 
-      <div className={styles.bannerDiv}>
-        <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
-        <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
-      </div>
+      <div ref={vantaRef} className={styles['main-container']}>
+        {systemConfig && systemConfig.logo && <Favicon url={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} />}
 
-      <div className={styles.loginContainer}>
-        <div className={styles.title}>用户登录</div>
-        <Form form={form} onFinish={onFinish}>
-          <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
-            <Input size="large" prefix={<UserOutlined />} placeholder="请输入账号" />
-          </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-            <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
-          </Form.Item>
-          <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
-            <Input
-              size="large"
-              prefix={<FieldNumberOutlined />}
-              placeholder="请输入验证码"
-              addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />}
-            />
-          </Form.Item>
-          <Button size="large" block loading={loading} className={styles.submit} type="primary" htmlType="submit">
-            登录
-          </Button>
-        </Form>
+        <div className={styles.bannerDiv}>
+          <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
+          <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+        </div>
+
+        <div className={styles.loginContainer}>
+          <div className={styles.title}>用户登录</div>
+          <Form form={form} onFinish={onFinish}>
+            <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
+              <Input size="large" prefix={<UserOutlined />} placeholder="请输入账号" />
+            </Form.Item>
+            <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+              <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
+            </Form.Item>
+            <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
+              <Input
+                size="large"
+                prefix={<FieldNumberOutlined />}
+                placeholder="请输入验证码"
+                addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />}
+              />
+            </Form.Item>
+            <Button size="large" block loading={loading} className={styles.submit} type="primary" htmlType="submit">
+              登录
+            </Button>
+          </Form>
+        </div>
       </div>
-    </div>
+    </HelmetProvider>
   );
 }

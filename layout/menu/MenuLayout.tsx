@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Empty, Layout } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useLocalStorage } from 'react-use';
 import { Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList } from "@fa/ui";
 import MenuLayoutContext, { MenuLayoutContextProps, OpenTabsItem } from './context/MenuLayoutContext';
@@ -9,6 +10,7 @@ import { HelpCube, LangToggle, Logo, MenuAppHorizontal, OpenTabs, SideMenu, User
 import { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@/services';
 import './MenuLayout.css';
+import { UserLayoutContext } from "@features/fa-admin-pages/layout";
 
 
 /**
@@ -18,6 +20,7 @@ import './MenuLayout.css';
 export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const {systemConfig} = useContext(UserLayoutContext)
 
   // 将tree平铺的menu list
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);
@@ -34,6 +37,8 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
 
+  const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {})
+
   useEffect(() => {
     rbacUserRoleApi.getMyMenusTree().then((res) => {
       setMenuFullTree(res.data);
@@ -42,10 +47,26 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
 
       // 初始化选中的菜单
       let menu = find(menuArr, (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
-      if (menu === undefined) {
-        menu = menuArr[0];
+      if (menu) {
+        // 找到菜单
+        syncOpenMenuById(menu.id, res.data);
+      } else {
+        // 未找到菜单，解析打开的菜单
+        try {
+          console.log('faTabCache', faTabCache)
+          const cacheTabItem = faTabCache[location.pathname]
+          if (!isNil(cacheTabItem)) {
+            const itemFind = find(openTabs, i => i.key === cacheTabItem.key)
+            if (isNil(itemFind)) {
+              setOpenTabs([ ...openTabs, cacheTabItem ])
+            }
+            setCurTab(cacheTabItem)
+            navigateTab(cacheTabItem)
+            // justSyncOpenMenuById(cacheTabItem.linkMenuId, res.data);
+          }
+        } catch (e) {
+        }
       }
-      syncOpenMenuById(menu.id, res.data);
     });
   }, []);
 
@@ -61,6 +82,34 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       closeable: true,
     }
   }
+
+  // function justSyncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[]) {
+  //   if (openMenuId === undefined) return;
+  //
+  //   const menuArr = flatTreeList(tree);
+  //   const menu = find(menuArr, (i) => i.id === openMenuId) as Rbac.RbacMenu;
+  //   if (menu === undefined) return;
+  //
+  //   // 设置选中的menuId，
+  //   setMenuSelMenuId(openMenuId);
+  //   const menuPath = findTreePath(tree, (menu) => menu.sourceData.id === openMenuId);
+  //   const [id0, ...restIds] = menuPath;
+  //
+  //   // 顶部模块同步打开位置
+  //   const blocks = tree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);
+  //   const blockFind = find(blocks, (i) => i.id === id0.id);
+  //   if (blockFind) {
+  //     setMenuSelAppId(blockFind.id);
+  //     setMenuTree(blockFind.children || []);
+  //   } else {
+  //     setMenuTree([]);
+  //   }
+  //
+  //   // sider同步打开位置
+  //   const menuIds = restIds.map((i) => i.id);
+  //   setMenuSelPath(menuIds);
+  //   setOpenSideMenuKeys(collapse ? [] : menuIds);
+  // }
 
   /**
    * 同步打开的菜单到页面布局
@@ -153,16 +202,19 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       syncOpenMenuById(tab?.key, menuFullTree)
     },
     setOpenTabs,
-    addTab: (tab: OpenTabsItem) => {
-      console.log('add tab', tab)
-      const tabFind = find(openTabs, i => i.key === tab.key);
+    addTab: (tab1: OpenTabsItem) => {
+      const newTab = { ...tab1, linkMenuId: menuSelMenuId }
+      console.log('add tab', newTab)
+      const tabFind = find(openTabs, i => i.key === newTab.key);
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree)
       } else {
-        setOpenTabs([ ...openTabs, tab ])
-        setCurTab(tab)
-        navigateTab(tab)
+        setOpenTabs([ ...openTabs, newTab ])
+        setCurTab(newTab)
+        navigateTab(newTab)
       }
+      // cache tab info
+      setFaTabCache({ ...faTabCache, [newTab.path]: newTab })
     },
     removeTab: (tabKey: string) => {
       console.log('close tab', tabKey)
@@ -180,37 +232,41 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const hasRoutePermission = true; // TODO 判断是否有路由权限
   const width = collapse ? 'calc(100% - 44px)' : 'calc(100% - 200px)';
   return (
-    <MenuLayoutContext.Provider value={contextValue}>
-      <FaUiContext.Provider value={faUiContextValue}>
-        <Layout style={{ height: '100vh', width: '100vw' }}>
-          <Layout.Header className="fa-menu-header">
-            <Logo />
-            <MenuAppHorizontal />
-            <LangToggle />
-            <HelpCube />
-            <UserAvatar />
-          </Layout.Header>
+    <HelmetProvider>
+      <MenuLayoutContext.Provider value={contextValue}>
+        <FaUiContext.Provider value={faUiContextValue}>
+          <Layout style={{ height: '100vh', width: '100vw' }}>
+            <Helmet title={`${curTab ? curTab.name + ' | ' : ''}${systemConfig.title}`} />
 
-          <Layout style={{ flexDirection: 'row' }}>
-            <SideMenu />
+            <Layout.Header className="fa-menu-header">
+              <Logo />
+              <MenuAppHorizontal />
+              <LangToggle />
+              <HelpCube />
+              <UserAvatar />
+            </Layout.Header>
 
-            <Layout style={{ width }}>
-              {hasRoutePermission ? (
-                <div className="fa-full fa-flex-column">
-                  <div className="fa-menu-open-tabs">
-                    <OpenTabs />
+            <Layout style={{ flexDirection: 'row' }}>
+              <SideMenu />
+
+              <Layout style={{ width }}>
+                {hasRoutePermission ? (
+                  <div className="fa-full fa-flex-column">
+                    <div className="fa-menu-open-tabs">
+                      <OpenTabs />
+                    </div>
+                    <FaFlexRestLayout>
+                      <div className="fa-main">{children}</div>
+                    </FaFlexRestLayout>
                   </div>
-                  <FaFlexRestLayout>
-                    <div className="fa-main">{children}</div>
-                  </FaFlexRestLayout>
-                </div>
-              ) : (
-                <Empty description="403" />
-              )}
+                ) : (
+                  <Empty description="403" />
+                )}
+              </Layout>
             </Layout>
           </Layout>
-        </Layout>
-      </FaUiContext.Provider>
-    </MenuLayoutContext.Provider>
+        </FaUiContext.Provider>
+      </MenuLayoutContext.Provider>
+    </HelmetProvider>
   );
 }
