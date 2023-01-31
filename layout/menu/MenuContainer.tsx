@@ -4,6 +4,8 @@ import { ApiEffectLayout, PageLoading } from '@fa/ui';
 import { LangLayout, UserLayout } from "@/layout";
 import MenuLayout from "./MenuLayout";
 
+import 'allotment/dist/style.css';
+
 
 export default function MenuContainer() {
   return (
