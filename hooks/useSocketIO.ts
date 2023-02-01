@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { trim } from 'lodash';
-import { message } from 'antd';
 import { getToken } from '@fa/ui';
 import { UserLayoutContext } from '@/layout';
 
@@ -58,7 +57,8 @@ export default function useSocketIO({ query = { from: 'web', token: getToken() }
   const socketEmit = useCallback(
     (event: string, ...args: any[]) => {
       if (!ready) {
-        message.error('socket接口尚未准备好，请稍等');
+        console.error('socket接口尚未准备好，请稍等')
+        // message.error('socket接口尚未准备好，请稍等');
         return;
       }
       // console.log('socketEmit', socketRef.current);
