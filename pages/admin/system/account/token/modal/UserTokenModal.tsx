@@ -2,15 +2,15 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ApiEffectLayoutContext, BaseBoolRadio, DragModal, FaHref, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, DragModal, FaHref, FaUtils, CommonModalProps } from '@fa/ui';
 import { userTokenApi as api } from '@/services';
-import { Base } from '@/types';
+import { Admin } from '@/types';
 
 
 /**
  * BASE-用户token实体新增、编辑弹框
  */
-export default function UserTokenModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: Fa.CommonModalProps<Base.UserToken>) {
+export default function UserTokenModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.UserToken>) {
   const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [form] = Form.useForm();
 
