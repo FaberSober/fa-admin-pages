@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import { trim } from 'lodash';
-import { ApiEffectLayoutContext, Captcha, setToken } from '@fa/ui';
+import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken } from '@fa/ui';
 import { authApi, configSysApi, fileSaveApi } from '@/services'
 import { SITE_INFO } from '@/configs';
 import styles from './login.module.scss';
@@ -46,6 +46,7 @@ export default function Login() {
   function onFinish(fieldsValue: any) {
     authApi.login(fieldsValue.username, fieldsValue.password).then((res) => {
       setToken(res.data);
+      setLoginMode(LoginMode.LOCAL)
       navigate(SITE_INFO.HOME_LINK);
     });
   }

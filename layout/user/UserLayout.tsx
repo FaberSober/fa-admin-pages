@@ -3,7 +3,7 @@ import { Admin, Rbac } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
-import { userApi, configSysApi, msgApi, rbacUserRoleApi, fileSaveApi, authApi } from '@/services';
+import { authApi, configSysApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@/services';
 
 
 export interface UserLayoutContextProps {
@@ -53,8 +53,10 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   }
 
   function logout() {
-    clearToken();
-    authApi.logout().then(() => navigate('/login'))
+    authApi.logout().then(res => {
+      clearToken();
+      navigate(res.data)
+    })
   }
 
   function refreshUnreadCount() {
