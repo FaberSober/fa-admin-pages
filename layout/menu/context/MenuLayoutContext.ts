@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import React, { createContext, ReactNode } from 'react';
 import { Fa, Rbac } from '@/types';
 
 export interface OpenTabsItem {
@@ -7,7 +7,7 @@ export interface OpenTabsItem {
   name: string; // 名称
   type?: 'iframe' | 'inner'; // 打开页面类型，默认为inner
   closeable?: boolean; // 是否可以关闭/** 图标标识 */
-  icon?: string;
+  icon?: string|ReactNode;
   linkMenuId?: string; // 对应需要打开的菜单ID
 }
 

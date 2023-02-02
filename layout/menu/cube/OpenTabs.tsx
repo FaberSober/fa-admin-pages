@@ -34,7 +34,13 @@ export default function OpenTabs() {
 
   const items = openTabs.map((i) => ({
     key: i.key,
-    label: i.name,
+    label: (
+      <span>
+        <span>{i.icon}</span>
+        <span>{i.name}</span>
+      </span>
+    ),
+    closable: i.closeable,
   }));
   return (
     <Tabs
