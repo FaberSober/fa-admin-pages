@@ -17,7 +17,7 @@ export function HelloBanner() {
 
   return (
     <div style={{ padding: 12 }}>
-      <div style={{fontSize: '18px', fontWeight: 600}} className="fa-mb12">Hello, {user.name}.</div>
+      <div style={{fontSize: '18px', fontWeight: 600}} className="fa-mb12">欢迎，{user.name}.</div>
       <div>{time}</div>
     </div>
   );
