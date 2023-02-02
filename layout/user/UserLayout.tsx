@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { Admin, Rbac } from '@/types';
-import { useNavigate } from 'react-router-dom';
 import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
 import { authApi, configSysApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@/services';
@@ -34,8 +33,6 @@ export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any
  * @date 2022/9/21
  */
 export default function UserLayout({ children }: Fa.BaseChildProps) {
-  const navigate = useNavigate();
-
   const [user, setUser] = useState<Admin.User>();
   const [roles, setRoles] = useState<Rbac.RbacRole[]>([]);
   const [systemConfig, setSystemConfig] = useState<Admin.SystemConfigPo>(defaultConfig);
@@ -55,7 +52,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   function logout() {
     authApi.logout().then(res => {
       clearToken();
-      navigate(res.data)
+      window.location.href = res.data;
     })
   }
 
