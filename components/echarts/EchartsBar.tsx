@@ -3,6 +3,7 @@ import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import { ECharts, BarSeriesOption } from 'echarts';
 import { Fa } from '@fa/ui'
+import { useSize } from "ahooks";
 
 
 export interface EchartsBarProps {
@@ -23,6 +24,16 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())
   const [ready, setReady] = useState(false)
+
+  const domRef = useRef<any | null>();
+  const size = useSize(domRef);
+
+  useEffect(() => {
+    // console.log('size', size)
+    if (!ready) return;
+
+    chartRef.current!.resize();
+  }, [size])
 
   useEffect(() => {
     // 基于准备好的dom，初始化echarts实例
@@ -73,7 +84,7 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
   }, [data])
 
   return (
-    <div style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
+    <div ref={domRef} style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
       <div id={id} style={{ height: '100%', width: '100%' }} />
     </div>
   )

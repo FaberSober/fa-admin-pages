@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import * as homecubes from '@/homecubes'
 import { FaGridLayout } from "@/components";
 import { Layout } from "react-grid-layout";
-import { each } from "lodash";
+import { each, isNil } from "lodash";
 import { Button, Card, List, Space, Spin, Switch } from "antd";
 import { configApi } from '@/services'
 import { Admin } from '@/types'
@@ -126,6 +126,9 @@ export default function index() {
             size="small"
             renderItem={(item) => {
               const Component = (homecubes as any)[item.i];
+              if (isNil(Component)) {
+                return null;
+              }
               const sel = inIds.indexOf(item.i) > -1
               return (
                 <List.Item

@@ -23,7 +23,7 @@ export function HelloBanner() {
   );
 }
 
-HelloBanner.displayName = "HelloBanner";
+HelloBanner.displayName = "HelloBanner"; // 必须与方法名称一致
 HelloBanner.title = "欢迎组件";
 HelloBanner.description = "欢迎组件";
 HelloBanner.showTitle = false; // 是否展示Card的Title
