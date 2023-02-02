@@ -1,7 +1,7 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
 import { logApiApi } from '@/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
@@ -86,6 +86,15 @@ export default function LogApiList() {
         <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
+            <Form.Item name="crud" label="类型">
+              <DictEnumApiSelector enumName="LogCrudEnum" />
+            </Form.Item>
+            <Form.Item name="biz" label="模块">
+              <Input placeholder="请输入模块" />
+            </Form.Item>
+            <Form.Item name="opr" label="操作">
+              <Input placeholder="请输入操作" />
+            </Form.Item>
             <Form.Item name="url" label="URL">
               <Input placeholder="请输入请求URL" />
             </Form.Item>

@@ -3,7 +3,7 @@ import { Admin, Rbac } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
-import { userApi, configSysApi, msgApi, rbacUserRoleApi, fileSaveApi } from '@/services';
+import { userApi, configSysApi, msgApi, rbacUserRoleApi, fileSaveApi, authApi } from '@/services';
 
 
 export interface UserLayoutContextProps {
@@ -26,15 +26,7 @@ const defaultConfig: Admin.SystemConfigPo = {
   socketUrl: '',
 };
 
-export const UserLayoutContext = createContext<UserLayoutContextProps>({
-  user: undefined!,
-  roles: [],
-  refreshUser: () => {},
-  logout: () => {},
-  systemConfig: defaultConfig,
-  unreadCount: 0,
-  refreshUnreadCount: () => {},
-});
+export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any);
 
 /**
  * 登录后的用户上下文
@@ -62,7 +54,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
 
   function logout() {
     clearToken();
-    navigate('/login');
+    authApi.logout().then(() => navigate('/login'))
   }
 
   function refreshUnreadCount() {
