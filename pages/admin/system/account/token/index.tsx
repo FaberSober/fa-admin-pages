@@ -16,7 +16,7 @@ export default function UserTokenList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, dicts, paginationProps } =
-    useTableQueryParams<Admin.UserToken>(api.page, {}, serviceName)
+    useTableQueryParams<Admin.UserToken>(api.minePage, {}, serviceName)
 
   const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
   const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
