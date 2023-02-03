@@ -29,6 +29,7 @@
 .loginContainer {
   position: absolute;
   top: calc(50vh - 150px);
+  min-width: 380px;
   right: 200px;
   padding: 24px;
   background-color: #fff;

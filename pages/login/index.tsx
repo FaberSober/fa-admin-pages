@@ -83,14 +83,16 @@ export default function Login() {
             <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
               <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
             </Form.Item>
-            <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
-              <Input
-                size="large"
-                prefix={<FieldNumberOutlined />}
-                placeholder="请输入验证码"
-                addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />}
-              />
-            </Form.Item>
+            {systemConfig?.safeCaptchaOn && (
+              <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
+                <Input
+                  size="large"
+                  prefix={<FieldNumberOutlined />}
+                  placeholder="请输入验证码"
+                  addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />}
+                />
+              </Form.Item>
+            )}
             <Button size="large" block loading={loading} className={styles.submit} type="primary" htmlType="submit">
               登录
             </Button>

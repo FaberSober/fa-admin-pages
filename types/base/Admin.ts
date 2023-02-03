@@ -55,6 +55,7 @@ namespace Admin {
     logoWithText: string;
     portalLink: string;
     storeLocalPath: string;
+    safeCaptchaOn: boolean; // [安全]是否开启验证码
   }
 
   // -------------------------------------------- 系统-字典值 --------------------------------------------
@@ -327,6 +328,8 @@ namespace Admin {
     phpRedisAdmin: string;
     /** [Web]SocketIO服务地址 */
     socketUrl: string;
+    /** [安全]是否开启验证码 */
+    safeCaptchaOn: boolean;
   }
 
   // -------------------------------------------- 系统-URL请求日志 --------------------------------------------

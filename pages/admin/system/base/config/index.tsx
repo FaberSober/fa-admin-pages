@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Segmented } from 'antd';
 import ConfigSystem from './cube/ConfigSystem';
+import ConfigSafe from './cube/ConfigSafe';
 import ConfigStorage from './cube/storage/ConfigStorage';
-import { DatabaseOutlined, SettingOutlined } from '@ant-design/icons';
+import { DatabaseOutlined, SafetyCertificateOutlined, SettingOutlined } from '@ant-design/icons';
 
 /**
  * 系统配置
@@ -24,6 +25,11 @@ export default function index() {
             icon: <SettingOutlined />,
           },
           {
+            label: '安全配置',
+            value: 'safe',
+            icon: <SafetyCertificateOutlined />,
+          },
+          {
             label: '文件配置',
             value: 'file',
             icon: <DatabaseOutlined />,
@@ -32,8 +38,9 @@ export default function index() {
       />
 
       <div className="fa-mt12 fa-bg-white">
-        {tab === 'system' && <ConfigSystem />}
-        {tab === 'file' && <ConfigStorage />}
+        {tab === 'system'   && <ConfigSystem />}
+        {tab === 'safe'     && <ConfigSafe />}
+        {tab === 'file'     && <ConfigStorage />}
       </div>
     </div>
   );

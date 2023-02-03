@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, FaUtils, UploadImgLocal } from '@fa/ui';
-import { Button, Col, Form, Input, Row, Space } from 'antd';
+import { ApiEffectLayoutContext, BaseBoolRadio, FaUtils } from '@fa/ui';
+import { Button, Col, Form, Row, Space } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { configSysApi } from '@/services';
 import { Admin } from '@/types';
@@ -10,7 +10,7 @@ import { Admin } from '@/types';
  * @author xu.pengfei
  * @date 2022/12/11 22:48
  */
-export default function ConfigSystem() {
+export default function ConfigSafe() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
   const [configSys, setConfigSys] = useState<Admin.ConfigSys>();
@@ -47,30 +47,8 @@ export default function ConfigSystem() {
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Row gutter={12}>
           <Col md={8}>
-            <Form.Item name="logo" label="系统LOGO" rules={[{ required: true }]}>
-              <UploadImgLocal />
-            </Form.Item>
-          </Col>
-          <Col md={8}>
-            <Form.Item name="logoWithText" label="系统LOGO（带文字）" rules={[{ required: true }]}>
-              <UploadImgLocal />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={12}>
-          <Col md={8}>
-            <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col md={8}>
-            <Form.Item name="subTitle" label="网站副标题" rules={[{ required: true }]}>
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col md={8}>
-            <Form.Item name="cop" label="版权信息" rules={[{ required: true }]}>
-              <Input />
+            <Form.Item name="safeCaptchaOn" label="是否开启验证码" rules={[{ required: true }]}>
+              <BaseBoolRadio />
             </Form.Item>
           </Col>
         </Row>
