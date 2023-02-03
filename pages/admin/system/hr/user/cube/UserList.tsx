@@ -9,6 +9,7 @@ import UserModal from '../modal/UserModal';
 import { DepartmentCascade } from '@/components';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
+import UsersChangePwdModal from "./modal/UsersChangePwdModal";
 
 const serviceName = '用户';
 const biz = 'UserList-v2';
@@ -128,7 +129,7 @@ export default function UserList({ departmentId }: IProps) {
           <Space>
             <UsersChangeDeptModal userIds={rowKeys} fetchFinish={fetchPageList} />
             <UsersChangeRoleModal userIds={rowKeys} fetchFinish={fetchPageList} />
-            <Button>修改密码</Button>
+            <UsersChangePwdModal  userIds={rowKeys} fetchFinish={fetchPageList} />
           </Space>
         )}
       />

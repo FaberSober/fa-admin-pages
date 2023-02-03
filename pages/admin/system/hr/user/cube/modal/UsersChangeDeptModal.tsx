@@ -11,7 +11,7 @@ interface UsersChangeDeptModalProps extends DragModalProps {
 }
 
 /**
- * 批量更新部门
+ * 批量修改部门
  */
 export default function UsersChangeDeptModal({ children, userIds, fetchFinish, ...props }: UsersChangeDeptModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
@@ -21,7 +21,7 @@ export default function UsersChangeDeptModal({ children, userIds, fetchFinish, .
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
     userApi.updateBatchDept({userIds, departmentId: fieldsValue.departmentId}).then((res) => {
-      FaUtils.showResponse(res, '批量更新部门');
+      FaUtils.showResponse(res, '批量修改部门');
       setOpen(false);
       if (fetchFinish) fetchFinish();
     });

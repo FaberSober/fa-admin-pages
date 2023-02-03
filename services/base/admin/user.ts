@@ -22,6 +22,9 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   /** 批量更新角色 */
   updateBatchRole = (params: { userIds: string[], roleIds: string[] }): Promise<Fa.Ret> => this.post('updateBatchRole', params);
 
+  /** 批量更新密码 */
+  updateBatchPwd = (params: { userIds: string[], newPwd: string, passwordCheck: string }): Promise<Fa.Ret> => this.post('updateBatchPwd', params);
+
   /** ------------------------------------------ 个人账户 操作接口 ------------------------------------------ */
 
   /** 更新个人账户基本信息 */

@@ -36,7 +36,7 @@ export default function UsersChangeRoleModal({ children, userIds, fetchFinish, .
     <span>
       <span onClick={() => showModal()}><Button>修改角色</Button></span>
       <DragModal
-        title="批量修改部门"
+        title="批量修改角色"
         open={open}
         onOk={() => form.submit()}
         confirmLoading={loading}
