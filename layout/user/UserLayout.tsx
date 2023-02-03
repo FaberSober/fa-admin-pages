@@ -15,16 +15,6 @@ export interface UserLayoutContextProps {
   refreshUnreadCount: () => void;
 }
 
-const defaultConfig: Admin.SystemConfigPo = {
-  title: '',
-  subTitle: '',
-  logo: '',
-  logoWithText: '',
-  portalLink: '',
-  phpRedisAdmin: '',
-  socketUrl: '',
-};
-
 export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any);
 
 /**
@@ -35,7 +25,7 @@ export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any
 export default function UserLayout({ children }: Fa.BaseChildProps) {
   const [user, setUser] = useState<Admin.User>();
   const [roles, setRoles] = useState<Rbac.RbacRole[]>([]);
-  const [systemConfig, setSystemConfig] = useState<Admin.SystemConfigPo>(defaultConfig);
+  const [systemConfig, setSystemConfig] = useState<Admin.SystemConfigPo>();
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
@@ -61,6 +51,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   }
 
   if (user === undefined) return <PageLoading />;
+  if (systemConfig === undefined) return <PageLoading />;
 
   const contextValue: UserLayoutContextProps = {
     user,

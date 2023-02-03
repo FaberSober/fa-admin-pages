@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, BaseBoolRadio, FaUtils } from '@fa/ui';
-import { Button, Col, Form, Row, Space } from 'antd';
+import { ApiEffectLayoutContext, BaseBoolRadio, DictEnumApiSelector, FaUtils } from '@fa/ui';
+import { Button, Col, Form, InputNumber, Row, Space } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { configSysApi } from '@/services';
 import { Admin } from '@/types';
@@ -41,6 +41,15 @@ export default function ConfigSafe() {
     });
   }
 
+  function validateSafePasswordLen() {
+    const safePasswordLenMin = form.getFieldValue('safePasswordLenMin');
+    const safePasswordLenMax = form.getFieldValue('safePasswordLenMax');
+    if (safePasswordLenMin > safePasswordLenMax) {
+      return Promise.reject('密码最大长度要大于最小长度');
+    }
+    return Promise.resolve();
+  }
+
   const loading = loadingEffect[configSysApi.getUrl('update')];
   return (
     <div className="fa-p12">
@@ -49,6 +58,23 @@ export default function ConfigSafe() {
           <Col md={8}>
             <Form.Item name="safeCaptchaOn" label="是否开启验证码" rules={[{ required: true }]}>
               <BaseBoolRadio />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={12}>
+          <Col md={8}>
+            <Form.Item name="safePasswordType" label="密码类型" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+              <DictEnumApiSelector enumName="ConfigSysSafePasswordTypeEnum" />
+            </Form.Item>
+          </Col>
+          <Col md={8}>
+            <Form.Item name="safePasswordLenMin" label="密码最小长度" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+              <InputNumber min={1} max={30} />
+            </Form.Item>
+          </Col>
+          <Col md={8}>
+            <Form.Item name="safePasswordLenMax" label="密码最大长度" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+              <InputNumber min={1} max={30} />
             </Form.Item>
           </Col>
         </Row>

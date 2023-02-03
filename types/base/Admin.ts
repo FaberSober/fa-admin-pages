@@ -56,6 +56,51 @@ namespace Admin {
     portalLink: string;
     storeLocalPath: string;
     safeCaptchaOn: boolean; // [安全]是否开启验证码
+    /**
+     * [安全]密码类型
+     */
+    safePasswordType: FaEnums.ConfigSysSafePasswordTypeEnum;
+    /**
+     * [安全]密码最小长度
+     */
+    safePasswordLenMin: number;
+    /**
+     * [安全]密码最大长度
+     */
+    safePasswordLenMax: number;
+  }
+
+
+  // -------------------------------------------- 系统配置参数 --------------------------------------------
+  export interface SystemConfigPo {
+    /** [网站]标题 */
+    title: string;
+    /** [网站]副标题 */
+    subTitle: string;
+    /** [网站]logo */
+    logo: string;
+    /** [网站]logo带文字 */
+    logoWithText: string;
+    /** [官网]地址 */
+    portalLink: string;
+    /** [Web]redis web管理页面地址 */
+    phpRedisAdmin: string;
+    /** [Web]SocketIO服务地址 */
+    socketUrl: string;
+    /** [安全]是否开启验证码 */
+    safeCaptchaOn: boolean;
+    /**
+     * [安全]密码类型
+     */
+    safePasswordType: FaEnums.ConfigSysSafePasswordTypeEnum;
+    /**
+     * [安全]密码最小长度
+     */
+    safePasswordLenMin: number;
+    /**
+     * [安全]密码最大长度
+     */
+    safePasswordLenMax: number;
   }
 
   // -------------------------------------------- 系统-字典值 --------------------------------------------
@@ -310,26 +355,6 @@ namespace Admin {
     buzzType: string;
     /** 业务ID  */
     buzzId: string;
-  }
-
-  // -------------------------------------------- 系统配置参数 --------------------------------------------
-  export interface SystemConfigPo {
-    /** [网站]标题 */
-    title: string;
-    /** [网站]副标题 */
-    subTitle: string;
-    /** [网站]logo */
-    logo: string;
-    /** [网站]logo带文字 */
-    logoWithText: string;
-    /** [官网]地址 */
-    portalLink: string;
-    /** [Web]redis web管理页面地址 */
-    phpRedisAdmin: string;
-    /** [Web]SocketIO服务地址 */
-    socketUrl: string;
-    /** [安全]是否开启验证码 */
-    safeCaptchaOn: boolean;
   }
 
   // -------------------------------------------- 系统-URL请求日志 --------------------------------------------

@@ -3,6 +3,7 @@ import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
 import { UserLayoutContext } from "@/layout";
 import { userApi } from "@/services";
+import { validatePasswordSafeRule } from "@/components";
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
@@ -13,7 +14,7 @@ const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
  */
 export default function AccountPwdUpdate() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const { logout } = useContext(UserLayoutContext);
+  const { systemConfig, logout } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
 
   function onFinish(fieldValues: any) {
@@ -22,19 +23,22 @@ export default function AccountPwdUpdate() {
     });
   }
 
-  async function validateNewPwd(_rule: any, value: any) {
+  function validateNewPwd(_rule: any, value: any) {
     form.setFieldsValue({ newPwdConfirm: undefined });
     const oldPwd = form.getFieldValue('oldPwd');
     if (oldPwd === value) {
-      throw new Error('新旧密码不能一样');
+      return Promise.reject('新旧密码不能一样');
     }
+
+    return validatePasswordSafeRule(value, systemConfig);
   }
 
-  async function validateNewPwdConfirm(_rule: any, value: any) {
+  function validateNewPwdConfirm(_rule: any, value: any) {
     const newPwd = form.getFieldValue('newPwd');
     if (newPwd !== value) {
       throw new Error('两次输入密码不一致');
     }
+    return Promise.resolve();
   }
 
   const loading = loadingEffect[userApi.getUrl('updateMyPwd')];
