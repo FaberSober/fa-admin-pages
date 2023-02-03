@@ -6,7 +6,8 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref
 import { Admin } from '@/types';
 import { userApi } from '@/services';
 import UserModal from '../modal/UserModal';
-import DepartmentCascade from '../helper/DepartmentCascade';
+import { DepartmentCascade } from '@/components';
+import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 
 const serviceName = '用户';
 const biz = 'UserList-v2';
@@ -18,19 +19,8 @@ interface IProps {
 export default function UserList({ departmentId }: IProps) {
   const [form] = Form.useForm();
 
-  const {
-    queryParams,
-    setFormValues,
-    handleTableChange,
-    setExtraParams,
-    setSceneId,
-    setConditionList,
-    fetchPageList,
-    loading,
-    list,
-    dicts,
-    paginationProps,
-  } = useTableQueryParams<Admin.UserWeb>(
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, dicts, paginationProps } =
+    useTableQueryParams<Admin.UserWeb>(
     userApi.page,
     { extraParams: { departmentIdSuper: departmentId }, sorter: { field: 'crtTime', order: 'descend' } },
     serviceName,
@@ -133,6 +123,13 @@ export default function UserList({ departmentId }: IProps) {
         showBatchBelBtn={false}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
+        renderCheckBtns={rowKeys => (
+          <Space>
+            <UsersChangeDeptModal userIds={rowKeys} />
+            <Button>修改角色</Button>
+            <Button>修改密码</Button>
+          </Space>
+        )}
       />
     </div>
   );

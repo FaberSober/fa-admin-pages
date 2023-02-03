@@ -16,6 +16,9 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   /** 分页查询 */
   pageOut = (params: UserWebQuery): Promise<Fa.Ret<Fa.Page<Admin.UserWeb>>> => this.post(`pageOut`, params);
 
+  /** 批量更新部门 */
+  updateInfoBatch = (params: { userIds: string[], departmentId: string }): Promise<Fa.Ret> => this.post('updateInfoBatch', params);
+
   /** ------------------------------------------ 个人账户 操作接口 ------------------------------------------ */
 
   /** 更新个人账户基本信息 */
