@@ -1,27 +1,27 @@
 import React, { useContext, useState } from 'react';
 import { Button, Form } from 'antd';
 import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import { DepartmentCascade } from '@/components';
+import { RbacRoleSelect } from '@/components';
 import { userApi } from '@/services';
 
 
-interface UsersChangeDeptModalProps extends DragModalProps {
+interface UsersChangeRoleModalProps extends DragModalProps {
   userIds: string[];
   fetchFinish?: () => void;
 }
 
 /**
- * 批量更新部门
+ * 批量更新角色
  */
-export default function UsersChangeDeptModal({ children, userIds, fetchFinish, ...props }: UsersChangeDeptModalProps) {
+export default function UsersChangeRoleModal({ children, userIds, fetchFinish, ...props }: UsersChangeRoleModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
-    userApi.updateBatchDept({userIds, departmentId: fieldsValue.departmentId}).then((res) => {
-      FaUtils.showResponse(res, '批量更新部门');
+    userApi.updateBatchRole({userIds, roleIds: fieldsValue.roleIds}).then((res) => {
+      FaUtils.showResponse(res, '批量更新角色');
       setOpen(false);
       if (fetchFinish) fetchFinish();
     });
@@ -34,7 +34,7 @@ export default function UsersChangeDeptModal({ children, userIds, fetchFinish, .
   const loading = loadingEffect[userApi.getUrl('save')]
   return (
     <span>
-      <span onClick={() => showModal()}><Button>修改部门</Button></span>
+      <span onClick={() => showModal()}><Button>修改角色</Button></span>
       <DragModal
         title="批量修改部门"
         open={open}
@@ -45,8 +45,8 @@ export default function UsersChangeDeptModal({ children, userIds, fetchFinish, .
         {...props}
       >
         <Form form={form} onFinish={onFinish}>
-          <Form.Item name="departmentId" label="部门" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DepartmentCascade />
+          <Form.Item name="roleIds" label="角色" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <RbacRoleSelect mode="multiple" />
           </Form.Item>
         </Form>
       </DragModal>

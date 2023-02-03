@@ -8,6 +8,7 @@ import { userApi } from '@/services';
 import UserModal from '../modal/UserModal';
 import { DepartmentCascade } from '@/components';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
+import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
 
 const serviceName = '用户';
 const biz = 'UserList-v2';
@@ -125,8 +126,8 @@ export default function UserList({ departmentId }: IProps) {
         onConditionChange={(cL) => setConditionList(cL)}
         renderCheckBtns={rowKeys => (
           <Space>
-            <UsersChangeDeptModal userIds={rowKeys} />
-            <Button>修改角色</Button>
+            <UsersChangeDeptModal userIds={rowKeys} fetchFinish={fetchPageList} />
+            <UsersChangeRoleModal userIds={rowKeys} fetchFinish={fetchPageList} />
             <Button>修改密码</Button>
           </Space>
         )}
