@@ -9,7 +9,16 @@ export interface UserWebQuery extends Fa.BasePageProps {
   tel: string;
 }
 
+export interface UserRegistryVo {
+  username: string;
+  name: string;
+  tel: string;
+  password: string;
+  passwordConfirm: string;
+}
+
 class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
+
   /** 获取用户信息 */
   getLoginUser = (): Promise<Fa.Ret<Admin.User>> => this.get('getLoginUser');
 
@@ -32,6 +41,15 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 更新个人账户密码 */
   updateMyPwd = (params: any): Promise<Fa.Ret> => this.post('updateMyPwd', params);
+
+  /** ------------------------------------------ biz 操作接口 ------------------------------------------ */
+
+  /** 不鉴权计数 */
+  jumpCount = (params: {username?:string,tel?:string}): Promise<Fa.Ret<number>> => this.post('jumpCount', params);
+
+  /** 注册 */
+  registry = (params: UserRegistryVo): Promise<Fa.Ret<boolean>> => this.post('registry', params);
+
 }
 
 export default new User(GATE_APP.admin, serviceModule);

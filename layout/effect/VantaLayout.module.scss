@@ -1,0 +1,46 @@
+.main-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  //background-image: url('~@/assets/images/login/login_bg.jpg');
+  //background-repeat: no-repeat;
+  //background-size: 100% 100%;
+}
+
+.bannerDiv {
+  position: absolute;
+  left: 200px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.bannerTitle {
+  font-size: 50px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.bannerSubTitle {
+  font-size: 20px;
+  color: #fff;
+}
+
+.mainDiv {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.main {
+  width: 380px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 40px 28px 2px rgba(0, 132, 255, 0.33);
+}

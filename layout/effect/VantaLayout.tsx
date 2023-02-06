@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext, useEffect, useRef } from 'react';
 import { ConfigLayoutContext } from "@/layout";
-import styles from "@features/fa-admin-pages/pages/login/login.module.scss";
+import styles from "./VantaLayout.module.scss";
 
 
 export interface VantaLayoutProps {
@@ -38,12 +38,16 @@ export default function VantaLayout({children}: VantaLayoutProps) {
   return (
     <div ref={vantaRef} className={styles['main-container']}>
       <div className={styles.bannerDiv}>
-        <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
-        <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+        <div>
+          <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
+          <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+        </div>
       </div>
 
-      <div className={styles.loginContainer}>
-        {children}
+      <div className={styles.mainDiv}>
+        <div className={styles.main}>
+          {children}
+        </div>
       </div>
     </div>
   )

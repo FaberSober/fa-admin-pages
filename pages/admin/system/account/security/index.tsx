@@ -36,7 +36,7 @@ export default function AccountPwdUpdate() {
   function validateNewPwdConfirm(_rule: any, value: any) {
     const newPwd = form.getFieldValue('newPwd');
     if (newPwd !== value) {
-      throw new Error('两次输入密码不一致');
+      throw Promise.reject('两次输入密码不一致');
     }
     return Promise.resolve();
   }

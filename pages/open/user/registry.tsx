@@ -1,49 +1,29 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
-import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken } from '@fa/ui';
-import { authApi } from '@/services'
-import { SITE_INFO } from '@/configs';
+import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
+import { userApi } from '@/services'
 import { Helmet } from "react-helmet-async";
-import { ConfigLayoutContext } from "@/layout";
+import { ConfigLayoutContext, VantaLayout } from "@/layout";
 import styles from '@features/fa-admin-pages/pages/login/login.module.scss';
 
 
+const formItemLayout = { labelCol: { span: 5 }, wrapperCol: { span: 19 } };
+
 export default function Login() {
-  const vantaRef = useRef<any>();
-  const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const { systemConfig } = useContext(ConfigLayoutContext);
+  const {loadingEffect} = useContext(ApiEffectLayoutContext);
+  const {systemConfig} = useContext(ConfigLayoutContext);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const [code, setCode] = useState('');
 
-  useEffect(() => {
-    // 使用vanta制作背景效果图
-    const vantaEffect = window.VANTA.WAVES({
-      el: vantaRef.current,
-      // THREE: THREE, // use a custom THREE when initializing
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.0,
-      minWidth: 200.0,
-      scale: 1.0,
-      scaleMobile: 1.0,
-      zoom: 0.79,
-    });
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
-    };
-  }, []);
-
   function onFinish(fieldsValue: any) {
-    authApi.login(fieldsValue.username, fieldsValue.password).then((res) => {
-      setToken(res.data);
-      setLoginMode(LoginMode.LOCAL)
-      navigate(SITE_INFO.HOME_LINK);
+    userApi.registry(fieldsValue).then((res) => {
+      FaUtils.showResponse(res, '注册账户')
+      navigate('/login');
     });
   }
 
@@ -57,44 +37,80 @@ export default function Login() {
     return Promise.resolve();
   }
 
-  const loading = loadingEffect[authApi.getUrl('login')];
+  function validateNewPwdConfirm(_rule: any, value: any) {
+    const newPwd = form.getFieldValue('password');
+    if (newPwd !== value) {
+      return Promise.reject('两次输入密码不一致');
+    }
+    return Promise.resolve();
+  }
+
+  function validateUsername(_rule: any, value: any) {
+    if (trim(value) === '') return Promise.resolve();
+    return userApi.jumpCount({ username: value }).then(res => {
+      if (Number(res.data) === 0) {
+        return Promise.resolve();
+      }
+      return Promise.reject('该账户已存在，请修改');
+    })
+  }
+
+  function validateTel(_rule: any, value: any) {
+    if (trim(value) === '') return Promise.resolve();
+    return userApi.jumpCount({ tel: value }).then(res => {
+      if (Number(res.data) === 0) {
+        return Promise.resolve();
+      }
+      return Promise.reject('该手机号已存在，请修改');
+    })
+  }
+
+  const loading = loadingEffect[userApi.getUrl('registry')];
   return (
-    <div ref={vantaRef} className={styles['main-container']}>
-      <Helmet title={`注册 | ${systemConfig?.title}`} />
+    <VantaLayout>
+      <Helmet title={`注册 | ${systemConfig?.title}`}/>
 
-      <div className={styles.bannerDiv}>
-        <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
-        <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
-      </div>
+      <div className={styles.title}>用户注册</div>
+      <Form form={form} onFinish={onFinish}>
+        <Form.Item label="账号" name="username" rules={[{required: true, message: '请输入账号'}, { validator: validateUsername }]} {...formItemLayout}>
+          <Input size="large" prefix={<UserOutlined/>} placeholder="请输入账号"/>
+        </Form.Item>
+        <Form.Item label="手机号" name="tel" rules={[{required: true, message: '请输入手机号'}, { validator: validateTel }, FaUtils.FormRules.PATTERN_TEL]} {...formItemLayout}>
+          <Input size="large" prefix={<UserOutlined/>} placeholder="请输入手机号"/>
+        </Form.Item>
+        <Form.Item label="用户名" name="name" rules={[{required: true, message: '请输入用户名'}]} {...formItemLayout}>
+          <Input size="large" prefix={<UserOutlined/>} placeholder="请输入用户名"/>
+        </Form.Item>
+        <Form.Item label="密码" name="password" rules={[{required: true, message: '请输入密码'}]} {...formItemLayout}>
+          <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请输入密码"/>
+        </Form.Item>
+        <Form.Item
+          label="密码确认"
+          name="passwordConfirm"
+          rules={[{ required: true }, { validator: validateNewPwdConfirm }]}
+          {...formItemLayout}
+        >
+          <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请再次输入新密码" />
+        </Form.Item>
 
-      <div className={styles.loginContainer}>
-        <div className={styles.title}>用户注册</div>
-        <Form form={form} onFinish={onFinish}>
-          <Form.Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
-            <Input size="large" prefix={<UserOutlined />} placeholder="请输入账号" />
+        {systemConfig?.safeCaptchaOn && (
+          <Form.Item label="验证码" name="captcha" rules={[{required: true, message: '请输入验证码'}, {validator: validateCaptcha}]} {...formItemLayout}>
+            <Input
+              size="large"
+              prefix={<FieldNumberOutlined/>}
+              placeholder="请输入验证码"
+              addonAfter={<Captcha onCodeChange={(c) => setCode(c)}/>}
+            />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-            <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
-          </Form.Item>
-          {systemConfig?.safeCaptchaOn && (
-            <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
-              <Input
-                size="large"
-                prefix={<FieldNumberOutlined />}
-                placeholder="请输入验证码"
-                addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />}
-              />
-            </Form.Item>
-          )}
-          <Button size="large" block loading={loading} className={styles.submit} type="primary" htmlType="submit">
-            登录
-          </Button>
+        )}
+        <Button size="large" block loading={loading} className={styles.submit} type="primary" htmlType="submit">
+          注册
+        </Button>
 
-          <Space className="fa-flex-row-center fa-mt12">
-            <a href="/login">返回登录</a>
-          </Space>
-        </Form>
-      </div>
-    </div>
+        <Space className="fa-flex-row-center fa-mt12">
+          <a href="/login">返回登录</a>
+        </Space>
+      </Form>
+    </VantaLayout>
   );
 }
