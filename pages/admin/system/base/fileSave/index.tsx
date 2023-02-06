@@ -4,6 +4,7 @@ import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { fileSaveApi as api } from '@/services';
 import { Admin } from '@/types';
+import { FileSaveIcon } from '@/components';
 import FileSaveModal from './modal/FileSaveModal';
 
 const serviceName = '附件管理';
@@ -28,7 +29,7 @@ export default function FileSaveList() {
       BaseTableUtils.genIdColumn('ID', 'id', 280, sorter, false),
       {
         ...BaseTableUtils.genSimpleSorterColumn('原始文件名', 'originalFilename', undefined, sorter),
-        render: (v, r) => <a href={api.genLocalGetFile(r.id)} target="_blank">{v}</a>
+        render: (_, r) => <FileSaveIcon file={r} width={25} />
       },
       BaseTableUtils.genSimpleSorterColumn('文件存储地址', 'url', undefined, sorter),
       {

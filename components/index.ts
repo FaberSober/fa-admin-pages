@@ -1,5 +1,6 @@
 export * from './area-cascader'
 export * from './echarts'
+export * from './file'
 export * from './grid'
 export * from './helper'
 export * from './icons'
