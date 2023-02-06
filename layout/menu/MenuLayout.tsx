@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Empty, Layout } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { useLocalStorage } from 'react-use';
 import { Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList } from "@fa/ui";
 import MenuLayoutContext, { MenuLayoutContextProps, OpenTabsItem } from './context/MenuLayoutContext';
@@ -232,41 +232,39 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const hasRoutePermission = true; // TODO 判断是否有路由权限
   const width = collapse ? 'calc(100% - 44px)' : 'calc(100% - 200px)';
   return (
-    <HelmetProvider>
-      <MenuLayoutContext.Provider value={contextValue}>
-        <FaUiContext.Provider value={faUiContextValue}>
-          <Layout style={{ height: '100vh', width: '100vw' }}>
-            <Helmet title={`${curTab ? curTab.name + ' | ' : ''}${systemConfig.title}`} />
+    <MenuLayoutContext.Provider value={contextValue}>
+      <FaUiContext.Provider value={faUiContextValue}>
+        <Layout style={{ height: '100vh', width: '100vw' }}>
+          <Helmet title={`${curTab ? curTab.name + ' | ' : ''}${systemConfig.title}`} />
 
-            <Layout.Header className="fa-menu-header">
-              <Logo />
-              <MenuAppHorizontal />
-              {/*<LangToggle />*/}
-              {/*<HelpCube />*/}
-              <UserAvatar />
-            </Layout.Header>
+          <Layout.Header className="fa-menu-header">
+            <Logo />
+            <MenuAppHorizontal />
+            {/*<LangToggle />*/}
+            {/*<HelpCube />*/}
+            <UserAvatar />
+          </Layout.Header>
 
-            <Layout style={{ flexDirection: 'row' }}>
-              <SideMenu />
+          <Layout style={{ flexDirection: 'row' }}>
+            <SideMenu />
 
-              <Layout style={{ width }}>
-                {hasRoutePermission ? (
-                  <div className="fa-full fa-flex-column">
-                    <div className="fa-menu-open-tabs">
-                      <OpenTabs />
-                    </div>
-                    <FaFlexRestLayout>
-                      <div className="fa-main">{children}</div>
-                    </FaFlexRestLayout>
+            <Layout style={{ width }}>
+              {hasRoutePermission ? (
+                <div className="fa-full fa-flex-column">
+                  <div className="fa-menu-open-tabs">
+                    <OpenTabs />
                   </div>
-                ) : (
-                  <Empty description="403" />
-                )}
-              </Layout>
+                  <FaFlexRestLayout>
+                    <div className="fa-main">{children}</div>
+                  </FaFlexRestLayout>
+                </div>
+              ) : (
+                <Empty description="403" />
+              )}
             </Layout>
           </Layout>
-        </FaUiContext.Provider>
-      </MenuLayoutContext.Provider>
-    </HelmetProvider>
+        </Layout>
+      </FaUiContext.Provider>
+    </MenuLayoutContext.Provider>
   );
 }

@@ -60,6 +60,11 @@ export default function ConfigSafe() {
               <BaseBoolRadio />
             </Form.Item>
           </Col>
+          <Col md={8}>
+            <Form.Item name="safeRegistrationOn" label="是否开启注册" rules={[{ required: true }]}>
+              <BaseBoolRadio />
+            </Form.Item>
+          </Col>
         </Row>
         <Row gutter={12}>
           <Col md={8}>

@@ -1,3 +1,5 @@
+export * from './config'
+export * from './effect'
 export * from './lang'
 export * from './menu'
 export * from './socket'

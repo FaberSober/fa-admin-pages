@@ -89,6 +89,8 @@ namespace Admin {
     socketUrl: string;
     /** [安全]是否开启验证码 */
     safeCaptchaOn: boolean;
+    /** [安全]是否开启验证码 */
+    safeRegistrationOn: boolean;
     /**
      * [安全]密码类型
      */
