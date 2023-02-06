@@ -17,6 +17,13 @@ export interface UserRegistryVo {
   passwordConfirm: string;
 }
 
+export interface UserForgetResetPwdVo {
+  username: string;
+  tel: string;
+  password: string;
+  passwordConfirm: string;
+}
+
 class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 获取用户信息 */
@@ -49,6 +56,9 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 注册 */
   registry = (params: UserRegistryVo): Promise<Fa.Ret<boolean>> => this.post('registry', params);
+
+  /** 重置密码 */
+  forgetResetPwd = (params: UserForgetResetPwdVo): Promise<Fa.Ret<boolean>> => this.post('forgetResetPwd', params);
 
 }
 

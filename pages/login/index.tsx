@@ -66,7 +66,7 @@ export default function Login() {
 
         <Space className="fa-flex-row-center fa-mt12">
           <a href="/open/user/registry">注册账户</a>
-          <a>忘记密码？</a>
+          <a href="/open/user/forgetPwd">忘记密码？</a>
         </Space>
       </Form>
     </VantaLayout>
