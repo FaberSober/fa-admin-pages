@@ -90,7 +90,7 @@ export default function Login() {
           rules={[{ required: true }, { validator: validateNewPwdConfirm }]}
           {...formItemLayout}
         >
-          <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请再次输入新密码" />
+          <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请再次输入密码" />
         </Form.Item>
 
         {systemConfig?.safeCaptchaOn && (
