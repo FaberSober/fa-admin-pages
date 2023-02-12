@@ -1,20 +1,50 @@
 import React from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Tooltip } from 'antd';
+import { Menu, Popover } from 'antd';
 import { SITE_INFO } from '@/configs';
+import { find } from "lodash";
+
+
+const HelpCubeContent = () => {
+  function handleHeadDropdownClick(key: any) {
+    const doc = find(SITE_INFO.HELP_DOCS, i => i.name === key)
+    window.open(doc!.url, "_blank")
+  }
+
+  return (
+    <div style={{ minWidth: 160 }}>
+      <Menu
+        onClick={(menu) => handleHeadDropdownClick(menu.key)}
+        items={SITE_INFO.HELP_DOCS.map(i =>({
+          label: i.name,
+          key: i.name,
+        }))}
+        style={{ border: 'none' }}
+      />
+    </div>
+  );
+};
 
 /**
  * @author xu.pengfei
  * @date 2021/6/10
  */
 export default function HelpCube() {
+  if (SITE_INFO.HELP_DOCS.length === 0) return null;
+
   return (
     <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-      <Tooltip title="系统帮助文档" getPopupContainer={() => document.body}>
-        <a href={SITE_INFO.HELP_DOC_SITE} target="_blank" rel="noopener noreferrer" style={{ color: '#eee', margin: '0 4px' }}>
+      <Popover
+        placement="bottomRight"
+        content={<HelpCubeContent />}
+        trigger="click"
+        getPopupContainer={() => document.body}
+        overlayInnerStyle={{ padding: 0 }}
+      >
+        <a style={{ color: '#eee', margin: '0 4px' }}>
           <QuestionCircleOutlined /> 帮助文档
         </a>
-      </Tooltip>
+      </Popover>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { useLocalStorage } from 'react-use';
 import { Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList } from "@fa/ui";
 import MenuLayoutContext, { MenuLayoutContextProps, OpenTabsItem } from './context/MenuLayoutContext';
-import { Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar } from "./cube";
+import { HelpCube, Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar } from "./cube";
 import { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@/services';
 import { UserLayoutContext } from "@/layout";
@@ -241,7 +241,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
             <Logo />
             <MenuAppHorizontal />
             {/*<LangToggle />*/}
-            {/*<HelpCube />*/}
+            <HelpCube />
             <UserAvatar />
           </Layout.Header>
 
