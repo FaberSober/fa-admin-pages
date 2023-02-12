@@ -14,6 +14,9 @@ class FileSaveApi extends BaseApi<Admin.FileSave, string> {
 
   genLocalGetFilePreview = (fileId: string) => this.getUrl(`getFilePreview/${trim(fileId)}`);
 
+  /** 文件字符获取 */
+  getFileStr = (fileId: string): Promise<Fa.Ret<string>> => this.get(`getFileStr/${fileId}`);
+
 }
 
 export default new FileSaveApi(GATE_APP.admin, serviceModule);
