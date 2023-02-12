@@ -4,6 +4,7 @@ import { Avatar, Menu, Popover } from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
 import { LangContext, MenuLayoutContext, UserLayoutContext } from "@/layout";
+import { InputColor } from "@fa/ui";
 
 const UserPopoverContent = () => {
   const intl = useIntl();
@@ -77,9 +78,13 @@ const UserPopoverContent = () => {
     rootDom.setProperty('--primary-color', color);
   }
 
+  const primaryColor = document.body.style.getPropertyValue('--primary-color');
+
   return (
     <div style={{ minWidth: 160 }}>
       <div className="fa-flex-row-center">
+        <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} inputStyle={{display: 'none'}} cubeStyle={{minWidth: 25, height: 25}} />
+
         {['#F5222D', '#faad14', '#d4b106', '#52c41a', '#1677ff', '#a8071a', '#722ED1'].map((i) => (
           <div key={i} style={{ width: 25, height: 25, background: i }} onClick={() => handleChangeThemeColor(i)} />
         ))}
