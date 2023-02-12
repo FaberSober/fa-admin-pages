@@ -40,7 +40,7 @@ export default function Login() {
   const loading = loadingEffect[authApi.getUrl('login')];
   return (
     <VantaLayout>
-      <Helmet title={`登录 | ${systemConfig?.title}`} />
+      <Helmet title={`登录 | ${systemConfig.title}`} />
 
       <div className={styles.title}>用户登录</div>
       <Form form={form} onFinish={onFinish}>
@@ -50,7 +50,7 @@ export default function Login() {
         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
           <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
         </Form.Item>
-        {systemConfig?.safeCaptchaOn && (
+        {systemConfig.safeCaptchaOn && (
           <Form.Item name="captcha" rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
             <Input
               size="large"
@@ -65,7 +65,7 @@ export default function Login() {
         </Button>
 
         <Space className="fa-flex-row-center fa-mt12">
-          <a href="/open/user/registry">注册账户</a>
+          {systemConfig.safeRegistrationOn && <a href="/open/user/registry">注册账户</a>}
           <a href="/open/user/forgetPwd">忘记密码？</a>
         </Space>
       </Form>

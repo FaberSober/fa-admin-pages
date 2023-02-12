@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Empty, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
 import { userApi } from '@/services'
@@ -64,6 +64,8 @@ export default function Login() {
       return Promise.reject('该手机号已存在，请修改');
     })
   }
+
+  if (!systemConfig.safeRegistrationOn) return <Empty description="暂未开启" />
 
   const loading = loadingEffect[userApi.getUrl('registry')];
   return (
