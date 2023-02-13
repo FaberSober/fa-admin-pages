@@ -2,7 +2,7 @@ import React from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Menu, Popover } from 'antd';
 import { SITE_INFO } from '@/configs';
-import { find } from "lodash";
+import { find, isNil } from "lodash";
 
 
 const HelpCubeContent = () => {
@@ -30,7 +30,7 @@ const HelpCubeContent = () => {
  * @date 2021/6/10
  */
 export default function HelpCube() {
-  if (SITE_INFO.HELP_DOCS.length === 0) return null;
+  if (isNil(SITE_INFO.HELP_DOCS) || SITE_INFO.HELP_DOCS.length === 0) return null;
 
   return (
     <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
