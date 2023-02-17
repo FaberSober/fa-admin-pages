@@ -20,6 +20,9 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
       <span onClick={() => setOpen(true)}>{children}</span>
       <Drawer title="查看请求详情" open={open} onClose={() => setOpen(false)} width={700} {...props}>
         <Descriptions bordered column={1} labelStyle={{ width: 120 }}>
+          <Descriptions.Item label="模块">{record.biz}</Descriptions.Item>
+          <Descriptions.Item label="操作">{record.opr}</Descriptions.Item>
+          <Descriptions.Item label="类型">{record.crud}</Descriptions.Item>
           <Descriptions.Item label="URL">{record.url}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
@@ -27,6 +30,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="浏览器">{record.browser}</Descriptions.Item>
           <Descriptions.Item label="浏览器版本">{record.version}</Descriptions.Item>
           <Descriptions.Item label="IP">{record.crtHost}</Descriptions.Item>
+          <Descriptions.Item label="请求时间">{record.crtTime}</Descriptions.Item>
           <Descriptions.Item label="请求花费时间">{record.duration}ms</Descriptions.Item>
           <Descriptions.Item label="省">{record.pro}</Descriptions.Item>
           <Descriptions.Item label="市">{record.city}</Descriptions.Item>
