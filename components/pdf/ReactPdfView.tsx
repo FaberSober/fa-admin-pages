@@ -71,7 +71,7 @@ export default function ReactPdfView({ fileUrl }: ReactPdfViewProps) {
   }
 
   return (
-    <Worker workerUrl="/plugins/pdfjs/pdfjs-dist@3.1.81/build/pdf.worker.min.js">
+    <Worker workerUrl="/plugins/pdfjs/pdfjs-dist@3.3.122/build/pdf.worker.min.js">
       <div id="react-pdf-viewer" style={{ height: '100%', position: 'relative' }}>
         <Viewer fileUrl={fileUrl} plugins={[ defaultLayoutPluginInstance ]} />
 
