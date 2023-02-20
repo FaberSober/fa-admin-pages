@@ -14,5 +14,6 @@ export { default as logLoginApi } from './logLogin';
 export { default as msgApi } from './msg';
 export { default as noticeApi } from './notice';
 export { default as systemApi } from './system';
+export { default as systemUpdateLogApi } from './systemUpdateLog';
 export { default as userApi } from './user';
 export { default as userTokenApi } from './userToken';

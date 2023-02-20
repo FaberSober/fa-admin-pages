@@ -448,6 +448,24 @@ namespace Admin {
     content: string;
   }
 
+  /** BASE-系统版本更新日志表 */
+  export interface SystemUpdateLog extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 模块编码 */
+    no: string;
+    /** 模块名称 */
+    name: string;
+    /** 版本号 */
+    ver: string;
+    /** 版本编码 */
+    verNo: string;
+    /** 备注信息 */
+    remark: string;
+    /** SQL执行内容 */
+    log: string;
+  }
+
   // -------------------------------------------- 系统-server info --------------------------------------------
   export interface ServerInfo {
     cpuInfo: {
