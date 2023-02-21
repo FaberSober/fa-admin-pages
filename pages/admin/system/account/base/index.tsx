@@ -4,6 +4,7 @@ import { Admin } from '@/types';
 import { ApiEffectLayoutContext, DictEnumApiSelector, FaUtils, PageLoading, UploadImgLocal } from '@fa/ui';
 import { UserLayoutContext } from "@/layout";
 import { userApi } from '@/services'
+import KeepAlive from "react-activation";
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
@@ -12,7 +13,7 @@ const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
  * @author xu.pengfei
  * @date 2020/12/26
  */
-export default function AccountBase() {
+function AccountBase() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { refreshUser } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
@@ -82,3 +83,9 @@ export default function AccountBase() {
     </Card>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/account/base" saveScrollPosition="screen">
+    <AccountBase />
+  </KeepAlive>
+)

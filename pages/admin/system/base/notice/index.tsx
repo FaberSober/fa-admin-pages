@@ -5,12 +5,13 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, 
 import { Admin } from '@/types';
 import { noticeApi } from '@/services';
 import NoticeModal from './modal/NoticeModal';
+import KeepAlive from "react-activation";
 
 
 const serviceName = '通知与公告';
 const biz = 'base_notice';
 
-export default function NoticeList() {
+function NoticeList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
@@ -103,3 +104,9 @@ export default function NoticeList() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/base/notice" saveScrollPosition="screen">
+    <NoticeList />
+  </KeepAlive>
+)

@@ -4,6 +4,7 @@ import { ApiEffectLayoutContext } from '@fa/ui';
 import { UserLayoutContext } from "@/layout";
 import { userApi } from "@/services";
 import { validatePasswordSafeRule } from "@/components";
+import KeepAlive from "react-activation";
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
@@ -12,7 +13,7 @@ const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
  * @author xu.pengfei
  * @date 2020/12/26
  */
-export default function AccountPwdUpdate() {
+function AccountPwdUpdate() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { systemConfig, logout } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
@@ -69,3 +70,9 @@ export default function AccountPwdUpdate() {
     </Card>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/account/security" saveScrollPosition="screen">
+    <AccountPwdUpdate />
+  </KeepAlive>
+)

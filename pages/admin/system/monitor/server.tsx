@@ -4,13 +4,14 @@ import { Admin } from '@/types';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
 import { ReloadOutlined } from '@ant-design/icons';
 import { systemApi } from '@/services';
+import KeepAlive from "react-activation";
 
 
 /**
  * @author xu.pengfei
  * @date 2022/10/17
  */
-export default function Server() {
+function Server() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [data, setData] = useState<Admin.ServerInfo>();
 
@@ -57,3 +58,9 @@ export default function Server() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/monitor/server" saveScrollPosition="screen">
+    <Server />
+  </KeepAlive>
+)

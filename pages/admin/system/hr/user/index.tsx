@@ -8,13 +8,14 @@ import { dispatch } from 'use-bus';
 import { PlusOutlined } from '@ant-design/icons';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
+import KeepAlive from "react-activation";
 
 /**
  * 用户部门管理
  * @author xu.pengfei
  * @date 2020/12/27
  */
-export default function UserDepartmentManage() {
+function UserDepartmentManage() {
   const [viewRecord, setViewRecord] = useState<Admin.Department>();
 
   function onTreeSelect(keys: any[], event: any) {
@@ -63,3 +64,9 @@ export default function UserDepartmentManage() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/hr/user" saveScrollPosition="screen">
+    <UserDepartmentManage />
+  </KeepAlive>
+)

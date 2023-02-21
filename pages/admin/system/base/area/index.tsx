@@ -5,11 +5,12 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref
 import { Admin } from '@/types';
 import { areaApi } from '@/services';
 import AreaModal from './modal/AreaModal';
+import KeepAlive from "react-activation";
 
 const serviceName = '中国行政地区表';
 const biz = 'base_area';
 
-export default function AreaList() {
+function AreaList() {
   const [form] = Form.useForm();
 
   const {
@@ -109,3 +110,9 @@ export default function AreaList() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/base/area" saveScrollPosition="screen">
+    <AreaList />
+  </KeepAlive>
+)

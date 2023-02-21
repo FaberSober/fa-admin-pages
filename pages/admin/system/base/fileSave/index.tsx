@@ -6,6 +6,7 @@ import { fileSaveApi as api } from '@/services';
 import { Admin } from '@/types';
 import { FileSaveIcon } from '@/components';
 import FileSaveModal from './modal/FileSaveModal';
+import KeepAlive from "react-activation";
 
 const serviceName = '附件管理';
 const biz = 'base_file_save';
@@ -13,7 +14,7 @@ const biz = 'base_file_save';
 /**
  * BASE-用户文件表表格查询
  */
-export default function FileSaveList() {
+function FileSaveList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
@@ -105,3 +106,9 @@ export default function FileSaveList() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/base/fileSave" saveScrollPosition="screen">
+    <FileSaveList />
+  </KeepAlive>
+)

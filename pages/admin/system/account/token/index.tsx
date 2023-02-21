@@ -5,6 +5,7 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDel
 import { userTokenApi as api } from '@/services';
 import { Admin } from '@/types';
 import UserTokenModal from './modal/UserTokenModal';
+import KeepAlive from "react-activation";
 
 const serviceName = '用户token';
 const biz = 'base_user_token';
@@ -12,10 +13,10 @@ const biz = 'base_user_token';
 /**
  * BASE-用户token表格查询
  */
-export default function UserTokenList() {
+function UserTokenList() {
   const [form] = Form.useForm();
 
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, dicts, paginationProps } =
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Admin.UserToken>(api.minePage, {}, serviceName)
 
   const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
@@ -84,3 +85,9 @@ export default function UserTokenList() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/account/token" saveScrollPosition="screen">
+    <UserTokenList />
+  </KeepAlive>
+)

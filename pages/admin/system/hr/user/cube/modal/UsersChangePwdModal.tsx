@@ -17,6 +17,7 @@ interface UsersChangePwdModalProps extends DragModalProps {
 export default function UsersChangePwdModal({ children, userIds, fetchFinish, ...props }: UsersChangePwdModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { systemConfig } = useContext(UserLayoutContext);
+  console.log('systemConfig', systemConfig)
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 

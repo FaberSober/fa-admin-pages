@@ -7,11 +7,12 @@ import { rbacRoleApi } from '@/services';
 import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
 import RbacUserRoleList from './list/RbacUserRoleList';
+import KeepAlive from "react-activation";
 
 const serviceName = '角色';
 const biz = 'base_rbac_role';
 
-export default function RbacRoleList() {
+function RbacRoleList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
@@ -100,3 +101,9 @@ export default function RbacRoleList() {
     </div>
   );
 }
+
+export default () => (
+  <KeepAlive name="/admin/system/hr/role" saveScrollPosition="screen">
+    <RbacRoleList />
+  </KeepAlive>
+)
