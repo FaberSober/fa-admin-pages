@@ -26,7 +26,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
       setTree(res.data);
 
       rbacRoleMenuApi.getRoleMenu(record.id).then((res) => {
-        setCheckedKeys(res.data.checkedRoleIds);
+        setCheckedKeys(res.data.checkedMenuIds);
         setHalfCheckedKeys(res.data.halfCheckedMenuIds);
       });
     });
@@ -36,7 +36,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
     rbacRoleMenuApi
       .updateRoleMenu({
         roleId: record.id,
-        checkedRoleIds: checkedKeys.map((i) => Number(i)),
+        checkedMenuIds: checkedKeys.map((i) => Number(i)),
         halfCheckedMenuIds: halfCheckedKeys.map((i) => Number(i)),
       })
       .then((res) => {
