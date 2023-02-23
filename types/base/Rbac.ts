@@ -61,7 +61,7 @@ namespace Rbac {
   export interface RoleMenuVo {
     roleId: string;
     checkedRoleIds: number[];
-    halfCheckedRoleIds: number[];
+    halfCheckedMenuIds: number[];
   }
 
   export interface RbacUserRoleRetVo extends RbacUserRole {

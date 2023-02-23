@@ -27,7 +27,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
 
       rbacRoleMenuApi.getRoleMenu(record.id).then((res) => {
         setCheckedKeys(res.data.checkedRoleIds);
-        setHalfCheckedKeys(res.data.halfCheckedRoleIds);
+        setHalfCheckedKeys(res.data.halfCheckedMenuIds);
       });
     });
   }
@@ -37,7 +37,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
       .updateRoleMenu({
         roleId: record.id,
         checkedRoleIds: checkedKeys.map((i) => Number(i)),
-        halfCheckedRoleIds: halfCheckedKeys.map((i) => Number(i)),
+        halfCheckedMenuIds: halfCheckedKeys.map((i) => Number(i)),
       })
       .then((res) => {
         FaUtils.showResponse(res, '更新角色权限');
