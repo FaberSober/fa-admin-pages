@@ -36,7 +36,7 @@ export default function SystemUpdateLogView({record}: SystemUpdateLogViewProps) 
                 readOnly: true,
                 selectOnLineNumbers: true,
                 folding: true,
-                minimap: { enabled: false },
+                minimap: { enabled: true },
               }}
             />
           )}
