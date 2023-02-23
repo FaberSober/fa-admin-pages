@@ -4,14 +4,13 @@ import ConfigSystem from './cube/ConfigSystem';
 import ConfigSafe from './cube/ConfigSafe';
 import ConfigStorage from './cube/storage/ConfigStorage';
 import { DatabaseOutlined, SafetyCertificateOutlined, SettingOutlined } from '@ant-design/icons';
-import KeepAlive from "react-activation";
 
 /**
  * 系统配置
  * @author xu.pengfei
  * @date 2022/12/11 22:42
  */
-function Config() {
+export default function Config() {
   const [tab, setTab] = useState('system');
 
   return (
@@ -46,9 +45,3 @@ function Config() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/config" saveScrollPosition="screen">
-    <Config />
-  </KeepAlive>
-)

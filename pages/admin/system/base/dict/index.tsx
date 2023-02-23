@@ -7,7 +7,6 @@ import DictForm from './cube/DictForm';
 import { dictApi } from '@/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
-import KeepAlive from "react-activation";
 
 
 /**
@@ -15,7 +14,7 @@ import KeepAlive from "react-activation";
  * @author xu.pengfei
  * @date 2020/12/25
  */
-function DictManage() {
+export default function DictManage() {
   const [viewRecord, setViewRecord] = useState<Admin.Dict>();
 
   function onTreeSelect(keys: any[]) {
@@ -154,9 +153,3 @@ function DictManage() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/dict" saveScrollPosition="screen">
-    <DictManage />
-  </KeepAlive>
-)

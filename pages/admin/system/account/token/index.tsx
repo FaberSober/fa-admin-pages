@@ -5,7 +5,6 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDel
 import { userTokenApi as api } from '@/services';
 import { Admin } from '@/types';
 import UserTokenModal from './modal/UserTokenModal';
-import KeepAlive from "react-activation";
 
 const serviceName = '用户token';
 const biz = 'base_user_token';
@@ -13,7 +12,7 @@ const biz = 'base_user_token';
 /**
  * BASE-用户token表格查询
  */
-function UserTokenList() {
+export default function UserTokenList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
@@ -85,9 +84,3 @@ function UserTokenList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/account/token" saveScrollPosition="screen">
-    <UserTokenList />
-  </KeepAlive>
-)

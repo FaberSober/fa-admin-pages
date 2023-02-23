@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Button } from 'antd';
 import { UserLayoutContext } from "@/layout";
-import KeepAlive from "react-activation";
 
 
 /**
@@ -9,7 +8,7 @@ import KeepAlive from "react-activation";
  * @author xu.pengfei
  * @date 2022/11/29
  */
-function Redis() {
+export default function Redis() {
   const { systemConfig } = useContext(UserLayoutContext);
 
   function refreshIframe() {
@@ -30,12 +29,4 @@ function Redis() {
       </Button>
     </div>
   );
-}
-
-export default () => {
-  return (
-    <KeepAlive name="/admin/system/monitor/redis" saveScrollPosition="screen">
-      <Redis />
-    </KeepAlive>
-  )
 }

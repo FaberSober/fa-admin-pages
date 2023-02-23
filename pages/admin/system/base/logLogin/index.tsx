@@ -4,12 +4,11 @@ import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
 import { logLoginApi } from '@/services';
-import KeepAlive from "react-activation";
 
 const serviceName = '登录日志';
 const biz = 'base_log_login_v1';
 
-function LogLoginList() {
+export default function LogLoginList() {
   const [form] = Form.useForm();
 
   const {
@@ -100,9 +99,3 @@ function LogLoginList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/logLogin" saveScrollPosition="screen">
-    <LogLoginList />
-  </KeepAlive>
-)

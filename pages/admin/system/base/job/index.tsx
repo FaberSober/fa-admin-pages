@@ -6,12 +6,11 @@ import { Admin } from '@/types';
 import { jobApi } from '@/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
-import KeepAlive from 'react-activation'
 
 const serviceName = '系统定时任务';
 const biz = 'base_job';
 
-function JobList() {
+export default function JobList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
@@ -147,9 +146,3 @@ function JobList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/fileSave" saveScrollPosition="screen">
-    <JobList />
-  </KeepAlive>
-)

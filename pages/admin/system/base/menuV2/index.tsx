@@ -8,7 +8,6 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
 import { useCounter } from "react-use";
 import { rbacMenuApi } from "@/services";
-import KeepAlive from "react-activation";
 
 
 /**
@@ -16,7 +15,7 @@ import KeepAlive from "react-activation";
  * @author xu.pengfei
  * @date 2022/12/15 15:57
  */
-function MenuV2() {
+export default function MenuV2() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [edit, setEdit] = useState<Fa.TreeNode<Rbac.RbacMenu, string>>();
   const [open, setOpen] = useState(false);
@@ -82,9 +81,3 @@ function MenuV2() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/menuV2" saveScrollPosition="screen">
-    <MenuV2 />
-  </KeepAlive>
-)

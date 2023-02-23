@@ -6,7 +6,6 @@ import { systemUpdateLogApi as api } from '@/services';
 import { Admin } from '@/types';
 import { FaHrefView } from '@/components';
 import SystemUpdateLogView from "@features/fa-admin-pages/pages/admin/system/base/systemUpdateLog/cube/SystemUpdateLogView";
-import KeepAlive from "react-activation";
 
 const serviceName = '系统版本更新日志';
 const biz = 'base_system_update_log';
@@ -14,7 +13,7 @@ const biz = 'base_system_update_log';
 /**
  * BASE-系统版本更新日志表表格查询
  */
-function SystemUpdateLogList() {
+export default function SystemUpdateLogList() {
   const [form] = Form.useForm();
 
   const {queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps} =
@@ -99,10 +98,4 @@ function SystemUpdateLogList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/systemUpdateLog" saveScrollPosition="screen">
-    <SystemUpdateLogList />
-  </KeepAlive>
-)
 

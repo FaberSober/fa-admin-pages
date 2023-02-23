@@ -5,12 +5,11 @@ import { ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils,
 import { UserLayoutContext } from "@/layout";
 import { Admin } from '@/types';
 import { msgApi } from '@/services';
-import KeepAlive from "react-activation";
 
 const serviceName = '消息';
 const biz = 'base_msg';
 
-function MsgList() {
+export default function MsgList() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { user } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
@@ -135,9 +134,3 @@ function MsgList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/account/msg" saveScrollPosition="screen">
-    <MsgList />
-  </KeepAlive>
-)

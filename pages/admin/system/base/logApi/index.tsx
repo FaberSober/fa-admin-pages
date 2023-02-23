@@ -5,13 +5,12 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelecto
 import { Admin } from '@/types';
 import { logApiApi } from '@/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
-import KeepAlive from 'react-activation'
 
 
 const serviceName = 'URL请求日志';
 const biz = 'base_log_api';
 
-function LogApiList() {
+export default function LogApiList() {
   const [form] = Form.useForm();
 
   const {
@@ -131,9 +130,3 @@ function LogApiList() {
     </div>
   );
 }
-
-export default () => (
-  <KeepAlive name="/admin/system/base/logApi" saveScrollPosition="screen">
-    <LogApiList />
-  </KeepAlive>
-)
