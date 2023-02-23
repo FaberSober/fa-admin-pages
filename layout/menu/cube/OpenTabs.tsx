@@ -114,7 +114,7 @@ export default function OpenTabs() {
     key: i.key,
     label: (
       <div className="fa-open-tabs-item-title-div" onContextMenu={(e) => handleContextMenu(e, i)}>
-        <span>{i.icon}</span>
+        {/*<span>{i.icon}</span>*/}
         <span>{i.name}</span>
       </div>
     ),
