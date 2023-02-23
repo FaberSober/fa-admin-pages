@@ -4,6 +4,7 @@ import { Item, ItemParams, Menu, useContextMenu } from 'react-contexify';
 import MenuLayoutContext, { OpenTabsItem } from "../context/MenuLayoutContext";
 import './OpenTabs.scss'
 import { findIndex } from "lodash";
+import { FaFullscreenBtn } from "@fa/ui";
 
 
 /**
@@ -132,6 +133,8 @@ export default function OpenTabs() {
         items={items}
         className="fa-tab"
       />
+
+      <FaFullscreenBtn target={document.body} />
 
       <Menu id='menu_context_tab_item' className="contextMenu">
         <Item id="menu_close_current" onClick={handleItemClick}>关闭当前</Item>
