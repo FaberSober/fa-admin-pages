@@ -6,7 +6,8 @@
 
 .fa-menu-open-tabs .ant-tabs {
   flex: 1;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .fa-menu-open-tabs .ant-tabs-tab {
