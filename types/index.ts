@@ -1,4 +1,6 @@
-export * from "./base"
+export type { default as Admin } from './base/Admin';
+export type { default as Rbac } from './base/Rbac';
+
 
 
 /** -------------------------------- declare global -------------------------------- */

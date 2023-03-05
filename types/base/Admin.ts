@@ -284,6 +284,22 @@ namespace Admin {
     md5: string;
   }
 
+  /** BASE-通用业务附件表 */
+  export interface FileBiz extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 主业务ID */
+    mainBizId: string;
+    /** 业务ID */
+    bizId: string;
+    /** 业务类型 */
+    type: string;
+    /** 附件ID */
+    fileId: string;
+    /** 附件名称 */
+    fileName: string;
+  }
+
   // -------------------------------------------- 系统-通知与公告 --------------------------------------------
   /** BASE-通知与公告 */
   export interface Notice extends Fa.BaseDelEntity {
