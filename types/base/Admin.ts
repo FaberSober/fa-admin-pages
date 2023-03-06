@@ -68,6 +68,10 @@ namespace Admin {
      * [安全]密码最大长度
      */
     safePasswordLenMax: number;
+    /**
+     * [安全]token有效时长(小时)
+     */
+    safeTokenExpireHour: number;
   }
 
 
