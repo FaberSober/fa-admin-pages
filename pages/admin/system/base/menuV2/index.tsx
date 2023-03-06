@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaHref, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
@@ -47,35 +47,37 @@ export default function MenuV2() {
         </RbacMenuModal>
       </Space>
 
-      <BaseTree
-        // showRoot
-        showOprBtn
-        // onSelect={(keys) => console.log('onSelect', keys)}
-        onAfterDelItem={() => {}}
-        // 自定义配置
-        serviceName="Tree"
-        ServiceModal={RbacMenuModal}
-        serviceApi={rbacMenuApi}
-        bodyStyle={{ width: '100%', height: '100%' }}
-        showTips={false}
-        showTopBtn={false}
-        // @ts-ignore
-        titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
-          <div className={styles.item}>
-            <div style={{ flex: 1 }}>{item.name}</div>
-            <div style={{ width: 100 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
-            <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
-            <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
-            <Space>
-              <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
-              <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
-            </Space>
-          </div>
-        )}
-        showLine={false}
-        draggable
-        extraEffectArgs={[current]}
-      />
+      <FaFlexRestLayout>
+        <BaseTree
+          // showRoot
+          showOprBtn
+          // onSelect={(keys) => console.log('onSelect', keys)}
+          onAfterDelItem={() => {}}
+          // 自定义配置
+          serviceName="Tree"
+          ServiceModal={RbacMenuModal}
+          serviceApi={rbacMenuApi}
+          bodyStyle={{ width: '100%', height: '100%' }}
+          showTips={false}
+          showTopBtn={false}
+          // @ts-ignore
+          titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
+            <div className={styles.item}>
+              <div style={{ flex: 1 }}>{item.name}</div>
+              <div style={{ width: 100 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
+              <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
+              <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
+              <Space>
+                <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
+                <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
+              </Space>
+            </div>
+          )}
+          showLine={false}
+          draggable
+          extraEffectArgs={[current]}
+        />
+      </FaFlexRestLayout>
 
       <RbacMenuModal title="编辑菜单" record={edit?.sourceData} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
     </div>
