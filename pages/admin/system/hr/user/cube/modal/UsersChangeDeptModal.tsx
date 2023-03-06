@@ -31,7 +31,7 @@ export default function UsersChangeDeptModal({ children, userIds, fetchFinish, .
     setOpen(true);
   }
 
-  const loading = loadingEffect[userApi.getUrl('save')]
+  const loading = loadingEffect[userApi.getUrl('updateBatchDept')]
   return (
     <span>
       <span onClick={() => showModal()}><Button>修改部门</Button></span>

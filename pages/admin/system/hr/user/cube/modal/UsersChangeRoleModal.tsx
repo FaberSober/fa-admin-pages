@@ -31,7 +31,7 @@ export default function UsersChangeRoleModal({ children, userIds, fetchFinish, .
     setOpen(true);
   }
 
-  const loading = loadingEffect[userApi.getUrl('save')]
+  const loading = loadingEffect[userApi.getUrl('updateBatchRole')]
   return (
     <span>
       <span onClick={() => showModal()}><Button>修改角色</Button></span>

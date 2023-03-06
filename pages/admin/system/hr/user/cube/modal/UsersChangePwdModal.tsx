@@ -17,7 +17,7 @@ interface UsersChangePwdModalProps extends DragModalProps {
 export default function UsersChangePwdModal({ children, userIds, fetchFinish, ...props }: UsersChangePwdModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { systemConfig } = useContext(UserLayoutContext);
-  console.log('systemConfig', systemConfig)
+
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
@@ -52,7 +52,7 @@ export default function UsersChangePwdModal({ children, userIds, fetchFinish, ..
     setOpen(true);
   }
 
-  const loading = loadingEffect[userApi.getUrl('save')]
+  const loading = loadingEffect[userApi.getUrl('updateBatchPwd')]
   return (
     <span>
       <span onClick={() => showModal()}><Button>修改密码</Button></span>
