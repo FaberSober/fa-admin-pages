@@ -30,6 +30,8 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="浏览器">{record.browser}</Descriptions.Item>
           <Descriptions.Item label="浏览器版本">{record.version}</Descriptions.Item>
           <Descriptions.Item label="IP">{record.crtHost}</Descriptions.Item>
+          <Descriptions.Item label="请求用户ID">{record.crtUser}</Descriptions.Item>
+          <Descriptions.Item label="请求用户">{record.crtName}</Descriptions.Item>
           <Descriptions.Item label="请求时间">{record.crtTime}</Descriptions.Item>
           <Descriptions.Item label="请求花费时间">{record.duration}ms</Descriptions.Item>
           <Descriptions.Item label="省">{record.pro}</Descriptions.Item>
