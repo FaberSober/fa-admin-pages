@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { DataNode, DirectoryTreeProps } from "antd/es/tree";
-import { Form, Input, Tree } from "antd";
+import { Button, Form, Input, Space, Tree } from "antd";
 import { FaFlexRestLayout } from "@fa/ui";
-import { camelCase, isNil, get } from "lodash";
+import { camelCase, get, isNil } from "lodash";
 import { Generator } from "@/types";
 import { generatorApi } from "@/services";
 import { useLocalStorage } from "react-use";
+import { CopyOutlined } from "@ant-design/icons";
 
 
 function tableNameToJava(tableName:string) {
@@ -15,7 +16,7 @@ function tableNameToJava(tableName:string) {
 
 export interface CodeTreeProps {
   tableNames: string[]
-  onCodeChange: (code:string, language:string) => void;
+  onCodeChange: (v:Generator.CodeGenRetVo) => void;
 }
 
 /**
@@ -29,6 +30,7 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
     packageName: 'com.faber.api',
     tablePrefix: 'base_',
     mainModule: 'base',
+    javaCopyPath: 'fa-base/src/main/java/com/faber/api/base',
   });
 
   const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
@@ -49,7 +51,7 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
       type: item.type,
     }).then(res => {
       setCodeGen(res.data)
-      onCodeChange(res.data.code, item.type.split('.')[0])
+      onCodeChange(res.data)
     })
   };
 
@@ -176,8 +178,16 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
   ];
 
   return (
-    <div className="fa-full fa-flex-row">
-      <Form form={form} initialValues={configCache} style={{width: 250, marginRight: 12}}>
+    <div className="fa-full fa-flex-column">
+      <FaFlexRestLayout>
+        <Tree.DirectoryTree
+          defaultExpandAll
+          onSelect={onSelect}
+          treeData={treeData}
+        />
+      </FaFlexRestLayout>
+
+      <Form form={form} initialValues={configCache}>
         <Form.Item name="packageName" label="包名" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -187,15 +197,14 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
         <Form.Item name="mainModule" label="前端模块" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-      </Form>
+        <Form.Item name="javaCopyPath" label="Java复制目录" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
 
-      <FaFlexRestLayout>
-        <Tree.DirectoryTree
-          defaultExpandAll
-          onSelect={onSelect}
-          treeData={treeData}
-        />
-      </FaFlexRestLayout>
+        <Space>
+          <Button icon={<CopyOutlined />}>复制java文件到项目中</Button>
+        </Space>
+      </Form>
     </div>
   )
 }

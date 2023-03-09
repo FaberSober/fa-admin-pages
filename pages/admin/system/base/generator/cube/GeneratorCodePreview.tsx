@@ -3,6 +3,7 @@ import { FaFlexRestLayout } from "@fa/ui";
 import MonacoEditor from "react-monaco-editor";
 import { useSize } from "ahooks";
 import CodeTree from './CodeTree'
+import { Generator } from "@features/fa-admin-pages/types";
 
 
 export interface GeneratorCodePreviewProps {
@@ -17,18 +18,14 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
   const domRef = useRef<any | null>();
   const size = useSize(domRef);
 
-  const [code, setCode] = useState<string>("")
-  const [language, setLanguage] = useState<string>("java")
+  const [codeGen, setCodeGen] = useState<Generator.CodeGenRetVo>()
 
   return (
     <div className="fa-full-content-p12 fa-flex-row">
       <div style={{width: 600, marginRight: 12}}>
         <CodeTree
           tableNames={tableNames}
-          onCodeChange={(c,l) => {
-            setCode(c)
-            setLanguage(l)
-          }}
+          onCodeChange={setCodeGen}
         />
       </div>
 
@@ -38,8 +35,8 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             <MonacoEditor
               height={size.height}
               theme="vs-dark"
-              language={language}
-              value={code}
+              language={codeGen ? codeGen.type.split(".")[0] : ''}
+              value={codeGen && codeGen.code}
               options={{
                 selectOnLineNumbers: true,
                 folding: true,
