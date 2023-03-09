@@ -79,7 +79,7 @@ export default function StudentList() {
         showBatchBelBtn={false}
         renderCheckBtns={rowKeys => (
           <Space>
-            <BaseDrawer triggerDom={<Button type="primary" icon={<CodepenOutlined />}>预览代码</Button>} title="预览代码" width={1200}>
+            <BaseDrawer triggerDom={<Button type="primary" icon={<CodepenOutlined />}>预览代码</Button>} title="预览代码" width={document.body.clientWidth - 44}>
               <GeneratorCodePreview tableNames={rowKeys} />
             </BaseDrawer>
           </Space>

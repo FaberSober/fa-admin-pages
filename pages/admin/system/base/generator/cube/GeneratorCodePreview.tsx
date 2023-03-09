@@ -22,7 +22,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
 
   return (
     <div className="fa-full-content-p12 fa-flex-row">
-      <div style={{width: 240}}>
+      <div style={{width: 600, marginRight: 12}}>
         <CodeTree
           tableNames={tableNames}
           onCodeChange={(c,l) => {
