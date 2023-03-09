@@ -17,7 +17,7 @@ class RbacUserRoleApi extends BaseApi<Rbac.RbacUserRole, string> {
   getMyMenusTree = (): Promise<Fa.Ret<Fa.TreeNode<Rbac.RbacMenu>[]>> => this.get('getMyMenusTree');
 
   /** 获取实体 分页 */
-  pageVo = (params: Rbac.RbacUserRoleQueryVo): Promise<Fa.Ret<Fa.Page<Rbac.RbacUserRoleRetVo>>> => this.post('pageVo', params);
+  pageVo = (params: Fa.BasePageQuery<Rbac.RbacUserRoleQueryVo>): Promise<Fa.Ret<Fa.Page<Rbac.RbacUserRoleRetVo>>> => this.post('pageVo', params);
 
   /** 添加用户角色 */
   addUsers = (userIds: string[], roleId: string): Promise<Fa.Ret<boolean>> => this.post('addUsers', { userIds, roleId });

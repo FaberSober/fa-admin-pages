@@ -25,3 +25,6 @@ export { default as rbacMenuApi } from './base/rbac/rbacMenu';
 export { default as rbacRoleApi } from './base/rbac/rbacRole';
 export { default as rbacRoleMenuApi } from './base/rbac/rbacRoleMenu';
 export { default as rbacUserRoleApi } from './base/rbac/rbacUserRole';
+
+// ------------------------------------- Generator -------------------------------------
+export { default as generatorApi } from './base/generator/generator';

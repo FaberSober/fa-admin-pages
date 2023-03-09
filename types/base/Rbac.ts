@@ -70,7 +70,7 @@ namespace Rbac {
   }
 
   // ------------------------------------------------- VO-Query -------------------------------------------------
-  export interface RbacUserRoleQueryVo extends Fa.BasePageProps {
+  export interface RbacUserRoleQueryVo {
     roleId: string;
     name?: string;
     username?: string;

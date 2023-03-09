@@ -7,5 +7,7 @@ export default {
     admin: '/api/base/admin',
     /** rbac服务 */
     rbac: '/api/base/rbac',
+    /** rbac服务 */
+    generator: '/api/base/generator',
   }
 } as Fa.ConfigApp
