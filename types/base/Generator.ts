@@ -11,10 +11,22 @@ namespace Generator {
     createTime: string;
   }
 
+  export interface CodeGenReqVo {
+    packageName: string;
+    tablePrefix: string;
+    mainModule: string;
+    tableName: string;
+    type: string;
+  }
+
 
   // ------------------------------------------------- VO-Query -------------------------------------------------
   export interface TableQueryVo {
     name?: string;
+  }
+
+  export interface CodeGenRetVo extends CodeGenReqVo {
+    code: string;
   }
 
 }

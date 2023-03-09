@@ -3,6 +3,8 @@ import { DataNode, DirectoryTreeProps } from "antd/es/tree";
 import { Input, Tree } from "antd";
 import { FaFlexRestLayout } from "@fa/ui";
 import { camelCase, isNil } from "lodash";
+import { Generator } from "@/types";
+import { generatorApi } from "@/services";
 
 
 function tableNameToJava(tableName:string) {
@@ -21,6 +23,27 @@ export interface CodeTreeProps {
  */
 export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
   const [packageName, setPackageName] = useState<string>("com.faber.api.xxx")
+  const [_codeGen, setCodeGen] = useState<Generator.CodeGenRetVo>()
+
+  const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
+    if (keys.length !== 1) return;
+
+    const item:any = info.selectedNodes[0];
+    console.log('item', item)
+
+    if (isNil(item.type)) return;
+
+    generatorApi.preview({
+      packageName,
+      tablePrefix: "tn_",
+      mainModule: "tn",
+      tableName: item.tableName,
+      type: item.type,
+    }).then(res => {
+      setCodeGen(res.data)
+      onCodeChange(res.data.code, item.type.split('.')[0])
+    })
+  };
 
   const treeData: DataNode[] = [
     {
@@ -39,6 +62,7 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
                 key: i,
                 isLeaf: true,
                 type: 'java.entity',
+                tableName: i,
               }))
             },
             {
@@ -71,17 +95,6 @@ export default function CodeTree({tableNames, onCodeChange}: CodeTreeProps) {
       ],
     },
   ];
-
-  const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
-    if (keys.length !== 1) return;
-
-    const item:any = info.selectedNodes[0];
-    console.log('item', item)
-
-    if (isNil(item.type)) return;
-
-    onCodeChange(item.title, 'java')
-  };
 
   return (
     <div className="fa-full fa-flex-column">
