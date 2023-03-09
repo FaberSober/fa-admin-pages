@@ -1,6 +1,6 @@
-import { BaseZeroApi, Fa } from "@fa/ui";
-import { GATE_APP } from "@/configs";
-import { Generator } from "@/types";
+import {BaseZeroApi, Fa} from "@fa/ui";
+import {GATE_APP} from "@/configs";
+import {Generator} from "@/types";
 
 class Api extends BaseZeroApi {
 
@@ -9,6 +9,9 @@ class Api extends BaseZeroApi {
 
   /** 预览代码 */
   preview = (params: Generator.CodeGenReqVo): Promise<Fa.Ret<Generator.CodeGenRetVo>> => this.post('preview', params);
+
+  /** 复制全部java文件 */
+  copyJava = (params: Generator.CodeCopyVo): Promise<Fa.Ret<boolean>> => this.post('copyJava', params);
 
 }
 

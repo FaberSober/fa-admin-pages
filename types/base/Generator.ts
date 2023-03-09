@@ -17,6 +17,18 @@ namespace Generator {
     mainModule: string;
     tableName: string;
     type: string;
+    author: string;
+    email: string;
+  }
+
+  export interface CodeCopyVo {
+    packageName: string;
+    tablePrefix: string;
+    mainModule: string;
+    tableNames: string[];
+    author: string;
+    email: string;
+    javaCopyPath: string;
   }
 
 

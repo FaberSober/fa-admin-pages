@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { FaFlexRestLayout } from "@fa/ui";
+import {FaFlexRestLayout, FaHref, FaUtils} from "@fa/ui";
 import MonacoEditor from "react-monaco-editor";
 import {useSize, useUpdate} from "ahooks";
 import { Generator } from "@features/fa-admin-pages/types";
-import {Button, Form, Input, Space, Tree} from "antd";
+import {Button, Form, Input, Modal, Space, Tree} from "antd";
 import {CopyOutlined} from "@ant-design/icons";
 import {useLocalStorage} from "react-use";
 import {DataNode, DirectoryTreeProps} from "antd/es/tree";
@@ -31,7 +31,10 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
     packageName: 'com.faber.api',
     tablePrefix: 'base_',
     mainModule: 'base',
-    javaCopyPath: 'fa-base\\src\\main\\java\\com\\faber\\api\\base\\admin',
+    javaCopyPath: 'fa-base',
+    rnCopyPath: 'frontend\\apps\\admin\\features\\fa-admin-pages\\pages\\admin',
+    author: '',
+    email: '',
   });
 
   const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
@@ -58,8 +61,30 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       mainModule: get(fieldsValue, 'mainModule', ''),
       tableName: selItem.tableName,
       type: selItem.type,
+      author: get(fieldsValue, 'author', ''),
+      email: get(fieldsValue, 'email', ''),
     }).then(res => {
       setCodeGen(res.data)
+    })
+  }
+
+  function handleCopyJava() {
+    Modal.confirm({
+      title: '复制全部',
+      content: '确认复制全部java文件？',
+      onOk: () => {
+        const fieldsValue = form.getFieldsValue();
+        const params = {
+          packageName: get(fieldsValue, 'packageName', ''),
+          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          mainModule: get(fieldsValue, 'mainModule', ''),
+          tableNames,
+          author: get(fieldsValue, 'author', ''),
+          email: get(fieldsValue, 'email', ''),
+          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
+        }
+        generatorApi.copyJava(params).then(res => FaUtils.showResponse(res, '复制'))
+      }
     })
   }
 
@@ -197,7 +222,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
 
   return (
     <div className="fa-full-content-p12 fa-flex-row">
-      <div className="fa-flex-column" style={{width: 450, marginRight: 12}}>
+      <div className="fa-flex-column" style={{width: 550, marginRight: 12}}>
         <FaFlexRestLayout>
           <Tree.DirectoryTree
             defaultExpandAll
@@ -218,23 +243,34 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           }}
         >
           <Form.Item name="packageName" label="包名" rules={[{ required: true }]}>
-            <Input />
+            <Input placeholder="base_table_name" />
           </Form.Item>
           <Form.Item name="tablePrefix" label="去除表前缀" rules={[{ required: false }]}>
-            <Input />
+            <Input placeholder="base_" />
           </Form.Item>
           <Form.Item name="mainModule" label="前端模块" rules={[{ required: true }]}>
-            <Input />
+            <Input placeholder="base.admin" />
           </Form.Item>
-          <Form.Item name="javaCopyPath" label="Java复制目录" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="javaCopyPath" label="Java复制项目" rules={[{ required: true }]}>
+            <Input placeholder="项目名称" />
+          </Form.Item>
+          <Form.Item name="rnCopyPath" label="前端复制目录" rules={[{ required: true }]}>
+            <Input placeholder="前端的相对路径" />
+          </Form.Item>
+          <Form.Item name="author" label="作者" rules={[{ required: true }]}>
+            <Input placeholder="作者" />
+          </Form.Item>
+          <Form.Item name="email" label="email" rules={[{ required: true }]}>
+            <Input placeholder="email" />
           </Form.Item>
         </Form>
       </div>
 
       <FaFlexRestLayout style={{display: 'flex', flexDirection: 'column'}}>
         <Space className="fa-mb12">
-          <Button icon={<CopyOutlined />}>复制全部java文件</Button>
+          <FaHref onClick={() => {FaUtils.copyToClipboard(selItem?.title)}} icon={<CopyOutlined/>} text={selItem && selItem.title} />
+          <Button onClick={handleCopyJava} icon={<CopyOutlined />}>复制全部java文件</Button>
+          <Button icon={<CopyOutlined />}>复制当前文件</Button>
         </Space>
 
         <FaFlexRestLayout>
