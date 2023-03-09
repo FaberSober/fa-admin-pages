@@ -10,8 +10,11 @@ class Api extends BaseZeroApi {
   /** 预览代码 */
   preview = (params: Generator.CodeGenReqVo): Promise<Fa.Ret<Generator.CodeGenRetVo>> => this.post('preview', params);
 
-  /** 复制全部java文件 */
-  copyJava = (params: Generator.CodeCopyVo): Promise<Fa.Ret<boolean>> => this.post('copyJava', params);
+  /** 复制当前文件 */
+  copyOne = (params: Generator.CodeGenReqVo): Promise<Fa.Ret<boolean>> => this.post('copyOne', params);
+
+  /** 复制全部文件 */
+  copyAll = (params: Generator.CodeCopyVo): Promise<Fa.Ret<boolean>> => this.post('copyAll', params);
 
 }
 

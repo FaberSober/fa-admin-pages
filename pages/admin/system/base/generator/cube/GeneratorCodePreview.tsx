@@ -68,10 +68,10 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
     })
   }
 
-  function handleCopyJava() {
+  function handleCopyAll() {
     Modal.confirm({
       title: '复制全部',
-      content: '确认复制全部java文件？',
+      content: '确认复制全部文件？',
       onOk: () => {
         const fieldsValue = form.getFieldsValue();
         const params = {
@@ -82,8 +82,33 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           author: get(fieldsValue, 'author', ''),
           email: get(fieldsValue, 'email', ''),
           javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
+          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
         }
-        generatorApi.copyJava(params).then(res => FaUtils.showResponse(res, '复制'))
+        generatorApi.copyAll(params).then(res => FaUtils.showResponse(res, '复制'))
+      }
+    })
+  }
+
+  function handleCopyOne() {
+    if (selItem === undefined) return;
+
+    Modal.confirm({
+      title: '复制',
+      content: '确认复制当前文件？',
+      onOk: () => {
+        const fieldsValue = form.getFieldsValue();
+        const params = {
+          packageName: get(fieldsValue, 'packageName', ''),
+          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          mainModule: get(fieldsValue, 'mainModule', ''),
+          tableName: selItem.tableName,
+          type: selItem.type,
+          author: get(fieldsValue, 'author', ''),
+          email: get(fieldsValue, 'email', ''),
+          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
+          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
+        }
+        generatorApi.copyOne(params).then(res => FaUtils.showResponse(res, '复制'))
       }
     })
   }
@@ -269,8 +294,8 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       <FaFlexRestLayout style={{display: 'flex', flexDirection: 'column'}}>
         <Space className="fa-mb12">
           <FaHref onClick={() => {FaUtils.copyToClipboard(selItem?.title)}} icon={<CopyOutlined/>} text={selItem && selItem.title} />
-          <Button onClick={handleCopyJava} icon={<CopyOutlined />}>复制全部java文件</Button>
-          <Button icon={<CopyOutlined />}>复制当前文件</Button>
+          <Button onClick={handleCopyAll} icon={<CopyOutlined />}>复制全部文件</Button>
+          {selItem && <Button onClick={handleCopyOne} icon={<CopyOutlined />}>复制当前文件</Button>}
         </Space>
 
         <FaFlexRestLayout>
@@ -282,6 +307,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
                 language={codeGen ? codeGen.type.split(".")[0] : ''}
                 value={codeGen && codeGen.code}
                 options={{
+                  readOnly: true,
                   selectOnLineNumbers: true,
                   folding: true,
                   minimap: { enabled: true },
