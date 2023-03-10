@@ -60,7 +60,6 @@ export default function StudentList() {
             <Button onClick={() => clearForm(form)} loading={loading}>
               重置
             </Button>
-            <Button>代码转换工具</Button>
           </Space>
         </div>
       </div>
