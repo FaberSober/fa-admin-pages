@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {PageLoading} from "@fa/ui";
-import {SITE_INFO} from "@/configs";
 import {DocumentEditor} from "@onlyoffice/document-editor-react";
 import {onlyofficeApi} from "@/services";
 
@@ -15,23 +14,27 @@ export interface OnlyofficeEditorProps {
  */
 export default function OnlyofficeEditor({fileId}: OnlyofficeEditorProps) {
 
+  const [documentServerUrl, setDocumentServerUrl] = useState<string>()
   const [config, setConfig] = useState<any>()
 
   useEffect(() => {
-    onlyofficeApi.openFile(fileId).then(res => setConfig(res.data))
+    onlyofficeApi.openFile(fileId).then(res => {
+      setDocumentServerUrl(res.data.documentApi)
+      setConfig(res.data.fileModel)
+    })
   }, [fileId])
 
   const onDocumentReady = function (event:any) {
     console.log("Document is loaded", event);
   };
 
-  if (config === undefined) return <PageLoading />
+  if (config === undefined || documentServerUrl === undefined) return <PageLoading />
 
   return (
     <div className="fa-full">
       <DocumentEditor
         id="docxEditor"
-        documentServerUrl={SITE_INFO.ONLYOFFICE_SERVER}
+        documentServerUrl={documentServerUrl}
         config={config}
         // config={{
         //   "document": {
