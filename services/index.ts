@@ -28,3 +28,6 @@ export { default as rbacUserRoleApi } from './base/rbac/rbacUserRole';
 
 // ------------------------------------- Generator -------------------------------------
 export { default as generatorApi } from './base/generator/generator';
+
+// ------------------------------------- Doc -------------------------------------
+export { default as onlyofficeApi } from './base/doc/onlyoffice';

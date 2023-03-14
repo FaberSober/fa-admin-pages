@@ -5,7 +5,7 @@ import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
 import styles from './index.module.scss';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import {Button, Space, Tag} from 'antd';
 import { useCounter } from "react-use";
 import { rbacMenuApi } from "@/services";
 
@@ -65,7 +65,11 @@ export default function MenuV2() {
             <div className={styles.item}>
               <div style={{ flex: 1 }}>{item.name}</div>
               <div style={{ width: 100 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
-              <div style={{ width: 100 }}>{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</div>
+              <div style={{ width: 100 }}>
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && <Tag color="#2db7f5">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && <Tag color="#87d068">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+              </div>
               <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
               <Space>
                 <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
