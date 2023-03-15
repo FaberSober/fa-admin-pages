@@ -5,20 +5,21 @@ import {onlyofficeApi} from "@/services";
 
 
 export interface OnlyofficeEditorProps {
-  fileId: string;
+  fileId: string; // fileSave表的ID
+  mode: 'edit'|'view';
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/3/13 19:01
  */
-export default function OnlyofficeEditor({fileId}: OnlyofficeEditorProps) {
+export default function OnlyofficeEditor({fileId, mode}: OnlyofficeEditorProps) {
 
   const [documentServerUrl, setDocumentServerUrl] = useState<string>()
   const [config, setConfig] = useState<any>()
 
   useEffect(() => {
-    onlyofficeApi.openFile(fileId).then(res => {
+    onlyofficeApi.openFile(fileId, mode).then(res => {
       setDocumentServerUrl(res.data.documentApi)
       setConfig(res.data.fileModel)
     })
