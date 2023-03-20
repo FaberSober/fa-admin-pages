@@ -24,6 +24,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="操作">{record.opr}</Descriptions.Item>
           <Descriptions.Item label="类型">{record.crud}</Descriptions.Item>
           <Descriptions.Item label="URL">{record.url}</Descriptions.Item>
+          <Descriptions.Item label="URL[decodeURI]">{decodeURIComponent(record.url)}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
           <Descriptions.Item label="操作系统">{record.os}</Descriptions.Item>
@@ -68,6 +69,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
               record.response
             )}
           </Descriptions.Item>
+          <Descriptions.Item label="请求备注">{record.remark}</Descriptions.Item>
         </Descriptions>
       </Drawer>
     </span>
