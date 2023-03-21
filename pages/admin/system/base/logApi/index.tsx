@@ -37,6 +37,7 @@ export default function LogApiList() {
       BaseTableUtils.genEnumSorterColumn('类型', 'crud', 100, sorter, dicts, false),
       BaseTableUtils.genSimpleSorterColumn('模块', 'biz', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('操作', 'opr', 100, sorter),
+      BaseTableUtils.genSimpleSorterColumn('操作备注', 'oprRemark', 120, sorter),
       BaseTableUtils.genSimpleSorterColumn('请求URL', 'url', undefined, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('请求', 'method', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('客户端', 'agent', 100, sorter, false),

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Descriptions, Drawer, DrawerProps } from 'antd';
 import { Admin } from '@/types';
 import ReactJson from 'react-json-view';
-import { FaUtils } from '@fa/ui';
+import { FaUtils, FaClickCopyLink } from '@fa/ui';
 
 export interface GateLogDrawerProps extends DrawerProps {
   record: Admin.LogApi;
@@ -22,9 +22,10 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
         <Descriptions bordered column={1} labelStyle={{ width: 120 }}>
           <Descriptions.Item label="模块">{record.biz}</Descriptions.Item>
           <Descriptions.Item label="操作">{record.opr}</Descriptions.Item>
+          <Descriptions.Item label="操作备注">{record.oprRemark}</Descriptions.Item>
           <Descriptions.Item label="类型">{record.crud}</Descriptions.Item>
-          <Descriptions.Item label="URL">{record.url}</Descriptions.Item>
-          <Descriptions.Item label="URL[decodeURI]">{decodeURIComponent(record.url)}</Descriptions.Item>
+          <Descriptions.Item label={<FaClickCopyLink copyText={record.url}>URL</FaClickCopyLink>}>{record.url}</Descriptions.Item>
+          <Descriptions.Item label={<FaClickCopyLink copyText={decodeURIComponent(record.url)}>URL[decodeURI]</FaClickCopyLink>}>{decodeURIComponent(record.url)}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
           <Descriptions.Item label="操作系统">{record.os}</Descriptions.Item>
@@ -42,7 +43,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="客户端版本号">{record.versionCode}</Descriptions.Item>
           <Descriptions.Item label="客户端版本名">{record.versionName}</Descriptions.Item>
           <Descriptions.Item label="否为移动终端">{record.mobile ? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="请求内容">
+          <Descriptions.Item label={<FaClickCopyLink copyText={record.request}>请求内容</FaClickCopyLink>}>
             {open && FaUtils.isJson(record.request) ? (
               <ReactJson
                 src={JSON.parse(record.request)}
@@ -56,7 +57,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
             )}
           </Descriptions.Item>
           <Descriptions.Item label="返回码">{record.retStatus}</Descriptions.Item>
-          <Descriptions.Item label="返回内容">
+          <Descriptions.Item label={<FaClickCopyLink copyText={record.response}>返回内容</FaClickCopyLink>}>
             {open && FaUtils.isJson(record.response) ? (
               <ReactJson
                 src={JSON.parse(record.response)}
@@ -69,7 +70,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
               record.response
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="请求备注">{record.remark}</Descriptions.Item>
+          <Descriptions.Item label={<FaClickCopyLink copyText={record.remark}>请求备注</FaClickCopyLink>}>{record.remark}</Descriptions.Item>
         </Descriptions>
       </Drawer>
     </span>

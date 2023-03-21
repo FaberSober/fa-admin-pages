@@ -390,6 +390,8 @@ namespace Admin {
     biz: string;
     /** 操作 */
     opr: string;
+    /** 操作备注 */
+    oprRemark: string;
     /** 请求URL */
     url: string;
     /** 请求类型 */
