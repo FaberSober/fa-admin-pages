@@ -14,6 +14,7 @@ namespace Generator {
   export interface CodeGenReqVo {
     packageName: string;
     tablePrefix: string;
+    apiPath: string;
     mainModule: string;
     tableName: string;
     type: string;
@@ -24,6 +25,7 @@ namespace Generator {
   export interface CodeCopyVo {
     packageName: string;
     tablePrefix: string;
+    apiPath: string;
     mainModule: string;
     tableNames: string[];
     author: string;

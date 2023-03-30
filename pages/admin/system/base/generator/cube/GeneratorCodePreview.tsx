@@ -30,6 +30,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
   const [configCache, setConfigCache] = useLocalStorage<any>('generator.configCache', {
     packageName: 'com.faber.api',
     tablePrefix: 'base_',
+    apiPath: 'base',
     mainModule: 'base',
     javaCopyPath: 'fa-base',
     rnCopyPath: 'frontend\\apps\\admin\\features\\fa-admin-pages\\pages\\admin',
@@ -58,6 +59,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
     generatorApi.preview({
       packageName: get(fieldsValue, 'packageName', ''),
       tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+      apiPath: get(fieldsValue, 'apiPath', ''),
       mainModule: get(fieldsValue, 'mainModule', ''),
       tableName: selItem.tableName,
       type: selItem.type,
@@ -77,6 +79,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         const params = {
           packageName: get(fieldsValue, 'packageName', ''),
           tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          apiPath: get(fieldsValue, 'apiPath', ''),
           mainModule: get(fieldsValue, 'mainModule', ''),
           tableNames,
           author: get(fieldsValue, 'author', ''),
@@ -99,6 +102,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         const params = {
           packageName: get(fieldsValue, 'packageName', ''),
           tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          apiPath: get(fieldsValue, 'apiPath', ''),
           mainModule: get(fieldsValue, 'mainModule', ''),
           tableNames,
           author: get(fieldsValue, 'author', ''),
@@ -122,6 +126,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         const params = {
           packageName: get(fieldsValue, 'packageName', ''),
           tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          apiPath: get(fieldsValue, 'apiPath', ''),
           mainModule: get(fieldsValue, 'mainModule', ''),
           tableName: selItem.tableName,
           type: selItem.type,
@@ -294,6 +299,9 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           </Form.Item>
           <Form.Item name="tablePrefix" label="去除表前缀" rules={[{ required: false }]}>
             <Input placeholder="base_" />
+          </Form.Item>
+          <Form.Item name="apiPath" label="API路径" rules={[{ required: true }]}>
+            <Input placeholder="base/admin" />
           </Form.Item>
           <Form.Item name="mainModule" label="前端模块" rules={[{ required: true }]}>
             <Input placeholder="base.admin" />
