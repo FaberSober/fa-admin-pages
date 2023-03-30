@@ -68,6 +68,28 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
     })
   }
 
+  function handleCopyJava() {
+    Modal.confirm({
+      title: '复制Java',
+      content: '确认复制Java文件？',
+      onOk: () => {
+        const fieldsValue = form.getFieldsValue();
+        const params = {
+          packageName: get(fieldsValue, 'packageName', ''),
+          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+          mainModule: get(fieldsValue, 'mainModule', ''),
+          tableNames,
+          author: get(fieldsValue, 'author', ''),
+          email: get(fieldsValue, 'email', ''),
+          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
+          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
+          types: ['java.entity'],
+        }
+        generatorApi.copyBatch(params).then(res => FaUtils.showResponse(res, '复制'))
+      }
+    })
+  }
+
   function handleCopyAll() {
     Modal.confirm({
       title: '复制全部',
@@ -295,6 +317,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         <Space className="fa-mb12">
           <FaHref onClick={() => {FaUtils.copyToClipboard(selItem?.title)}} icon={<CopyOutlined/>} text={selItem && selItem.title} />
           <Button onClick={handleCopyAll} icon={<CopyOutlined />}>复制全部文件</Button>
+          <Button onClick={handleCopyJava} icon={<CopyOutlined />}>复制Java文件</Button>
           {selItem && <Button onClick={handleCopyOne} icon={<CopyOutlined />}>复制当前文件</Button>}
         </Space>
 
