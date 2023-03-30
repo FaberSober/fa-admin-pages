@@ -86,7 +86,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           email: get(fieldsValue, 'email', ''),
           javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
           rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
-          types: ['java.entity'],
+          types: ['java.entity', 'java.mapper', 'java.biz', 'java.controller', 'xml.mapper'],
         }
         generatorApi.copyBatch(params).then(res => FaUtils.showResponse(res, '复制'))
       }
