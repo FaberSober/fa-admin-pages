@@ -75,8 +75,14 @@ export default function FileSaveList() {
         <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
-            <Form.Item name="search" label="搜索">
-              <Input placeholder="请输入搜索内容" />
+            <Form.Item name="originalFilename" label="文件名">
+              <Input placeholder="请输入原始文件名" />
+            </Form.Item>
+            <Form.Item name="url" label="存储地址">
+              <Input placeholder="请输入存储地址" />
+            </Form.Item>
+            <Form.Item name="ext" label="扩展名">
+              <Input placeholder="请输入扩展名" />
             </Form.Item>
           </Form>
 
