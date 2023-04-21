@@ -28,7 +28,8 @@ export default function AMapAutoComplete({onSelect, style}: AMapAutoCompleteProp
           <AutoComplete
             input={input}
             onSelect={(opts: any) => {
-              if (opts.poi.location == undefined) {
+              console.log('opts', opts)
+              if (opts.poi.location == undefined || opts.poi.location.lng === undefined || opts.poi.location.lat === undefined) {
                 message.error("该位置没有坐标信息，请选择其他位置")
                 return
               }
