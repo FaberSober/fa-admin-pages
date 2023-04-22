@@ -46,7 +46,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       setMenuList(menuArr);
 
       // 初始化选中的菜单
-      let menu = find(menuArr, (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
+      const menu = find(menuArr, (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
       if (menu) {
         // 找到菜单
         syncOpenMenuById(menu.id, res.data);
@@ -64,8 +64,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
             navigateTab(cacheTabItem)
             // justSyncOpenMenuById(cacheTabItem.linkMenuId, res.data);
           }
-        } catch (e) {
-        }
+        } catch (e) { /* empty */ }
       }
     });
   }, []);
