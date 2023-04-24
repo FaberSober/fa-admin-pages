@@ -1,5 +1,5 @@
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {Map, Marker} from "@uiw/react-amap";
+import {Map, Marker, MapTypeControl} from "@uiw/react-amap";
 import {Fa} from "@/types";
 import useAMapGeocoder from "./useAMapGeocoder";
 import AMapAutoComplete from "@features/fa-admin-pages/components/map/AMapAutoComplete";
@@ -46,6 +46,7 @@ export default function AMapSearchSelect({onSelect, value, style}: AMapSearchSel
         }}
         center={pos ? [pos.lng, pos.lat] : undefined}
       >
+        <MapTypeControl offset={[10, 110]} position="RB" />
         {pos && <Marker position={new AMap.LngLat(pos.lng, pos.lat)}/>}
       </Map>
 

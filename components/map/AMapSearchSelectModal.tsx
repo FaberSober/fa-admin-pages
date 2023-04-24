@@ -44,6 +44,7 @@ export default function AMapSearchSelectModal({onSelect, value, style, children,
         }}
         onCancel={() => setOpen(false)}
         width={1000}
+        style={{top: 44}}
         {...props}
       >
         <AMapSearchSelect
