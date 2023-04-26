@@ -15,7 +15,7 @@ console.log('homecubes', homecubes)
 const biz = "HOME_LAYOUT";
 const type = "LAYOUT";
 
-const allLayout: Layout[] = new Array();
+const allLayout: Layout[] = [];
 each(homecubes, (k) => {
   allLayout.push({
     i: k.displayName,
