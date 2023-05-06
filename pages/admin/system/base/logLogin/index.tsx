@@ -73,9 +73,7 @@ export default function LogLoginList() {
             <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined/>}>
               查询
             </Button>
-            <Button onClick={() => clearForm(form)} loading={loading}>
-              重置
-            </Button>
+            <Button onClick={() => clearForm(form)}>重置</Button>
             <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>
               导出
             </Button>

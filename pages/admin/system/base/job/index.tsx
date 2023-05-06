@@ -115,9 +115,7 @@ export default function JobList() {
             <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
               查询
             </Button>
-            <Button onClick={() => clearForm(form)} loading={loading}>
-              重置
-            </Button>
+            <Button onClick={() => clearForm(form)}>重置</Button>
             <JobModal title={`新增${serviceName}信息`} fetchFinish={fetchPageList}>
               <Button icon={<PlusOutlined />} type="primary">
                 新增
