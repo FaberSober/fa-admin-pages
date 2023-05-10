@@ -67,7 +67,7 @@ export default function ConfigSafe() {
           </Col>
           <Col md={8}>
             <Form.Item name="safeTokenExpireHour" label="token有效时长" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
-              <InputNumber step={1} min={1} max={7200} addonAfter="小时" />
+              <InputNumber step={1} min={-1} max={7200} addonAfter="小时" />
             </Form.Item>
           </Col>
         </Row>
