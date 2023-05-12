@@ -1,0 +1,107 @@
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import {v4 as uuidv4} from 'uuid'
+import * as echarts from 'echarts';
+import { ECharts, LineSeriesOption } from 'echarts';
+import { FaUtils } from '@fa/ui'
+import { useSize } from "ahooks";
+
+
+type serie = {
+  name: string;
+  data: number[];
+}
+
+export interface EchartsLineProps {
+  title?: string,
+  subTitle?: string,
+  dataX: string[];
+  dataY: serie[];
+  dataTitle?: string,
+  style?: CSSProperties;
+  lineSeriesOption?: LineSeriesOption;
+  restOption?: any;
+}
+
+/**
+ * @author xu.pengfei
+ * @date 2023/2/2 09:52
+ */
+export default function EchartsLine({title, subTitle, dataX, dataY, style, lineSeriesOption, restOption}: EchartsLineProps) {
+  const chartRef = useRef<ECharts>()
+  const [id] = useState(uuidv4())
+  const [ready, setReady] = useState(false)
+
+  const domRef = useRef<any | null>();
+  const size = useSize(domRef);
+
+  useEffect(() => {
+    // console.log('size', size)
+    if (!ready) return;
+
+    chartRef.current!.resize();
+  }, [size])
+
+  useEffect(() => {
+    // 基于准备好的dom，初始化echarts实例
+    // @ts-ignore
+    chartRef.current = echarts.init(document.getElementById(id));
+
+    // @ts-ignore
+    chartRef.current.setOption({
+      title: {
+        text: title,
+        subtext: subTitle,
+        left: 'center'
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        top: '15%',
+        containLabel: true
+      },
+      toolbox: FaUtils.EchartsToolbox,
+      tooltip: {
+        trigger: 'axis',
+      },
+      legend: {
+        data: dataY.map(i => i.name),
+      },
+      xAxis: {
+        type: 'category',
+        data: dataX,
+      },
+      yAxis: {},
+      series: dataY.map(dy => ({
+        name: dy.name,
+        data: dy.data,
+        type: 'line',
+        smooth: true,
+        ...lineSeriesOption
+      })),
+      ...restOption
+    });
+    setReady(true)
+  }, [])
+
+  useEffect(() => {
+    if (!ready) return;
+
+    // @ts-ignore
+    chartRef.current.setOption({
+      xAxis: {
+        data: dataX,
+      },
+      series: dataY.map(dy => ({
+        name: dy.name,
+        data: dy.data,
+      }))
+    })
+  }, [dataX, dataY])
+
+  return (
+    <div ref={domRef} style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
+      <div id={id} style={{ height: '100%', width: '100%' }} />
+    </div>
+  )
+}
