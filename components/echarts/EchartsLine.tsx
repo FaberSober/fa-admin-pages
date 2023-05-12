@@ -63,6 +63,9 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
       toolbox: FaUtils.EchartsToolbox,
       tooltip: {
         trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
       },
       legend: {
         data: dataY.map(i => i.name),
@@ -77,6 +80,9 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
         data: dy.data,
         type: 'line',
         smooth: true,
+        emphasis: {
+          focus: 'series'
+        },
         ...lineSeriesOption
       })),
       ...restOption
