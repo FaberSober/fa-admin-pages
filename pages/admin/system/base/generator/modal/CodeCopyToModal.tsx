@@ -22,6 +22,7 @@ export default function IotDeviceModal({ children, onSubmit, ...props }: IotDevi
     if (onSubmit) {
       onSubmit(fieldsValue.path)
     }
+    setOpen(false)
   }
 
 
