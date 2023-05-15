@@ -9,6 +9,7 @@ import {useLocalStorage} from "react-use";
 import {DataNode, DirectoryTreeProps} from "antd/es/tree";
 import {camelCase, get, isNil, trim} from "lodash";
 import {generatorApi} from "@features/fa-admin-pages/services";
+import CodeCopyToModal from '../modal/CodeCopyToModal'
 
 
 export interface GeneratorCodePreviewProps {
@@ -52,19 +53,28 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
     fetchPreview()
   }, [selItem])
 
+  function getBasicParams(): any {
+    const fieldsValue = form.getFieldsValue();
+    return {
+      packageName: get(fieldsValue, 'packageName', ''),
+      tablePrefix: get(fieldsValue, 'tablePrefix', ''),
+      apiPath: get(fieldsValue, 'apiPath', ''),
+      mainModule: get(fieldsValue, 'mainModule', ''),
+      author: get(fieldsValue, 'author', ''),
+      email: get(fieldsValue, 'email', ''),
+      javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
+      rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
+    }
+  }
+
   function fetchPreview() {
     if (selItem === undefined) return;
     const fieldsValue = form.getFieldsValue();
     setConfigCache(fieldsValue)
     generatorApi.preview({
-      packageName: get(fieldsValue, 'packageName', ''),
-      tablePrefix: get(fieldsValue, 'tablePrefix', ''),
-      apiPath: get(fieldsValue, 'apiPath', ''),
-      mainModule: get(fieldsValue, 'mainModule', ''),
+      ...getBasicParams(),
       tableName: selItem.tableName,
       type: selItem.type,
-      author: get(fieldsValue, 'author', ''),
-      email: get(fieldsValue, 'email', ''),
     }).then(res => {
       setCodeGen(res.data)
     })
@@ -75,17 +85,9 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       title: '复制Java',
       content: '确认复制Java文件？',
       onOk: () => {
-        const fieldsValue = form.getFieldsValue();
         const params = {
-          packageName: get(fieldsValue, 'packageName', ''),
-          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
-          apiPath: get(fieldsValue, 'apiPath', ''),
-          mainModule: get(fieldsValue, 'mainModule', ''),
+          ...getBasicParams(),
           tableNames,
-          author: get(fieldsValue, 'author', ''),
-          email: get(fieldsValue, 'email', ''),
-          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
-          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
           types: ['java.entity', 'java.mapper', 'java.biz', 'java.controller', 'xml.mapper'],
         }
         generatorApi.copyBatch(params).then(res => FaUtils.showResponse(res, '复制'))
@@ -98,17 +100,9 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       title: '复制全部',
       content: '确认复制全部文件？',
       onOk: () => {
-        const fieldsValue = form.getFieldsValue();
         const params = {
-          packageName: get(fieldsValue, 'packageName', ''),
-          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
-          apiPath: get(fieldsValue, 'apiPath', ''),
-          mainModule: get(fieldsValue, 'mainModule', ''),
+          ...getBasicParams(),
           tableNames,
-          author: get(fieldsValue, 'author', ''),
-          email: get(fieldsValue, 'email', ''),
-          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
-          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
         }
         generatorApi.copyAll(params).then(res => FaUtils.showResponse(res, '复制'))
       }
@@ -122,22 +116,25 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       title: '复制',
       content: '确认复制当前文件？',
       onOk: () => {
-        const fieldsValue = form.getFieldsValue();
         const params = {
-          packageName: get(fieldsValue, 'packageName', ''),
-          tablePrefix: get(fieldsValue, 'tablePrefix', ''),
-          apiPath: get(fieldsValue, 'apiPath', ''),
-          mainModule: get(fieldsValue, 'mainModule', ''),
+          ...getBasicParams(),
           tableName: selItem.tableName,
           type: selItem.type,
-          author: get(fieldsValue, 'author', ''),
-          email: get(fieldsValue, 'email', ''),
-          javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
-          rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
         }
         generatorApi.copyOne(params).then(res => FaUtils.showResponse(res, '复制'))
       }
     })
+  }
+
+  function handleCopyOneToPath(path:string) {
+    if (selItem === undefined) return;
+    const params = {
+      ...getBasicParams(),
+      tableName: selItem.tableName,
+      type: selItem.type,
+      path,
+    }
+    generatorApi.copyOneToPath(params).then(res => FaUtils.showResponse(res, '复制'))
   }
 
   function tableNameToJava(tableName:string) {
@@ -327,6 +324,11 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           <Button onClick={handleCopyAll} icon={<CopyOutlined />}>复制全部文件</Button>
           <Button onClick={handleCopyJava} icon={<CopyOutlined />}>复制Java文件</Button>
           {selItem && <Button onClick={handleCopyOne} icon={<CopyOutlined />}>复制当前文件</Button>}
+          {selItem && (
+            <CodeCopyToModal onSubmit={(path) => handleCopyOneToPath(path)}>
+              <Button icon={<CopyOutlined />}>复制当前文件到...</Button>
+            </CodeCopyToModal>
+          )}
         </Space>
 
         <FaFlexRestLayout>

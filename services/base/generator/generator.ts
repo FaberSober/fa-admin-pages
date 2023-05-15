@@ -2,6 +2,7 @@ import {BaseZeroApi, Fa} from "@fa/ui";
 import {GATE_APP} from "@/configs";
 import {Generator} from "@/types";
 
+
 class Api extends BaseZeroApi {
 
   /** 查询表 */
@@ -12,6 +13,9 @@ class Api extends BaseZeroApi {
 
   /** 复制当前文件 */
   copyOne = (params: Generator.CodeGenReqVo): Promise<Fa.Ret<boolean>> => this.post('copyOne', params);
+
+  /** 复制当前文件 */
+  copyOneToPath = (params: Generator.CodeCopyToReqVo): Promise<Fa.Ret<boolean>> => this.post('copyOneToPath', params);
 
   /** 复制当前文件 */
   copyBatch = (params: any): Promise<Fa.Ret<boolean>> => this.post('copyBatch', params);

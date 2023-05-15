@@ -22,6 +22,10 @@ namespace Generator {
     email: string;
   }
 
+  export interface CodeCopyToReqVo extends CodeGenReqVo {
+    path: string;
+  }
+
   export interface CodeCopyVo {
     packageName: string;
     tablePrefix: string;
