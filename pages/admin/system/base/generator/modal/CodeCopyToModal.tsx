@@ -1,7 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {Form, Input} from 'antd';
-import {ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils} from '@fa/ui';
-import {iotDeviceApi as api} from '@/services';
+import {DragModal, DragModalProps, FaUtils} from '@fa/ui';
 
 
 export interface IotDeviceModalProps extends DragModalProps {
@@ -12,7 +11,6 @@ export interface IotDeviceModalProps extends DragModalProps {
  * HZX-厂商设备实体新增、编辑弹框
  */
 export default function IotDeviceModal({ children, onSubmit, ...props }: IotDeviceModalProps) {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -30,7 +28,6 @@ export default function IotDeviceModal({ children, onSubmit, ...props }: IotDevi
     setOpen(true)
   }
 
-  const loading = loadingEffect[api.getUrl('save')] || loadingEffect[api.getUrl('update')];
   return (
     <span>
       <span onClick={showModal}>
@@ -40,7 +37,6 @@ export default function IotDeviceModal({ children, onSubmit, ...props }: IotDevi
         title="复制当前文件到..."
         open={open}
         onOk={() => form.submit()}
-        confirmLoading={loading}
         onCancel={() => setOpen(false)}
         width={700}
         {...props}
