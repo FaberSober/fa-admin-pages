@@ -3,14 +3,14 @@ import {Form, Input} from 'antd';
 import {DragModal, DragModalProps, FaUtils} from '@fa/ui';
 
 
-export interface IotDeviceModalProps extends DragModalProps {
+export interface CodeCopyToModalProps extends DragModalProps {
   onSubmit: (path: string) => void;
 }
 
 /**
- * HZX-厂商设备实体新增、编辑弹框
+ * 代码生成-复制当前文件到指定的绝对路径
  */
-export default function IotDeviceModal({ children, onSubmit, ...props }: IotDeviceModalProps) {
+export default function CodeCopyToModal({ children, onSubmit, ...props }: CodeCopyToModalProps) {
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
