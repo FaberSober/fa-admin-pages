@@ -63,7 +63,7 @@ export default function ConfigSystem() {
           </Col>
         </Row>
         <Row gutter={12}>
-          <Col md={6}>
+          <Col md={7}>
             <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
               <Input />
             </Form.Item>

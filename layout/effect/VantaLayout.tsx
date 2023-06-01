@@ -2,6 +2,7 @@ import React, {CSSProperties, ReactNode, useContext, useEffect, useRef} from 're
 import { ConfigLayoutContext } from "@/layout";
 import styles from "./VantaLayout.module.scss";
 import {fileSaveApi} from "@fa/ui";
+import {trim} from "lodash";
 
 
 export interface VantaLayoutProps {
@@ -18,6 +19,10 @@ export default function VantaLayout({children}: VantaLayoutProps) {
 
 
   useEffect(() => {
+    if (systemConfig === undefined) return
+    // 表示有背景图片
+    if (trim(systemConfig.loginBg) !== '') return;
+
     // 使用vanta制作背景效果图
     const vantaEffect = window.VANTA.WAVES({
       el: vantaRef.current,
@@ -34,7 +39,7 @@ export default function VantaLayout({children}: VantaLayoutProps) {
     return () => {
       if (vantaEffect) vantaEffect.destroy();
     };
-  }, []);
+  }, [systemConfig]);
 
   const bgStyle:CSSProperties = {
     background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : '',
