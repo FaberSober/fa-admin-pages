@@ -81,6 +81,10 @@ namespace Admin {
     title: string;
     /** [网站]副标题 */
     subTitle: string;
+    /** [网站]版权信息 */
+    cop: string;
+    /** [网站]登录背景图 */
+    loginBg: string;
     /** [网站]logo */
     logo: string;
     /** [网站]logo带文字 */

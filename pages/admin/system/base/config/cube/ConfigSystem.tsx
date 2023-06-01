@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, FaUtils, UploadImgLocal } from '@fa/ui';
-import { Button, Col, Form, Input, Row, Space } from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
-import { configSysApi } from '@/services';
-import { Admin } from '@/types';
+import React, {useContext, useEffect, useState} from 'react';
+import {ApiEffectLayoutContext, FaUtils, UploadImgLocal} from '@fa/ui';
+import {Button, Col, Form, Input, Row, Space} from 'antd';
+import {SaveOutlined} from '@ant-design/icons';
+import {configSysApi} from '@/services';
+import {Admin} from '@/types';
 
 
 /**
@@ -53,6 +53,11 @@ export default function ConfigSystem() {
           </Col>
           <Col md={8}>
             <Form.Item name="logoWithText" label="系统LOGO（带文字）" rules={[{ required: true }]}>
+              <UploadImgLocal />
+            </Form.Item>
+          </Col>
+          <Col md={8}>
+            <Form.Item name="loginBg" label="登录页面背景图" rules={[{ required: false }]}>
               <UploadImgLocal />
             </Form.Item>
           </Col>

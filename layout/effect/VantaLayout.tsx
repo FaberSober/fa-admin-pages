@@ -1,6 +1,7 @@
-import React, { ReactNode, useContext, useEffect, useRef } from 'react';
+import React, {CSSProperties, ReactNode, useContext, useEffect, useRef} from 'react';
 import { ConfigLayoutContext } from "@/layout";
 import styles from "./VantaLayout.module.scss";
+import {fileSaveApi} from "@fa/ui";
 
 
 export interface VantaLayoutProps {
@@ -35,18 +36,36 @@ export default function VantaLayout({children}: VantaLayoutProps) {
     };
   }, []);
 
+  const bgStyle:CSSProperties = {
+    background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : '',
+    backgroundSize: '100% 100%',
+  }
+  console.log(bgStyle)
+
   return (
     <div ref={vantaRef} className={styles['main-container']}>
-      <div className={styles.bannerDiv}>
-        <div>
-          <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
-          <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+      <div className="fa-full-content" style={bgStyle}>
+        {/* left title info */}
+        <div className={styles.bannerDiv}>
+          <div>
+            <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
+            <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+            <div style={{width: 1, height: 260}} />
+          </div>
         </div>
-      </div>
 
-      <div className={styles.mainDiv}>
-        <div className={styles.main}>
-          {children}
+        {/* right panel slot */}
+        <div className={styles.mainDiv}>
+          <div className={styles.main}>
+            {children}
+          </div>
+        </div>
+
+        {/* bottom copyright */}
+        <div className={styles.footerDiv}>
+          <div className={styles.footerMain}>
+            {systemConfig?.cop}
+          </div>
         </div>
       </div>
     </div>
