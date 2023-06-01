@@ -79,10 +79,16 @@ namespace Admin {
   export interface SystemConfigPo {
     /** [网站]标题 */
     title: string;
+    /** [网站]标题 */
+    titleColor: string;
     /** [网站]副标题 */
     subTitle: string;
+    /** [网站]副标题 */
+    subTitleColor: string;
     /** [网站]版权信息 */
     cop: string;
+    /** [网站]版权信息 */
+    copColor: string;
     /** [网站]登录背景图 */
     loginBg: string;
     /** [网站]logo */

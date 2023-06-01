@@ -48,8 +48,8 @@ export default function VantaLayout({children}: VantaLayoutProps) {
         {/* left title info */}
         <div className={styles.bannerDiv}>
           <div>
-            <div className={styles.bannerTitle}>{systemConfig?.title || '-'}</div>
-            <div className={styles.bannerSubTitle}>{systemConfig?.subTitle || '-'}</div>
+            <div className={styles.bannerTitle} style={{color: systemConfig.titleColor}}>{systemConfig?.title || '-'}</div>
+            <div className={styles.bannerSubTitle} style={{color: systemConfig.subTitleColor}}>{systemConfig?.subTitle || '-'}</div>
             <div style={{width: 1, height: 260}} />
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function VantaLayout({children}: VantaLayoutProps) {
 
         {/* bottom copyright */}
         <div className={styles.footerDiv}>
-          <div className={styles.footerMain}>
+          <div className={styles.footerMain} style={{color: systemConfig.copColor}}>
             {systemConfig?.cop}
           </div>
         </div>

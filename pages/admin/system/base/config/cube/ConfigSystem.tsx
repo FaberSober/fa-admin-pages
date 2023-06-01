@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {ApiEffectLayoutContext, FaUtils, UploadImgLocal} from '@fa/ui';
+import {ApiEffectLayoutContext, FaUtils, InputColor, UploadImgLocal} from '@fa/ui';
 import {Button, Col, Form, Input, Row, Space} from 'antd';
 import {SaveOutlined} from '@ant-design/icons';
 import {configSysApi} from '@/services';
@@ -63,19 +63,36 @@ export default function ConfigSystem() {
           </Col>
         </Row>
         <Row gutter={12}>
-          <Col md={8}>
+          <Col md={6}>
             <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
           </Col>
-          <Col md={8}>
+          <Col md={1}>
+            <Form.Item name="titleColor" rules={[{ required: true }]}>
+              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
+            </Form.Item>
+          </Col>
+
+          <Col md={7}>
             <Form.Item name="subTitle" label="网站副标题" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
           </Col>
-          <Col md={8}>
+          <Col md={1}>
+            <Form.Item name="subTitleColor" rules={[{ required: true }]}>
+              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
+            </Form.Item>
+          </Col>
+
+          <Col md={7}>
             <Form.Item name="cop" label="版权信息" rules={[{ required: true }]}>
               <Input />
+            </Form.Item>
+          </Col>
+          <Col md={1}>
+            <Form.Item name="copColor" rules={[{ required: true }]}>
+              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
             </Form.Item>
           </Col>
         </Row>
