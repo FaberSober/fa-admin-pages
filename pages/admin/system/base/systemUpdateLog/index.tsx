@@ -61,24 +61,24 @@ export default function SystemUpdateLogList() {
         <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="no" label="模块编码">
-              <Input placeholder="请输入模块编码"/>
+              <Input placeholder="请输入模块编码" allowClear/>
             </Form.Item>
             <Form.Item name="name" label="模块名称">
-              <Input placeholder="请输入模块名称"/>
+              <Input placeholder="请输入模块名称" allowClear/>
             </Form.Item>
             <Form.Item name="ver" label="版本号">
-              <Input placeholder="请输入版本号"/>
+              <Input placeholder="请输入版本号" allowClear/>
             </Form.Item>
             <Form.Item name="verNo" label="版本编码">
-              <Input placeholder="请输入版本编码"/>
+              <Input placeholder="请输入版本编码" allowClear/>
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined/>}>查询</Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>导出</Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

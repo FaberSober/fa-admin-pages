@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import { get } from 'lodash';
-import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { Admin } from '@/types';
-import { userApi } from '@/services';
+import React, {useEffect} from 'react';
+import {get} from 'lodash';
+import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
+import {Button, Form, Input, Space} from 'antd';
+import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams} from '@fa/ui';
+import {Admin} from '@/types';
+import {userApi} from '@/services';
 import UserModal from '../modal/UserModal';
-import { DepartmentCascade } from '@/components';
+import {DepartmentCascade} from '@/components';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
 import UsersChangePwdModal from "./modal/UsersChangePwdModal";
@@ -64,9 +64,7 @@ export default function UserList({ departmentId }: IProps) {
         dataIndex: 'opr',
         render: (_, record) => (
           <Space>
-            <UserModal title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList}>
-              <FaHref icon={<EditOutlined />} text="编辑" />
-            </UserModal>
+            <UserModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
@@ -85,27 +83,19 @@ export default function UserList({ departmentId }: IProps) {
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="tel" label="手机号">
-              <Input placeholder="请输入手机号" />
+              <Input placeholder="请输入手机号" allowClear />
             </Form.Item>
             <Form.Item name="name" label="姓名">
-              <Input placeholder="请输入姓名" />
+              <Input placeholder="请输入姓名" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <UserModal title={`新增${serviceName}信息`} fetchFinish={fetchPageList}>
-              <Button icon={<PlusOutlined />} type="primary">
-                新增
-              </Button>
-            </UserModal>
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <UserModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

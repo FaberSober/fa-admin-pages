@@ -1,16 +1,17 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
-import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaUtils } from '@fa/ui';
+import {Button, Form, Input} from 'antd';
+import {ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils} from '@fa/ui';
 import { Rbac } from '@/types';
 import { rbacRoleApi } from '@/services';
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '角色';
 
 /**
  * BASE-角色表实体新增、编辑弹框
  */
-export default function RbacRoleModal({ children, title, record, fetchFinish, ...props }: CommonModalProps<Rbac.RbacRole>) {
+export default function RbacRoleModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Rbac.RbacRole>) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
@@ -63,7 +64,11 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ..
   const loading = loadingEffect[rbacRoleApi.getUrl('save')] || loadingEffect[rbacRoleApi.getUrl('update')];
   return (
     <span>
-      <span onClick={showModal}>{children}</span>
+      <span onClick={showModal}>
+        {children}
+        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+      </span>
       <DragModal
         title={title}
         open={open}

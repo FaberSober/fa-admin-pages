@@ -1,24 +1,19 @@
-import React, { useContext, useState } from 'react';
-import { get } from 'lodash';
-import { Form, Input, Switch } from 'antd';
-import { ApiEffectLayoutContext, DictEnumApiRadio, DragModal, DragModalProps, FaUtils, UploadImgLocal } from '@fa/ui';
-import { DepartmentCascade, RbacRoleSelect } from '@/components';
+import React, {useContext, useState} from 'react';
+import {get} from 'lodash';
+import {Button, Form, Input, Switch} from 'antd';
+import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal} from '@fa/ui';
+import {DepartmentCascade, RbacRoleSelect} from '@/components';
 import useBus from 'use-bus';
-import { Admin } from '@/types';
-import { rbacUserRoleApi, userApi } from '@/services';
+import {Admin} from '@/types';
+import {rbacUserRoleApi, userApi} from '@/services';
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '用户';
-
-interface IProps extends DragModalProps {
-  title?: string;
-  record?: Admin.User;
-  fetchFinish?: () => void;
-}
 
 /**
  * 用户实体新增、编辑弹框
  */
-export default function UserModal({ children, title, record, fetchFinish, ...props }: IProps) {
+export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.User>) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
@@ -95,7 +90,11 @@ export default function UserModal({ children, title, record, fetchFinish, ...pro
   const loading = loadingEffect[userApi.getUrl('save')] || loadingEffect[userApi.getUrl('update')];
   return (
     <span>
-      <span onClick={() => showModal()}>{children}</span>
+      <span onClick={showModal}>
+        {children}
+        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+      </span>
       <DragModal
         title={title}
         open={open}

@@ -1,9 +1,9 @@
 import React from 'react';
-import { CodepenOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, useTableQueryParams } from '@fa/ui';
-import { generatorApi } from '@/services';
-import { Generator } from '@/types';
+import {CodepenOutlined, SearchOutlined} from '@ant-design/icons';
+import {Button, Form, Input, Space} from 'antd';
+import {BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, useTableQueryParams} from '@fa/ui';
+import {generatorApi} from '@/services';
+import {Generator} from '@/types';
 import GeneratorCodePreview from "./cube/GeneratorCodePreview";
 
 
@@ -49,16 +49,17 @@ export default function StudentList() {
         <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="tableName" label="表名">
-              <Input placeholder="请输入表名"/>
+              <Input placeholder="请输入表名" allowClear/>
             </Form.Item>
-          </Form>
+            <Form.Item name="tableComment" label="备注">
+              <Input placeholder="请输入备注" allowClear/>
+            </Form.Item>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined/>}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

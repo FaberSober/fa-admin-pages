@@ -1,9 +1,9 @@
 import React from 'react';
-import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined, } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
-import { Rbac } from '@/types';
-import { rbacRoleApi } from '@/services';
+import {DownloadOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined,} from '@ant-design/icons';
+import {Button, Form, Input, Space} from 'antd';
+import {AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams,} from '@fa/ui';
+import {Rbac} from '@/types';
+import {rbacRoleApi} from '@/services';
 import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
 import RbacUserRoleList from './list/RbacUserRoleList';
@@ -34,9 +34,7 @@ export default function RbacRoleList() {
         dataIndex: 'opr',
         render: (_, record) => (
           <Space>
-            <RbacRoleModal title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList}>
-              <FaHref icon={<EditOutlined />} text="编辑" />
-            </RbacRoleModal>
+            <RbacRoleModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
             <RbacRoleMenuDrawer record={record}>
               <FaHref icon={<UnorderedListOutlined />} text="权限" />
             </RbacRoleMenuDrawer>
@@ -61,24 +59,16 @@ export default function RbacRoleList() {
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="name" label="角色名称">
-              <Input placeholder="请输入角色名称" />
+              <Input placeholder="请输入角色名称" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <RbacRoleModal title={`新增${serviceName}信息`} fetchFinish={fetchPageList}>
-              <Button icon={<PlusOutlined />} type="primary">
-                新增
-              </Button>
-            </RbacRoleModal>
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <RbacRoleModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 
