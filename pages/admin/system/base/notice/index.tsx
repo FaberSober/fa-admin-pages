@@ -1,9 +1,9 @@
 import React from 'react';
-import { DownloadOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Image, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
-import { Admin } from '@/types';
-import { noticeApi } from '@/services';
+import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
+import {Button, Form, Image, Input, Space} from 'antd';
+import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams,} from '@fa/ui';
+import {Admin} from '@/types';
+import {noticeApi} from '@/services';
 import NoticeModal from './modal/NoticeModal';
 
 
@@ -40,9 +40,7 @@ export default function NoticeList() {
         dataIndex: 'opr',
         render: (_, record: Admin.Notice) => (
           <Space>
-            <NoticeModal title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList}>
-              <FaHref icon={<EditOutlined />} text="编辑" />
-            </NoticeModal>
+            <NoticeModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
@@ -59,29 +57,21 @@ export default function NoticeList() {
       <div className="fa-flex-row-center fa-p8">
         <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form style={{ flex: 1, flexDirection: 'row-reverse' }} form={form} layout="inline" onFinish={setFormValues}>
+          <Form  form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="status" label="状态">
               <DictDataSelector dictLabel="common.enum.true_or_false" />
             </Form.Item>
             <Form.Item name="title" label="标题">
-              <Input placeholder="请输入标题" />
+              <Input placeholder="请输入标题" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <NoticeModal title={`新增${serviceName}信息`} fetchFinish={fetchPageList}>
-              <Button icon={<PlusOutlined />} type="primary">
-                新增
-              </Button>
-            </NoticeModal>
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <NoticeModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

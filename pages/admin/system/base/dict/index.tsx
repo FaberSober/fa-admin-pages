@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Empty } from 'antd';
-import { Admin } from '@/types';
-import { BaseTree, FaFlexRestLayout, FaLabel, FaSortList, FaUtils } from '@fa/ui';
+import React, {useState} from 'react';
+import {Empty} from 'antd';
+import {Admin} from '@/types';
+import {BaseTree, FaFlexRestLayout, FaLabel, FaSortList, FaUtils} from '@fa/ui';
 import DictModal from './modal/DictModal';
 import DictForm from './cube/DictForm';
-import { dictApi } from '@/services';
-import { Allotment } from 'allotment';
+import {dictApi} from '@/services';
+import {Allotment} from 'allotment';
 import 'allotment/dist/style.css';
 
 
@@ -116,10 +116,10 @@ export default function DictManage() {
         </Allotment.Pane>
 
         {/* 右侧面板 */}
-        <div className="fa-flex-column fa-full">
+        <div className="fa-flex-column fa-full fa-m12">
           {viewRecord ? (
             <div className="fa-flex-column fa-full">
-              <FaLabel title={`${viewRecord?.name}/${viewRecord?.code}/${viewRecord?.description || ''}`} className="fa-mb12"/>
+              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12"/>
 
               <FaFlexRestLayout className="fa-bg-white">
                 <div className="fa-flex-row-center fa-bg-grey">

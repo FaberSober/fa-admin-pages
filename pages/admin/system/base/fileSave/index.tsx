@@ -76,22 +76,22 @@ export default function FileSaveList() {
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="originalFilename" label="文件名">
-              <Input placeholder="请输入原始文件名" />
+              <Input placeholder="请输入原始文件名" allowClear />
             </Form.Item>
             <Form.Item name="url" label="存储地址">
-              <Input placeholder="请输入存储地址" />
+              <Input placeholder="请输入存储地址" allowClear />
             </Form.Item>
             <Form.Item name="ext" label="扩展名">
-              <Input placeholder="请输入扩展名" />
+              <Input placeholder="请输入扩展名" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>查询</Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <FileSaveModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <FileSaveModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

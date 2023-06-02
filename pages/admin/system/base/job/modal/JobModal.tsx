@@ -1,22 +1,17 @@
-import React, { useContext, useState } from 'react';
-import { find, get } from 'lodash';
-import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, CronModal, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import { Admin } from '@/types';
-import { jobApi } from '@/services';
+import React, {useContext, useState} from 'react';
+import {find, get} from 'lodash';
+import {Button, Form, Input, Select} from 'antd';
+import {ApiEffectLayoutContext, CommonModalProps, CronModal, DragModal, FaHref, FaUtils} from '@fa/ui';
+import {Admin} from '@/types';
+import {jobApi} from '@/services';
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '系统定时任务';
-
-interface IProps extends DragModalProps {
-  title?: string;
-  record?: Admin.Job;
-  fetchFinish?: () => void;
-}
 
 /**
  * 系统定时任务实体新增、编辑弹框
  */
-export default function JobModal({ children, title, record, fetchFinish, ...props }: IProps) {
+export default function JobModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.Job>) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
@@ -71,7 +66,11 @@ export default function JobModal({ children, title, record, fetchFinish, ...prop
   const loading = loadingEffect[jobApi.getUrl('save')] || loadingEffect[jobApi.getUrl('update')];
   return (
     <span>
-      <span onClick={showModal}>{children}</span>
+      <span onClick={showModal}>
+        {children}
+        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+      </span>
       <DragModal
         title={title}
         open={open}

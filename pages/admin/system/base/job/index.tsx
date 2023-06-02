@@ -1,9 +1,9 @@
 import React from 'react';
-import { DownloadOutlined, EditOutlined, PauseCircleOutlined, PlayCircleOutlined, PlusOutlined, SearchOutlined, ThunderboltOutlined, } from '@ant-design/icons';
-import { Badge, Button, Form, Input, Popconfirm, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { Admin } from '@/types';
-import { jobApi } from '@/services';
+import {DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined,} from '@ant-design/icons';
+import {Badge, Button, Form, Input, Popconfirm, Space} from 'antd';
+import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams} from '@fa/ui';
+import {Admin} from '@/types';
+import {jobApi} from '@/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
 
@@ -85,9 +85,7 @@ export default function JobList() {
               )}
             </Popconfirm>
             {!record.status && (
-              <JobModal title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList}>
-                <FaHref icon={<EditOutlined />} text="编辑" />
-              </JobModal>
+              <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
             )}
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
@@ -105,26 +103,18 @@ export default function JobList() {
       <div className="fa-flex-row-center fa-p8">
         <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form style={{ flex: 1, flexDirection: 'row-reverse' }} form={form} layout="inline" onFinish={setFormValues}>
+          <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="jobName" label="任务名称">
               <Input placeholder="请输入任务名称" />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <JobModal title={`新增${serviceName}信息`} fetchFinish={fetchPageList}>
-              <Button icon={<PlusOutlined />} type="primary">
-                新增
-              </Button>
-            </JobModal>
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <JobModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

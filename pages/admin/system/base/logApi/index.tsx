@@ -91,25 +91,21 @@ export default function LogApiList() {
               <DictEnumApiSelector enumName="LogCrudEnum" />
             </Form.Item>
             <Form.Item name="biz" label="模块">
-              <Input placeholder="请输入模块" />
+              <Input placeholder="请输入模块" allowClear />
             </Form.Item>
             <Form.Item name="opr" label="操作">
-              <Input placeholder="请输入操作" />
+              <Input placeholder="请输入操作" allowClear />
             </Form.Item>
             <Form.Item name="url" label="URL">
-              <Input placeholder="请输入请求URL" />
+              <Input placeholder="请输入请求URL" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 

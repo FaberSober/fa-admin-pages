@@ -1,22 +1,16 @@
-import React, { useContext, useState } from 'react';
-import { get } from 'lodash';
-import { Form, Input } from 'antd';
-import { Admin, BaseBoolRadio, DragModal, DragModalProps, FaUtils, UploadImgLocal } from '@fa/ui';
-import { noticeApi } from '@/services';
-import { ApiEffectLayoutContext } from '@fa/ui';
+import React, {useContext, useState} from 'react';
+import {get} from 'lodash';
+import {Button, Form, Input} from 'antd';
+import {Admin, ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal} from '@fa/ui';
+import {noticeApi} from '@/services';
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '通知与公告';
-
-interface IProps extends DragModalProps {
-  title?: string;
-  record?: Admin.Notice;
-  fetchFinish?: () => void;
-}
 
 /**
  * BASE-通知与公告实体新增、编辑弹框
  */
-export default function NoticeModal({ children, title, record, fetchFinish, ...props }: IProps) {
+export default function NoticeModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.Notice>) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
@@ -53,10 +47,30 @@ export default function NoticeModal({ children, title, record, fetchFinish, ...p
     }
   }
 
+  function getInitialValues() {
+    return {
+      title: get(record, 'title'),
+      content: get(record, 'content'),
+      url: get(record, 'url'),
+      status: get(record, 'status'),
+      forApp: get(record, 'forApp'),
+      strongNotice: get(record, 'strongNotice'),
+    }
+  }
+
+  function showModal() {
+    setOpen(true)
+    form.setFieldsValue(getInitialValues())
+  }
+
   const loading = loadingEffect[noticeApi.getUrl('save')] || loadingEffect[noticeApi.getUrl('update')];
   return (
     <span>
-      <span onClick={() => setOpen(true)}>{children}</span>
+      <span onClick={showModal}>
+        {children}
+        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+      </span>
       <DragModal
         title={title}
         open={open}
@@ -70,12 +84,6 @@ export default function NoticeModal({ children, title, record, fetchFinish, ...p
           form={form}
           onFinish={onFinish}
           initialValues={{
-            title: get(record, 'title'),
-            content: get(record, 'content'),
-            url: get(record, 'url'),
-            status: get(record, 'status'),
-            forApp: get(record, 'forApp'),
-            strongNotice: get(record, 'strongNotice'),
           }}
         >
           <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>

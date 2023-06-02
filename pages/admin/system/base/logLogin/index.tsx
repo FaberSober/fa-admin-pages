@@ -40,7 +40,7 @@ export default function LogLoginList() {
       BaseTableUtils.genSimpleSorterColumn('省', 'pro', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('市', 'city', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('地址', 'addr', 150, sorter),
-      ...BaseTableUtils.genCtrColumns(sorter),
+      ...BaseTableUtils.genCtrColumns(sorter, true, true),
       ...BaseTableUtils.genUpdateColumns(sorter),
       {
         title: '操作',
@@ -65,19 +65,15 @@ export default function LogLoginList() {
         <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="crtName" label="创建用户">
-              <Input placeholder="请输入创建用户"/>
+              <Input placeholder="请输入创建用户" allowClear />
             </Form.Item>
-          </Form>
 
-          <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined/>}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-            <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
+            <Space>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+              <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>导出</Button>
+            </Space>
+          </Form>
         </div>
       </div>
 
