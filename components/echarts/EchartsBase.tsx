@@ -1,8 +1,9 @@
-import React, {CSSProperties, useEffect, useRef, useState} from 'react';
+import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import {ECharts, EChartsOption} from 'echarts';
 import {useSize} from "ahooks";
+import {LangContext} from "@features/fa-admin-pages/layout";
 
 
 export interface EchartsBaseProps {
@@ -15,6 +16,7 @@ export interface EchartsBaseProps {
  * @date 2023/2/2 09:52
  */
 export default function EchartsBase({option, style}: EchartsBaseProps) {
+  const {themeDark} = useContext(LangContext)
 
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())
@@ -31,14 +33,17 @@ export default function EchartsBase({option, style}: EchartsBaseProps) {
   }, [size])
 
   useEffect(() => {
+    if (chartRef.current) chartRef.current.dispose();
+
     // 基于准备好的dom，初始化echarts实例
+    const theme = themeDark ? 'dark' : 'light'
     // @ts-ignore
-    chartRef.current = echarts.init(document.getElementById(id));
+    chartRef.current = echarts.init(document.getElementById(id), theme);
 
     // @ts-ignore
     chartRef.current.setOption(option);
     setReady(true)
-  }, [])
+  }, [themeDark])
 
   useEffect(() => {
     if (!ready) return;

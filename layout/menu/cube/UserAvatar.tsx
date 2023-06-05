@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Menu, Popover } from 'antd';
+import {Avatar, Menu, Popover, Switch} from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
 import { LangContext, MenuLayoutContext, UserLayoutContext } from "@/layout";
@@ -8,7 +8,7 @@ import { InputColor } from "@fa/ui";
 
 const UserPopoverContent = () => {
   const intl = useIntl();
-  const { setColorPrimary } = useContext(LangContext);
+  const { setColorPrimary, themeDark, setThemeDark } = useContext(LangContext);
   const { logout } = useContext(UserLayoutContext);
   const { addTab } = useContext(MenuLayoutContext);
 
@@ -85,9 +85,11 @@ const UserPopoverContent = () => {
       <div className="fa-flex-row-center">
         <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} inputStyle={{display: 'none'}} cubeStyle={{minWidth: 25, height: 25}} />
 
-        {['#F5222D', '#faad14', '#d4b106', '#52c41a', '#1677ff', '#a8071a', '#722ED1'].map((i) => (
+        {['#F5222D', '#faad14', '#52c41a', '#1677ff', '#722ED1', '#053553'].map((i) => (
           <div key={i} style={{ width: 25, height: 25, background: i }} onClick={() => handleChangeThemeColor(i)} />
         ))}
+
+        <Switch checkedChildren="暗色" unCheckedChildren="亮色" checked={themeDark} onChange={setThemeDark} />
       </div>
       <Menu selectedKeys={[]} onClick={(menu) => handleHeadDropdownClick(menu.key)} items={items} style={{ border: 'none' }} />
     </div>
@@ -105,7 +107,7 @@ export default function UserAvatar() {
       content={<UserPopoverContent />}
       trigger="click"
       getPopupContainer={() => document.body}
-      overlayInnerStyle={{ padding: 0 }}
+      // overlayInnerStyle={{ padding: 0 }}
     >
       <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <Avatar size="small" src={user ? fileSaveApi.genLocalGetFilePreview(user.img) : ''} />
