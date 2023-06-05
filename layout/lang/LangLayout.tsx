@@ -85,6 +85,7 @@ const ThemeConfig = {
     'fa-bg-color-hover': '#999',
     'fa-bg-grey': '#fafafa',
     'fa-text-color': '#353535',
+    'fa-subtitle-color': '#666',
     'fa-border-color': '#eee',
   },
   dark: {
@@ -92,7 +93,8 @@ const ThemeConfig = {
     'fa-bg-color-hover': '#999',
     'fa-bg-grey': '#05202F',
     'fa-text-color': '#FFF',
-    'fa-border-color': '#f1f1f1',
+    'fa-subtitle-color': '#A5C9E6',
+    'fa-border-color': '#0A3046',
   },
 }
 

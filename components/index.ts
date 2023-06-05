@@ -1,4 +1,5 @@
 export * from './area-cascader'
+export * from './base-card'
 export * from './echarts'
 export * from './file'
 export * from './grid'
