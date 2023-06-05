@@ -72,7 +72,7 @@ export default function FileSaveList() {
   return (
     <div className="fa-full-content fa-flex-column fa-bg-white">
       <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: 8 }}>
-        <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
+        <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="originalFilename" label="文件名">

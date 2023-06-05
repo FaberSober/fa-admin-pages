@@ -77,7 +77,7 @@ export default function MsgList() {
   return (
     <div className="fa-full-content fa-flex-column">
       <div className="fa-flex-row-center fa-p8">
-        <strong style={{fontSize: '18px'}}>{serviceName}</strong>
+        <div className="fa-h3">{serviceName}</div>
         <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="content" label="消息内容">

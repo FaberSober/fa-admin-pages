@@ -55,7 +55,7 @@ export default function NoticeList() {
   return (
     <div className="fa-full-content fa-flex-column fa-bg-white">
       <div className="fa-flex-row-center fa-p8">
-        <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
+        <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form  form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="status" label="状态">

@@ -111,7 +111,7 @@ export default function UserAvatar() {
     >
       <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <Avatar size="small" src={user ? fileSaveApi.genLocalGetFilePreview(user.img) : ''} />
-        <span style={{ color: '#eee', marginLeft: 12 }}>{user?.name}</span>
+        <span style={{ color: 'var(--fa-text-color)', marginLeft: 12 }}>{user?.name}</span>
       </div>
     </Popover>
   );

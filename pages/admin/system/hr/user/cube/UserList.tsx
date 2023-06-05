@@ -79,7 +79,7 @@ export default function UserList({ departmentId }: IProps) {
   return (
     <div className="fa-full-content fa-flex-column fa-p12 fa-bg-white">
       <div style={{ display: 'flex', alignItems: 'center', position: 'relative', marginBottom: 12 }}>
-        <strong style={{ fontSize: '18px' }}>{serviceName}</strong>
+        <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="tel" label="手机号">

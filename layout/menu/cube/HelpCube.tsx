@@ -41,7 +41,7 @@ export default function HelpCube() {
         getPopupContainer={() => document.body}
         overlayInnerStyle={{ padding: 0 }}
       >
-        <a style={{ color: '#eee', margin: '0 4px' }}>
+        <a style={{ color: 'var(--fa-text-color)', margin: '0 4px' }}>
           <QuestionCircleOutlined /> 帮助文档
         </a>
       </Popover>

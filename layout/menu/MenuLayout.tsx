@@ -10,7 +10,7 @@ import { HelpCube, Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar } fro
 import { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@/services';
 import { UserLayoutContext } from "@/layout";
-import './MenuLayout.css';
+import './MenuLayout.scss';
 
 
 /**

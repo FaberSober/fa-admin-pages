@@ -3,6 +3,7 @@ import { Menu } from 'antd';
 import { FaEnums } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
+import {LangContext} from "@features/fa-admin-pages/layout";
 
 /**
  * 顶部水平的菜单
@@ -10,6 +11,7 @@ import MenuLayoutContext from '../context/MenuLayoutContext';
  * @date 2022/9/23
  */
 export default function MenuAppHorizontal() {
+  const {themeDark} = useContext(LangContext)
   const { menuFullTree, menuSelAppId, setMenuSelAppId } = useContext(MenuLayoutContext);
 
   const blocks = menuFullTree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);
@@ -24,8 +26,9 @@ export default function MenuAppHorizontal() {
   }));
   return (
     <Menu
+      className="fa-menu-top"
       mode="horizontal"
-      theme="dark"
+      theme={themeDark ? 'dark' : 'light'}
       items={items}
       selectedKeys={menuSelAppId ? [menuSelAppId] : []}
       onSelect={({ key }) => setMenuSelAppId(key)}
