@@ -1,1 +1,1 @@
-export * from './NumBlock'
+export {default as NumBlock} from './NumBlock'
