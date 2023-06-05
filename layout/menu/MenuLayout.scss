@@ -52,6 +52,15 @@
     margin: 0 10px;
     border-radius: 15px !important;
   }
+
+  .ant-menu-item-active {
+    border-radius: 15px !important;
+    background-color: var(--fa-bg-color-hover) !important;
+  }
+
+  .ant-menu-item::after {
+    border-bottom-width: 0 !important;
+  }
 }
 
 .ant-layout-header {
