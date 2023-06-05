@@ -13,6 +13,7 @@ import enCNMessage from '@/lang/en_US';
 import {SmileOutlined} from '@ant-design/icons';
 import {Fa} from '@fa/ui';
 import {useLocalStorage} from 'react-use';
+import {SITE_INFO} from '@/configs'
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
@@ -107,8 +108,8 @@ const ThemeConfig = {
  */
 function LangLayout({children}: Fa.BaseChildProps) {
   const [locale, setLocale] = useState('zh_CN');
-  const [colorPrimary, setColorPrimary] = useLocalStorage<string>('colorPrimary', '#053553');
-  const [themeDark, setThemeDark] = useLocalStorage<boolean>('themeDark', false);
+  const [colorPrimary, setColorPrimary] = useLocalStorage<string>('colorPrimary', SITE_INFO.PRIMARY_COLOR);
+  const [themeDark, setThemeDark] = useLocalStorage<boolean>('themeDark', SITE_INFO.THEME === 'dark');
 
   useEffect(() => {
     const rootDom = document.getElementsByTagName('body')[0].style;
