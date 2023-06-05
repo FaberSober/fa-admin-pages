@@ -47,6 +47,7 @@ export default function EchartsPie({title, subTitle, data, dataTitle, style, pie
 
     // @ts-ignore
     chartRef.current.setOption({
+      backgroundColor: 'transparent',
       title: {
         text: title,
         subtext: subTitle,

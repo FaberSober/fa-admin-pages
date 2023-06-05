@@ -41,7 +41,7 @@ export default function EchartsBase({option, style}: EchartsBaseProps) {
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
     // @ts-ignore
-    chartRef.current.setOption(option);
+    chartRef.current.setOption({ backgroundColor: 'transparent', ...option });
     setReady(true)
   }, [themeDark])
 
@@ -49,7 +49,7 @@ export default function EchartsBase({option, style}: EchartsBaseProps) {
     if (!ready) return;
     if (option === undefined) return;
 
-    chartRef.current!.setOption(option)
+    chartRef.current!.setOption({ backgroundColor: 'transparent', ...option })
   }, [option])
 
   return (

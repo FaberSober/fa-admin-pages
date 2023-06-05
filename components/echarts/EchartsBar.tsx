@@ -47,6 +47,7 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
 
     // @ts-ignore
     chartRef.current.setOption({
+      backgroundColor: 'transparent',
       title: {
         text: title,
         subtext: subTitle,

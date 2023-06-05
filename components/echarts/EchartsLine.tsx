@@ -54,6 +54,7 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
 
     // @ts-ignore
     chartRef.current.setOption({
+      backgroundColor: 'transparent',
       title: {
         text: title,
         subtext: subTitle,
