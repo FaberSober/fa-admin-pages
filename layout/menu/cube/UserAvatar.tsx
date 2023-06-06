@@ -85,9 +85,11 @@ const UserPopoverContent = () => {
       <div className="fa-flex-row-center">
         <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} inputStyle={{display: 'none'}} cubeStyle={{minWidth: 25, height: 25}} />
 
-        {['#F5222D', '#faad14', '#50CEE3', '#1677ff', '#722ED1', '#053553'].map((i) => (
-          <div key={i} style={{ width: 25, height: 25, background: i }} onClick={() => handleChangeThemeColor(i)} />
-        ))}
+        <div className="fa-flex-row-center fa-mr8">
+          {['#F5222D', '#faad14', '#50CEE3', '#1677ff', '#722ED1', '#053553'].map((i) => (
+            <div key={i} className="fa-hover" style={{ width: 25, height: 25, background: i }} onClick={() => handleChangeThemeColor(i)} />
+          ))}
+        </div>
 
         <Switch checkedChildren="暗色" unCheckedChildren="亮色" checked={themeDark} onChange={setThemeDark} />
       </div>

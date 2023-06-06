@@ -64,7 +64,8 @@ export default function MenuV2() {
           titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
             <div className={styles.item}>
               <div style={{ flex: 1 }}>{item.name}</div>
-              <div style={{ width: 100 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
+              <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
+              <div style={{ width: 100 }}>{item.sourceData.id}</div>
               <div style={{ width: 100 }}>
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && <Tag color="#2db7f5">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
