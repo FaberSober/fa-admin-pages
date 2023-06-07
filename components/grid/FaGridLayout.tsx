@@ -22,7 +22,7 @@ export function FaGridLayout({ layout, renderItem, itemDivStyle, ...props }: FaG
       {...props}
     >
       {layout.map(i => (
-        <div key={i.i} style={{ background: '#FFF', ...itemDivStyle }}>
+        <div key={i.i} className="fa-bg-white" style={{ ...itemDivStyle }}>
           {renderItem(i)}
         </div>
       ))}

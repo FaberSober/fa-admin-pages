@@ -157,6 +157,7 @@ function LangLayout({children}: Fa.BaseChildProps) {
           token: {
             borderRadius: 3,
             colorPrimary: colorPrimary,
+            colorBgContainer: themeDark ? '#05202F' : '#FFF',
           },
         }}
         // getPopupContainer={(trigger) => (trigger ? trigger.parentElement : document.body)}
