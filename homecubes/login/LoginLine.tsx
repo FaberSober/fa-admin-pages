@@ -1,20 +1,32 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {EchartsLine} from "@/components";
+import {logLoginApi} from '@/services'
+import {Fa} from '@/types'
+import {FaUtils} from '@fa/ui'
+import dayjs from "dayjs";
 
 
 export interface LoginLineProps {
 }
 
 export function LoginLine() {
+  const [array, setArray] = useState<Fa.ChartSeriesVo[]>([])
+
+  useEffect(() => {
+    logLoginApi.countByDay({
+      startDate: FaUtils.getDateStrBeginOfDay(dayjs().add(-10, 'day'))!,
+      endDate: FaUtils.getDateStrEndOfDay(dayjs())!,
+    }).then(res => setArray(res.data))
+  }, [])
 
   return (
     <div className="fa-full">
       <EchartsLine
-        dataX={["一", "二", "三", "四", "五", "六", "七"]}
+        dataX={array.map(i => i.label)}
         dataY={[
           {
-            name: '指标1',
-            data: [4,5,4,5,4,5,6],
+            name: '登录用户数',
+            data: array.map(i => i.value),
           }
         ]}
         restOption={{ toolbox: {show: false} }}
