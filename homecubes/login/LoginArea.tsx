@@ -1,24 +1,37 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {EchartsPie} from "@/components";
+import {Fa} from "@/types";
+import {logLoginApi} from "@features/fa-admin-pages/services";
+import dayjs from "dayjs";
+import {FaUtils} from '@fa/ui'
 
 
 export interface LoginAreaProps {
 }
 
 export function LoginArea() {
+  const [array, setArray] = useState<Fa.ChartSeriesVo[]>([])
+
+  useEffect(() => {
+    logLoginApi.countByDay({
+      startDate: FaUtils.getDateStrBeginOfDay(dayjs().add(-10, 'day'))!,
+      endDate: FaUtils.getDateStrEndOfDay(dayjs())!,
+    }).then(res => setArray(res.data))
+  }, [])
 
   return (
     <div className="fa-full">
       <EchartsPie
         title="Pie"
         subTitle="Pie Chart"
-        data={[
-          {value: 1048, name: 'Search Engine'},
-          {value: 735, name: 'Direct'},
-          {value: 580, name: 'Email'},
-          {value: 484, name: 'Union Ads'},
-          {value: 300, name: 'Video Ads'}
-        ]}
+        // data={[
+        //   {value: 1048, name: 'Search Engine'},
+        //   {value: 735, name: 'Direct'},
+        //   {value: 580, name: 'Email'},
+        //   {value: 484, name: 'Union Ads'},
+        //   {value: 300, name: 'Video Ads'}
+        // ]}
+        data={array}
         dataTitle="销量"
         // style={{width: 500, height: 300}}
       />

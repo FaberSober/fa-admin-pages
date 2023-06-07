@@ -22,7 +22,7 @@ export function LoginLine() {
   return (
     <div className="fa-full">
       <EchartsLine
-        dataX={array.map(i => i.label)}
+        dataX={array.map(i => i.name)}
         dataY={[
           {
             name: '登录用户数',
