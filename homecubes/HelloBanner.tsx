@@ -16,7 +16,7 @@ export function HelloBanner() {
   }, 1000)
 
   return (
-    <div className="fa-bg-white" style={{ padding: 12 }}>
+    <div>
       <div style={{fontSize: '18px', fontWeight: 600}} className="fa-mb12">欢迎，{user.name}.</div>
       <div>{time}</div>
     </div>
@@ -24,9 +24,9 @@ export function HelloBanner() {
 }
 
 HelloBanner.displayName = "HelloBanner"; // 必须与方法名称一致
-HelloBanner.title = "欢迎组件";
+HelloBanner.title = "欢迎";
 HelloBanner.description = "欢迎组件";
 HelloBanner.showTitle = false; // 是否展示Card的Title
 HelloBanner.permission = ""; // 需要的权限
-HelloBanner.w = 16; // 宽度
+HelloBanner.w = 16; // 宽度-max=16
 HelloBanner.h = 3; // 高度

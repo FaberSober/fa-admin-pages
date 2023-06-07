@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import * as homecubes from '@/homecubes'
-import { FaGridLayout } from "@/components";
-import { Layout } from "react-grid-layout";
-import { each, isNil } from "lodash";
-import { Button, Card, List, Space, Spin, Switch } from "antd";
-import { configApi } from '@/services'
-import { Admin } from '@/types'
-import { ApiEffectLayoutContext, BaseDrawer } from "@fa/ui";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import {FaGridLayout} from "@/components";
+import {Layout} from "react-grid-layout";
+import {each, isNil} from "lodash";
+import {Button, List, Space, Spin, Switch} from "antd";
+import {configApi} from '@/services'
+import {Admin} from '@/types'
+import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard} from "@fa/ui";
+import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 
 
 console.log('homecubes', homecubes)
@@ -94,13 +94,13 @@ export default function Desktop() {
         renderItem={i => {
           const Component = (homecubes as any)[i.i];
           if (Component) {
-            if (!Component.showTitle) {
-              return <Component />
-            }
+            // if (!Component.showTitle) {
+            //   return <Component />
+            // }
             return (
-              <Card title={Component.title} size="small" style={{height: '100%'}}>
+              <FaFlashCard title={Component.title} hideTitle={!Component.showTitle}>
                 <Component />
-              </Card>
+              </FaFlashCard>
             )
           }
           return <span>Component {i.i} Not Found</span>
