@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {EchartsPie} from "@/components";
 import {Fa} from "@/types";
 import {logLoginApi} from "@features/fa-admin-pages/services";
-import dayjs from "dayjs";
-import {FaUtils} from '@fa/ui'
 
 
 export interface LoginAreaProps {
@@ -13,10 +11,7 @@ export function LoginArea() {
   const [array, setArray] = useState<Fa.ChartSeriesVo[]>([])
 
   useEffect(() => {
-    logLoginApi.countByDay({
-      startDate: FaUtils.getDateStrBeginOfDay(dayjs().add(-10, 'day'))!,
-      endDate: FaUtils.getDateStrEndOfDay(dayjs())!,
-    }).then(res => setArray(res.data))
+    logLoginApi.countByPro().then(res => setArray(res.data))
   }, [])
 
   return (
