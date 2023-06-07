@@ -13,18 +13,8 @@ const biz = 'base_log_api';
 export default function LogApiList() {
   const [form] = Form.useForm();
 
-  const {
-    queryParams,
-    setFormValues,
-    handleTableChange,
-    setSceneId,
-    setConditionList,
-    fetchPageList,
-    loading,
-    list,
-    dicts,
-    paginationProps,
-  } = useTableQueryParams<Admin.LogApi>(logApiApi.page, {}, serviceName);
+  const {queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, dicts, paginationProps} =
+    useTableQueryParams<Admin.LogApi>(logApiApi.page, {}, serviceName);
 
   const [handleDelete] = useDelete<string>(logApiApi.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(logApiApi.exportExcel, queryParams);
@@ -44,7 +34,7 @@ export default function LogApiList() {
       BaseTableUtils.genSimpleSorterColumn('操作系统', 'os', 100, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('浏览器', 'browser', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('浏览器版本', 'version', 120, sorter),
-      BaseTableUtils.genBoolSorterColumn('手机', 'mobile', 60, sorter),
+      BaseTableUtils.genBoolSorterColumn('手机', 'mobile', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('来源', 'faFrom', 80, sorter),
       BaseTableUtils.genSimpleSorterColumn('版本号', 'versionCode', 80, sorter),
       BaseTableUtils.genSimpleSorterColumn('版本名', 'versionName', 80, sorter),

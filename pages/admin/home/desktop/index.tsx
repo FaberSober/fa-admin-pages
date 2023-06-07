@@ -10,7 +10,7 @@ import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 
 
-console.log('homecubes', homecubes)
+// console.log('homecubes', homecubes)
 
 const biz = "HOME_LAYOUT";
 const type = "LAYOUT";
@@ -25,7 +25,7 @@ each(homecubes, (k) => {
     y: 0,
   })
 })
-console.log('layout', allLayout)
+// console.log('layout', allLayout)
 
 /**
  * @author xu.pengfei
@@ -52,7 +52,7 @@ export default function Desktop() {
   }, [])
 
   function onLayoutChange(layout: Layout[]) {
-    console.log('onLayoutChange', layout)
+    // console.log('onLayoutChange', layout)
     if (loading) return
     const params = {
       biz,
@@ -68,16 +68,45 @@ export default function Desktop() {
     }
   }
 
+  /**
+   * 添加item到布局中
+   * @param id
+   */
   function handleAdd(id: string) {
+    // console.log('layout', layout)
     const Component = (homecubes as any)[id];
+
+    let x = 0, y =0;
+
+    // 循环layout找到摆放位置
+    each(layout, l => {
+      const tryX = l.x + l.w;
+
+      // 已经循环到下一行了，需要从这一行的起始x=0处进行比对
+      if (l.y > y) {
+        x = 0;
+        y = l.y;
+      }
+
+      if (tryX + Component.w > 16) { // 本行已经摆放不下了，需要摆放到下一行
+        x = 0;
+        y = l.y + l.h; // y的下一行位置
+        return;
+      }
+
+      // 本行可以摆的下
+      x = tryX;
+      y = l.y;
+    })
+
     setLayout([
       ...layout,
       {
         i: Component.displayName,
         w: Component.w,
         h: Component.h,
-        x: 0,
-        y: 0,
+        x: x,
+        y: y,
       }
     ])
   }
