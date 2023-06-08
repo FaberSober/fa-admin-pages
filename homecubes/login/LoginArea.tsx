@@ -17,8 +17,8 @@ export function LoginArea() {
   return (
     <div className="fa-full">
       <EchartsPie
-        title="Pie"
-        subTitle="Pie Chart"
+        title="登录地区统计"
+        // subTitle="Pie Chart"
         // data={[
         //   {value: 1048, name: 'Search Engine'},
         //   {value: 735, name: 'Direct'},
@@ -27,7 +27,7 @@ export function LoginArea() {
         //   {value: 300, name: 'Video Ads'}
         // ]}
         data={array}
-        dataTitle="销量"
+        dataTitle="登录地区"
         // style={{width: 500, height: 300}}
       />
     </div>
