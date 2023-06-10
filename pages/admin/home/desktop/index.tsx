@@ -8,6 +8,7 @@ import {configApi} from '@/services'
 import {Admin} from '@/types'
 import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
+import {SITE_INFO} from "@/configs";
 
 
 // console.log('homecubes', homecubes)
@@ -32,7 +33,7 @@ each(homecubes, (k) => {
  * @date 2023/1/3 16:13
  */
 export default function Desktop() {
-  const { loadingEffect } = useContext(ApiEffectLayoutContext);
+  const {loadingEffect} = useContext(ApiEffectLayoutContext);
   const loading = loadingEffect[configApi.getUrl('save')] || loadingEffect[configApi.getUrl('update')];
 
   const [editing, setEditing] = useState(false)
@@ -46,7 +47,7 @@ export default function Desktop() {
         setConfig(res.data)
       } else {
         setConfig(undefined)
-        setLayout([])
+        setLayout(SITE_INFO.ADMIN_DEFAULT_LAYOUT || [])
       }
     })
   }, [])
@@ -60,7 +61,7 @@ export default function Desktop() {
       data: layout
     }
     if (config) {
-      configApi.update(config.id, { id: config.id, ...params })
+      configApi.update(config.id, {id: config.id, ...params})
     } else {
       configApi.save(params).then(res => {
         setConfig(res.data)
@@ -76,7 +77,7 @@ export default function Desktop() {
     // console.log('layout', layout)
     const Component = (homecubes as any)[id];
 
-    let x = 0, y =0;
+    let x = 0, y = 0;
 
     // 循环layout找到摆放位置
     each(layout, l => {
@@ -115,7 +116,7 @@ export default function Desktop() {
     setLayout(layout.filter(i => i.i !== id))
   }
 
-  const inIds:string[] = layout.map(i => i.i);
+  const inIds: string[] = layout.map(i => i.i);
   return (
     <div className="fa-full-content">
       <FaGridLayout
@@ -128,7 +129,7 @@ export default function Desktop() {
             // }
             return (
               <FaFlashCard title={Component.title} hideTitle={!Component.showTitle}>
-                <Component />
+                <Component/>
               </FaFlashCard>
             )
           }
@@ -141,12 +142,12 @@ export default function Desktop() {
         isResizable={editing}
       />
 
-      <Space style={{ position: 'absolute', top: 12, right: 12 }}>
-        {loading && <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />}
+      <Space style={{position: 'absolute', top: 12, right: 12}}>
+        {loading && <Spin indicator={<LoadingOutlined style={{fontSize: 24}} spin/>}/>}
 
         <BaseDrawer
           title="添加组件"
-          triggerDom={<Button shape="circle" icon={<PlusOutlined />} size="small" />}
+          triggerDom={<Button shape="circle" icon={<PlusOutlined/>} size="small"/>}
           bodyStyle={{padding: 0}}
         >
           <List
@@ -164,7 +165,7 @@ export default function Desktop() {
                   extra={(
                     <div>
                       {!sel && <a onClick={() => handleAdd(item.i)} key="list-item-add">添加</a>}
-                      {sel  && <a onClick={() => handleDel(item.i)} key="list-item-del" style={{ color: '#F00' }}>移除</a>}
+                      {sel && <a onClick={() => handleDel(item.i)} key="list-item-del" style={{color: '#F00'}}>移除</a>}
                     </div>
                   )}
                 >
@@ -177,7 +178,7 @@ export default function Desktop() {
             }}
           />
         </BaseDrawer>
-        <Switch checkedChildren="退出编辑" unCheckedChildren="编辑布局" checked={editing} onChange={(e) => setEditing(e)} />
+        <Switch checkedChildren="退出编辑" unCheckedChildren="编辑布局" checked={editing} onChange={(e) => setEditing(e)}/>
       </Space>
     </div>
   )
