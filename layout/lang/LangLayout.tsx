@@ -83,7 +83,7 @@ const customizeRenderEmpty = () => (
 const ThemeConfig = {
   light: {
     'fa-bg-color': '#fff',
-    'fa-bg-color-hover': '#999',
+    'fa-bg-color-hover': '#99999999',
     'fa-bg-color2': '#eee',
     'fa-bg-grey': '#fafafa',
     'fa-text-color': '#353535',
@@ -95,7 +95,7 @@ const ThemeConfig = {
   },
   dark: {
     'fa-bg-color': '#05202F',
-    'fa-bg-color-hover': '#999',
+    'fa-bg-color-hover': '#99999999',
     'fa-bg-color2': '#012C4A',
     'fa-bg-grey': '#05202F',
     'fa-text-color': '#FFF',
