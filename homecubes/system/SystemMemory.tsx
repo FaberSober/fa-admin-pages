@@ -23,7 +23,8 @@ export function SystemMemory() {
 
   let value:any = 0;
   if (data && data.memory && data.memory.total > 0) {
-    value = (data.memory.available / data.memory.total * 100).toFixed(0);
+    const used = data.memory.total - data.memory.available;
+    value = (used / data.memory.total * 100).toFixed(0);
   }
 
   return (
