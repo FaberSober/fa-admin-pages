@@ -63,7 +63,6 @@ export default function Server() {
           <Col md={12}>
             <Card title="磁盘">
               {data.fileStoreList.map(i => {
-                const usedSpace = i.totalSpace - i.freeSpace;
                 const freePer = i.freeSpace / i.totalSpace;
                 const totalWidth = 400;
                 const freePerWidth = (freePer * totalWidth).toFixed(0)
@@ -74,7 +73,7 @@ export default function Server() {
                     <div className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative" style={{width: totalWidth, background: 'darkblue', color: '#FFF'}}>
                       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey'  }} />
                       <div className="fa-flex-1" />
-                      <div>{FaUtils.sizeToHuman(usedSpace, 1)}</div>
+                      <div>{FaUtils.sizeToHuman(i.freeSpace, 1)}</div>
                       <div>&nbsp;/&nbsp;</div>
                       <div>{FaUtils.sizeToHuman(i.totalSpace, 1)}</div>
                     </div>
