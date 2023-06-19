@@ -1,21 +1,46 @@
-import React from 'react';
-import {EchartsGaugeStep} from "@/components";
+import React, {useEffect, useState} from 'react';
+import {useInterval} from "ahooks";
+import {Admin} from "@/types";
+import {systemApi} from "@/services";
+import {FaUtils} from "@fa/ui";
 
 
 export interface SystemDiskProps {
 }
 
 export function SystemDisk() {
+  const [data, setData] = useState<Admin.ServerInfo>();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useInterval(fetchData, 5000);
+
+  function fetchData() {
+    systemApi.server().then((res) => setData(res.data));
+  }
 
   return (
     <div className="fa-full">
-      <EchartsGaugeStep
-        min={0}
-        max={100}
-        value={50}
-        unit="%"
-        // style={{width: 500, height: 300}}
-      />
+      {data && data.fileStoreList.map(i => {
+        const freePer = i.freeSpace / i.totalSpace;
+        const totalWidth = 200;
+        const freePerWidth = (freePer * totalWidth).toFixed(0)
+        return (
+          <div key={i.uuid} className="fa-flex-row-center fa-mb12">
+            <div className="fa-flex-1 fa-keep-word">{i.volume}</div>
+            <div className="fa-mr12">{i.name}</div>
+            <div className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative" style={{width: totalWidth, background: 'darkblue', color: '#FFF'}}>
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey'  }} />
+              <div className="fa-flex-1" />
+              <div>{FaUtils.sizeToHuman(i.freeSpace, 1)}</div>
+              <div>&nbsp;/&nbsp;</div>
+              <div>{FaUtils.sizeToHuman(i.totalSpace, 1)}</div>
+            </div>
+          </div>
+        )
+      })}
     </div>
   );
 }

@@ -1,18 +1,37 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {useInterval} from "ahooks";
 import {EchartsGaugeStep} from "@/components";
+import {Admin} from "@/types";
+import {systemApi} from "@/services";
 
 
 export interface SystemCpuProps {
 }
 
 export function SystemCpu() {
+  const [data, setData] = useState<Admin.ServerInfo>();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useInterval(fetchData, 5000);
+
+  function fetchData() {
+    systemApi.server().then((res) => setData(res.data));
+  }
+
+  let value = 0;
+  if (data && data.cpuInfo) {
+    value = data.cpuInfo.used;
+  }
 
   return (
     <div className="fa-full">
       <EchartsGaugeStep
         min={0}
         max={100}
-        value={20}
+        value={value}
         unit="%"
         // style={{width: 500, height: 300}}
       />

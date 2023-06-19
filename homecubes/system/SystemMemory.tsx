@@ -1,18 +1,37 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {useInterval} from "ahooks";
 import {EchartsGaugeStep} from "@/components";
+import {Admin} from "@/types";
+import {systemApi} from "@/services";
 
 
 export interface SystemMemoryProps {
 }
 
 export function SystemMemory() {
+  const [data, setData] = useState<Admin.ServerInfo>();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useInterval(fetchData, 5000);
+
+  function fetchData() {
+    systemApi.server().then((res) => setData(res.data));
+  }
+
+  let value:any = 0;
+  if (data && data.memory && data.memory.total > 0) {
+    value = (data.memory.available / data.memory.total * 100).toFixed(0);
+  }
 
   return (
     <div className="fa-full">
       <EchartsGaugeStep
         min={0}
         max={100}
-        value={60}
+        value={value}
         unit="%"
         // style={{width: 500, height: 300}}
       />
