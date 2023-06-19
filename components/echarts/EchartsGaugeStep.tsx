@@ -61,10 +61,10 @@ export default function EchartsGaugeStep({min, max, value, unit, restOption, sty
             lineStyle: {
               width: 6,
               color: [
-                [0.25, '#FF6E76'],
-                [0.5, '#FDDD60'],
-                [0.75, '#58D9F9'],
-                [1, '#7CFFB2']
+                [0.25, '#7CFFB2'],
+                [0.5, '#58D9F9'],
+                [0.75, '#FDDD60'],
+                [1, '#FF6E76']
               ]
             }
           },
