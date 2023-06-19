@@ -515,6 +515,16 @@ namespace Admin {
       model: string;
       manufacturer: string;
     };
+    fileStoreList: FileStore[];
+  }
+
+  export interface FileStore {
+    uuid: string;
+    volume: string;
+    name: string;
+    totalSpace: number;
+    freeSpace: number;
+    usableSpace: number;
   }
 }
 
