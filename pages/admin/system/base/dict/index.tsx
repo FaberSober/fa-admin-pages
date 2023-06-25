@@ -136,7 +136,7 @@ export default function DictManage() {
                 <FaSortList
                   list={showDicts}
                   renderItem={(i) => <DictForm dict={i} onChange={handleEditDict} onDelete={handleDelDict}/>}
-                  itemStyle={{borderBottom: '1px solid #eee', position: 'relative', cursor: 'default'}}
+                  itemStyle={{borderBottom: '1px solid var(--fa-border-color)', position: 'relative', cursor: 'default'}}
                   onSortEnd={(l) => handleChangeDicts(l)}
                   vertical
                   handle
