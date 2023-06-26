@@ -28,7 +28,7 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
 
   const [handleDelete] = useDelete<string>(rbacUserRoleApi.remove, fetchPageList, serviceName);
 
-  function handleAddUsers(users: SelectedUser[], callback: any) {
+  function handleAddUsers(users: SelectedUser[], callback: any, error: any) {
     rbacUserRoleApi
       .addUsers(
         users.map((i) => i.id),
@@ -38,7 +38,7 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
         FaUtils.showResponse(res, '添加用户角色');
         callback();
         fetchPageList();
-      });
+      }).catch(() => error());
   }
 
   /** 生成表格字段List */
