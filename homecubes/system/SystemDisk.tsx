@@ -34,9 +34,11 @@ export function SystemDisk() {
             <div className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative" style={{width: totalWidth, background: 'darkblue', color: '#FFF'}}>
               <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey'  }} />
               <div className="fa-flex-1" />
-              <div>{FaUtils.sizeToHuman(i.freeSpace, 1)}</div>
-              <div>&nbsp;/&nbsp;</div>
-              <div>{FaUtils.sizeToHuman(i.totalSpace, 1)}</div>
+              <div className="fa-flex-row-center" style={{zIndex: 1}}>
+                <div>{FaUtils.sizeToHuman(i.freeSpace, 1)}</div>
+                <div>&nbsp;/&nbsp;</div>
+                <div>{FaUtils.sizeToHuman(i.totalSpace, 1)}</div>
+              </div>
             </div>
           </div>
         )

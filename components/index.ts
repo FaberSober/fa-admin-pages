@@ -1,6 +1,7 @@
 export * from './area-cascader'
 export * from './base-card'
 export * from './echarts'
+export * from './excel'
 export * from './file'
 export * from './grid'
 export * from './helper'
