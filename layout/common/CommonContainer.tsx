@@ -3,6 +3,7 @@ import {ApiEffectLayout, PageLoading, ThemeLayout} from "@fa/ui";
 import {SITE_INFO} from "@/configs";
 import LangLayout from "../lang/LangLayout";
 import {Outlet} from "react-router-dom";
+import {ConfigLayout} from "@features/fa-admin-pages/layout";
 
 
 /**
@@ -15,9 +16,11 @@ export default function CommonContainer() {
     <ThemeLayout colorPrimary={SITE_INFO.PRIMARY_COLOR}>
       <LangLayout>
         <ApiEffectLayout>
-          <Suspense fallback={<PageLoading />}>
-            <Outlet />
-          </Suspense>
+          <ConfigLayout>
+            <Suspense fallback={<PageLoading />}>
+              <Outlet />
+            </Suspense>
+          </ConfigLayout>
         </ApiEffectLayout>
       </LangLayout>
     </ThemeLayout>
