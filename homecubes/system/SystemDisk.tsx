@@ -29,7 +29,7 @@ export function SystemDisk() {
         const freePerWidth = (freePer * totalWidth).toFixed(0)
         return (
           <div key={i.uuid} className="fa-flex-row-center fa-mb12">
-            <div className="fa-flex-1 fa-keep-word">{i.volume}</div>
+            <div className="fa-flex-1">{i.volume}</div>
             <div className="fa-mr12">{i.name}</div>
             <div className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative" style={{width: totalWidth, background: 'darkblue', color: '#FFF'}}>
               <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey'  }} />

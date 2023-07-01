@@ -3,7 +3,7 @@ import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import {ECharts, EChartsOption} from 'echarts';
 import {useSize} from "ahooks";
-import {LangContext} from "@features/fa-admin-pages/layout";
+import {ThemeLayoutContext} from "@fa/ui";
 
 
 export interface EchartsBaseProps {
@@ -16,7 +16,7 @@ export interface EchartsBaseProps {
  * @date 2023/2/2 09:52
  */
 export default function EchartsBase({option, style}: EchartsBaseProps) {
-  const {themeDark} = useContext(LangContext)
+  const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())

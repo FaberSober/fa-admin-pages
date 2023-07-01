@@ -2,9 +2,8 @@ import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'rea
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import { ECharts, BarSeriesOption } from 'echarts';
-import { Fa } from '@fa/ui'
+import {Fa, ThemeLayoutContext} from '@fa/ui'
 import { useSize } from "ahooks";
-import {LangContext} from "@features/fa-admin-pages/layout";
 
 
 export interface EchartsBarProps {
@@ -21,7 +20,7 @@ export interface EchartsBarProps {
  * @date 2023/2/2 09:52
  */
 export default function EchartsBar({title, subTitle, data, dataTitle, style, barSeriesOption}: EchartsBarProps) {
-  const {themeDark} = useContext(LangContext)
+  const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())

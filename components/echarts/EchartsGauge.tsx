@@ -3,7 +3,7 @@ import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import {ECharts} from 'echarts';
 import {useSize} from "ahooks";
-import {LangContext} from "@features/fa-admin-pages/layout";
+import {ThemeLayoutContext} from "@fa/ui";
 
 
 export interface EchartsGaugeProps {
@@ -20,7 +20,7 @@ export interface EchartsGaugeProps {
  * @date 2023/6/7 11:22
  */
 export default function EchartsGauge({min, max, value, unit, restOption, style}: EchartsGaugeProps) {
-  const {themeDark} = useContext(LangContext)
+  const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())

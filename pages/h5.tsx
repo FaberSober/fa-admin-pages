@@ -1,7 +1,5 @@
-import React, {Suspense} from 'react';
-import {LangLayout} from "@features/fa-admin-pages/layout";
-import {Outlet} from "react-router-dom";
-import {PageLoading} from "@fa/ui";
+import React from 'react';
+import {CommonContainer} from "@features/fa-admin-pages/layout";
 
 
 /**
@@ -10,10 +8,6 @@ import {PageLoading} from "@fa/ui";
  */
 export default function h5() {
   return (
-    <LangLayout>
-      <Suspense fallback={<PageLoading />}>
-        <Outlet />
-      </Suspense>
-    </LangLayout>
+    <CommonContainer />
   )
 }

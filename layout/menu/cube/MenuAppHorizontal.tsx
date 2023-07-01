@@ -1,9 +1,8 @@
-import React, { useContext } from 'react';
-import { Menu } from 'antd';
-import { FaEnums } from '@fa/ui';
-import { FaIcon } from '@fa/icons';
+import React, {useContext} from 'react';
+import {Menu} from 'antd';
+import {FaEnums, ThemeLayoutContext} from '@fa/ui';
+import {FaIcon} from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
-import {LangContext} from "@features/fa-admin-pages/layout";
 
 /**
  * 顶部水平的菜单
@@ -11,7 +10,7 @@ import {LangContext} from "@features/fa-admin-pages/layout";
  * @date 2022/9/23
  */
 export default function MenuAppHorizontal() {
-  const {themeDark} = useContext(LangContext)
+  const {themeDark} = useContext(ThemeLayoutContext)
   const { menuFullTree, menuSelAppId, setMenuSelAppId } = useContext(MenuLayoutContext);
 
   const blocks = menuFullTree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);

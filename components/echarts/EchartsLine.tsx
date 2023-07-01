@@ -1,10 +1,9 @@
 import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
-import { ECharts, LineSeriesOption } from 'echarts';
-import { FaUtils } from '@fa/ui'
-import { useSize } from "ahooks";
-import {LangContext} from "@features/fa-admin-pages/layout";
+import {ECharts, LineSeriesOption} from 'echarts';
+import {FaUtils, ThemeLayoutContext} from '@fa/ui'
+import {useSize} from "ahooks";
 
 
 type serie = {
@@ -28,7 +27,7 @@ export interface EchartsLineProps {
  * @date 2023/2/2 09:52
  */
 export default function EchartsLine({title, subTitle, dataX, dataY, style, lineSeriesOption, restOption}: EchartsLineProps) {
-  const {themeDark} = useContext(LangContext)
+  const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
   const [id] = useState(uuidv4())

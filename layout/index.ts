@@ -1,3 +1,4 @@
+export { default as CommonContainer } from './common/CommonContainer'
 export * from './config'
 export * from './effect'
 export * from './lang'
