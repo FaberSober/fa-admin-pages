@@ -6,9 +6,10 @@ const HTML_HEADING_QUERY = "h1,h2,h3,h4,h5,h6"
 //
 // Returns an array of objects, with the keys "element" and "children",
 // where "element" is a JSDOM element.
-export function extractHeadingStructure(dom:Element) {
+export function extractHeadingStructure(dom:HTMLElement): StructureElement[] {
+  if (dom === undefined || dom === null) return [];
   // const dom = new JSDOM(html)
-  const headings:Element[] = Array.from(dom.querySelectorAll(HTML_HEADING_QUERY))
+  const headings:HTMLElement[] = Array.from(dom.querySelectorAll(HTML_HEADING_QUERY))
 
   let output = []
   let topLevel = 0
@@ -31,7 +32,7 @@ export function extractHeadingStructure(dom:Element) {
 
 
 export interface StructureElement {
-  element: Element,
+  element: HTMLElement,
   children: StructureElement[],
 }
 
@@ -39,14 +40,14 @@ export interface StructureElement {
 
 // === PRIVATE FUNCTIONS ===
 
-function buildStructureElement(headings:Element[], expectedLevel:number): StructureElement|undefined {
+function buildStructureElement(headings:HTMLElement[], expectedLevel:number): StructureElement|undefined {
   const heading = headings[0]
   const level = extractLevel(heading)
 
   if (expectedLevel !== 0) {
-    if (level > expectedLevel) {
-      throw new Error(`encountered skipped heading level - expected ${expectedLevel}, found ${level}`)
-    }
+    // if (level > expectedLevel) {
+    //   throw new Error(`encountered skipped heading level - expected ${expectedLevel}, found ${level}`)
+    // }
     if (level < expectedLevel) {
       return undefined
     }
