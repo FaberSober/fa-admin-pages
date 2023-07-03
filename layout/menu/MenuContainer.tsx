@@ -8,19 +8,22 @@ import {SITE_INFO} from "@/configs";
 
 
 import 'allotment/dist/style.css';
+import {ConfigLayout} from "@features/fa-admin-pages/layout";
 
 export default function MenuContainer() {
   return (
     <ThemeLayout colorPrimary={SITE_INFO.PRIMARY_COLOR}>
       <LangLayout>
         <ApiEffectLayout>
-          <UserLayout>
-            <MenuLayout>
-              <Suspense fallback={<PageLoading />}>
-                <Outlet />
-              </Suspense>
-            </MenuLayout>
-          </UserLayout>
+          <ConfigLayout>
+            <UserLayout>
+              <MenuLayout>
+                <Suspense fallback={<PageLoading />}>
+                  <Outlet />
+                </Suspense>
+              </MenuLayout>
+            </UserLayout>
+          </ConfigLayout>
         </ApiEffectLayout>
       </LangLayout>
     </ThemeLayout>

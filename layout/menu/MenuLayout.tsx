@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Empty, Layout } from 'antd';
-import { find, isNil } from 'lodash';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { useLocalStorage } from 'react-use';
-import { Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList } from "@fa/ui";
-import MenuLayoutContext, { MenuLayoutContextProps, OpenTabsItem } from './context/MenuLayoutContext';
-import { HelpCube, Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar } from "./cube";
-import { Rbac } from '@/types';
-import { rbacUserRoleApi } from '@/services';
-import { UserLayoutContext } from "@/layout";
+import React, {useContext, useEffect, useState} from 'react';
+import {Empty, Layout} from 'antd';
+import {find, isNil} from 'lodash';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {Helmet} from 'react-helmet-async';
+import {useLocalStorage} from 'react-use';
+import {Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList} from "@fa/ui";
+import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
+import {HelpCube, Logo, MenuAppHorizontal, OpenTabs, SideMenu, UserAvatar} from "./cube";
+import {Rbac} from '@/types';
+import {rbacUserRoleApi} from '@/services';
+import {ConfigLayoutContext} from "@/layout";
 import './MenuLayout.scss';
 
 
@@ -20,7 +20,7 @@ import './MenuLayout.scss';
 export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const {systemConfig} = useContext(UserLayoutContext)
+  const {systemConfig} = useContext(ConfigLayoutContext)
 
   // 将tree平铺的menu list
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);

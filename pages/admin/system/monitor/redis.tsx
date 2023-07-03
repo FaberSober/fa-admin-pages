@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import { Button } from 'antd';
-import { UserLayoutContext } from "@/layout";
+import React, {useContext} from 'react';
+import {Button} from 'antd';
+import {ConfigLayoutContext} from "@/layout";
 
 
 /**
@@ -9,7 +9,7 @@ import { UserLayoutContext } from "@/layout";
  * @date 2022/11/29
  */
 export default function Redis() {
-  const { systemConfig } = useContext(UserLayoutContext);
+  const { systemConfig } = useContext(ConfigLayoutContext);
 
   function refreshIframe() {
     (document.getElementById('phpRedisAdmin') as any).contentWindow.location = systemConfig.phpRedisAdmin;

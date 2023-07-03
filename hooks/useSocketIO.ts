@@ -1,7 +1,7 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { trim } from 'lodash';
-import { getToken } from '@fa/ui';
-import { UserLayoutContext } from '@/layout';
+import {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {trim} from 'lodash';
+import {getToken} from '@fa/ui';
+import {ConfigLayoutContext} from '@/layout';
 
 export interface Props {
   query?: any;
@@ -26,7 +26,7 @@ export interface Ret {
  * @date 2021/3/20
  */
 export default function useSocketIO({ query = { from: 'web', token: getToken() }, onConnect, onDisconnect }: Props): Ret {
-  const { systemConfig } = useContext(UserLayoutContext);
+  const { systemConfig } = useContext(ConfigLayoutContext);
   const socketRef = useRef<any>();
   const [ready, setReady] = useState(false);
 

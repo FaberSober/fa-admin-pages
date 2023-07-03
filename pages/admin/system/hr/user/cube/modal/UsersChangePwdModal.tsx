@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { Button, Form, Input } from 'antd';
-import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import { validatePasswordSafeRule } from '@/components';
-import { userApi } from '@/services';
-import { UserLayoutContext } from "@features/fa-admin-pages/layout";
+import React, {useContext, useState} from 'react';
+import {Button, Form, Input} from 'antd';
+import {ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils} from '@fa/ui';
+import {validatePasswordSafeRule} from '@/components';
+import {userApi} from '@/services';
+import {ConfigLayoutContext} from "@features/fa-admin-pages/layout";
 
 
 interface UsersChangePwdModalProps extends DragModalProps {
@@ -16,7 +16,7 @@ interface UsersChangePwdModalProps extends DragModalProps {
  */
 export default function UsersChangePwdModal({ children, userIds, fetchFinish, ...props }: UsersChangePwdModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const { systemConfig } = useContext(UserLayoutContext);
+  const { systemConfig } = useContext(ConfigLayoutContext);
 
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);

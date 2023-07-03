@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
-import { UserLayoutContext } from "@/layout";
+import {ConfigLayoutContext, UserLayoutContext} from "@/layout";
 import { userApi } from "@/services";
 import { validatePasswordSafeRule } from "@/components";
 
@@ -14,7 +14,8 @@ const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
  */
 export default function AccountPwdUpdate() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const { systemConfig, logout } = useContext(UserLayoutContext);
+  const { systemConfig } = useContext(ConfigLayoutContext);
+  const { logout } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
 
   function onFinish(fieldValues: any) {
