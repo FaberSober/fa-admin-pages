@@ -27,8 +27,8 @@ function buildTOCFromHeadingStructure(headingStructure: StructureElement[], opti
 //
 // For the available options that can be passed into the options parameter,
 // please refer to the README of toc-extract.
-export function extractTOC(html: string, options = {}) {
-  return buildTOCFromHeadingStructure(extractHeadingStructure(html), options)
+export function extractTOC(dom: Element, options = {}) {
+  return buildTOCFromHeadingStructure(extractHeadingStructure(dom), options)
 }
 
 

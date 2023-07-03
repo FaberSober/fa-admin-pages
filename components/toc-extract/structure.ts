@@ -1,4 +1,3 @@
-import { JSDOM } from 'jsdom';
 import { extractLevel } from './helpers';
 
 const HTML_HEADING_QUERY = "h1,h2,h3,h4,h5,h6"
@@ -7,9 +6,9 @@ const HTML_HEADING_QUERY = "h1,h2,h3,h4,h5,h6"
 //
 // Returns an array of objects, with the keys "element" and "children",
 // where "element" is a JSDOM element.
-export function extractHeadingStructure(html:string) {
-  const dom = new JSDOM(html)
-  const headings:Element[] = Array.from(dom.window.document.querySelectorAll(HTML_HEADING_QUERY))
+export function extractHeadingStructure(dom:Element) {
+  // const dom = new JSDOM(html)
+  const headings:Element[] = Array.from(dom.querySelectorAll(HTML_HEADING_QUERY))
 
   let output = []
   let topLevel = 0
