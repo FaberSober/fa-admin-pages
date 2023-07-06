@@ -1,4 +1,4 @@
-import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'react';
+import React, {CSSProperties, ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import {ECharts} from 'echarts';
@@ -13,13 +13,14 @@ export interface EchartsGaugeStepProps {
   unit?: string;
   restOption?: any;
   style?: CSSProperties;
+  subTitle?: string|ReactNode;
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/6/7 11:22
  */
-export default function EchartsGaugeStep({min, max, value, unit, restOption, style}: EchartsGaugeStepProps) {
+export default function EchartsGaugeStep({min, max, value, unit, restOption, style, subTitle}: EchartsGaugeStepProps) {
   const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
@@ -144,6 +145,12 @@ export default function EchartsGaugeStep({min, max, value, unit, restOption, sty
   return (
     <div ref={domRef} style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
       <div id={id} style={{ height: '100%', width: '100%' }} />
+
+      {subTitle && (
+        <div className="fa-flex-column-center" style={{position: 'absolute', bottom: '20%', left: 0, right: 0 }}>
+          {subTitle}
+        </div>
+      )}
     </div>
   )
 }
