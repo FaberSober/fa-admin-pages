@@ -83,7 +83,7 @@ const UserPopoverContent = () => {
   return (
     <div style={{ minWidth: 160 }}>
       <div className="fa-flex-row-center">
-        <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} inputStyle={{display: 'none'}} cubeStyle={{minWidth: 25, height: 25}} />
+        <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} style={{width: 25, height: 25}} />
 
         <div className="fa-flex-row-center fa-mr8">
           {['#F5222D', '#faad14', '#50CEE3', '#1677ff', '#722ED1', '#053553'].map((i) => (

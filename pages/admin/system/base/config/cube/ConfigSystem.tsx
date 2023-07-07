@@ -70,7 +70,7 @@ export default function ConfigSystem() {
           </Col>
           <Col md={1}>
             <Form.Item name="titleColor" rules={[{ required: true }]}>
-              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
+              <InputColor style={{width: 32, height: 32, marginTop: 30}} />
             </Form.Item>
           </Col>
 
@@ -81,7 +81,7 @@ export default function ConfigSystem() {
           </Col>
           <Col md={1}>
             <Form.Item name="subTitleColor" rules={[{ required: true }]}>
-              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
+              <InputColor style={{width: 32, height: 32, marginTop: 30}} />
             </Form.Item>
           </Col>
 
@@ -92,7 +92,7 @@ export default function ConfigSystem() {
           </Col>
           <Col md={1}>
             <Form.Item name="copColor" rules={[{ required: true }]}>
-              <InputColor inputStyle={{display: 'none'}} cubeStyle={{minWidth: 32, height: 32, marginTop: 30, borderRadius: 4}} />
+              <InputColor style={{width: 32, height: 32, marginTop: 30}} />
             </Form.Item>
           </Col>
         </Row>
