@@ -21,7 +21,7 @@ const allLayout: Layout[] = parseAllLayout(homecubes);
  * @date 2023/1/3 16:13
  */
 export default function Desktop() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(homecubes, biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
 
   const [editing, setEditing] = useState(false)
 

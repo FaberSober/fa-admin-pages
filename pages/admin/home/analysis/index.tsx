@@ -19,7 +19,7 @@ const allLayout: Layout[] = parseAllLayout(cubes);
  * @date 2023/1/3 16:13
  */
 export default function Analysis() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(biz, type, []);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, []);
 
   const [editing, setEditing] = useState(false)
 

@@ -20,7 +20,7 @@ export function LoginLine() {
   }, [])
 
   return (
-    <div className="fa-full">
+    <div className="fa-full fa-p12">
       <EchartsLine
         dataX={array.map(i => i.name)}
         dataY={[

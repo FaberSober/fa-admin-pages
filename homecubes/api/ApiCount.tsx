@@ -52,7 +52,7 @@ export function ApiCount() {
   useInterval(refresh, 60 * 1000)
 
   return (
-    <div className="fa-full">
+    <div className="fa-full fa-p12">
       <NumBlock
         title="今日API访问数"
         value={apiCount}

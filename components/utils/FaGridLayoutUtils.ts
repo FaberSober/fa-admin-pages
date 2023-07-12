@@ -4,7 +4,6 @@ import {each} from "lodash";
 import {ApiEffectLayoutContext, FaUtils} from "@fa/ui";
 import {configApi} from "@/services";
 import {Admin} from "@/types";
-import * as homecubes from "@/homecubes";
 import {Modal} from "antd";
 
 
@@ -64,7 +63,7 @@ export function calAddLayout(cubes: any, layout: Layout[], addId: string) {
   ];
 }
 
-export function useGridLayoutConfig(biz: string, type: string, defaultLayout: any[]) {
+export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: any[]) {
   const {loadingEffect} = useContext(ApiEffectLayoutContext);
   const loading = loadingEffect[configApi.getUrl('save')] || loadingEffect[configApi.getUrl('update')];
 
@@ -110,7 +109,7 @@ export function useGridLayoutConfig(biz: string, type: string, defaultLayout: an
    * @param id
    */
   function handleAdd(id: string) {
-    const newLayout = calAddLayout(homecubes, layout, id);
+    const newLayout = calAddLayout(cubes, layout, id);
     setLayout(newLayout)
   }
 

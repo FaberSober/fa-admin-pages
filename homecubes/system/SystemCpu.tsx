@@ -27,7 +27,7 @@ export function SystemCpu() {
   }
 
   return (
-    <div className="fa-full">
+    <div className="fa-full fa-p12">
       <EchartsGaugeStep
         min={0}
         max={100}

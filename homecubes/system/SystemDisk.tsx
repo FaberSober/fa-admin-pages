@@ -22,7 +22,7 @@ export function SystemDisk() {
   }
 
   return (
-    <div className="fa-full">
+    <div className="fa-full fa-p12">
       {data && data.fileStoreList.map(i => {
         const freePer = i.freeSpace / i.totalSpace;
         const totalWidth = 200;

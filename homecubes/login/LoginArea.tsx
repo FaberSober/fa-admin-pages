@@ -15,7 +15,7 @@ export function LoginArea() {
   }, [])
 
   return (
-    <div className="fa-full">
+    <div className="fa-full fa-p12">
       <EchartsPie
         title="登录地区统计"
         // subTitle="Pie Chart"
