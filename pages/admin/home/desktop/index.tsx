@@ -1,139 +1,29 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import * as homecubes from '@/homecubes'
-import {FaGridLayout} from "@/components";
+import {FaGridLayout, parseAllLayout, useGridLayoutConfig} from "@/components";
 import {Layout} from "react-grid-layout";
-import {each, isNil} from "lodash";
-import {Button, List, Modal, Space, Spin, Switch} from "antd";
-import {configApi} from '@/services'
-import {Admin} from '@/types'
-import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard, FaUtils} from "@fa/ui";
+import {isNil} from "lodash";
+import {Button, List, Space, Spin, Switch} from "antd";
+import {BaseDrawer, FaFlashCard} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 import {SITE_INFO} from "@/configs";
 
 
-// console.log('homecubes', homecubes)
-
 const biz = "HOME_LAYOUT";
 const type = "LAYOUT";
 
-const allLayout: Layout[] = [];
-each(homecubes, (k) => {
-  allLayout.push({
-    i: k.displayName,
-    w: k.w,
-    h: k.h,
-    x: 0,
-    y: 0,
-  })
-})
+const allLayout: Layout[] = parseAllLayout(homecubes);
 // console.log('layout', allLayout)
 
 /**
+ * 工作台
  * @author xu.pengfei
  * @date 2023/1/3 16:13
  */
 export default function Desktop() {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext);
-  const loading = loadingEffect[configApi.getUrl('save')] || loadingEffect[configApi.getUrl('update')];
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
 
   const [editing, setEditing] = useState(false)
-  const [config, setConfig] = useState<Admin.Config<Layout[]>>();
-  const [layout, setLayout] = useState<Layout[]>([])
-
-  useEffect(() => {
-    configApi.getOne(biz, type).then(res => {
-      if (res.data) {
-        setLayout(res.data.data)
-        setConfig(res.data)
-      } else {
-        // 未找到，去查找全局是否有配置
-        configApi.getOneGlobal(biz, type).then(res1 => {
-          setConfig(undefined)
-          setLayout(res1.data?.data || SITE_INFO.ADMIN_DEFAULT_LAYOUT)
-        })
-      }
-    })
-  }, [])
-
-  function onLayoutChange(layout: Layout[]) {
-    // console.log('onLayoutChange', layout)
-    if (loading) return
-    const params = {
-      biz,
-      type,
-      data: layout
-    }
-    if (config) {
-      configApi.update(config.id, {id: config.id, ...params})
-    } else {
-      configApi.save(params).then(res => {
-        setConfig(res.data)
-      })
-    }
-    setLayout(layout)
-  }
-
-  /**
-   * 添加item到布局中
-   * @param id
-   */
-  function handleAdd(id: string) {
-    // console.log('layout', layout)
-    const Component = (homecubes as any)[id];
-
-    let x = 0, y = 0;
-
-    // 循环layout找到摆放位置
-    each(layout, l => {
-      const tryX = l.x + l.w;
-
-      // 已经循环到下一行了，需要从这一行的起始x=0处进行比对
-      if (l.y > y) {
-        x = 0;
-        y = l.y;
-      }
-
-      if (tryX + Component.w > 16) { // 本行已经摆放不下了，需要摆放到下一行
-        x = 0;
-        y = l.y + l.h; // y的下一行位置
-        return;
-      }
-
-      // 本行可以摆的下
-      x = tryX;
-      y = l.y;
-    })
-
-    setLayout([
-      ...layout,
-      {
-        i: Component.displayName,
-        w: Component.w,
-        h: Component.h,
-        x: x,
-        y: y,
-      }
-    ])
-  }
-
-  function handleDel(id: string) {
-    setLayout(layout.filter(i => i.i !== id))
-  }
-
-  function handleSaveCurAsDefault() {
-    Modal.confirm({
-      title: '确认',
-      content: '确认保存当前为默认配置，全局生效？',
-      onOk: () => {
-        const params = {
-          biz,
-          type,
-          data: layout
-        }
-        return configApi.saveGlobal(params).then(res => FaUtils.showResponse(res, '保存当前为默认配置'))
-      },
-    })
-  }
 
   const inIds: string[] = layout.map(i => i.i);
   return (
