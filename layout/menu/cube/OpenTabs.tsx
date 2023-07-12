@@ -123,7 +123,7 @@ export default function OpenTabs() {
   }));
 
   return (
-    <div className="fa-menu-open-tabs">
+    <div className="fa-menu-open-tabs fa-border-b">
       <Tabs
         hideAdd
         type="editable-card"
