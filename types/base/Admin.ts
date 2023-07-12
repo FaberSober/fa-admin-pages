@@ -27,7 +27,7 @@ namespace Admin {
   /**
    * 配置-通用
    */
-  export interface Config<T> extends Fa.BaseDelEntity {
+  export interface Config<T = any> extends Fa.BaseDelEntity {
     /** ID */
     id: number;
     /** 业务模块 */

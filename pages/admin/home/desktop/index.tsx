@@ -3,10 +3,10 @@ import * as homecubes from '@/homecubes'
 import {FaGridLayout} from "@/components";
 import {Layout} from "react-grid-layout";
 import {each, isNil} from "lodash";
-import {Button, List, Space, Spin, Switch} from "antd";
+import {Button, List, Modal, Space, Spin, Switch} from "antd";
 import {configApi} from '@/services'
 import {Admin} from '@/types'
-import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard} from "@fa/ui";
+import {ApiEffectLayoutContext, BaseDrawer, FaFlashCard, FaUtils} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 import {SITE_INFO} from "@/configs";
 
@@ -46,8 +46,11 @@ export default function Desktop() {
         setLayout(res.data.data)
         setConfig(res.data)
       } else {
-        setConfig(undefined)
-        setLayout(SITE_INFO.ADMIN_DEFAULT_LAYOUT || [])
+        // 未找到，去查找全局是否有配置
+        configApi.getOneGlobal(biz, type).then(res1 => {
+          setConfig(undefined)
+          setLayout(res1.data?.data || SITE_INFO.ADMIN_DEFAULT_LAYOUT)
+        })
       }
     })
   }, [])
@@ -67,6 +70,7 @@ export default function Desktop() {
         setConfig(res.data)
       })
     }
+    setLayout(layout)
   }
 
   /**
@@ -116,6 +120,21 @@ export default function Desktop() {
     setLayout(layout.filter(i => i.i !== id))
   }
 
+  function handleSaveCurAsDefault() {
+    Modal.confirm({
+      title: '确认',
+      content: '确认保存当前为默认配置，全局生效？',
+      onOk: () => {
+        const params = {
+          biz,
+          type,
+          data: layout
+        }
+        return configApi.saveGlobal(params).then(res => FaUtils.showResponse(res, '保存当前为默认配置'))
+      },
+    })
+  }
+
   const inIds: string[] = layout.map(i => i.i);
   return (
     <div className="fa-full-content">
@@ -150,6 +169,9 @@ export default function Desktop() {
           triggerDom={<Button shape="circle" icon={<PlusOutlined/>} size="small"/>}
           bodyStyle={{padding: 0}}
         >
+          <Space>
+            <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
+          </Space>
           <List
             itemLayout="horizontal"
             dataSource={allLayout}
