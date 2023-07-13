@@ -1,6 +1,5 @@
 import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
 import {extractHeadingStructure, StructureElement} from "./structure";
-import {isNil} from "lodash";
 import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
 import {useScroll} from "ahooks";
@@ -12,12 +11,38 @@ export interface FaTocProps extends HTMLAttributes<any> {
   style?: CSSProperties;
 }
 
+interface CalElement {
+  id: string;
+  element: HTMLElement;
+  top: number;
+  bottom: number;
+  level: number;
+}
+
+const TOP_GAP = 107; // 距离顶部的高度默认距离
+
+/** 平铺Tree型结构 */
+export function flatTreeList(tree: StructureElement[] = [], level = 0, prefix = '0'): CalElement[] {
+  const list: CalElement[] = [];
+  tree.forEach((item, index) => {
+    const { children, element } = item;
+    const id = `${prefix}_${index}`
+    element.setAttribute('id', id)
+    list.push({ id, element, top: element.offsetTop, bottom: element.offsetTop + element.clientHeight, level });
+    if (children && children[0]) {
+      list.push(...flatTreeList(children, level + 1, id));
+    }
+  });
+  return list;
+}
+
 /**
  * @author xu.pengfei
  * @date 2023/7/3 15:53
  */
 export default function FaToc({domId, style, ...props}: FaTocProps) {
-  const [array, setArray] = useState<StructureElement[]>([])
+  const [_array, setArray] = useState<StructureElement[]>([])
+  const [calElements, setCalElements] = useState<CalElement[]>([])
 
   const scroll = useScroll(document.getElementById('fa-doc-div'));
   console.log('scroll', scroll)
@@ -26,6 +51,25 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
     const dom = document.getElementById(domId);
     const toc = extractHeadingStructure(dom!)
     setArray(toc)
+    console.log('toc', toc)
+
+    const flatElementList = flatTreeList(toc)
+    const calElements:CalElement[] = flatElementList.map((v, i) => {
+      let bottom = 9999999;
+      if (i < flatElementList.length - 1) {
+        const nextEle = flatElementList[i + 1]
+        bottom = nextEle.top;
+      }
+      return {
+        id: v.id,
+        element: v.element,
+        top: v.top,
+        bottom,
+        level: v.level,
+      }
+    })
+    console.log('calElements', calElements)
+    setCalElements(calElements)
   }, [domId])
 
   function handleClickTocLink(e: any) {
@@ -34,35 +78,69 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
     FaUtils.scrollToDomById(faTocId)
   }
 
-  function loopToc(tocArr: StructureElement[], level: number, prefix: string = '0'): any {
-    if (isNil(tocArr) || tocArr.length === 0) return null;
 
-    return (
-      <div>
-        {tocArr.map((toc, i) => {
-          const id = `${prefix}_${i}`
-          if (toc.element) {
-            toc.element.setAttribute('id', id)
-          }
-          return (
-            <div key={id}>
-              <div
-                className="fa-toc-item"
-                style={{paddingLeft: level * 12 + 6}}
-                fa-toc-id={id}
-                onClick={handleClickTocLink}
-              >{toc.element.innerText}</div>
-              <div>{loopToc(toc.children, level + 1, `${prefix}_${level}`)}</div>
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
+
+  // function loopToc(tocArr: StructureElement[], level: number, prefix: string = '0'): any {
+  //   if (isNil(tocArr) || tocArr.length === 0) return null;
+  //
+  //   return (
+  //     <div>
+  //       {tocArr.map((toc, i) => {
+  //         const id = `${prefix}_${i}`
+  //         if (toc.element) {
+  //           toc.element.setAttribute('id', id)
+  //
+  //           console.log('toc.element.offsetTop', toc.element.innerText, toc.element.offsetTop, scroll?.top)
+  //         }
+  //         let indicator = false;
+  //         if (scroll && scroll.top > toc.element.offsetTop) {
+  //           indicator = true;
+  //         }
+  //         return (
+  //           <div key={id}>
+  //             <div
+  //               className="fa-toc-item"
+  //               style={{paddingLeft: level * 12 + 6}}
+  //               fa-toc-id={id}
+  //               onClick={handleClickTocLink}
+  //             >
+  //               <span>{toc.element.innerText}</span>
+  //               {indicator && <div className="fa-toc-item-slider" />}
+  //             </div>
+  //             <div>{loopToc(toc.children, level + 1, `${prefix}_${level}`)}</div>
+  //           </div>
+  //         )
+  //       })}
+  //     </div>
+  //   )
+  // }
 
   return (
     <div style={{...style}} className="fa-toc fa-scroll-auto-y" {...props}>
-      {loopToc(array, 0)}
+      {/*{loopToc(array, 0)}*/}
+
+      {calElements.map(toc => {
+        let sel = false;
+        if (scroll) {
+          const fixScrollTop = scroll.top + TOP_GAP;
+          if (fixScrollTop >= toc.top && fixScrollTop < toc.bottom) {
+            sel = true;
+          }
+        }
+        return (
+          <div key={toc.id}>
+            <div
+              className="fa-toc-item"
+              style={{paddingLeft: toc.level * 12 + 6}}
+              fa-toc-id={toc.id}
+              onClick={handleClickTocLink}
+            >
+              <span>{toc.element.innerText}</span>
+              {sel && <div className="fa-toc-item-slider" />}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

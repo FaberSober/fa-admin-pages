@@ -12,8 +12,18 @@
   font-size: 12px;
   transition: var(--fa-transition);
   background-color: var(--fa-bg-color);
+  position: relative;
 }
 
 .fa-toc-item:hover {
   background-color: var(--fa-hover-bg);
+}
+
+.fa-toc-item-slider {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  position: absolute;
+  background: var(--primary-color);
 }
