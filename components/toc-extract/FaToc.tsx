@@ -3,10 +3,12 @@ import {extractHeadingStructure, StructureElement} from "./structure";
 import {isNil} from "lodash";
 import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
+import {useScroll} from "ahooks";
 
 
 export interface FaTocProps extends HTMLAttributes<any> {
-  domId: string;
+  // parentDomId: string; // 滚动容器dom的id，监听dom的滚动位置
+  domId: string; // html富文本内容，侦测此dom元素的h标签结构
   style?: CSSProperties;
 }
 
@@ -16,6 +18,9 @@ export interface FaTocProps extends HTMLAttributes<any> {
  */
 export default function FaToc({domId, style, ...props}: FaTocProps) {
   const [array, setArray] = useState<StructureElement[]>([])
+
+  const scroll = useScroll(document.getElementById('fa-doc-div'));
+  console.log('scroll', scroll)
 
   useEffect(() => {
     const dom = document.getElementById(domId);
