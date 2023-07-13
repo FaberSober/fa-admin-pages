@@ -23,7 +23,7 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
     setArray(toc)
   }, [domId])
 
-  function handleClickTocLink(e:any) {
+  function handleClickTocLink(e: any) {
     const faTocId = e.target.getAttribute('fa-toc-id')
     // console.log('handleClickTocLink', e, faTocId)
     FaUtils.scrollToDomById(faTocId)
@@ -40,10 +40,10 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
             toc.element.setAttribute('id', id)
           }
           return (
-            <div>
+            <div key={id}>
               <div
                 className="fa-toc-item"
-                style={{ paddingLeft: level * 12 + 6 }}
+                style={{paddingLeft: level * 12 + 6}}
                 fa-toc-id={id}
                 onClick={handleClickTocLink}
               >{toc.element.innerText}</div>
@@ -56,7 +56,7 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
   }
 
   return (
-    <div style={{ ...style }} className="fa-toc fa-scroll-auto-y" {...props}>
+    <div style={{...style}} className="fa-toc fa-scroll-auto-y" {...props}>
       {loopToc(array, 0)}
     </div>
   )
