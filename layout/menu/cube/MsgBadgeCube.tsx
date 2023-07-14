@@ -1,5 +1,5 @@
 import React, { CSSProperties, useContext, useEffect, useState } from 'react';
-import { msgApi } from '@/services';
+import { fileSaveApi, msgApi } from '@/services';
 import { Admin } from '@/types';
 import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';
@@ -17,7 +17,7 @@ function MsgList() {
   }, [unreadCount]);
 
   function fetchMsgList() {
-    msgApi.pageMine({ pageSize: 10, isRead: false }).then((res) => {
+    msgApi.pageMine({ pageSize: 10, query: { isRead: false }, sorter: 'id DESC' }).then((res) => {
       setData(res.data.rows);
       refreshUnreadCount();
     });
@@ -39,21 +39,21 @@ function MsgList() {
   };
 
   return (
-    <div style={{ width: 400, maxHeight: 400, overflowY: 'auto' }}>
+    <div style={{ width: 400, maxHeight: 400, overflowY: 'auto', padding: '0 12px' }}>
       <List
         itemLayout="horizontal"
         dataSource={data}
         renderItem={(item) => (
           <List.Item>
             <List.Item.Meta
-              avatar={<Avatar src={get(item, 'fromUser.img')} />}
+              avatar={<Avatar size="small" src={fileSaveApi.genLocalGetFilePreview(get(item, 'fromUser.img')!)} />}
               title={<a onClick={() => handleReadOne(item.id)}>{get(item, 'content')}</a>}
               // description={get(item, 'content')}
             />
           </List.Item>
         )}
       />
-      <Link to="/system/account/msg" style={bottomLink}>
+      <Link to="/admin/system/account/msg" style={bottomLink}>
         查看更多
       </Link>
     </div>

@@ -31,6 +31,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
 
   useEffect(() => {
     refreshUser();
+    refreshUnreadCount();
     rbacUserRoleApi.getMyRoles().then((res) => setRoles(res.data));
   }, []);
 

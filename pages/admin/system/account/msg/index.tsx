@@ -11,7 +11,7 @@ const biz = 'base_msg';
 
 export default function MsgList() {
   const {loadingEffect} = useContext(ApiEffectLayoutContext);
-  const {user} = useContext(UserLayoutContext);
+  const {user, refreshUnreadCount} = useContext(UserLayoutContext);
   const [form] = Form.useForm();
 
   const {queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps} =
@@ -28,8 +28,7 @@ export default function MsgList() {
   function handleBatchRead(ids: string[]) {
     msgApi.batchRead(ids).then(() => {
       fetchPageList();
-      // TODO 全局消息数量刷新
-      // refreshUnreadCount();
+      refreshUnreadCount();
     });
   }
 
@@ -37,8 +36,8 @@ export default function MsgList() {
   function handleReadOne(id: string) {
     msgApi.batchRead([id]).then(() => {
       fetchPageList();
-      // TODO 全局消息数量刷新
-      // refreshUnreadCount();
+      // TO-DO 全局消息数量刷新
+      refreshUnreadCount();
     });
   }
 
@@ -51,13 +50,16 @@ export default function MsgList() {
         ...BaseTableUtils.genSimpleSorterColumn('消息内容', 'content', undefined, sorter),
         render: (val, record) => (
           <div>
-            <Badge status={record.isRead ? 'default' : 'processing'}/>
-            <span style={{color: record.isRead ? '#999' : '#333'}}>{val}</span>
+            <Badge status={record.isRead ? 'default' : 'success'}/>
+            <span style={{color: record.isRead ? '#999' : '#333', marginLeft: 4}}>{val}</span>
           </div>
         ),
       },
       BaseTableUtils.genSimpleSorterColumn('来源用户', 'fromUserName', 100, sorter),
-      BaseTableUtils.genBoolSorterColumn('是否已读', 'isRead', 100, sorter),
+      {
+        ...BaseTableUtils.genBoolSorterColumn('是否已读', 'isRead', 100, sorter),
+        render: (val: any) => (val ? <Badge status="default" text="是" /> : <Badge status="success" text="否" />),
+      },
       ...BaseTableUtils.genCtrColumns(sorter),
       {
         title: '操作',
