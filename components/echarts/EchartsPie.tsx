@@ -13,13 +13,14 @@ export interface EchartsPieProps {
   dataTitle?: string,
   style?: CSSProperties;
   pieSeriesOption?: PieSeriesOption,
+  options?: any;
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsPie({title, subTitle, data, dataTitle, style, pieSeriesOption}: EchartsPieProps) {
+export default function EchartsPie({title, subTitle, data, dataTitle, style, pieSeriesOption, options}: EchartsPieProps) {
   const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
@@ -82,6 +83,7 @@ export default function EchartsPie({title, subTitle, data, dataTitle, style, pie
           ...pieSeriesOption,
         }
       ],
+      ...options,
     });
     setReady(true)
   }, [themeDark])
