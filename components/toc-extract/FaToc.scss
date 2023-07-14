@@ -6,7 +6,7 @@
   //padding: 12px;
 }
 
-.fa-toc-item {
+.fa-toc-item, .fa-toc-item-sel {
   padding: 3px 6px;
   cursor: pointer;
   font-size: 12px;
@@ -15,7 +15,11 @@
   position: relative;
 }
 
-.fa-toc-item:hover {
+.fa-toc-item-sel {
+  background-color: var(--fa-bg-color2);
+}
+
+.fa-toc-item:hover, .fa-toc-item-sel {
   background-color: var(--fa-hover-bg);
 }
 
@@ -26,4 +30,5 @@
   width: 2px;
   position: absolute;
   background: var(--primary-color);
+  transition: var(--fa-transition);
 }

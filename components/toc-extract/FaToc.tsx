@@ -1,12 +1,11 @@
 import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
 import {extractHeadingStructure, StructureElement} from "./structure";
-import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
 import {useScroll} from "ahooks";
 
 
 export interface FaTocProps extends HTMLAttributes<any> {
-  // parentDomId: string; // 滚动容器dom的id，监听dom的滚动位置
+  parentDomId: string; // 滚动容器dom的id，监听dom的滚动位置
   domId: string; // html富文本内容，侦测此dom元素的h标签结构
   style?: CSSProperties;
 }
@@ -19,7 +18,7 @@ interface CalElement {
   level: number;
 }
 
-const TOP_GAP = 107; // 距离顶部的高度默认距离
+let TOP_GAP = 109; // 距离顶部的高度默认距离
 
 /** 平铺Tree型结构 */
 export function flatTreeList(tree: StructureElement[] = [], level = 0, prefix = '0'): CalElement[] {
@@ -40,18 +39,18 @@ export function flatTreeList(tree: StructureElement[] = [], level = 0, prefix = 
  * @author xu.pengfei
  * @date 2023/7/3 15:53
  */
-export default function FaToc({domId, style, ...props}: FaTocProps) {
+export default function FaToc({parentDomId, domId, style, ...props}: FaTocProps) {
   const [_array, setArray] = useState<StructureElement[]>([])
   const [calElements, setCalElements] = useState<CalElement[]>([])
 
-  const scroll = useScroll(document.getElementById('fa-doc-div'));
-  console.log('scroll', scroll)
+  const scroll = useScroll(document.getElementById(parentDomId));
+  // console.log('scroll', scroll)
 
   useEffect(() => {
     const dom = document.getElementById(domId);
     const toc = extractHeadingStructure(dom!)
     setArray(toc)
-    console.log('toc', toc)
+    // console.log('toc', toc)
 
     const flatElementList = flatTreeList(toc)
     const calElements:CalElement[] = flatElementList.map((v, i) => {
@@ -68,18 +67,22 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
         level: v.level,
       }
     })
-    console.log('calElements', calElements)
+    // console.log('calElements', calElements)
     setCalElements(calElements)
+
+    if (calElements && calElements[0]) {
+      TOP_GAP = calElements[0].top;
+    }
   }, [domId])
 
-  function handleClickTocLink(e: any) {
-    const faTocId = e.target.getAttribute('fa-toc-id')
-    // console.log('handleClickTocLink', e, faTocId)
-    FaUtils.scrollToDomById(faTocId)
+  function handleClickTocLink(toc: CalElement) {
+    const parentDom = document.getElementById(parentDomId)
+    if (parentDom) {
+      parentDom.scrollTo(0, toc.top)
+    }
   }
 
-
-
+  // 循环tree生成树
   // function loopToc(tocArr: StructureElement[], level: number, prefix: string = '0'): any {
   //   if (isNil(tocArr) || tocArr.length === 0) return null;
   //
@@ -118,8 +121,8 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
   return (
     <div style={{...style}} className="fa-toc fa-scroll-auto-y" {...props}>
       {/*{loopToc(array, 0)}*/}
-
-      {calElements.map(toc => {
+      {/* 使用计算后的flatTreeList生成列表 */}
+      {calElements.map((toc, index) => {
         let sel = false;
         if (scroll) {
           const fixScrollTop = scroll.top + TOP_GAP;
@@ -127,17 +130,22 @@ export default function FaToc({domId, style, ...props}: FaTocProps) {
             sel = true;
           }
         }
+        // 初始化未滚动的情况
+        if (index === 0) {
+          if (scroll === undefined || scroll.top === 0) {
+            sel = true;
+          }
+        }
         return (
-          <div key={toc.id}>
-            <div
-              className="fa-toc-item"
-              style={{paddingLeft: toc.level * 12 + 6}}
-              fa-toc-id={toc.id}
-              onClick={handleClickTocLink}
-            >
-              <span>{toc.element.innerText}</span>
-              {sel && <div className="fa-toc-item-slider" />}
-            </div>
+          <div
+            key={toc.id}
+            className={sel ? "fa-toc-item-sel" : "fa-toc-item"}
+            style={{paddingLeft: toc.level * 12 + 6}}
+            fa-toc-id={toc.id}
+            onClick={() => handleClickTocLink(toc)}
+          >
+            <span>{toc.element.innerText}</span>
+            {sel && <div className="fa-toc-item-slider" />}
           </div>
         )
       })}
