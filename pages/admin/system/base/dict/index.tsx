@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
-import {Empty} from 'antd';
-import {Admin} from '@/types';
-import {BaseTree, FaFlexRestLayout, FaLabel, FaSortList, FaUtils} from '@fa/ui';
-import DictModal from './modal/DictModal';
-import DictForm from './cube/DictForm';
-import {dictApi} from '@/services';
-import {Allotment} from 'allotment';
+import React, { useState } from 'react';
+import { Empty } from 'antd';
+import { BaseTree, FaLabel } from '@fa/ui';
+import { Admin } from '@/types';
+import { dictApi } from '@/services';
+import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
+import DictModal from './modal/DictModal';
+import DictOptionsEdit from "./cube/DictOptionsEdit";
 
 
 /**
@@ -34,70 +34,6 @@ export default function DictManage() {
     dictApi.getById(viewRecord.id).then((res) => setViewRecord(res.data));
   }
 
-  function handleChangeDicts(list: any) {
-    if (viewRecord === undefined) return;
-
-    const options = [...list, ...viewRecord.options.filter((i) => i.deleted)].map((v: any, i: any) => ({
-      ...v,
-      id: i + 1,
-    }));
-    setViewRecord({...viewRecord, options: options});
-    dictApi
-      .update(viewRecord.id, {
-        ...viewRecord,
-        options,
-      })
-      .then((res) => {
-        FaUtils.showResponse(res, '更新字典排序');
-      });
-  }
-
-  function handleAddDict(v: any) {
-    if (viewRecord === undefined) return;
-
-    const options = viewRecord.options || [];
-    dictApi
-      .update(viewRecord.id, {
-        ...viewRecord,
-        options: [...options, {id: options.length + 1, ...v, deleted: false}],
-      })
-      .then((res) => {
-        FaUtils.showResponse(res, '新增字典');
-        refreshData();
-      });
-  }
-
-  function handleEditDict(v: any) {
-    if (viewRecord === undefined) return;
-
-    const options = viewRecord.options.map((d) => (d.id === v.id ? v : d));
-    dictApi
-      .update(viewRecord.id, {
-        ...viewRecord,
-        options,
-      })
-      .then((res) => {
-        FaUtils.showResponse(res, '更新字典');
-        refreshData();
-      });
-  }
-
-  function handleDelDict(v: any) {
-    if (viewRecord === undefined) return;
-
-    const options = viewRecord.options.map((d) => (d.id === v.id ? {...v, deleted: true} : d));
-    dictApi
-      .update(viewRecord.id, {
-        ...viewRecord,
-        options,
-      })
-      .then((res) => {
-        FaUtils.showResponse(res, '删除字典');
-        refreshData();
-      });
-  }
-
-  const showDicts = (viewRecord?.options || []).filter((i) => !i.deleted);
   return (
     <div className="fa-full-content">
       <Allotment defaultSizes={[100, 500]}>
@@ -121,29 +57,11 @@ export default function DictManage() {
             <div className="fa-flex-column fa-full">
               <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12"/>
 
-              <FaFlexRestLayout className="fa-bg-white">
-                <div className="fa-flex-row-center fa-bg-grey">
-                  <div className="fa-p12 fa-border-b fa-border-r" style={{flex: 1}}>
-                    字典名称
-                  </div>
-                  <div className="fa-p12 fa-border-b fa-border-r" style={{flex: 1}}>
-                    字典值
-                  </div>
-                  <div className="fa-p12 fa-border-b " style={{width: 80}}>
-                    操作
-                  </div>
-                </div>
-                <FaSortList
-                  list={showDicts}
-                  renderItem={(i) => <DictForm dict={i} onChange={handleEditDict} onDelete={handleDelDict}/>}
-                  itemStyle={{borderBottom: '1px solid var(--fa-border-color)', position: 'relative', cursor: 'default'}}
-                  onSortEnd={(l) => handleChangeDicts(l)}
-                  vertical
-                  handle
-                  handleStyle={{position: 'absolute', right: 10, top: 14}}
-                />
-                <DictForm onChange={handleAddDict}/>
-              </FaFlexRestLayout>
+              <DictOptionsEdit
+                dict={viewRecord}
+                onChange={v => setViewRecord(v)}
+                onRefresh={refreshData}
+              />
             </div>
           ) : (
             <Empty description="请先选择字典分组"/>
