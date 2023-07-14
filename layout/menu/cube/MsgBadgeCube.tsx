@@ -32,14 +32,14 @@ function MsgList() {
 
   const bottomLink: CSSProperties = {
     width: '100%',
-    padding: '12px 12px',
+    padding: '12px 0',
     textAlign: 'center',
     display: 'inline-block',
     borderTop: '1px solid #eee',
   };
 
   return (
-    <div style={{ width: 300, maxHeight: 400, overflow: 'auto' }}>
+    <div style={{ width: 400, maxHeight: 400, overflowY: 'auto' }}>
       <List
         itemLayout="horizontal"
         dataSource={data}
@@ -69,11 +69,11 @@ export default function MsgBadgeCube() {
   const { unreadCount } = useContext(UserLayoutContext);
 
   return (
-    <Popover placement="bottomRight" content={<MsgList />} trigger="click">
-      <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+    <Popover placement="bottomRight" content={<MsgList />} trigger="click" overlayInnerStyle={{padding: 0}}>
+      <div style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <a>
           <Badge size="small" count={unreadCount}>
-            <BellOutlined style={{ color: '#eee', margin: '0 4px' }} />
+            <BellOutlined style={{ margin: '0 4px' }} />
           </Badge>
         </a>
       </div>
