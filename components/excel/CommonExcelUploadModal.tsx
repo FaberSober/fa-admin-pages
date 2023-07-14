@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { ReactNode, useState } from 'react';
 import {DragModal, DragModalProps, FaUtils, Fa, UploadFileLocal} from '@fa/ui';
 import {Col, Form, Row} from "antd";
 
@@ -7,6 +7,7 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
   apiDownloadTplExcel: () => any;
   apiImportExcel: (params: {fileId: string}) => Promise<Fa.Ret<boolean>>;
+  tips?: string|ReactNode;
 }
 
 /**
@@ -14,7 +15,7 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
  * @author xu.pengfei
  * @date 2023/6/27 14:21
  */
-export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, ...props }: CommonExcelUploadModalProps) {
+export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, tips, ...props }: CommonExcelUploadModalProps) {
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -66,6 +67,12 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
           <Form.Item name="fileId" label="导入文件" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <UploadFileLocal accept={FaUtils.FileAccept.EXCEL} />
           </Form.Item>
+
+          {tips && (
+            <Row className="fa-mb12">
+              <Col offset={4}>{tips}</Col>
+            </Row>
+          )}
         </Form>
       </DragModal>
     </span>
