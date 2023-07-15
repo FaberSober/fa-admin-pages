@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import * as cubes from '@/cubes/homecubes'
+import * as cubes from '@/cubes/monitorcubes'
 import {FaGridLayout, useAllLayout, useGridLayoutConfig} from "@/components";
 import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
@@ -12,11 +12,11 @@ const biz = "HOME_LAYOUT";
 const type = "LAYOUT";
 
 /**
- * 工作台
+ * 监控页
  * @author xu.pengfei
  * @date 2023/1/3 16:13
  */
-export default function Desktop() {
+export default function Monitor() {
   const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
 
   const {allLayout} = useAllLayout(cubes)
