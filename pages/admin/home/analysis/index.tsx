@@ -56,6 +56,7 @@ export default function Analysis() {
           bodyStyle={{padding: 0}}
         >
           <Space>
+            <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
           </Space>
           <List

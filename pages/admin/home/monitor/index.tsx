@@ -8,7 +8,7 @@ import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 import {SITE_INFO} from "@/configs";
 
 
-const biz = "HOME_LAYOUT";
+const biz = "MONITOR_LAYOUT";
 const type = "LAYOUT";
 
 /**
@@ -57,6 +57,7 @@ export default function Monitor() {
           bodyStyle={{padding: 0}}
         >
           <Space>
+            <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
           </Space>
           <List

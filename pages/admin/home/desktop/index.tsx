@@ -39,7 +39,7 @@ export default function Desktop() {
               </FaFlashCard>
             )
           }
-          return <span>Component {i.i} Not Found</span>
+          return <FaFlashCard>Component {i.i} Not Found</FaFlashCard>
         }}
         onLayoutChange={onLayoutChange}
         rowHeight={20}
@@ -57,6 +57,7 @@ export default function Desktop() {
           bodyStyle={{padding: 0}}
         >
           <Space>
+            <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
           </Space>
           <List
