@@ -27,6 +27,6 @@ HelloBanner.displayName = "HelloBanner"; // 必须与方法名称一致
 HelloBanner.title = "欢迎";
 HelloBanner.description = "欢迎组件";
 HelloBanner.showTitle = false; // 是否展示Card的Title
-HelloBanner.permission = ""; // 需要的权限
+HelloBanner.permission = ""; // 需要的权限-对应RbacMenu.linkUrl
 HelloBanner.w = 16; // 宽度-max=16
 HelloBanner.h = 3; // 高度
