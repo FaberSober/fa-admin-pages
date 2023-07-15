@@ -5,6 +5,7 @@ import {ApiEffectLayoutContext, FaUtils} from "@fa/ui";
 import {configApi} from "@/services";
 import {Admin} from "@/types";
 import {Modal} from "antd";
+import {MenuLayoutContext} from "@/layout";
 
 
 /**
@@ -23,6 +24,28 @@ export function parseAllLayout(cubes: any) {
     })
   })
   return allLayout;
+}
+
+export function useAllLayout(cubes: any): { allLayout: Layout[] } {
+  const { menuList } = useContext(MenuLayoutContext);
+  const permissions = menuList.map(i => i.linkUrl);
+
+  const allLayout: Layout[] = [];
+  each(cubes, (k) => {
+    if (!FaUtils.hasPermission(permissions, k.permission)) {
+      return;
+    }
+
+    allLayout.push({
+      i: k.displayName,
+      w: k.w,
+      h: k.h,
+      x: 0,
+      y: 0,
+    })
+  })
+
+  return {allLayout};
 }
 
 export function calAddLayout(cubes: any, layout: Layout[], addId: string) {

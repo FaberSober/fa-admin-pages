@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import * as homecubes from '@/homecubes'
-import {FaGridLayout, parseAllLayout, useGridLayoutConfig} from "@/components";
-import {Layout} from "react-grid-layout";
+import * as homecubes from '@/cubes/homecubes'
+import {FaGridLayout, useAllLayout, useGridLayoutConfig} from "@/components";
 import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
 import {BaseDrawer, FaFlashCard} from "@fa/ui";
@@ -12,9 +11,6 @@ import {SITE_INFO} from "@/configs";
 const biz = "HOME_LAYOUT";
 const type = "LAYOUT";
 
-const allLayout: Layout[] = parseAllLayout(homecubes);
-// console.log('layout', allLayout)
-
 /**
  * 工作台
  * @author xu.pengfei
@@ -23,6 +19,7 @@ const allLayout: Layout[] = parseAllLayout(homecubes);
 export default function Desktop() {
   const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(homecubes, biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
 
+  const {allLayout} = useAllLayout(homecubes)
   const [editing, setEditing] = useState(false)
 
   const inIds: string[] = layout.map(i => i.i);

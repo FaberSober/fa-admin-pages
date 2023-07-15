@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import * as cubes from '@/analysiscubes'
-import {FaGridLayout, parseAllLayout, useGridLayoutConfig} from "@/components";
-import {Layout} from "react-grid-layout";
+import * as cubes from '@/cubes/analysiscubes'
+import {FaGridLayout, useAllLayout, useGridLayoutConfig} from "@/components";
 import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
 import {BaseDrawer, FaFlashCard} from "@fa/ui";
@@ -11,8 +10,6 @@ import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 const biz = "HOME_ANALYSIS_LAYOUT";
 const type = "LAYOUT";
 
-const allLayout: Layout[] = parseAllLayout(cubes);
-
 /**
  * 工作台
  * @author xu.pengfei
@@ -21,6 +18,7 @@ const allLayout: Layout[] = parseAllLayout(cubes);
 export default function Analysis() {
   const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, []);
 
+  const {allLayout} = useAllLayout(cubes)
   const [editing, setEditing] = useState(false)
 
   const inIds: string[] = layout.map(i => i.i);
