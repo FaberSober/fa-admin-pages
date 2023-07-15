@@ -1,5 +1,6 @@
 import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
 import {useScroll} from "ahooks";
+import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
 
 
@@ -50,9 +51,12 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
         const nextEle = headings[i + 1]
         bottom = nextEle.offsetTop;
       }
+      const id = FaUtils.generateId();
+      v.setAttribute("id", id)
+
       const level = extractLevel(v); // 识别h1、h2的后缀数字
       return {
-        id: v.id,
+        id,
         element: v,
         top: v.offsetTop,
         bottom,
