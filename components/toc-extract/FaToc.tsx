@@ -8,6 +8,7 @@ export interface FaTocProps extends HTMLAttributes<any> {
   parentDomId: string; // 滚动容器dom的id，监听dom的滚动位置
   domId: string; // html富文本内容，侦测此dom元素的h标签结构
   style?: CSSProperties;
+  onClickToc?: (toc: CalElement) => void;
 }
 
 interface CalElement {
@@ -39,7 +40,7 @@ export function flatTreeList(tree: StructureElement[] = [], level = 0, prefix = 
  * @author xu.pengfei
  * @date 2023/7/3 15:53
  */
-export default function FaToc({parentDomId, domId, style, ...props}: FaTocProps) {
+export default function FaToc({parentDomId, domId, onClickToc, style, ...props}: FaTocProps) {
   const [_array, setArray] = useState<StructureElement[]>([])
   const [calElements, setCalElements] = useState<CalElement[]>([])
 
@@ -79,6 +80,16 @@ export default function FaToc({parentDomId, domId, style, ...props}: FaTocProps)
     const parentDom = document.getElementById(parentDomId)
     if (parentDom) {
       parentDom.scrollTo(0, toc.top)
+    }
+    const originBg = toc.element.style.backgroundColor;
+    toc.element.style.transition = 'var(--fa-transition)'
+    toc.element.style.backgroundColor = 'var(--primary-color)'
+    setTimeout(() => {
+      toc.element.style.backgroundColor = originBg;
+    }, 1000)
+
+    if (onClickToc) {
+      onClickToc(toc)
     }
   }
 
