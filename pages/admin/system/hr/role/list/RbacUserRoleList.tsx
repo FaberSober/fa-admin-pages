@@ -3,7 +3,7 @@ import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, FaberTable, FaUtils, SelectedUser, useDelete, useTableQueryParams, } from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacUserRoleApi } from '@/services';
+import { rbacUserRoleApi as api } from '@/services';
 
 const serviceName = '角色用户';
 const biz = 'RbacUserRoleList';
@@ -17,7 +17,7 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
 
   const { queryParams, setFormValues, setExtraParams, handleTableChange, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Rbac.RbacUserRoleRetVo>(
-      rbacUserRoleApi.pageVo,
+      api.pageVo,
       { extraParams: { roleId: rbacRole.id }, sorter: { field: 'crtTime', order: 'descend' } },
       serviceName,
     );
@@ -26,10 +26,10 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
     setExtraParams({ roleId: rbacRole.id });
   }, [rbacRole]);
 
-  const [handleDelete] = useDelete<string>(rbacUserRoleApi.remove, fetchPageList, serviceName);
+  const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
 
   function handleAddUsers(users: SelectedUser[], callback: any, error: any) {
-    rbacUserRoleApi
+    api
       .addUsers(
         users.map((i) => i.id),
         rbacRole.id,
@@ -98,7 +98,7 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
         rowKey={(item) => item.id}
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}
-        batchDelete={(ids) => rbacUserRoleApi.removeBatchByIds(ids)}
+        batchDelete={(ids) => api.removeBatchByIds(ids)}
         showComplexQuery={false}
       />
     </div>
