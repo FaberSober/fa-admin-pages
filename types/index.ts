@@ -31,6 +31,8 @@ declare global {
     globalData: any;
     /** VANTA */
     VANTA: any;
+    /** Prism */
+    Prism: any;
     FaFrom: any;
     FaVersionCode: any;
     FaVersionName: any;
