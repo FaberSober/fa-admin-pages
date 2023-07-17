@@ -1,0 +1,1 @@
+export { default as FaRichHtmlImgPreview } from './FaRichHtmlImgPreview'

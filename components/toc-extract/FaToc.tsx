@@ -2,6 +2,7 @@ import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
 import {useScroll} from "ahooks";
 import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
+import { isNil } from "lodash";
 
 
 function extractLevel(heading:Element) {
@@ -43,6 +44,8 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
 
   useEffect(() => {
     const dom = document.getElementById(domId);
+    if (isNil(dom)) return;
+
     const headings:HTMLElement[] = Array.from(dom!.querySelectorAll("h1,h2,h3,h4,h5,h6"))
 
     const calElements:CalElement[] = headings.map((v, i) => {
