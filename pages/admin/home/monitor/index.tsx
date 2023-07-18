@@ -5,7 +5,6 @@ import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
 import {BaseDrawer, FaFlashCard} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
-import {SITE_INFO} from "@/configs";
 
 
 const biz = "MONITOR_LAYOUT";
@@ -17,7 +16,7 @@ const type = "LAYOUT";
  * @date 2023/1/3 16:13
  */
 export default function Monitor() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, []);
 
   const {allLayout} = useAllLayout(cubes)
   const [editing, setEditing] = useState(false)
