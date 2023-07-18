@@ -52,6 +52,13 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
         subtext: subTitle,
         left: 'center'
       },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        top: '15%',
+        containLabel: true
+      },
       tooltip: {
         trigger: 'item'
       },
@@ -70,6 +77,7 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
           type: 'bar',
           // data: [5, 20, 36, 10, 10, 20]
           data: data.map(i => i.value),
+          barWidth: 30,
           ...barSeriesOption,
         }
       ]
