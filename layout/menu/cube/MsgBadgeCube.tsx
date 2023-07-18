@@ -4,11 +4,19 @@ import { Admin } from '@/types';
 import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';
 import { BellOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import { UserLayoutContext } from "@/layout";
+import { MenuLayoutContext, UserLayoutContext } from "@/layout";
+import { ApiEffectLayoutContext } from "@fa/ui";
 
-function MsgList() {
+
+interface MsgListProps {
+  onClose?: () => void;
+}
+
+function MsgList({ onClose }: MsgListProps) {
+  const {loadingEffect} = useContext(ApiEffectLayoutContext)
+
   const { unreadCount, refreshUnreadCount } = useContext(UserLayoutContext);
+  const { addTab } = useContext(MenuLayoutContext);
 
   const [data, setData] = useState<Admin.Msg[]>([]);
 
@@ -30,6 +38,15 @@ function MsgList() {
     });
   }
 
+  function handleOpenMsgTag() {
+    addTab({
+      key: 'msg',
+      path: '/admin/system/account/msg',
+      name: '消息中心',
+    })
+    if (onClose) onClose()
+  }
+
   const bottomLink: CSSProperties = {
     width: '100%',
     padding: '12px 0',
@@ -38,6 +55,7 @@ function MsgList() {
     borderTop: '1px solid #eee',
   };
 
+  const loading = loadingEffect[msgApi.getUrl('pageMine')]
   return (
     <div style={{ width: 400, maxHeight: 400, overflowY: 'auto', padding: '0 12px' }}>
       <List
@@ -52,10 +70,11 @@ function MsgList() {
             />
           </List.Item>
         )}
+        loading={loading}
       />
-      <Link to="/admin/system/account/msg" style={bottomLink}>
+      <a onClick={handleOpenMsgTag} style={bottomLink}>
         查看更多
-      </Link>
+      </a>
     </div>
   );
 }
@@ -67,9 +86,17 @@ function MsgList() {
  */
 export default function MsgBadgeCube() {
   const { unreadCount } = useContext(UserLayoutContext);
+  const [open, setOpen] = useState(false)
 
   return (
-    <Popover placement="bottomRight" content={<MsgList />} trigger="click" overlayInnerStyle={{padding: 0}}>
+    <Popover
+      placement="bottomRight"
+      content={<MsgList onClose={() => setOpen(false)} />}
+      trigger="click"
+      overlayInnerStyle={{padding: 0}}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <div style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <a>
           <Badge size="small" count={unreadCount}>
