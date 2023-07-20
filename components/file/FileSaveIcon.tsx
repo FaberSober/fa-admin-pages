@@ -26,6 +26,7 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
       <div className="fa-flex-row fa-flex-row-center" style={divStyle}>
         <Image
           width={width}
+          // height={width}
           src={fileSaveApi.genLocalGetFilePreview(file.id)}
           preview={{
             src: fileSaveApi.genLocalGetFile(file.id),
