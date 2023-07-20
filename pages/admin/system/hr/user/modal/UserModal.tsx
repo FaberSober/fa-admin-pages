@@ -126,7 +126,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <RbacRoleSelect mode="multiple" />
           </Form.Item>
           <Form.Item name="status" label="账户有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout} valuePropName="checked">
-            <Switch />
+            <Switch checkedChildren="有效" unCheckedChildren="禁止" />
           </Form.Item>
           <Form.Item name="email" label="邮箱" {...FaUtils.formItemFullLayout}>
             <Input />
