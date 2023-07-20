@@ -265,7 +265,7 @@ namespace Admin {
     /** 文件访问地址 */
     url: string;
     /** 文件大小，单位字节 */
-    size: string;
+    size: number;
     /** 文件名 */
     filename: string;
     /** 原始文件名 */
