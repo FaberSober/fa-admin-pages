@@ -246,6 +246,17 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           key: 'list',
           children: [
             {
+              title: 'cube',
+              key: 'cube',
+              children: tableNames.map(i => ({
+                title: `${tableNameToJava(i)}View.tsx`,
+                key: `${i}.rn.view`,
+                isLeaf: true,
+                type: 'rn.view',
+                tableName: i,
+              })),
+            },
+            {
               title: 'modal',
               key: 'modal',
               children: tableNames.map(i => ({

@@ -113,7 +113,7 @@ export default function FileSaveList() {
       />
 
       <Drawer title="查看详情" open={open} onClose={hide} width={1000} bodyStyle={{position: 'relative'}}>
-        {open && item && <FileSaveView file={item} /> }
+        {open && item && <FileSaveView item={item} /> }
       </Drawer>
     </div>
   );
