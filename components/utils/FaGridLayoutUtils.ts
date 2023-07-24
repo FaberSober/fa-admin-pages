@@ -155,6 +155,19 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     })
   }
 
+  function handleClearAllUserConfig() {
+    Modal.confirm({
+      title: '确认',
+      content: '确认清空全部用户缓存？',
+      onOk: () => {
+        const params = {
+          query: { biz, type }
+        }
+        return configApi.removeByQuery(params).then(res => FaUtils.showResponse(res, '清空全部用户缓存'))
+      },
+    })
+  }
+
   return {
     config,
     layout,
@@ -163,5 +176,6 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     handleAdd,
     handleDel,
     handleSaveCurAsDefault,
+    handleClearAllUserConfig,
   }
 }

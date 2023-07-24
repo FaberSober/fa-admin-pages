@@ -16,7 +16,7 @@ const type = "LAYOUT";
  * @date 2023/1/3 16:13
  */
 export default function Analysis() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, []);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig} = useGridLayoutConfig(cubes, biz, type, []);
 
   const {allLayout} = useAllLayout(cubes)
   const [editing, setEditing] = useState(false)
@@ -58,6 +58,7 @@ export default function Analysis() {
           <Space>
             <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
+            <Button onClick={handleClearAllUserConfig} danger>清空全部用户缓存</Button>
           </Space>
           <List
             itemLayout="horizontal"
