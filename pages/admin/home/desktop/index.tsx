@@ -5,7 +5,6 @@ import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
 import {BaseDrawer, FaFlashCard} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
-import {SITE_INFO} from "@/configs";
 
 
 const biz = "HOME_LAYOUT";
@@ -17,7 +16,7 @@ const type = "LAYOUT";
  * @date 2023/1/3 16:13
  */
 export default function Desktop() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault} = useGridLayoutConfig(cubes, biz, type, SITE_INFO.ADMIN_DEFAULT_LAYOUT);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig} = useGridLayoutConfig(cubes, biz, type, []);
 
   const {allLayout} = useAllLayout(cubes)
   const [editing, setEditing] = useState(false)
@@ -59,6 +58,7 @@ export default function Desktop() {
           <Space>
             <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
+            <Button onClick={handleClearAllUserConfig} danger>清空全部用户缓存</Button>
           </Space>
           <List
             itemLayout="horizontal"
