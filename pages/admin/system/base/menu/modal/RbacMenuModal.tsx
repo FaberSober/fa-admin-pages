@@ -122,7 +122,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
           </Form.Item>
 
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {level === FaEnums.RbacMenuLevelEnum.BUTTON ? <Input /> : <RouteCascader />}
+            {level === FaEnums.RbacMenuLevelEnum.BUTTON ? <Input placeholder="请输入菜单的权限点" /> : <RouteCascader />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>

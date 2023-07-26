@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {Button, Form, Input} from 'antd';
 import {ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils} from '@fa/ui';
-import {validatePasswordSafeRule} from '@/components';
+import {FaSecurityUtils} from '@/components';
 import {userApi} from '@/services';
 import {ConfigLayoutContext} from "@features/fa-admin-pages/layout";
 
@@ -37,7 +37,7 @@ export default function UsersChangePwdModal({ children, userIds, fetchFinish, ..
       return Promise.reject('新旧密码不能一样');
     }
 
-    return validatePasswordSafeRule(value, systemConfig);
+    return FaSecurityUtils.validatePasswordSafeRule(value, systemConfig);
   }
 
   function validateNewPwdConfirm(_rule: any, value: any) {

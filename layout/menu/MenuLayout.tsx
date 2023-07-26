@@ -10,10 +10,12 @@ import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, Us
 import {Rbac} from '@/types';
 import {rbacUserRoleApi} from '@/services';
 import {ConfigLayoutContext} from "@/layout";
+import {useRoutePermission} from "@/hooks";
 import './MenuLayout.scss';
 
 
 /**
+ * 厂字形菜单布局
  * @author xu.pengfei
  * @date 2022/9/22 22:23
  */
@@ -36,6 +38,8 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
+
+  const [hasPermission] = useRoutePermission(menuList)
 
   const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {})
 
@@ -228,7 +232,6 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     permissions: menuList.map((m) => m.linkUrl),
   };
 
-  const hasRoutePermission = true; // TODO 判断是否有路由权限
   const width = collapse ? 'calc(100% - 44px)' : 'calc(100% - 200px)';
   return (
     <MenuLayoutContext.Provider value={contextValue}>
@@ -249,16 +252,12 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
             <SideMenu />
 
             <Layout style={{ width }}>
-              {hasRoutePermission ? (
-                <div className="fa-full fa-flex-column">
-                  <OpenTabs />
-                  <FaFlexRestLayout>
-                    <div className="fa-main">{children}</div>
-                  </FaFlexRestLayout>
-                </div>
-              ) : (
-                <Empty description="403" />
-              )}
+              <div className="fa-full fa-flex-column">
+                <OpenTabs />
+                <FaFlexRestLayout>
+                  <div className="fa-main">{hasPermission ? children : <Empty description="页面丢失了" />}</div>
+                </FaFlexRestLayout>
+              </div>
             </Layout>
           </Layout>
         </Layout>

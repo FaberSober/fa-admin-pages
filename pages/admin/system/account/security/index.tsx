@@ -3,7 +3,7 @@ import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
 import {ConfigLayoutContext, UserLayoutContext} from "@/layout";
 import { userApi } from "@/services";
-import { validatePasswordSafeRule } from "@/components";
+import { FaSecurityUtils } from "@/components";
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
@@ -31,7 +31,7 @@ export default function AccountPwdUpdate() {
       return Promise.reject('新旧密码不能一样');
     }
 
-    return validatePasswordSafeRule(value, systemConfig);
+    return FaSecurityUtils.validatePasswordSafeRule(value, systemConfig);
   }
 
   function validateNewPwdConfirm(_rule: any, value: any) {

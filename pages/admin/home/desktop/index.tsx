@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import * as cubes from '@/cubes/homecubes'
-import {FaGridLayout, useAllLayout, useGridLayoutConfig} from "@/components";
+import {FaGridLayout, FaGridLayoutUtils} from "@/components";
 import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
 import {BaseDrawer, FaFlashCard} from "@fa/ui";
@@ -16,9 +16,9 @@ const type = "LAYOUT";
  * @date 2023/1/3 16:13
  */
 export default function Desktop() {
-  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig} = useGridLayoutConfig(cubes, biz, type, []);
+  const {layout, loading, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig} = FaGridLayoutUtils.useGridLayoutConfig(cubes, biz, type, []);
 
-  const {allLayout} = useAllLayout(cubes)
+  const {allLayout} = FaGridLayoutUtils.useAllLayout(cubes)
   const [editing, setEditing] = useState(false)
 
   const inIds: string[] = layout.map(i => i.i);
