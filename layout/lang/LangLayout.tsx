@@ -71,7 +71,7 @@ const customizeRenderEmpty = () => (
 /**
  * 国际化组件
  */
-function LangLayout({children}: Fa.BaseChildProps) {
+export default function LangLayout({children}: Fa.BaseChildProps) {
   const {colorPrimary, themeDark} = useContext(ThemeLayoutContext)
   const [locale, setLocale] = useState('zh_CN');
 
@@ -103,5 +103,3 @@ function LangLayout({children}: Fa.BaseChildProps) {
     </LangContext.Provider>
   );
 }
-
-export default LangLayout;
