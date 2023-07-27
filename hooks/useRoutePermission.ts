@@ -14,7 +14,7 @@ export default function useRoutePermission(menuList: Rbac.RbacMenu[]): [hasPermi
   // console.log('useRouteMatch', location, routesList)
 
   const matchRoute = FaRouteUtils.matchRoute(location.pathname, routesList);
-  console.log('useRouteMatch', location, matchRoute)
+  // console.log('useRouteMatch', location, matchRoute)
 
   const index = findIndex(menuList, menu => {
     return menu.linkUrl === matchRoute;
