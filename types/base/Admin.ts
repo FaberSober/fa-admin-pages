@@ -235,6 +235,10 @@ namespace Admin {
     img: string;
     /** api token  */
     apiToken: string;
+    /** 开放平台的唯一标识符 */
+    wxUnionId: string;
+    /** 微信小程序用户唯一标识 */
+    wxMaOpenid: string;
   }
 
   export interface UserWeb extends User {
