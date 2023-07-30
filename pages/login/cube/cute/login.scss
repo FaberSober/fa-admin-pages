@@ -1,5 +1,8 @@
 .fa-login-cute-management {
   width: 400px;
+  border-radius: 4px;
+  padding: 24px;
+  background: #FFF;
 }
 
 .fa-login-cute-managementTop {
@@ -22,7 +25,6 @@
 
 .fa-login-cute-managementMainBtns {
   display: flex;
-  justify-content: space-between;
 }
 
 .fa-login-cute-managementMainBtns label {

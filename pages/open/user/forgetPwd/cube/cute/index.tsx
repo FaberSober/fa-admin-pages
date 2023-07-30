@@ -11,8 +11,6 @@ import LoginCuteLayout from "@features/fa-admin-pages/pages/login/layout/LoginCu
 import '@features/fa-admin-pages/pages/login/cube/cute/login.scss';
 
 
-const formItemLayout = {labelCol: {span: 5}, wrapperCol: {span: 19}};
-
 export default function Index() {
   const {loadingEffect} = useContext(ApiEffectLayoutContext);
   const {systemConfig} = useContext(ConfigLayoutContext);
@@ -56,13 +54,13 @@ export default function Index() {
 
         <div className='fa-login-cute-managementMain'>
           <Form form={form} onFinish={onFinish} layout="vertical" autoComplete="off">
-            <Form.Item label="账号" name="username" required={false} rules={[{required: true, message: '请输入账号'}]} {...formItemLayout}>
+            <Form.Item label="账号" name="username" required={false} rules={[{required: true, message: '请输入账号'}]}>
               <Input size="large" prefix={<UserOutlined/>} placeholder="请输入账号"/>
             </Form.Item>
-            <Form.Item label="手机号" name="tel" required={false} rules={[{required: true, message: '请输入手机号'}, FaUtils.FormRules.PATTERN_TEL]} {...formItemLayout}>
+            <Form.Item label="手机号" name="tel" required={false} rules={[{required: true, message: '请输入手机号'}, FaUtils.FormRules.PATTERN_TEL]}>
               <Input size="large" prefix={<UserOutlined/>} placeholder="请输入手机号"/>
             </Form.Item>
-            <Form.Item label="密码" name="password" required={false} rules={[{required: true, message: '请输入密码'}]} {...formItemLayout}>
+            <Form.Item label="密码" name="password" required={false} rules={[{required: true, message: '请输入密码'}]}>
               <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请输入密码"/>
             </Form.Item>
             <Form.Item
@@ -70,15 +68,14 @@ export default function Index() {
               name="passwordConfirm"
               required={false}
               rules={[{required: true}, {validator: validateNewPwdConfirm}]}
-              {...formItemLayout}
             >
               <Input.Password size="large" prefix={<LockOutlined/>} type="password" placeholder="请再次输入新密码"/>
             </Form.Item>
 
             {systemConfig?.safeCaptchaOn && (
-              <Form.Item label="验证码" required={false} name="captcha" rules={[{required: true, message: '请输入验证码'}, {validator: validateCaptcha}]} {...formItemLayout}>
+              <Form.Item label="验证码" required={false} name="captcha" rules={[{required: true, message: '请输入验证码'}, {validator: validateCaptcha}]}>
                 <Input
-                  className='verify'
+                  size="large"
                   prefix={<FieldNumberOutlined/>}
                   placeholder="请输入验证码"
                   addonAfter={<Captcha onCodeChange={(c) => setCode(c)}/>}

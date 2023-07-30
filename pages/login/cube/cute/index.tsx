@@ -66,12 +66,13 @@ export default function Login() {
               </Form.Item>
             )}
 
-            <div className="fa-login-cute-managementMainBtns">
-              <Form.Item name="remember" valuePropName="checked">
+            <div className="fa-login-cute-managementMainBtns fa-flex-row-center fa-mb12">
+              <Form.Item name="remember" valuePropName="checked" style={{marginBottom: 0}}>
                 <Checkbox>记住密码</Checkbox>
               </Form.Item>
+              <div className="fa-flex-1" />
               {systemConfig.safeRegistrationOn && <a href="/open/user/registry">注册账户</a>}
-              <a href="/open/user/forgetPwd">忘记密码？</a>
+              <a href="/open/user/forgetPwd" className="fa-ml12">忘记密码？</a>
             </div>
 
             <Button size="large" block loading={loading} type="primary" htmlType="submit">

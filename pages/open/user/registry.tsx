@@ -7,7 +7,7 @@ import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
 import { userApi } from '@/services'
 import { Helmet } from "react-helmet-async";
 import { ConfigLayoutContext, VantaLayout } from "@/layout";
-import styles from '@features/fa-admin-pages/pages/login/cube/cute/login.module.scss';
+import styles from '@features/fa-admin-pages/pages/login/cube/default/login.module.scss';
 
 
 const formItemLayout = { labelCol: { span: 5 }, wrapperCol: { span: 19 } };
