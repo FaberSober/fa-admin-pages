@@ -66,7 +66,7 @@ export default function FileBizList({mainBizId, bizId, type}: FileBizListProps) 
             render: (_, r) => <a href={fileSaveApi.genLocalGetFile(r.fileId)} target="_blank">{r.fileName}</a>
           },
           {dataIndex: 'crtTime', title: '创建时间'},
-          {dataIndex: 'crtUser', title: '创建用户'},
+          {dataIndex: 'crtName', title: '创建用户'},
           {
             title: '操作',
             dataIndex: 'menu',
