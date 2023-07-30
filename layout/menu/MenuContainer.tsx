@@ -2,13 +2,13 @@ import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ApiEffectLayout, PageLoading, ThemeLayout } from '@fa/ui';
 import LangLayout from "../lang/LangLayout";
+import ConfigLayout from "../config/ConfigLayout";
 import UserLayout from "../user/UserLayout";
 import MenuLayout from "./MenuLayout";
 import {SITE_INFO} from "@/configs";
 
 
 import 'allotment/dist/style.css';
-import {ConfigLayout} from "@features/fa-admin-pages/layout";
 
 export default function MenuContainer() {
   return (
