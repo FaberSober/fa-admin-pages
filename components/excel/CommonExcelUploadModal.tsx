@@ -52,6 +52,7 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
         title="导入文件"
         open={open}
         onOk={() => form.submit()}
+        okText="导入"
         confirmLoading={loading}
         onCancel={() => setOpen(false)}
         width={700}

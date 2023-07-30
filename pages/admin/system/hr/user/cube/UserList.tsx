@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import {get} from 'lodash';
 import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
-import {Button, Form, Input, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams} from '@fa/ui';
+import {Button, Drawer, Form, Input, Space} from 'antd';
+import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams, useViewItem} from '@fa/ui';
 import {Admin} from '@/types';
 import {userApi} from '@/services';
 import UserModal from '../modal/UserModal';
@@ -10,6 +10,7 @@ import {DepartmentCascade} from '@/components';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
 import UsersChangePwdModal from "./modal/UsersChangePwdModal";
+import UserView from "./cube/UserView";
 
 const serviceName = '用户';
 const biz = 'UserList-v2';
@@ -33,6 +34,7 @@ export default function UserList({ departmentId }: IProps) {
     extraParams: { departmentIdSuper: departmentId },
   });
   const [handleDelete] = useDelete<string>(userApi.remove, fetchPageList, serviceName);
+  const {show, hide, open, item} = useViewItem<Admin.User>() // 查看记录
 
   useEffect(() => setExtraParams({ departmentIdSuper: departmentId }), [departmentId]);
 
@@ -57,6 +59,8 @@ export default function UserList({ departmentId }: IProps) {
       BaseTableUtils.genSimpleSorterColumn('邮箱', 'email', 150, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('地址', 'address', 200, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter, false),
+      BaseTableUtils.genSimpleSorterColumn('开放平台的唯一标识符', 'wxUnionId', 100, sorter, false),
+      BaseTableUtils.genSimpleSorterColumn('微信小程序用户唯一标识', 'wxMaOpenid', 100, sorter, false),
       ...BaseTableUtils.genCtrColumns(sorter),
       ...BaseTableUtils.genUpdateColumns(sorter),
       {
@@ -120,7 +124,12 @@ export default function UserList({ departmentId }: IProps) {
             <UsersChangePwdModal  userIds={rowKeys} fetchFinish={fetchPageList} />
           </Space>
         )}
+        onRow={r => ({ onDoubleClick: () => show(r) })}
       />
+
+      <Drawer title="查看详情" open={open} onClose={hide} width={1000} bodyStyle={{position: 'relative'}}>
+        {open && item && <UserView item={item} /> }
+      </Drawer>
     </div>
   );
 }
