@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { ConfigLayoutContext } from "@features/fa-admin-pages/layout";
-import LoginDefault from './cube/default'
-import LoginCute from './cube/cute'
+import ForgetPwdDefault from './cube/default'
+import ForgetPwdCute from './cube/cute'
 
 
 /**
@@ -14,8 +14,8 @@ export default function index() {
 
   switch (systemConfig.loginPageType) {
     case 'cute':
-      return <LoginCute />
+      return <ForgetPwdCute />
   }
 
-  return <LoginDefault />
+  return <ForgetPwdDefault />
 }

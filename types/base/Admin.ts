@@ -49,28 +49,43 @@ namespace Admin {
   }
 
   export interface ConfigSysConfig {
+    /** 网站标题 */
     title: string;
+    /** [网站]标题 */
+    titleColor: string;
+    /** [网站]副标题 */
     subTitle: string;
+    /** [网站]版权信息 */
+    cop: string;
+    /** [网站]版权信息 */
+    copColor: string;
+    /** [网站]登录背景图 */
+    loginBg: string;
+    /** 登录页面样式 */
+    loginPageType: string;
+    /** 顶部菜单条样式 */
+    topMenuBarStyle: string;
+    /** [网站]logo */
     logo: string;
+    /** [网站]logo带文字 */
     logoWithText: string;
+    /** [官网]地址 */
     portalLink: string;
+    /** [Web]redis web管理页面地址 */
+    phpRedisAdmin: string;
+    /** [Web]SocketIO服务地址 */
+    socketUrl: string;
+    /** [存储][本地]目录 */
     storeLocalPath: string;
-    safeCaptchaOn: boolean; // [安全]是否开启验证码
-    /**
-     * [安全]密码类型
-     */
+    /** [安全]是否开启验证码 */
+    safeCaptchaOn: boolean;
+    /** [安全]密码类型 */
     safePasswordType: FaEnums.ConfigSysSafePasswordTypeEnum;
-    /**
-     * [安全]密码最小长度
-     */
+    /** [安全]密码最小长度 */
     safePasswordLenMin: number;
-    /**
-     * [安全]密码最大长度
-     */
+    /**[安全]密码最大长度 */
     safePasswordLenMax: number;
-    /**
-     * [安全]token有效时长(小时)
-     */
+    /** [安全]token有效时长(小时) */
     safeTokenExpireHour: number;
   }
 
@@ -91,6 +106,10 @@ namespace Admin {
     copColor: string;
     /** [网站]登录背景图 */
     loginBg: string;
+    /** 登录页面样式 */
+    loginPageType: string;
+    /** 顶部菜单条样式 */
+    topMenuBarStyle: string;
     /** [网站]logo */
     logo: string;
     /** [网站]logo带文字 */
@@ -105,17 +124,11 @@ namespace Admin {
     safeCaptchaOn: boolean;
     /** [安全]是否开启注册 */
     safeRegistrationOn: boolean;
-    /**
-     * [安全]密码类型
-     */
+    /** [安全]密码类型 */
     safePasswordType: FaEnums.ConfigSysSafePasswordTypeEnum;
-    /**
-     * [安全]密码最小长度
-     */
+    /** [安全]密码最小长度 */
     safePasswordLenMin: number;
-    /**
-     * [安全]密码最大长度
-     */
+    /** [安全]密码最大长度 */
     safePasswordLenMax: number;
   }
 

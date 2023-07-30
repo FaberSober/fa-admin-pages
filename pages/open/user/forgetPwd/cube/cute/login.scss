@@ -1,0 +1,95 @@
+.resetPassword {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  display: flex;
+
+  .loginLeft {
+    flex: 1;
+    background: url('@/assets/images/login/newLogin.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+
+  .loginRight {
+    flex: 1;
+    background: url('@/assets/images/login/rigthLoginBg.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    .management {
+      position: absolute;
+
+      left: 77%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      align-items: center;
+      justify-content: center;
+      width: 400px;
+      padding: 24px;
+    }
+
+  }
+
+  .loginRight > .management > .managementTop {
+    background: url('@/assets/images/login/management.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    width: 200px;
+    height: 54px;
+    margin-bottom: 30px;
+
+  }
+
+  .loginRight > .management > .managementMain {
+    .submit {
+      width: 100%;
+
+    }
+
+    .verify {
+      margin-bottom: 10px;
+
+      .ant-input-wrapper {
+        height: 50px;
+
+        .ant-input {
+          height: 50px;
+        }
+
+      }
+    }
+
+    label {
+      color: #1677FF;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .ant-form-item {
+      margin-bottom: 5px;
+    }
+
+  }
+
+  .loginRight > .management > .managementMain {
+    .member {
+      display: flex;
+      justify-content: space-between;
+
+      label {
+        color: #666;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+    }
+
+  }
+
+  .loginRight > .management > .managementBottom {
+    color: #666;
+    font-size: 12px;
+    margin-top: 5vh;
+  }
+}

@@ -98,9 +98,9 @@ export default function MsgBadgeCube() {
       onOpenChange={setOpen}
     >
       <div style={{ cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <a>
+        <a className="fa-menu-normal-cube">
           <Badge size="small" count={unreadCount}>
-            <BellOutlined style={{ margin: '0 4px' }} />
+            <BellOutlined className="fa-menu-normal-cube" style={{ margin: '0 4px' }} />
           </Badge>
         </a>
       </div>

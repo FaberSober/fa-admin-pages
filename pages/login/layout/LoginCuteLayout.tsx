@@ -1,15 +1,16 @@
 import React, { CSSProperties, useContext, useEffect, useRef } from 'react';
-import { ConfigLayoutContext } from "@/layout";
-import styles from "./VantaLayout.module.scss";
-import { Fa, fileSaveApi } from "@fa/ui";
 import { trim } from "lodash";
+import { ConfigLayoutContext } from "@/layout";
+import { Fa, fileSaveApi } from "@fa/ui";
+import styles from "./LoginCuteLayout.module.scss";
 
 
 /**
+ *
  * @author xu.pengfei
  * @date 2023/2/6 10:26
  */
-export default function VantaLayout({children}: Fa.BaseChildProps) {
+export default function LoginCuteLayout({children}: Fa.BaseChildProps) {
   const vantaRef = useRef<any>();
   const {systemConfig} = useContext(ConfigLayoutContext);
 
@@ -46,26 +47,10 @@ export default function VantaLayout({children}: Fa.BaseChildProps) {
   return (
     <div ref={vantaRef} className={styles['main-container']}>
       <div className="fa-full-content" style={bgStyle}>
-        {/* left title info */}
-        <div className={styles.bannerDiv}>
-          <div>
-            <div className={styles.bannerTitle} style={{color: systemConfig.titleColor}}>{systemConfig?.title || '-'}</div>
-            <div className={styles.bannerSubTitle} style={{color: systemConfig.subTitleColor}}>{systemConfig?.subTitle || '-'}</div>
-            <div style={{width: 1, height: 260}}/>
-          </div>
-        </div>
-
         {/* right panel slot */}
         <div className={styles.mainDiv}>
           <div className={styles.main}>
             {children}
-          </div>
-        </div>
-
-        {/* bottom copyright */}
-        <div className={styles.footerDiv}>
-          <div className={styles.footerMain} style={{color: systemConfig.copColor}}>
-            {systemConfig?.cop}
           </div>
         </div>
       </div>

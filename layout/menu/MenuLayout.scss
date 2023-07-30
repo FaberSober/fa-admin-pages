@@ -25,6 +25,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  background-color: var(--fa-bg-color);
 }
 
 
@@ -66,3 +67,57 @@
 .ant-layout-header {
   background-color: var(--fa-bg-color) !important;
 }
+
+.fa-menu-help-cube {
+  color: var(--fa-text-color);
+  margin: 0 4px;
+}
+
+.fa-menu-normal-cube {
+  color: var(--fa-text-color);
+}
+
+// ------------------------------------- 顶部菜单条样式-color-begin -------------------------------------
+[fa-menu-theme=color] .fa-menu-top {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: #FFF;
+  background-color: var(--primary-color) !important;
+
+  li.ant-menu-item-selected {
+    background-color: #fff !important;
+    border-radius: 15px !important;
+    color: var(--primary-color) !important;
+  }
+
+  .ant-menu-item-selected::after {
+    display: none !important;
+  }
+
+  .ant-menu-item-active {
+    color: #fff !important;
+  }
+}
+
+[fa-menu-theme=color] .ant-layout-header {
+  background-color: var(--primary-color) !important;
+}
+
+[fa-menu-theme=color] .fa-menu-header {
+  color: #FFF;
+  background-color: var(--primary-color) !important;
+}
+
+[fa-menu-theme=color] .fa-menu-logo-title {
+  color: #FFF;
+}
+
+[fa-menu-theme=color] .fa-menu-help-cube {
+  color: #FFF;
+}
+
+[fa-menu-theme=color] .fa-menu-normal-cube {
+  color: #FFF;
+}
+// ------------------------------------- 顶部菜单条样式-color-end -------------------------------------

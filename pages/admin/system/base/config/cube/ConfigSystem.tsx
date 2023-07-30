@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {ApiEffectLayoutContext, FaUtils, InputColor, UploadImgLocal} from '@fa/ui';
-import {Button, Col, Form, Input, Row, Space} from 'antd';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import {SaveOutlined} from '@ant-design/icons';
 import {configSysApi} from '@/services';
 import {Admin} from '@/types';
@@ -62,6 +62,7 @@ export default function ConfigSystem() {
             </Form.Item>
           </Col>
         </Row>
+
         <Row gutter={12}>
           <Col md={7}>
             <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
@@ -93,6 +94,29 @@ export default function ConfigSystem() {
           <Col md={1}>
             <Form.Item name="copColor" rules={[{ required: true }]}>
               <InputColor style={{width: 32, height: 32, marginTop: 30}} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={12}>
+          <Col md={8}>
+            <Form.Item name="loginPageType" label="登录页面样式" rules={[{ required: true }]}>
+              <Select
+               options={[
+                 { label: '默认', value: 'default' },
+                 { label: '样式一', value: 'cute' },
+               ]}
+              />
+            </Form.Item>
+          </Col>
+          <Col md={8}>
+            <Form.Item name="topMenuBarStyle" label="顶部菜单条样式" rules={[{ required: true }]}>
+              <Select
+               options={[
+                 { label: '默认(白色底)', value: 'default' },
+                 { label: '主题色', value: 'color' },
+               ]}
+              />
             </Form.Item>
           </Col>
         </Row>
