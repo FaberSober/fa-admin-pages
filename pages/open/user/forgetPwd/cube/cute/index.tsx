@@ -8,7 +8,7 @@ import { userApi } from '@/services'
 import { ConfigLayoutContext } from "@/layout";
 import { Helmet } from "react-helmet-async";
 import LoginCuteLayout from "@features/fa-admin-pages/pages/login/layout/LoginCuteLayout";
-import '@features/fa-admin-pages/pages/login/cube/cute/login.scss';
+import '@features/fa-admin-pages/pages/login/login.scss';
 
 
 export default function Index() {
@@ -50,7 +50,9 @@ export default function Index() {
       <Helmet title={`重置密码 | ${systemConfig?.title}`}/>
 
       <div className='fa-login-cute-management'>
-        <div className="fa-login-cute-managementTop" style={{background: `url(${fileSaveApi.genLocalGetFile(systemConfig.logoWithText)}) no-repeat`, backgroundSize: '100% 100%'}}/>
+        <div className="fa-login-cute-managementTop">
+          <img src={fileSaveApi.genLocalGetFile(systemConfig.logoWithText)} alt={systemConfig.title} style={{height: '100%'}} />
+        </div>
 
         <div className='fa-login-cute-managementMain'>
           <Form form={form} onFinish={onFinish} layout="vertical" autoComplete="off">

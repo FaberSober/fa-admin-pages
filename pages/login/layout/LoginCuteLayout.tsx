@@ -42,7 +42,7 @@ export default function LoginCuteLayout({children}: Fa.BaseChildProps) {
     background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : '',
     backgroundSize: '100% 100%',
   }
-  console.log(bgStyle)
+  // console.log(bgStyle)
 
   return (
     <div ref={vantaRef} className={styles['main-container']}>
