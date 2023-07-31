@@ -59,7 +59,7 @@ export default function LoginForm() {
         </Form.Item>
       )}
 
-      <div className="fa-login-cute-managementMainBtns fa-flex-row-center fa-mb12">
+      <div className="fa-login-cute-main-btn fa-flex-row-center fa-mb12">
         <Form.Item name="remember" valuePropName="checked" style={{marginBottom: 0}}>
           <Checkbox>记住密码</Checkbox>
         </Form.Item>

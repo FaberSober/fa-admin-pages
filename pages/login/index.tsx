@@ -21,14 +21,14 @@ export default function index() {
   if (systemConfig.loginPageType === 'cute') {
     return (
       <LoginCuteLayout>
-        <div className="fa-login-cute-management">
-          <div className="fa-login-cute-managementTop">
+        <div className="fa-login-cute-main">
+          <div className="fa-login-cute-main-top">
             <img src={fileSaveApi.genLocalGetFile(systemConfig.logoWithText)} alt={systemConfig.title} style={{height: '100%'}}/>
           </div>
 
           <LoginForm/>
 
-          <div className="fa-login-cute-managementBottom">
+          <div className="fa-login-cute-main-bottom">
             {systemConfig.cop}
           </div>
         </div>
@@ -38,14 +38,14 @@ export default function index() {
 
   return (
     <VantaLayout>
-      <div className="fa-login-cute-management">
-        <div className="fa-login-cute-managementTop">
+      <div className="fa-login-cute-main">
+        <div className="fa-login-cute-main-top">
           <img src={fileSaveApi.genLocalGetFile(systemConfig.logoWithText)} alt={systemConfig.title} style={{height: '100%'}}/>
         </div>
 
         <LoginForm/>
 
-        <div className="fa-login-cute-managementBottom">
+        <div className="fa-login-cute-main-bottom">
           {systemConfig.cop}
         </div>
       </div>
