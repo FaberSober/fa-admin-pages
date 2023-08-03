@@ -33,7 +33,7 @@ export default function HelpCube() {
   if (isNil(SITE_INFO.HELP_DOCS) || SITE_INFO.HELP_DOCS.length === 0) return null;
 
   return (
-    <div style={{ padding: '0 12px', cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+    <div className="fa-link-grey fa-flex-center">
       <Popover
         placement="bottomRight"
         content={<HelpCubeContent />}
