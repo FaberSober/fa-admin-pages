@@ -109,17 +109,17 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <DepartmentCascade />
           </Form.Item>
           <Form.Item name="name" label="姓名" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input />
+            <Input placeholder="请输入姓名" />
           </Form.Item>
           <Form.Item name="username" label="账户" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input />
+            <Input placeholder="请输入账户，账户不可重复" />
           </Form.Item>
           <Form.Item name="tel" label="手机号" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input />
+            <Input placeholder="请输入手机号，手机号不可重复" />
           </Form.Item>
           {record === undefined && (
             <Form.Item name="password" label="密码" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-              <Input.Password />
+              <Input.Password placeholder="请输入密码" />
             </Form.Item>
           )}
           <Form.Item name="roleIds" label="角色" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
@@ -129,7 +129,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <Switch checkedChildren="有效" unCheckedChildren="禁止" />
           </Form.Item>
           <Form.Item name="email" label="邮箱" {...FaUtils.formItemFullLayout}>
-            <Input />
+            <Input placeholder="请输入邮箱" />
           </Form.Item>
           <Form.Item name="sex" label="性别" {...FaUtils.formItemFullLayout}>
             <DictEnumApiRadio enumName="SexEnum" />
@@ -138,7 +138,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <UploadImgLocal />
           </Form.Item>
           <Form.Item name="description" label="备注" {...FaUtils.formItemFullLayout}>
-            <Input.TextArea />
+            <Input.TextArea autoSize />
           </Form.Item>
         </Form>
       </DragModal>
