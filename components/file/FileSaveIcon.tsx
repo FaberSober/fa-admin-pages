@@ -3,6 +3,7 @@ import { Image } from 'antd';
 import { Admin } from '@/types';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@/services';
+import { VideoModal } from "@features/fa-admin-pages/components";
 
 export interface FileSaveIconProps {
   file: Admin.FileSave;
@@ -36,6 +37,15 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
         {/*<img src={fileSaveApi.genLocalGetFilePreview(file.id)} style={{ maxWidth: width, maxHeight: width }} alt={file.originalFilename} />*/}
       </div>
     );
+  }
+
+  const isVideo = FaUtils.isVideo(file.ext);
+  if (isVideo) {
+    return (
+      <VideoModal url={fileSaveApi.genLocalGetFile(file.id)}>
+        <a>{file.originalFilename}</a>
+      </VideoModal>
+    )
   }
 
   return (

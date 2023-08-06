@@ -33,6 +33,10 @@ declare global {
     VANTA: any;
     /** Prism */
     Prism: any;
+    /** videojs */
+    videojs: any;
+
+    /** fa-admin自定义 */
     FaFrom: any;
     FaVersionCode: any;
     FaVersionName: any;
