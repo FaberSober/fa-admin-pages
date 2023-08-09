@@ -17,6 +17,7 @@ export default function FileSaveModal({ children, title, record, fetchFinish, ad
 
   function showModal() {
     setOpen(true)
+    form.setFieldsValue({ url: undefined })
   }
 
   const loading = loadingEffect[api.getUrl('save')] || loadingEffect[api.getUrl('update')];
@@ -38,7 +39,7 @@ export default function FileSaveModal({ children, title, record, fetchFinish, ad
       >
         <Form form={form}>
           <Form.Item name="url" label="上传文件" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
-            <UploadFileLocal multiple />
+            <UploadFileLocal multiple onChange={fetchFinish} />
           </Form.Item>
         </Form>
       </DragModal>
