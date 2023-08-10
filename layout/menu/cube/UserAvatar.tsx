@@ -10,7 +10,7 @@ const UserPopoverContent = () => {
   const intl = useIntl();
   const { setColorPrimary, themeDark, setThemeDark } = useContext(ThemeLayoutContext);
   const { logout } = useContext(UserLayoutContext);
-  const { addTab } = useContext(MenuLayoutContext);
+  const { addTab, showTabs, setShowTabs } = useContext(MenuLayoutContext);
 
   // 头像下拉弹框-菜单点击
   function handleHeadDropdownClick(key: any) {
@@ -93,6 +93,14 @@ const UserPopoverContent = () => {
 
         <Switch checkedChildren="暗色" unCheckedChildren="亮色" checked={themeDark} onChange={setThemeDark} />
       </div>
+
+      <div className="fa-flex-row-center fa-mt12 fa-mb12">
+        <div className="fa-flex-1" style={{paddingLeft: 20}}>是否展示标签栏</div>
+        <div>
+          <Switch checkedChildren="展示" unCheckedChildren="隐藏" checked={showTabs} onChange={setShowTabs} />
+        </div>
+      </div>
+
       <Menu selectedKeys={[]} onClick={(menu) => handleHeadDropdownClick(menu.key)} items={items} style={{ border: 'none' }} />
     </div>
   );

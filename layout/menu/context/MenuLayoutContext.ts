@@ -25,6 +25,8 @@ export interface MenuLayoutContextProps {
   setCollapse: (v: boolean) => void;
   openSideMenuKeys: string[];
   setOpenSideMenuKeys: (v: string[]) => void;
+  showTabs: boolean|undefined; // 是否展示标签栏
+  setShowTabs: (v:boolean) => void; // 改变展示标签栏
   openTabs: OpenTabsItem[]; // 打开的菜单历史记录
   curTab: OpenTabsItem | undefined; // 当前选中的tab
   setCurTab: (v: OpenTabsItem|undefined) => void;
@@ -48,6 +50,8 @@ const MenuLayoutContext: React.Context<MenuLayoutContextProps> = createContext<M
   setCollapse: () => {},
   openSideMenuKeys: [],
   setOpenSideMenuKeys: () => {},
+  showTabs: true,
+  setShowTabs: () => {},
   openTabs: [],
   curTab: undefined,
   setCurTab: () => {},

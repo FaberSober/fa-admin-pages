@@ -35,6 +35,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [menuSelMenuId, setMenuSelMenuId] = useState<string>(); // 当前选中的左侧菜单menu id
   const [menuSelPath, setMenuSelPath] = useState<string[]>([]); // 当前选中的菜单ID数组（不包含顶部block菜单）
   const [collapse, setCollapse] = useLocalStorage<boolean>('MenuLayout.collapse', false); // 是否折叠左侧菜单
+  const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', true); // 是否展示标签栏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
@@ -57,7 +58,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       } else {
         // 未找到菜单，解析打开的菜单
         try {
-          console.log('faTabCache', faTabCache)
+          // console.log('faTabCache', faTabCache)
           const cacheTabItem = faTabCache[location.pathname]
           if (!isNil(cacheTabItem)) {
             const itemFind = find(openTabs, i => i.key === cacheTabItem.key)
@@ -199,6 +200,8 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     setCollapse: setCollapse,
     openSideMenuKeys,
     setOpenSideMenuKeys,
+    showTabs,
+    setShowTabs,
     openTabs,
     curTab,
     setCurTab: (tab: OpenTabsItem|undefined) => {
@@ -207,7 +210,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     setOpenTabs,
     addTab: (tab1: OpenTabsItem) => {
       const newTab = { ...tab1, linkMenuId: menuSelMenuId }
-      console.log('add tab', newTab)
+      // console.log('add tab', newTab)
       const tabFind = find(openTabs, i => i.key === newTab.key);
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree)
@@ -220,7 +223,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       setFaTabCache({ ...faTabCache, [newTab.path]: newTab })
     },
     removeTab: (tabKey: string) => {
-      console.log('close tab', tabKey)
+      // console.log('close tab', tabKey)
       setOpenTabs(openTabs.filter(i => i.key !== tabKey))
     },
     selTab: (tabKey: string) => {
@@ -253,7 +256,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
 
             <Layout style={{ width }}>
               <div className="fa-full fa-flex-column">
-                <OpenTabs />
+                {showTabs && <OpenTabs />}
                 <FaFlexRestLayout>
                   <div className="fa-main">{hasPermission ? children : <Empty description="页面丢失了" />}</div>
                 </FaFlexRestLayout>
