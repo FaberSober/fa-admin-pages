@@ -41,5 +41,6 @@ declare global {
     FaVersionCode: any;
     FaVersionName: any;
     FaIframeUrl: any;
+    faHeader: any;
   }
 }
