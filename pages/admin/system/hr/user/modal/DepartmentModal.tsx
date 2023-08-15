@@ -1,24 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, CommonModalProps, DragModal, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
 import { departmentApi } from '@/services';
 import { DepartmentCascade, UserSearchSelect } from '@/components';
 
 const serviceName = '部门';
 
-interface IProps extends DragModalProps {
+interface DepartmentModalProps extends CommonModalProps<Admin.Department> {
   parentId?: number;
-  title?: string;
-  record?: Admin.Department;
-  fetchFinish?: () => void;
 }
 
 /**
  * 部门实体新增、编辑弹框
  */
-export default function DepartmentModal({ children, parentId, title, record, fetchFinish, ...props }: IProps) {
+export default function DepartmentModal({ children, parentId, title, record, fetchFinish, ...props }: DepartmentModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
