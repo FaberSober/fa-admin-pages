@@ -3,8 +3,9 @@ import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } f
 import {Avatar, Menu, Popover, Switch} from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
-import { MenuLayoutContext, UserLayoutContext } from "@/layout";
 import {InputColor, ThemeLayoutContext} from "@fa/ui";
+import { UserLayoutContext } from '../../user/UserLayout'
+import MenuLayoutContext from "../context/MenuLayoutContext";
 
 const UserPopoverContent = () => {
   const intl = useIntl();

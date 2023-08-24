@@ -5,12 +5,12 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Helmet} from 'react-helmet-async';
 import {useLocalStorage} from 'react-use';
 import {Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList} from "@fa/ui";
-import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
 import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar } from "./cube";
 import {Rbac} from '@/types';
 import {rbacUserRoleApi} from '@/services';
-import {ConfigLayoutContext} from "@/layout";
-import {useRoutePermission} from "@/hooks";
+import useRoutePermission from "../../hooks/useRoutePermission";
+import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
+import {ConfigLayoutContext} from "../config/ConfigLayout";
 import './MenuLayout.scss';
 
 

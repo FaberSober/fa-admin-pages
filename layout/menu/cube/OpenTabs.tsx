@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Tabs } from 'antd';
+import { findIndex } from "lodash";
 import { Item, ItemParams, Menu, useContextMenu } from 'react-contexify';
+import { FaFullscreenBtn } from "@fa/ui";
 import MenuLayoutContext, { OpenTabsItem } from "../context/MenuLayoutContext";
 import './OpenTabs.scss'
-import { findIndex } from "lodash";
-import { FaFullscreenBtn } from "@fa/ui";
 
 
 /**

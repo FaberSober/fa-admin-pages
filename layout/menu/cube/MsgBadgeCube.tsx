@@ -4,8 +4,9 @@ import { Admin } from '@/types';
 import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';
 import { BellOutlined } from '@ant-design/icons';
-import { MenuLayoutContext, UserLayoutContext } from "@/layout";
 import { ApiEffectLayoutContext } from "@fa/ui";
+import { UserLayoutContext } from '../../user/UserLayout'
+import MenuLayoutContext from "../context/MenuLayoutContext";
 
 
 interface MsgListProps {

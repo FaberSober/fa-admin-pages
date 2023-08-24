@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import {fileSaveApi} from '@/services';
-import {ConfigLayoutContext} from "@/layout";
+import {ConfigLayoutContext} from "../../config/ConfigLayout";
 import {SITE_INFO} from '@/configs';
 
 

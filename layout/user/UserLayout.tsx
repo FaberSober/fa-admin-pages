@@ -3,7 +3,7 @@ import { Admin, Rbac } from '@/types';
 import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
 import { authApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@/services';
-import {ConfigLayoutContext} from "@features/fa-admin-pages/layout";
+import {ConfigLayoutContext} from "../config/ConfigLayout";
 
 
 export interface UserLayoutContextProps {
