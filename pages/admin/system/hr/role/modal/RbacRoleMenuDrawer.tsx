@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, Drawer, DrawerProps, Tree } from 'antd';
-import { ApiEffectLayoutContext, Fa, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, calCheckedKey, Fa, FaUtils } from '@fa/ui';
 import { Rbac } from '@/types';
 import { rbacMenuApi, rbacRoleMenuApi } from '@/services';
+import { difference } from "lodash";
 
 
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
@@ -20,6 +21,18 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   const [halfCheckedKeys, setHalfCheckedKeys] = useState<React.Key[]>([]);
 
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const cks = calCheckedKey(tree, checkedKeys)
+    if (cks === undefined) return;
+
+    const diffIds = difference(checkedKeys, cks)
+    // console.log('cks', cks, diffIds, checkedKeys)
+    // 有差异
+    if (diffIds.length > 0) {
+      setCheckedKeys(cks)
+    }
+  }, [tree, checkedKeys])
 
   function refreshData() {
     rbacMenuApi.allTree().then((res) => {
