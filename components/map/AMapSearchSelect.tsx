@@ -46,7 +46,7 @@ export default function AMapSearchSelect({onSelect, value, style}: AMapSearchSel
         }}
         center={pos ? [pos.lng, pos.lat] : undefined}
       >
-        <MapTypeControl offset={[10, 110]} position="RB" />
+        <MapTypeControl  />
         {pos && <Marker position={new AMap.LngLat(pos.lng, pos.lat)}/>}
       </Map>
 

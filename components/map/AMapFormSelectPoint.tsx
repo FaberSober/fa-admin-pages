@@ -29,7 +29,7 @@ export default function AMapFormSelectPoint<V extends Record>({form, record, off
     <Row className="fa-mb12">
       <Col offset={offset}>
         <AMapSearchSelectModal
-          value={record ? {lng: record.lng, lat: record.lat} : undefined}
+          value={record && record.lng && record.lat ? {lng: record.lng, lat: record.lat} : undefined}
           onSelect={pos => {
             form.setFieldsValue({lng: pos.lng, lat: pos.lat})
             posToAddress(pos, v => {
