@@ -22,7 +22,7 @@ export default function AMapAutoComplete({onSelect, style}: AMapAutoCompleteProp
 
   return (
     <div style={{ position: 'relative', ...style}}>
-      <input type="text" ref={mapRef} className="fa-input-amap-search" />
+      <input type="text" ref={mapRef} className="fa-input-amap-search" placeholder="请输入地址进行搜索" />
       <div>
         {input && (
           <AutoComplete
