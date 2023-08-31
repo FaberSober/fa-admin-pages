@@ -5,10 +5,11 @@ import LangLayout from "../lang/LangLayout";
 import ConfigLayout from "../config/ConfigLayout";
 import UserLayout from "../user/UserLayout";
 import MenuLayout from "./MenuLayout";
-import {SITE_INFO} from "@/configs";
+import { SITE_INFO } from "@/configs";
 
 
 import 'allotment/dist/style.css';
+import { AMapLayout } from "@features/fa-admin-pages/layout";
 
 export default function MenuContainer() {
   return (
@@ -17,11 +18,13 @@ export default function MenuContainer() {
         <ApiEffectLayout>
           <ConfigLayout>
             <UserLayout>
-              <MenuLayout>
-                <Suspense fallback={<PageLoading />}>
-                  <Outlet />
-                </Suspense>
-              </MenuLayout>
+              <AMapLayout>
+                <MenuLayout>
+                  <Suspense fallback={<PageLoading />}>
+                    <Outlet />
+                  </Suspense>
+                </MenuLayout>
+              </AMapLayout>
             </UserLayout>
           </ConfigLayout>
         </ApiEffectLayout>
