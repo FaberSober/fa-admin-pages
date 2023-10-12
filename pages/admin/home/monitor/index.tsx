@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import * as cubes from '@/cubes/monitorcubes'
-import {FaGridLayout, FaGridLayoutUtils} from "@/components";
+import { FaCodeEditModal, FaGridLayout, FaGridLayoutUtils } from "@/components";
 import {isNil} from "lodash";
 import {Button, List, Space, Spin, Switch} from "antd";
-import {BaseDrawer, FaFlashCard} from "@fa/ui";
+import {BaseDrawer, FaFlashCard, FaUtils} from "@fa/ui";
 import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
 
 
@@ -59,6 +59,9 @@ export default function Monitor() {
             <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
             <Button onClick={handleClearAllUserConfig} danger>清空全部用户缓存</Button>
+            <FaCodeEditModal value={FaUtils.tryFormatJson(JSON.stringify(layout))} onChange={v => onLayoutChange(JSON.parse(v))}>
+              <Button>编辑配置</Button>
+            </FaCodeEditModal>
           </Space>
           <List
             itemLayout="horizontal"
