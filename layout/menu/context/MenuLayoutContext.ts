@@ -6,8 +6,8 @@ export interface OpenTabsItem {
   path: string; // 页面URL
   name: string; // 名称
   type?: 'iframe' | 'inner'; // 打开页面类型，默认为inner
-  closeable?: boolean; // 是否可以关闭/** 图标标识 */
-  icon?: string|ReactNode;
+  closeable?: boolean; // 是否可以关闭
+  icon?: string|ReactNode; // 图标标识
   linkMenuId?: string; // 对应需要打开的菜单ID
 }
 
