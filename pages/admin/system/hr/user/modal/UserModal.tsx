@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {get} from 'lodash';
 import {Button, Form, Input, Switch} from 'antd';
-import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal} from '@fa/ui';
+import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector} from '@fa/ui';
 import {DepartmentCascade, RbacRoleSelect} from '@/components';
 import useBus from 'use-bus';
 import {Admin} from '@/types';
@@ -133,6 +133,9 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
           </Form.Item>
           <Form.Item name="sex" label="性别" {...FaUtils.formItemFullLayout}>
             <DictEnumApiRadio enumName="SexEnum" />
+          </Form.Item>
+          <Form.Item name="workStates" label="工作状态" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <DictEnumApiSelector enumName='WorkStatusEnum' />
           </Form.Item>
           <Form.Item name="img" label="头像" {...FaUtils.formItemFullLayout}>
             <UploadImgLocal />

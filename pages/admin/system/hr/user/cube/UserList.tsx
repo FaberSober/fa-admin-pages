@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {get} from 'lodash';
 import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
-import {Button, Drawer, Form, Input, Space} from 'antd';
+import {Button, Drawer, Form, Input, Space, Badge, Select} from 'antd';
 import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams, useViewItem} from '@fa/ui';
 import {Admin} from '@/types';
 import {userApi} from '@/services';
@@ -54,6 +54,15 @@ export default function UserList({ departmentId }: IProps) {
           <DepartmentCascade value={value} onChangeWithItem={(v: any, item: any) => callback(v, index, get(item, 'name'))} {...props} />
         ),
       },
+      {
+        title: '工作状态',
+        dataIndex: 'workStatus',
+        render: (_,record) => (
+          [record.workStatus == 0 && <Badge status="success" text='在职'/>,
+          record.workStatus == 1 && <Badge status="warning" text='请假'/>,
+          record.workStatus == 2 && <Badge status="error" text='离职'/>]
+        )
+      },
       BaseTableUtils.genBoolSorterColumn('账户有效', 'status', 100, sorter),
       BaseTableUtils.genDictSorterColumn('性别', 'sex', 100, sorter, dicts, 'common_sex'),
       BaseTableUtils.genSimpleSorterColumn('邮箱', 'email', 150, sorter, false),
@@ -86,11 +95,19 @@ export default function UserList({ departmentId }: IProps) {
         <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
-            <Form.Item name="tel" label="手机号">
-              <Input placeholder="请输入手机号" allowClear />
+            <Form.Item name="workStatus" label="工作状态">
+              <Select
+                placeholder='请选择工作状态'
+                style={{ width: 150 }}
+                options={[
+                  { value: '0', label: '在职' },
+                  { value: '1', label: '请假' },
+                  { value: '2', label: '离职' }
+                ]}
+              />
             </Form.Item>
             <Form.Item name="name" label="姓名">
-              <Input placeholder="请输入姓名" allowClear />
+              <Input placeholder="请输入员工姓名" allowClear />
             </Form.Item>
 
             <Space>

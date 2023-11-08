@@ -254,6 +254,8 @@ namespace Admin {
     wxUnionId: string;
     /** 微信小程序用户唯一标识 */
     wxMaOpenid: string;
+    /** 工作状态 */
+    workStatus: number;
   }
 
   export interface UserWeb extends User {
