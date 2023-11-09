@@ -72,6 +72,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
       description: get(record, 'description'),
       post: get(record, 'post'),
       img: get(record, 'img'),
+      workStatus: get(record, 'workStatus'),
       roleIds: [],
     };
   }
@@ -134,8 +135,8 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
           <Form.Item name="sex" label="性别" {...FaUtils.formItemFullLayout}>
             <DictEnumApiRadio enumName="SexEnum" />
           </Form.Item>
-          <Form.Item name="workStates" label="工作状态" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DictEnumApiSelector enumName='WorkStatusEnum' />
+          <Form.Item name="workStatus" label="工作状态" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <DictEnumApiSelector enumName='UserWorkStatusEnum' />
           </Form.Item>
           <Form.Item name="img" label="头像" {...FaUtils.formItemFullLayout}>
             <UploadImgLocal />
