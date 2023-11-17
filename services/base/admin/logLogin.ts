@@ -1,7 +1,6 @@
 import {GATE_APP} from '@/configs';
 import {BaseApi} from '@fa/ui';
-import {Admin} from '@/types';
-import {Fa} from "@fa/ui/src";
+import {Admin, Fa} from '@/types';
 
 /** ------------------------------------------ xx 操作接口 ------------------------------------------ */
 class LogLoginApi extends BaseApi<Admin.LogLogin, number> {
