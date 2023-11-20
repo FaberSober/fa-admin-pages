@@ -15,6 +15,15 @@ export interface GateLogDrawerProps extends DrawerProps {
 export default function LogApiDrawer({ children, record, ...props }: GateLogDrawerProps) {
   const [open, setOpen] = useState(false);
 
+  function decode(url:string) {
+    try {
+      return decodeURIComponent(url);
+    } catch (e:any) {
+      console.error(e.message, 'url=', url)
+    }
+    return url;
+  }
+
   return (
     <span>
       <span onClick={() => setOpen(true)}>{children}</span>
@@ -25,7 +34,7 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="操作备注">{record.oprRemark}</Descriptions.Item>
           <Descriptions.Item label="类型">{record.crud}</Descriptions.Item>
           <Descriptions.Item label={<FaClickCopyLink copyText={record.url}>URL</FaClickCopyLink>}>{record.url}</Descriptions.Item>
-          <Descriptions.Item label={<FaClickCopyLink copyText={decodeURIComponent(record.url)}>URL[decodeURI]</FaClickCopyLink>}>{decodeURIComponent(record.url)}</Descriptions.Item>
+          <Descriptions.Item label={<FaClickCopyLink copyText={decode(record.url)}>URL[decodeURI]</FaClickCopyLink>}>{decode(record.url)}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
           <Descriptions.Item label="操作系统">{record.os}</Descriptions.Item>
