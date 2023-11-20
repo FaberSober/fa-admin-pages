@@ -9,7 +9,7 @@ import UserLayout from "../../layout/user/UserLayout";
  * @author xu.pengfei
  * @date 2023/9/5 19:33
  */
-export default function index() {
+export default function H5() {
   const search:any = useQs();
 
   setToken(search.token)

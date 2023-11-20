@@ -11,7 +11,7 @@ import MainForm from "./cube/ForgetPwdForm";
  * @author xu.pengfei
  * @date 2023/7/30 15:55
  */
-export default function index() {
+export default function ForgetPwd() {
   const {systemConfig} = useContext(ConfigLayoutContext);
 
   switch (systemConfig.loginPageType) {
