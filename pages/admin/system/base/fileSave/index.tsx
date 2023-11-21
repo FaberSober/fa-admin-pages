@@ -112,7 +112,7 @@ export default function FileSaveList() {
         onRow={r => ({ onDoubleClick: () => show(r) })}
       />
 
-      <Drawer title="查看详情" open={open} onClose={hide} width={1000} bodyStyle={{position: 'relative'}}>
+      <Drawer title="查看详情" open={open} onClose={hide} width={1000} styles={{ body: { position: 'relative' } }}>
         {open && item && <FileSaveView item={item} /> }
       </Drawer>
     </div>

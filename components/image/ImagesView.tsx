@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from "antd";
-import { fileSaveApi } from "@features/fa-admin-pages/services";
+import { fileSaveApi } from "@fa/ui";
 
 
 export interface ImagesViewProps {

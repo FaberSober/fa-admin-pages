@@ -44,7 +44,7 @@ export default function IconSelect({value, onChange}: IconSelectProps) {
         open={open}
         onClose={() => setOpen(false)}
         width={940}
-        bodyStyle={{ display: 'flex', flexDirection: 'column' }}
+        styles={{ body: { display: 'flex', flexDirection: 'column' } }}
       >
         <Input value={search} placeholder="搜索图标" onChange={(e) => setSearch(e.target.value)} />
         <FaFlexRestLayout>
