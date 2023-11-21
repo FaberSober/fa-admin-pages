@@ -7,7 +7,7 @@ import { logApiApi } from '@/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
 
 
-const serviceName = 'URL请求日志';
+const serviceName = '请求日志';
 const biz = 'base_log_api';
 
 export default function LogApiList() {

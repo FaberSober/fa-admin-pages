@@ -7,7 +7,7 @@ import {jobApi} from '@/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
 
-const serviceName = '系统定时任务';
+const serviceName = '定时任务';
 const biz = 'base_job';
 
 export default function JobList() {
