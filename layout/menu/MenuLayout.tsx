@@ -132,6 +132,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       if (tabItem) {
         navigateTab(tabItem)
       }
+      setMenuSelPath([])
       return;
     }
 
@@ -209,15 +210,18 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     },
     setOpenTabs,
     addTab: (tab1: OpenTabsItem) => {
-      const newTab = { ...tab1, linkMenuId: menuSelMenuId }
+      const newTab: OpenTabsItem = { ...tab1, linkMenuId: menuSelMenuId }
       // console.log('add tab', newTab)
-      const tabFind = find(openTabs, i => i.key === newTab.key);
+      const tabFind = find(openTabs, i => i.key === newTab.key); // 查找已打开的tab
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree)
       } else {
         setOpenTabs([ ...openTabs, newTab ])
         setCurTab(newTab)
         navigateTab(newTab)
+        setTimeout(() => {
+          syncOpenMenuById(newTab.key, menuFullTree)
+        }, 100)
       }
       // cache tab info
       setFaTabCache({ ...faTabCache, [newTab.path]: newTab })

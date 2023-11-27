@@ -42,6 +42,7 @@ export default function SideMenu() {
     }
   };
 
+  console.log('SideMenu', menuSelPath)
   const width = collapse ? 44 : 200;
   return (
     <SiderLayout collapse={collapse} onCollapse={() => setCollapse(!collapse)}>
