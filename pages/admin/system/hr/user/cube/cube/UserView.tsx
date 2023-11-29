@@ -11,12 +11,15 @@ export interface UserViewProps {
  * BASE-用户实体详情查看
  */
 export default function UserView({item}: UserViewProps) {
+
+  
+
   return (
-    <Descriptions column={1} bordered>
+    <Descriptions column={2} bordered>
       <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
       <Descriptions.Item label="部门ID">{item.departmentId}</Descriptions.Item>
       <Descriptions.Item label="账户">{item.username}</Descriptions.Item>
-      {/*<Descriptions.Item label="密码">{item.password}</Descriptions.Item>*/}
+      <Descriptions.Item label="密码">{item.password}</Descriptions.Item>
       <Descriptions.Item label="姓名">{item.name}</Descriptions.Item>
       <Descriptions.Item label="手机号">{item.tel}</Descriptions.Item>
       <Descriptions.Item label="生日">{item.birthday}</Descriptions.Item>
