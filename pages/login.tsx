@@ -1,7 +1,7 @@
 import {CommonContainer} from "@/layout";
 import React from "react";
 
-export default function App() {
+export default function LoginLayout() {
   return (
     <CommonContainer />
   );
