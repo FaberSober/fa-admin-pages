@@ -2,7 +2,7 @@ import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'rea
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
 import {ECharts, LineSeriesOption} from 'echarts';
-import {FaUtils, ThemeLayoutContext} from '@fa/ui'
+import {ThemeLayoutContext} from '@fa/ui'
 import {useSize} from "ahooks";
 
 
@@ -66,7 +66,7 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
         top: '15%',
         containLabel: true
       },
-      toolbox: FaUtils.EchartsToolbox,
+      // toolbox: FaUtils.EchartsToolbox,
       tooltip: {
         trigger: 'axis',
         axisPointer: {
