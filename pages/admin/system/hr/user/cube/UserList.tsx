@@ -66,7 +66,7 @@ export default function UserList({ departmentId }: IProps) {
         ),
       },
       {
-        ...BaseTableUtils.genEnumSorterColumn('工作状态', 'workStatus', 70, sorter, dicts),
+        ...BaseTableUtils.genEnumSorterColumn('工作状态', 'workStatus', 100, sorter, dicts),
         render: (_, record) => {
           switch (record.workStatus) {
             case FaEnums.UserWorkStatusEnum.ON_JOB:
