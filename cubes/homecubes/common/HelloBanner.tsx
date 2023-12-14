@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { UserLayoutContext } from "@features/fa-admin-pages/layout";
 import { FaUtils } from "@fa/ui";
 import { useInterval } from "ahooks";
+import './HelloBanner.scss'
 
 
 export interface HelloBannerProps {
@@ -16,7 +17,7 @@ export function HelloBanner() {
   }, 1000)
 
   return (
-    <div className="fa-full fa-p12">
+    <div className="fa-full fa-p12 fa-admin-hello-banner">
       <div style={{fontSize: '18px', fontWeight: 600}} className="fa-mb12">欢迎，{user.name}.</div>
       <div>{time}</div>
     </div>
