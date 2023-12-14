@@ -20,6 +20,9 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
   const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
     return record ? record.level : undefined;
   });
+  const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum|undefined>(() => {
+    return record ? record.linkType : undefined;
+  });
 
   /** 新增Item */
   function invokeInsertTask(params: any) {
@@ -94,6 +97,9 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
             if (cv.level) {
               setLevel(cv.level)
             }
+            if (cv.linkType) {
+              setLinkType(cv.linkType)
+            }
           }}
         >
           <Form.Item name="level" label="菜单等级" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
@@ -122,7 +128,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
           </Form.Item>
 
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {level === FaEnums.RbacMenuLevelEnum.BUTTON ? <Input placeholder="请输入菜单的权限点" /> : <RouteCascader />}
+            {(linkType === FaEnums.RbacLinkTypeEnum.OUT || level === FaEnums.RbacMenuLevelEnum.BUTTON) ? <Input placeholder="请输入菜单的权限点" /> : <RouteCascader />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Menu } from 'antd';
 import { isNil } from 'lodash';
-import { Fa, FaEnums, SiderLayout } from '@fa/ui';
+import { Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import { Rbac } from '@/types';
 import MenuLayoutContext from "../context/MenuLayoutContext";
@@ -57,7 +57,18 @@ export default function SideMenu() {
         openKeys={openSideMenuKeys}
         onOpenChange={onOpenChange}
         selectedKeys={menuSelPath}
-        onSelect={({ key, keyPath }) => setMenuSelPath(key, keyPath)}
+        onClick={({ key, keyPath }) => {
+          // console.log(key, keyPath, item)
+          const menuItem = treeUtils.findTreeNode(menuTree, i => i.id === key)
+          // console.log('menuItem', menuItem)
+          // 打开外部网址
+          if (menuItem && menuItem.sourceData?.linkType === FaEnums.RbacLinkTypeEnum.OUT) {
+            window.open(menuItem.sourceData.linkUrl, '_blank')
+            return;
+          }
+          setMenuSelPath(key, keyPath)
+        }}
+        // onSelect={({ key, keyPath }) => setMenuSelPath(key, keyPath)}
       />
     </SiderLayout>
   );
