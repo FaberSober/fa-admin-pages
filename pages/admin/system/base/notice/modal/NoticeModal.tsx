@@ -1,9 +1,9 @@
-import React, {useContext, useState} from 'react';
-import {get} from 'lodash';
-import {Button, Form, Input} from 'antd';
-import {Admin, ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal} from '@fa/ui';
-import {noticeApi} from '@/services';
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import React, { useContext, useState } from 'react';
+import { get } from 'lodash';
+import { Button, Form, Input } from 'antd';
+import { Admin, ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
+import { noticeApi } from '@/services';
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 
 const serviceName = '通知与公告';
 
@@ -51,7 +51,6 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
     return {
       title: get(record, 'title'),
       content: get(record, 'content'),
-      url: get(record, 'url'),
       status: get(record, 'status'),
       forApp: get(record, 'forApp'),
       strongNotice: get(record, 'strongNotice'),
@@ -91,9 +90,6 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
           </Form.Item>
           <Form.Item name="content" label="内容" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input.TextArea maxLength={255} />
-          </Form.Item>
-          <Form.Item name="url" label="图片" {...FaUtils.formItemFullLayout}>
-            <UploadImgLocal />
           </Form.Item>
           <Form.Item name="status" label="是否有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />
