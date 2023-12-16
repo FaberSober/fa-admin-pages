@@ -1,4 +1,5 @@
 // ------------------------------------- Admin -------------------------------------
+export { default as alertApi } from './base/admin/alert';
 export { default as areaApi } from './base/admin/area';
 export { default as authApi } from './base/admin/auth';
 export { default as configApi } from './base/admin/config';

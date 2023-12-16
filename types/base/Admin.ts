@@ -164,6 +164,27 @@ namespace Admin {
     deleted?: boolean;
   }
 
+  // -------------------------------------------- 系统-告警信息 --------------------------------------------
+  /** BASE-告警信息 */
+  export interface Alert extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 告警内容 */
+    content: string;
+    /** 告警类型 */
+    type: string;
+    /** 是否处理 */
+    deal: boolean;
+    /** 负责人 */
+    dutyStaff: string;
+    /** 处理人 */
+    dealStaff: string;
+    /** 处理时间 */
+    dealTime: string;
+    /** 处理描述 */
+    dealDesc: string;
+  }
+
   // -------------------------------------------- 系统-中国行政地区表 --------------------------------------------
 
   /** 中国行政地区表 */
