@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Admin } from "@features/fa-admin-pages/types";
 import { alertApi } from "@features/fa-admin-pages/services";
 import AlertModal from "@features/fa-admin-pages/pages/admin/system/base/alert/modal/AlertModal";
+import { useNavigate } from "react-router-dom";
 
 
 export function AlertHomeCube() {
+  const navigate = useNavigate();
   const [array, setArray] = useState<Admin.Alert[]>([])
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export function AlertHomeCube() {
   }
 
   return (
-    <div className="fa-full-content fa-scroll-auto-y">
+    <div className="fa-full-content">
       {array.map(item => {
         return (
           <AlertModal key={item.id} record={item} title="处理告警" fetchFinish={refreshData}>
@@ -30,6 +32,13 @@ export function AlertHomeCube() {
           </AlertModal>
         )
       })}
+
+      <a
+        style={{ position: 'absolute', right: 12, top: -24, zIndex: 9999 }}
+        onClick={() => navigate('/admin/system/base/alert')}
+      >
+        更多
+      </a>
     </div>
   );
 }
