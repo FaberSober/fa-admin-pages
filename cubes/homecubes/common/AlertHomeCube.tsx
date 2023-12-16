@@ -22,8 +22,8 @@ export function AlertHomeCube() {
       {array.map(item => {
         return (
           <AlertModal key={item.id} record={item} title="处理告警" fetchFinish={refreshData}>
-            <div className="fa-flex-row fa-link-grey fa-p8 fa-border-b">
-              <div style={{ width: 100 }}>{item.type}</div>
+            <div className="fa-flex-row-center fa-link-grey fa-p8 fa-border-b">
+              <div style={{ width: 120, fontWeight: 500 }}>{item.type}</div>
               <div className="fa-flex-1">{item.content}</div>
               <div style={{ width: 150 }}>{item.crtTime}</div>
             </div>
