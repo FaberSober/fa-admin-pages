@@ -568,6 +568,23 @@ namespace Admin {
     freeSpace: number;
     usableSpace: number;
   }
+
+  /** BASE-系统-新闻 */
+  export interface SysNews extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 标题 */
+    title: string;
+    /** 内容 */
+    content: string;
+    /** 封面 */
+    cover: string;
+    /** 作者 */
+    author: string;
+    /** 发布时间 */
+    pubTime: string;
+  }
+
 }
 
 export default Admin;

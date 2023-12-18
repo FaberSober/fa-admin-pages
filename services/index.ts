@@ -17,6 +17,7 @@ export { default as logLoginApi } from './base/admin/logLogin';
 export { default as msgApi } from './base/admin/msg';
 export { default as noticeApi } from './base/admin/notice';
 export { default as socketTaskApi } from './base/admin/socketTask';
+export { default as sysNewsApi } from './base/admin/sysNews';
 export { default as systemApi } from './base/admin/system';
 export { default as systemUpdateLogApi } from './base/admin/systemUpdateLog';
 export { default as userApi } from './base/admin/user';
