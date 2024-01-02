@@ -1,7 +1,7 @@
 import React, {useContext, useEffect} from 'react';
 import {CheckOutlined, SearchOutlined} from '@ant-design/icons';
-import {Badge, Button, Form, Input, Space} from 'antd';
-import {ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, useTableQueryParams} from '@fa/ui';
+import { Badge, Button, Form, Input, Modal, Space } from 'antd';
+import {ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useTableQueryParams} from '@fa/ui';
 import {UserLayoutContext} from "@/layout";
 import {Admin} from '@/types';
 import {msgApi} from '@/services';
@@ -25,20 +25,35 @@ export default function MsgList() {
     setExtraParams({toUserId: user.id});
   }, [user.id]);
 
+  function handleRefreshAll() {
+    fetchPageList();
+    // 全局消息数量刷新
+    refreshUnreadCount();
+  }
+
   function handleBatchRead(ids: string[]) {
     msgApi.batchRead(ids).then(() => {
-      fetchPageList();
-      refreshUnreadCount();
+      handleRefreshAll()
     });
   }
 
   /** 消息已读 */
   function handleReadOne(id: string) {
     msgApi.batchRead([id]).then(() => {
-      fetchPageList();
-      // TO-DO 全局消息数量刷新
-      refreshUnreadCount();
+      handleRefreshAll()
     });
+  }
+
+  /** 全部已读 */
+  function handleReadAll() {
+    Modal.confirm({
+      title: '全部已读',
+      content: '确认标记全部消息为已读？',
+      onOk: () => msgApi.readAll().then(res => {
+        FaUtils.showResponse(res, '标记全部已读')
+        handleRefreshAll()
+      }),
+    })
   }
 
   /** 生成表格字段List */
@@ -117,6 +132,9 @@ export default function MsgList() {
               批量已读
             </Button>
           </Space>
+        )}
+        querySuffix={(
+          <Button onClick={handleReadAll}>全部已读</Button>
         )}
       />
     </div>

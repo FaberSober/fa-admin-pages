@@ -14,6 +14,9 @@ class Msg extends BaseApi<Admin.Msg, string> {
 
   /** 消息数量统计 */
   countMine = (): Promise<Fa.Ret<{ unreadCount: number }>> => this.get(`countMine`);
+
+  /** 全部已读 */
+  readAll = (): Promise<Fa.Ret<{ unreadCount: number }>> => this.get(`readAll`);
 }
 
 export default new Msg(GATE_APP.admin, serviceModule);
