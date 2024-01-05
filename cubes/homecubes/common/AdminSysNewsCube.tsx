@@ -17,7 +17,7 @@ export function AdminSysNewsCube() {
     })
   }, [])
 
-  console.log('size', size)
+  // console.log('size', size)
 
   return (
     <div id="AdminSysNewsCube" className="fa-full-content">
