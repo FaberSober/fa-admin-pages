@@ -78,6 +78,7 @@ export default function UserDeviceList() {
           />
         )
       },
+      BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 170, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
       ...BaseTableUtils.genUpdateColumns(sorter),
       {

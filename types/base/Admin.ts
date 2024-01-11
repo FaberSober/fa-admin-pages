@@ -318,6 +318,8 @@ namespace Admin {
     osVersion: string;
     /** 是否允许访问 */
     enable: boolean;
+    /** 最后在线时间 */
+    lastOnlineTime: string;
     // ----------------- show cols -----------------
     /** 所属用户名称  */
     userName: string;
