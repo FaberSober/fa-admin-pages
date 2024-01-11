@@ -21,6 +21,7 @@ export { default as sysNewsApi } from './base/admin/sysNews';
 export { default as systemApi } from './base/admin/system';
 export { default as systemUpdateLogApi } from './base/admin/systemUpdateLog';
 export { default as userApi } from './base/admin/user';
+export { default as userDeviceApi } from './base/admin/userDevice';
 export { default as userTokenApi } from './base/admin/userToken';
 
 // ------------------------------------- Rbac -------------------------------------

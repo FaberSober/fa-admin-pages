@@ -300,6 +300,29 @@ namespace Admin {
     remark: string;
   }
 
+  /** BASE-用户设备 */
+  export interface UserDevice extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 所属用户ID */
+    userId: string;
+    /** 设备ID */
+    deviceId: string;
+    /** 设备型号 */
+    model: string;
+    /** 设备厂商 */
+    manufacturer: string;
+    /** 系统 */
+    os: string;
+    /** 系统版本号 */
+    osVersion: string;
+    /** 是否允许访问 */
+    enable: boolean;
+    // ----------------- show cols -----------------
+    /** 所属用户名称  */
+    userName: string;
+  }
+
   // -------------------------------------------- 系统-上传文件 --------------------------------------------
   export interface FileSave extends Fa.BaseDelEntity {
     /** ID */
