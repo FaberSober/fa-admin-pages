@@ -277,6 +277,8 @@ namespace Admin {
     wxMaOpenid: string;
     /** 工作状态 */
     workStatus: FaEnums.UserWorkStatusEnum;
+    /** 最后在线时间 */
+    lastOnlineTime: string;
   }
 
   export interface UserWeb extends User {

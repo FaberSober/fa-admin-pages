@@ -82,6 +82,7 @@ export default function UserList({ departmentId }: IProps) {
       },
       BaseTableUtils.genBoolSorterColumn('账户有效', 'status', 100, sorter),
       BaseTableUtils.genDictSorterColumn('性别', 'sex', 100, sorter, dicts, 'common_sex'),
+      BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 165, sorter),
       BaseTableUtils.genSimpleSorterColumn('邮箱', 'email', 150, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('地址', 'address', 200, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter, false),
