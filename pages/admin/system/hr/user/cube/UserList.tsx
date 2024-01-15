@@ -24,7 +24,7 @@ import UsersChangePwdModal from "./modal/UsersChangePwdModal";
 import UserView from "./cube/UserView";
 
 const serviceName = '用户';
-const biz = 'UserList-v2';
+const biz = 'UserList-v3';
 
 interface IProps {
   departmentId?: string;
