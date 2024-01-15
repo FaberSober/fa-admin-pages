@@ -3,7 +3,14 @@ import { Link, Outlet } from "react-router-dom";
 import { FaFlexRestLayout, PageLoading } from '@fa/ui';
 import { Input, Space } from "antd";
 import { useSessionStorage } from "react-use";
+import { trim } from "lodash";
 
+
+// 从.env.development中获取密码
+const AdminSuperPwd = import.meta.env.VITE_APP_ADMIN_SUPER_PWD;
+if (trim(AdminSuperPwd) === '') {
+  console.warn('未设置VITE_APP_ADMIN_SUPER_PWD，请在.env.xxx中设置')
+}
 
 /**
  * 超级管理员ultra管理页面
@@ -13,7 +20,7 @@ import { useSessionStorage } from "react-use";
 export default function UltraIndex() {
   const [pwd, setPwd] = useSessionStorage<string>('ultra', '')
 
-  const isLogin = pwd === '103103'
+  const isLogin = pwd === AdminSuperPwd
 
   return (
     <div className="fa-full-content fa-flex-column">
