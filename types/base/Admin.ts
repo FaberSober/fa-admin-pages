@@ -277,6 +277,8 @@ namespace Admin {
     wxMaOpenid: string;
     /** 工作状态 */
     workStatus: FaEnums.UserWorkStatusEnum;
+    /** 最后在线时间 */
+    lastOnlineTime: string;
   }
 
   export interface UserWeb extends User {
@@ -298,6 +300,31 @@ namespace Admin {
     valid: string;
     /** 备注 */
     remark: string;
+  }
+
+  /** BASE-用户设备 */
+  export interface UserDevice extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 所属用户ID */
+    userId: string;
+    /** 设备ID */
+    deviceId: string;
+    /** 设备型号 */
+    model: string;
+    /** 设备厂商 */
+    manufacturer: string;
+    /** 系统 */
+    os: string;
+    /** 系统版本号 */
+    osVersion: string;
+    /** 是否允许访问 */
+    enable: boolean;
+    /** 最后在线时间 */
+    lastOnlineTime: string;
+    // ----------------- show cols -----------------
+    /** 所属用户名称  */
+    userName: string;
   }
 
   // -------------------------------------------- 系统-上传文件 --------------------------------------------
