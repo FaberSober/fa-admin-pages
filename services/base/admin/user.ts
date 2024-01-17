@@ -60,6 +60,9 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   /** 重置密码 */
   forgetResetPwd = (params: UserForgetResetPwdVo): Promise<Fa.Ret<boolean>> => this.post('forgetResetPwd', params);
 
+  /** 更新 */
+  updateSimpleById = (id: string, params: any): Promise<Fa.Ret> => this.post('updateSimpleById', { id, ...params });
+
 }
 
 export default new User(GATE_APP.admin, serviceModule);

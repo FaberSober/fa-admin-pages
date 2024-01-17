@@ -22,6 +22,7 @@ import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
 import UsersChangePwdModal from "./modal/UsersChangePwdModal";
 import UserView from "./cube/UserView";
+import UserStatusCol from "./cube/UserStatusCol";
 
 const serviceName = '用户';
 const biz = 'UserList-v3';
@@ -33,7 +34,7 @@ interface IProps {
 export default function UserList({ departmentId }: IProps) {
   const [form] = Form.useForm();
 
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, dicts, paginationProps } =
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, setList, dicts, paginationProps } =
     useTableQueryParams<Admin.UserWeb>(
       userApi.page,
       { extraParams: { departmentIdSuper: departmentId }, sorter: { field: 'crtTime', order: 'descend' } },
@@ -80,7 +81,17 @@ export default function UserList({ departmentId }: IProps) {
           }
         },
       },
-      BaseTableUtils.genBoolSorterColumn('账户有效', 'status', 100, sorter),
+      {
+        ...BaseTableUtils.genBoolSorterColumn('账户有效', 'status', 100, sorter),
+        render: (_v, r) => (
+          <UserStatusCol
+            item={r}
+            onChange={() => {
+              setList(list.map(i => i.id === r.id ? {...i, status: !i.status } : i))
+            }}
+          />
+        )
+      },
       BaseTableUtils.genDictSorterColumn('性别', 'sex', 100, sorter, dicts, 'common_sex'),
       BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 165, sorter),
       BaseTableUtils.genSimpleSorterColumn('邮箱', 'email', 150, sorter, false),
