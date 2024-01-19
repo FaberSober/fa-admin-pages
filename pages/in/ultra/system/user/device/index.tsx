@@ -67,13 +67,7 @@ export default function UserDeviceList() {
           <ItemEnable
             item={r}
             onChange={() => {
-              setList(list.map(i => {
-                if (i.id === r.id) {
-                  return {...i, enable:!i.enable }
-                } else {
-                  return i
-                }
-              }))
+              setList(list.map(i => i.id === r.id ? {...i, enable: !i.enable } : i))
             }}
           />
         )
