@@ -5,7 +5,7 @@ import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';
 import { BellOutlined } from '@ant-design/icons';
 import { ApiEffectLayoutContext } from "@fa/ui";
-import { UserLayoutContext } from '../../user/UserLayout'
+import UserLayoutContext from '../../user/context/UserLayoutContext'
 import MenuLayoutContext from "../context/MenuLayoutContext";
 
 

@@ -1,15 +1,10 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Admin } from '@/types';
 import Favicon from 'react-favicon'
 import { Fa, PageLoading } from "@fa/ui";
 import { configSysApi, fileSaveApi } from '@/services';
+import ConfigLayoutContext, { ConfigLayoutContextProps } from './context/ConfigLayoutContext'
 
-
-export interface ConfigLayoutContextProps {
-  systemConfig: Admin.SystemConfigPo;
-}
-
-export const ConfigLayoutContext = createContext<ConfigLayoutContextProps>({} as any);
 
 /**
  * 系统配置的上下文

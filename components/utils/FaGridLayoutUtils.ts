@@ -5,7 +5,7 @@ import { ApiEffectLayoutContext, FaUtils } from "@fa/ui";
 import { configApi } from "@/services";
 import { Admin } from "@/types";
 import { Modal } from "antd";
-import { MenuLayoutContext } from "@/layout";
+import MenuLayoutContext from "@features/fa-admin-pages/layout/menu/context/MenuLayoutContext";
 
 
 /**

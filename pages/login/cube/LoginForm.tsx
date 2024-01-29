@@ -7,7 +7,7 @@ import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken } fr
 import { authApi } from '@/services'
 import { SITE_INFO } from '@/configs';
 import { Helmet } from "react-helmet-async";
-import { ConfigLayoutContext } from "@/layout";
+import { ConfigLayoutContext } from "@features/fa-admin-pages/layout/config/context/ConfigLayoutContext";
 
 
 export default function LoginForm() {

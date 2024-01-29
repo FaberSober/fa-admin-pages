@@ -4,7 +4,7 @@ import {Avatar, Menu, Popover, Switch} from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@/services';
 import {InputColor, ThemeLayoutContext} from "@fa/ui";
-import { UserLayoutContext } from '../../user/UserLayout'
+import UserLayoutContext from '../../user/context/UserLayoutContext'
 import MenuLayoutContext from "../context/MenuLayoutContext";
 
 const UserPopoverContent = () => {

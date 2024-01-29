@@ -1,21 +1,11 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState} from 'react';
 import { Admin, Rbac } from '@/types';
 import Favicon from 'react-favicon'
 import { clearToken, Fa, PageLoading } from "@fa/ui";
 import { authApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@/services';
-import {ConfigLayoutContext} from "../config/ConfigLayout";
+import ConfigLayoutContext from "../config/context/ConfigLayoutContext";
+import UserLayoutContext, { UserLayoutContextProps } from './context/UserLayoutContext'
 
-
-export interface UserLayoutContextProps {
-  user: Admin.User;
-  roles: Rbac.RbacRole[];
-  refreshUser: () => void; // 刷新用户
-  logout: () => void; // 登出
-  unreadCount: number;
-  refreshUnreadCount: () => void;
-}
-
-export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any);
 
 /**
  * 登录后的用户上下文

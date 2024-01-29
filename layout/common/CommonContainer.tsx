@@ -1,9 +1,9 @@
 import React, {Suspense} from 'react';
+import {Outlet} from "react-router-dom";
 import {ApiEffectLayout, PageLoading, ThemeLayout} from "@fa/ui";
 import {SITE_INFO} from "@/configs";
 import LangLayout from "../lang/LangLayout";
-import {Outlet} from "react-router-dom";
-import {ConfigLayout} from "@features/fa-admin-pages/layout";
+import ConfigLayout from "../config/ConfigLayout";
 
 
 /**

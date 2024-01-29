@@ -5,7 +5,7 @@ import { Button, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
 import { userApi } from '@/services'
-import { ConfigLayoutContext } from "@/layout";
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext'
 
 
 export default function ForgetPwdForm() {

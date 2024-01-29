@@ -6,7 +6,7 @@ import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
 import { userApi } from '@/services'
 import { Helmet } from "react-helmet-async";
-import { ConfigLayoutContext } from "@/layout";
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext'
 
 
 export default function RegistryForm() {

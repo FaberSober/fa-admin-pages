@@ -1,7 +1,7 @@
 import React, { CSSProperties, useContext, useEffect, useRef } from 'react';
 import { trim } from "lodash";
-import { ConfigLayoutContext } from "@/layout";
 import { Fa, fileSaveApi } from "@fa/ui";
+import { ConfigLayoutContext } from "@features/fa-admin-pages/layout/config/context/ConfigLayoutContext";
 import styles from "./LoginCuteLayout.module.scss";
 
 

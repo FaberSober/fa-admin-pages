@@ -1,8 +1,8 @@
 import React, { CSSProperties, useContext, useEffect, useRef } from 'react';
-import { ConfigLayoutContext } from "@/layout";
-import styles from "./VantaLayout.module.scss";
-import { Fa, fileSaveApi } from "@fa/ui";
 import { trim } from "lodash";
+import { Fa, fileSaveApi } from "@fa/ui";
+import styles from "./VantaLayout.module.scss";
+import ConfigLayoutContext from "../config/context/ConfigLayoutContext";
 
 
 /**

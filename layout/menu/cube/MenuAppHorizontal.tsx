@@ -3,7 +3,7 @@ import { Menu } from 'antd';
 import { FaEnums, ThemeLayoutContext } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
-import { ConfigLayoutContext } from "../../config/ConfigLayout";
+import { ConfigLayoutContext } from "../../config/context/ConfigLayoutContext";
 
 
 /**

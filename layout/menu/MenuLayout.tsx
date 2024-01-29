@@ -10,7 +10,7 @@ import {Rbac} from '@/types';
 import {rbacUserRoleApi} from '@/services';
 import useRoutePermission from "../../hooks/useRoutePermission";
 import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
-import {ConfigLayoutContext} from "../config/ConfigLayout";
+import {ConfigLayoutContext} from "../config/context/ConfigLayoutContext";
 import './MenuLayout.scss';
 
 

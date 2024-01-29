@@ -1,5 +1,5 @@
 import React from 'react';
-import {CommonContainer} from "@features/fa-admin-pages/layout";
+import CommonContainer from "@features/fa-admin-pages/layout/common/CommonContainer";
 
 
 /**

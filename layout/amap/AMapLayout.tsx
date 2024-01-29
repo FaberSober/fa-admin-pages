@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Fa } from "@fa/ui";
 import { APILoader } from '@uiw/react-amap';
-import { ConfigLayoutContext } from "../config/ConfigLayout";
+import { ConfigLayoutContext } from "../config/context/ConfigLayoutContext";
 
 const VITE_APP_AMAP_KEY = import.meta.env.VITE_APP_AMAP_KEY;
 

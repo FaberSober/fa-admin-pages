@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
-import { ConfigLayoutContext, VantaLayout } from "@features/fa-admin-pages/layout";
 import { fileSaveApi } from "@fa/ui";
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext'
+import VantaLayout from '@features/fa-admin-pages/layout/effect/VantaLayout'
 import LoginCuteLayout from "@features/fa-admin-pages/pages/login/layout/LoginCuteLayout";
 import '@features/fa-admin-pages/pages/login/login.scss';
 import MainForm from "./cube/ForgetPwdForm";
