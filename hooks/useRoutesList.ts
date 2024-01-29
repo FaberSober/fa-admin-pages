@@ -1,4 +1,3 @@
-import routes from '~react-pages';
 import { isNil } from "lodash";
 
 
@@ -11,6 +10,7 @@ import { isNil } from "lodash";
  */
 export default function useRoutesList(): string[] {
   const list: string[] = []
+  const routes = window.FaRoutes
 
   function loop(parentPath: string, rs: any[]) {
     if (isNil(rs) || rs.length === 0) return;

@@ -1,4 +1,3 @@
-import routes from '~react-pages';
 import { isNil } from "lodash";
 
 
@@ -8,6 +7,7 @@ import { isNil } from "lodash";
  * @date 2023/7/26 17:09
  */
 export default function useRoutesTree() {
+  const routes = window.FaRoutes
 
   function loop(rs:any[]):any[]|undefined {
     if (isNil(rs) || rs.length === 0) return undefined;

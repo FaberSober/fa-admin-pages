@@ -1,7 +1,7 @@
 import {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {trim} from 'lodash';
 import {getToken} from '@fa/ui';
-import {ConfigLayoutContext} from '@/layout';
+import {ConfigLayoutContext} from '../layout/config/ConfigLayout';
 
 export interface Props {
   query?: any;
