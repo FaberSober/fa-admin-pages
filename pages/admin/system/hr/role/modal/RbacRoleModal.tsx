@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import {Button, Form, Input} from 'antd';
 import {ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils} from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacRoleApi } from '@/services';
+import { rbacRoleApi } from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '角色';

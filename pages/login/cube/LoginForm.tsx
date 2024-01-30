@@ -4,7 +4,7 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Button, Checkbox, Form, Input } from 'antd';
 import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken } from '@fa/ui';
-import { authApi } from '@/services'
+import { authApi } from '@features/fa-admin-pages/services'
 import { SITE_INFO } from '@/configs';
 import { Helmet } from "react-helmet-async";
 import { ConfigLayoutContext } from "@features/fa-admin-pages/layout/config/context/ConfigLayoutContext";

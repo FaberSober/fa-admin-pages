@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Button, DatePicker, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, BaseTinyMCE, CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal } from '@fa/ui';
-import { sysNewsApi as api } from '@/services';
+import { sysNewsApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 
 

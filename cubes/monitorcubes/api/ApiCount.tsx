@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {logApiApi, jobLogApi} from "@/services";
+import {logApiApi, jobLogApi} from "@features/fa-admin-pages/services";
 import dayjs from "dayjs";
 import {FaUtils} from "@fa/ui";
 import {useInterval} from "ahooks";

@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacMenuApi } from "@/services";
+import { rbacMenuApi } from "@features/fa-admin-pages/services";
 import RbacMenuCascader from '../helper/RbacMenuCascader';
 import IconSelect from '@features/fa-admin-pages/components/icons/IconSelect';
 import RouteCascader from '@features/fa-admin-pages/components/route/RouteCascader';

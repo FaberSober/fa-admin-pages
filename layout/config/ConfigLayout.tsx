@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Admin } from '@/types';
 import Favicon from 'react-favicon'
 import { Fa, PageLoading } from "@fa/ui";
-import { configSysApi, fileSaveApi } from '@/services';
+import { configSysApi, fileSaveApi } from '@features/fa-admin-pages/services';
 import ConfigLayoutContext, { ConfigLayoutContextProps } from './context/ConfigLayoutContext'
 
 

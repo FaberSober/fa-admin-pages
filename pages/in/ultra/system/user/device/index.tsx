@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Switch } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { userDeviceApi as api } from '@/services';
+import { userDeviceApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import UserDeviceModal from './modal/UserDeviceModal';
 import UserSearchSelect from '@fa/ui/src/components/biz-user-select/UserSearchSelect';

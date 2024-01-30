@@ -2,7 +2,7 @@ import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Drawer, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams, useViewItem } from '@fa/ui';
-import { fileSaveApi as api } from '@/services';
+import { fileSaveApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import FileSaveModal from './modal/FileSaveModal';
 import FileSaveView from "./cube/FileSaveView";

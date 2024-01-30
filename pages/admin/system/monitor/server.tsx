@@ -3,7 +3,7 @@ import {Button, Card, Col, Descriptions, Row, Space} from 'antd';
 import {Admin} from '@/types';
 import {ApiEffectLayoutContext, FaUtils} from '@fa/ui';
 import {ReloadOutlined} from '@ant-design/icons';
-import {systemApi} from '@/services';
+import {systemApi} from '@features/fa-admin-pages/services';
 import {useInterval} from "ahooks";
 
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseSearchSelect, BaseSearchSelectProps } from '@fa/ui';
 import { Admin } from '@/types';
-import { userApi as api } from '@/services';
+import { userApi as api } from '@features/fa-admin-pages/services';
 
 export interface UserSearchSelectProps extends Omit<BaseSearchSelectProps<Admin.User, string>, 'serviceApi'> {}
 

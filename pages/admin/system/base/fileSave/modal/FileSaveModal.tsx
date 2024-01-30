@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Button, Form } from 'antd';
 import { PlusOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, CommonModalProps, DragModal, FaUtils, UploadFileLocal } from '@fa/ui';
-import { fileSaveApi as api } from '@/services';
+import { fileSaveApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 
 

@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import {Button, Form, Input} from 'antd';
 import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiSelector, DragModal, FaHref, FaUtils} from '@fa/ui';
 import { Admin } from '@/types';
-import { areaApi } from '@/services';
+import { areaApi } from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const serviceName = '中国行政地区表';

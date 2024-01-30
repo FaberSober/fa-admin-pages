@@ -1,5 +1,5 @@
 import React, { CSSProperties, useContext, useEffect, useState } from 'react';
-import { fileSaveApi, msgApi } from '@/services';
+import { fileSaveApi, msgApi } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import { Avatar, Badge, List, Popover } from 'antd';
 import { get } from 'lodash';

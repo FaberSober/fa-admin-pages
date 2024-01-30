@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseCascader, BaseCascaderProps } from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacMenuApi } from '@/services';
+import { rbacMenuApi } from '@features/fa-admin-pages/services';
 
 export interface RbacMenuCascaderProps extends Omit<BaseCascaderProps<Rbac.RbacMenu, string>, 'serviceApi'> {}
 

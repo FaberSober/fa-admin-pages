@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Button, Drawer, DrawerProps, Tree } from 'antd';
 import { ApiEffectLayoutContext, calCheckedKey, Fa, FaUtils } from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacMenuApi, rbacRoleMenuApi } from '@/services';
+import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
 import { difference } from "lodash";
 
 

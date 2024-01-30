@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Form, Input } from 'antd';
 import { ApiEffectLayoutContext, CommonModalProps, DragModal, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
-import { departmentApi } from '@/services';
+import { departmentApi } from '@features/fa-admin-pages/services';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import UserSearchSelect from '@fa/ui/src/components/biz-user-select/UserSearchSelect';
 

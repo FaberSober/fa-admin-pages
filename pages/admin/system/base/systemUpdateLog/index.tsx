@@ -2,7 +2,7 @@ import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { systemUpdateLogApi as api } from '@/services';
+import { systemUpdateLogApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import SystemUpdateLogView from "@features/fa-admin-pages/pages/admin/system/base/systemUpdateLog/cube/SystemUpdateLogView";
 import FaHrefView from '@features/fa-admin-pages/components/icons/FaHrefView';

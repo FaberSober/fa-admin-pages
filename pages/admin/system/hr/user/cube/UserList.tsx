@@ -15,7 +15,7 @@ import {
   useViewItem
 } from '@fa/ui';
 import {Admin, FaEnums} from '@/types';
-import {userApi} from '@/services';
+import {userApi} from '@features/fa-admin-pages/services';
 import UserModal from '../modal/UserModal';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";

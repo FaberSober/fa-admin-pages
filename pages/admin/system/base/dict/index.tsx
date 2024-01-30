@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Empty } from 'antd';
 import { BaseTree, FaLabel } from '@fa/ui';
 import { Admin } from '@/types';
-import { dictApi } from '@/services';
+import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import DictModal from './modal/DictModal';

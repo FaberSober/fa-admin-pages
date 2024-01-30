@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {Button, Form, Input} from 'antd';
 import {ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils} from '@fa/ui';
-import {userApi} from '@/services';
+import {userApi} from '@features/fa-admin-pages/services';
 import {ConfigLayoutContext} from "@features/fa-admin-pages/layout";
 import * as FaSecurityUtils from '@features/fa-admin-pages/components/utils/FaSecurityUtils';
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageLoading} from "@fa/ui";
 import {DocumentEditor} from "@onlyoffice/document-editor-react";
-import {onlyofficeApi} from "@/services";
+import {onlyofficeApi} from "@features/fa-admin-pages/services";
 
 
 export interface OnlyofficeEditorProps {

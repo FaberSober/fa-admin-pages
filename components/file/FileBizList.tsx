@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {fileSaveApi, fileBizApi} from '@/services';
+import {fileSaveApi, fileBizApi} from '@features/fa-admin-pages/services';
 import {ApiEffectLayoutContext, AuthDelBtn, useDelete, UploadFileModal, FaUtils} from "@fa/ui";
 import {Button, Space, Table} from "antd";
 import {UploadOutlined} from "@ant-design/icons";

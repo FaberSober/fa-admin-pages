@@ -3,7 +3,7 @@ import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
-import { logApiApi } from '@/services';
+import { logApiApi } from '@features/fa-admin-pages/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
 
 

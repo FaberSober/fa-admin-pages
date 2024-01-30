@@ -3,7 +3,7 @@ import {DownloadOutlined, EditOutlined, SearchOutlined} from '@ant-design/icons'
 import {Button, Form, Input, Space} from 'antd';
 import {AuthDelBtn, BaseBizTable, BaseTableUtils, DictEnumApiSelector, clearForm, FaberTable, FaHref, useDelete, useExport, useTableQueryParams} from '@fa/ui';
 import {Admin} from '@/types';
-import {areaApi} from '@/services';
+import {areaApi} from '@features/fa-admin-pages/services';
 import AreaModal from './modal/AreaModal';
 
 const serviceName = '中国行政地区表';

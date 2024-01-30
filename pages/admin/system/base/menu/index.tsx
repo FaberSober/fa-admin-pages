@@ -5,7 +5,7 @@ import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusO
 import { ColumnsType } from 'antd/es/table';
 import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
-import { rbacMenuApi } from '@/services';
+import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import RbacMenuModal from './modal/RbacMenuModal';
 
 

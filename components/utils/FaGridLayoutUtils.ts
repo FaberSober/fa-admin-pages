@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Layout } from "react-grid-layout";
 import { each } from "lodash";
 import { ApiEffectLayoutContext, FaUtils } from "@fa/ui";
-import { configApi } from "@/services";
+import { configApi } from "@features/fa-admin-pages/services";
 import { Admin } from "@/types";
 import { Modal } from "antd";
 import MenuLayoutContext from "@features/fa-admin-pages/layout/menu/context/MenuLayoutContext";

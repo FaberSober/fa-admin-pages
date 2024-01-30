@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Form, Input } from 'antd';
 import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
-import { dictApi } from '@/services';
+import { dictApi } from '@features/fa-admin-pages/services';
 import DictCascade from '../helper/DictCascade';
 
 const serviceName = '字典分类';

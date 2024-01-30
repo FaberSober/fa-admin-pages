@@ -4,7 +4,7 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Button, Empty, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { ApiEffectLayoutContext, Captcha, FaUtils } from '@fa/ui';
-import { userApi } from '@/services'
+import { userApi } from '@features/fa-admin-pages/services'
 import { Helmet } from "react-helmet-async";
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext'
 

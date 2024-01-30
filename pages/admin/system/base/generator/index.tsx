@@ -2,7 +2,7 @@ import React from 'react';
 import {CodepenOutlined, SearchOutlined} from '@ant-design/icons';
 import {Button, Form, Input, Space} from 'antd';
 import {BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, useTableQueryParams} from '@fa/ui';
-import {generatorApi} from '@/services';
+import {generatorApi} from '@features/fa-admin-pages/services';
 import {Generator} from '@/types';
 import GeneratorCodePreview from "./cube/GeneratorCodePreview";
 

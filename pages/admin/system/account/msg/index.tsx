@@ -3,7 +3,7 @@ import {CheckOutlined, SearchOutlined} from '@ant-design/icons';
 import { Badge, Button, Form, Input, Modal, Space } from 'antd';
 import {ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useTableQueryParams} from '@fa/ui';
 import {Admin} from '@/types';
-import {msgApi} from '@/services';
+import {msgApi} from '@features/fa-admin-pages/services';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 
 const serviceName = '消息';

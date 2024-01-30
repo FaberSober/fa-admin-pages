@@ -7,7 +7,7 @@ import styles from './index.module.scss';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import {Button, Space, Tag} from 'antd';
 import { useCounter } from "react-use";
-import { rbacMenuApi } from "@/services";
+import { rbacMenuApi } from "@features/fa-admin-pages/services";
 
 
 /**

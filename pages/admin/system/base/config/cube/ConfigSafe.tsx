@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, BaseBoolRadio, DictEnumApiSelector, FaUtils } from '@fa/ui';
 import { Button, Col, Form, InputNumber, Row, Space } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
-import { configSysApi } from '@/services';
+import { configSysApi } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 
 

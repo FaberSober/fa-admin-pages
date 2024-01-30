@@ -3,7 +3,7 @@ import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaEnums, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
 import { Admin } from '@/types';
-import { jobLogApi } from '@/services';
+import { jobLogApi } from '@features/fa-admin-pages/services';
 
 const serviceName = '系统定时任务-执行日志';
 const biz = 'base_job_log';

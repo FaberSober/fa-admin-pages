@@ -7,7 +7,7 @@ import {useLocalStorage} from 'react-use';
 import {Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList} from "@fa/ui";
 import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar } from "./cube";
 import {Rbac} from '@/types';
-import {rbacUserRoleApi} from '@/services';
+import {rbacUserRoleApi} from '@features/fa-admin-pages/services';
 import useRoutePermission from "../../hooks/useRoutePermission";
 import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
 import {ConfigLayoutContext} from "../config/context/ConfigLayoutContext";

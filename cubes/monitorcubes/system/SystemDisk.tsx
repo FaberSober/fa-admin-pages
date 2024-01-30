@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useInterval} from "ahooks";
 import {Admin} from "@/types";
-import {systemApi} from "@/services";
+import {systemApi} from "@features/fa-admin-pages/services";
 import {FaUtils} from "@fa/ui";
 
 

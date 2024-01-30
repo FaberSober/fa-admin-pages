@@ -3,7 +3,7 @@ import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, FaberTable, FaUtils, SelectedUser, useDelete, useTableQueryParams, } from '@fa/ui';
 import { Rbac } from '@/types';
-import { rbacUserRoleApi as api } from '@/services';
+import { rbacUserRoleApi as api } from '@features/fa-admin-pages/services';
 
 const serviceName = '角色用户';
 const biz = 'RbacUserRoleList';

@@ -2,7 +2,7 @@ import React, { CSSProperties } from 'react';
 import { Image } from 'antd';
 import { Admin } from '@/types';
 import { FaUtils } from '@fa/ui';
-import { fileSaveApi } from '@/services';
+import { fileSaveApi } from '@features/fa-admin-pages/services';
 import VideoPlainModal from "../video/VideoPlainModal";
 
 export interface FileSaveIconProps {

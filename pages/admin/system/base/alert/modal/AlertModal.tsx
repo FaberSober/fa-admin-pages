@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictDataSelector, DragModal, FaHref, FaUtils } from '@fa/ui';
-import { alertApi as api } from '@/services';
+import { alertApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 
 

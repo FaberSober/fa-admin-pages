@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { Admin, ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
-import { noticeApi } from '@/services';
+import { noticeApi } from '@features/fa-admin-pages/services';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 
 const serviceName = '通知与公告';

@@ -2,7 +2,7 @@ import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { userTokenApi as api } from '@/services';
+import { userTokenApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import UserTokenModal from './modal/UserTokenModal';
 

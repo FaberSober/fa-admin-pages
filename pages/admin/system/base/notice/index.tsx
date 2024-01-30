@@ -3,7 +3,7 @@ import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
 import {Button, Form, Image, Input, Space} from 'antd';
 import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams,} from '@fa/ui';
 import {Admin} from '@/types';
-import {noticeApi} from '@/services';
+import {noticeApi} from '@features/fa-admin-pages/services';
 import NoticeModal from './modal/NoticeModal';
 
 

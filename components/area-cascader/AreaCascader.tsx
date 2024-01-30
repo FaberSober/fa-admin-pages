@@ -3,7 +3,8 @@ import {cloneDeep, isNil, remove} from 'lodash';
 import {Cascader, message} from 'antd';
 import {BaseCascaderProps, Fa} from "@fa/ui";
 import {Admin} from '@/types';
-import {areaApi} from "@/services";
+import { BaseOptionType } from "antd/es/cascader";
+import { areaApi } from '@features/fa-admin-pages/services';
 
 
 function getLastValue(values: number[]) {
@@ -15,7 +16,7 @@ function getLastValue(values: number[]) {
 const CHINA_AD_CODE = 100000000000;
 const ROOT_CHINA = { label: '中国', value: CHINA_AD_CODE, isLeaf: false, children: undefined };
 
-export interface AreaCascaderProps<T> extends Omit<BaseCascaderProps<T>, 'serviceApi'> {
+export interface AreaCascaderProps<T extends BaseOptionType> extends Omit<BaseCascaderProps<T>, 'serviceApi'> {
   showRoot?: boolean; // 是否展示根节点-中国
   leafLevel?: number;
   leafPath?: boolean; // 是否返回完整的路径

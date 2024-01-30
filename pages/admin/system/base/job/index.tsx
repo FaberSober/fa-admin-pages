@@ -3,7 +3,7 @@ import {DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutline
 import {Badge, Button, Form, Input, Popconfirm, Space} from 'antd';
 import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams} from '@fa/ui';
 import {Admin} from '@/types';
-import {jobApi} from '@/services';
+import {jobApi} from '@features/fa-admin-pages/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
 

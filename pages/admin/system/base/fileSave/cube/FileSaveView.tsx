@@ -2,7 +2,7 @@ import React from 'react';
 import { Admin } from '@/types';
 import { Descriptions, Divider } from "antd";
 import { FaUtils } from "@fa/ui";
-import { fileSaveApi } from "@/services";
+import { fileSaveApi } from "@features/fa-admin-pages/services";
 
 
 export interface FileSaveViewProps {
