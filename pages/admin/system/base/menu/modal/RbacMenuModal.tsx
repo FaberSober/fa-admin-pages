@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
-import { IconSelect, RouteCascader } from "@/components";
 import { Rbac } from '@/types';
 import { rbacMenuApi } from "@/services";
 import RbacMenuCascader from '../helper/RbacMenuCascader';
+import IconSelect from '@features/fa-admin-pages/components/icons/IconSelect';
+import RouteCascader from '@features/fa-admin-pages/components/route/RouteCascader';
 
 const serviceName = '菜单';
 

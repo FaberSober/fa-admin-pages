@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Switch } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { CommonExcelUploadModal, UserSearchSelect } from "@/components";
 import { userDeviceApi as api } from '@/services';
 import { Admin } from '@/types';
 import UserDeviceModal from './modal/UserDeviceModal';
+import UserSearchSelect from '@fa/ui/src/components/biz-user-select/UserSearchSelect';
+import CommonExcelUploadModal from '@features/fa-admin-pages/components/excel/CommonExcelUploadModal';
 
 const serviceName = 'BASE-用户设备';
 const biz = 'base_user_device';

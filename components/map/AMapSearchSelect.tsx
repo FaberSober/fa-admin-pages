@@ -2,7 +2,7 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 import {Map, Marker, MapTypeControl} from "@uiw/react-amap";
 import {Fa} from "@/types";
 import useAMapGeocoder from "./useAMapGeocoder";
-import AMapAutoComplete from "@features/fa-admin-pages/components/map/AMapAutoComplete";
+import AMapAutoComplete from "./AMapAutoComplete";
 
 
 export interface AMapSearchSelectProps {
@@ -38,6 +38,7 @@ export default function AMapSearchSelect({onSelect, value, style}: AMapSearchSel
 
   return (
     <div style={{ position: 'relative', ...style }}>
+      {/* @ts-ignore */}
       <Map
         // style={{height: 200, width: 600}}
         onClick={(event) => {

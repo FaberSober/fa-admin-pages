@@ -17,12 +17,12 @@ import {
 import {Admin, FaEnums} from '@/types';
 import {userApi} from '@/services';
 import UserModal from '../modal/UserModal';
-import {DepartmentCascade} from '@/components';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
 import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
 import UsersChangePwdModal from "./modal/UsersChangePwdModal";
 import UserView from "./cube/UserView";
 import UserStatusCol from "./cube/UserStatusCol";
+import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 
 const serviceName = '用户';
 const biz = 'UserList-v3';

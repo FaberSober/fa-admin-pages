@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import * as cubes from '@/cubes/monitorcubes'
-import { FaGridLayout, FaGridLayoutUtils } from "@/components";
 import { isNil } from "lodash";
 import { Button, List, Space, Spin, Switch } from "antd";
 import { BaseDrawer, FaFlashCard, FaUtils } from "@fa/ui";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import * as FaGridLayoutUtils from '@features/fa-admin-pages/components/utils/FaGridLayoutUtils';
+import { FaGridLayout } from '@features/fa-admin-pages/components/grid/FaGridLayout';
 import ExportAndImportBtn from "@features/fa-admin-pages/components/utils/ExportAndImportBtn";
 
 

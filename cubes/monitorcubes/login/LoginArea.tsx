@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {EchartsPie} from "@/components";
 import {Fa} from "@/types";
 import {logLoginApi} from "@features/fa-admin-pages/services";
+import EchartsPie from '@features/fa-admin-pages/components/echarts/EchartsPie';
 
 
 export interface LoginAreaProps {

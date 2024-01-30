@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {EchartsLine} from "@/components";
-import {logLoginApi} from '@/services'
 import {Fa} from '@/types'
 import {FaUtils} from '@fa/ui'
 import dayjs from "dayjs";
+import EchartsLine from '@features/fa-admin-pages/components/echarts/EchartsLine';
+import { logLoginApi } from "@features/fa-admin-pages/services";
 
 
 export interface LoginLineProps {

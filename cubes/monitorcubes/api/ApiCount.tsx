@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {NumBlock} from '@/components';
 import {logApiApi, jobLogApi} from "@/services";
 import dayjs from "dayjs";
 import {FaUtils} from "@fa/ui";
 import {useInterval} from "ahooks";
+import NumBlock from '@features/fa-admin-pages/components/base-card/NumBlock';
 
 
 export interface ApiCountProps {

@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { Button, Form } from 'antd';
 import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import { RbacRoleSelect } from '@/components';
 import { userApi } from '@/services';
+import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 
 
 interface UsersChangeRoleModalProps extends DragModalProps {

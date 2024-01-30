@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Space, Upload } from "antd";
 import { saveAs } from "file-saver";
-import FaInputEditModal from "@features/fa-admin-pages/components/modal/FaInputEditModal";
+import FaInputEditModal from "../modal/FaInputEditModal";
 
 
 export interface ExportAndImportBtnProps {

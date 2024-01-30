@@ -4,7 +4,8 @@ import { Form, Input } from 'antd';
 import { ApiEffectLayoutContext, CommonModalProps, DragModal, FaUtils } from '@fa/ui';
 import { Admin } from '@/types';
 import { departmentApi } from '@/services';
-import { DepartmentCascade, UserSearchSelect } from '@/components';
+import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
+import UserSearchSelect from '@fa/ui/src/components/biz-user-select/UserSearchSelect';
 
 const serviceName = '部门';
 

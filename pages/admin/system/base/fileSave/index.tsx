@@ -4,9 +4,9 @@ import { Button, Drawer, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams, useViewItem } from '@fa/ui';
 import { fileSaveApi as api } from '@/services';
 import { Admin } from '@/types';
-import { FileSaveIcon } from '@/components';
 import FileSaveModal from './modal/FileSaveModal';
 import FileSaveView from "./cube/FileSaveView";
+import FileSaveIcon from '@features/fa-admin-pages/components/file/FileSaveIcon';
 
 const serviceName = '附件管理';
 const biz = 'base_file_save';

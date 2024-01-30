@@ -3,7 +3,7 @@ import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
 import {ConfigLayoutContext, UserLayoutContext} from "@/layout";
 import { userApi } from "@/services";
-import { FaSecurityUtils } from "@/components";
+import * as FaSecurityUtils from '@features/fa-admin-pages/components/utils/FaSecurityUtils';
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };

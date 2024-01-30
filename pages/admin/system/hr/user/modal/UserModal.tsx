@@ -2,11 +2,12 @@ import React, {useContext, useState} from 'react';
 import {get} from 'lodash';
 import {Button, Form, Input, Switch} from 'antd';
 import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector} from '@fa/ui';
-import {DepartmentCascade, RbacRoleSelect} from '@/components';
 import useBus from 'use-bus';
 import {Admin} from '@/types';
 import {rbacUserRoleApi, userApi} from '@/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
+import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 
 const serviceName = '用户';
 

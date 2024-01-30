@@ -3,7 +3,7 @@ import { Image } from 'antd';
 import { Admin } from '@/types';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@/services';
-import { VideoPlainModal } from "@features/fa-admin-pages/components";
+import VideoPlainModal from "../video/VideoPlainModal";
 
 export interface FileSaveIconProps {
   file: Admin.FileSave;

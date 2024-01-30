@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {useInterval} from "ahooks";
-import {EchartsGaugeStep} from "@/components";
-import {Admin} from "@/types";
-import {systemApi} from "@/services";
+import { Admin } from "@features/fa-admin-pages/types";
+import { systemApi } from "@features/fa-admin-pages/services";
+import EchartsGaugeStep from '@features/fa-admin-pages/components/echarts/EchartsGaugeStep';
 
 
 export interface SystemCpuProps {
