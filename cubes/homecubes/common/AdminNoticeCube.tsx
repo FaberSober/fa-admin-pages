@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Admin } from "@features/fa-admin-pages/types";
 import { noticeApi } from "@features/fa-admin-pages/services";
 import { BaseDrawer } from "@fa/ui";
+import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";
 
-
-export interface AdminNoticeCubeProps {
-}
 
 export function AdminNoticeCube() {
   const [array, setArray] = useState<Admin.Notice[]>([])
@@ -25,9 +23,9 @@ export function AdminNoticeCube() {
             title="查看公告详情"
             triggerDom={(
               <div className="fa-flex-row fa-link-grey fa-p8 fa-border-b">
-                <div style={{ width: 100 }}>{item.crtName}</div>
+                <div style={{width: 100}}>{item.crtName}</div>
                 <div className="fa-flex-1">{item.title}</div>
-                <div style={{ width: 150 }}>{item.crtTime}</div>
+                <div style={{width: 150}}>{item.crtTime}</div>
               </div>
             )}
           >
@@ -36,7 +34,7 @@ export function AdminNoticeCube() {
               <div className="fa-mr12">{item.crtName}</div>
               <div>{item.crtTime}</div>
             </div>
-            <div>{item.content}</div>
+            <FaRichHtmlView html={item.content} />
           </BaseDrawer>
         )
       })}

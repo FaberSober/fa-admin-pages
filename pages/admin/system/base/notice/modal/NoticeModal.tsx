@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
-import { Admin, ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
+import { Admin, ApiEffectLayoutContext, BaseBoolRadio, BaseTinyMCE, CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
 import { noticeApi } from '@features/fa-admin-pages/services';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -76,20 +76,15 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
         onOk={() => form.submit()}
         confirmLoading={loading}
         onCancel={() => setOpen(false)}
-        width={700}
+        width={1000}
         {...props}
       >
-        <Form
-          form={form}
-          onFinish={onFinish}
-          initialValues={{
-          }}
-        >
+        <Form form={form} onFinish={onFinish}>
           <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input maxLength={50} />
           </Form.Item>
           <Form.Item name="content" label="内容" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input.TextArea maxLength={255} />
+            <BaseTinyMCE style={{ height: 500 }} />
           </Form.Item>
           <Form.Item name="status" label="是否有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />

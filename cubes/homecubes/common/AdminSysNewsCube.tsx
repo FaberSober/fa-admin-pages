@@ -4,7 +4,7 @@ import { fileSaveApi, sysNewsApi } from "@features/fa-admin-pages/services";
 import { Carousel } from "antd";
 import { useSize } from "ahooks";
 import { BaseDrawer } from "@fa/ui";
-import SysNewsView from "@features/fa-admin-pages/pages/admin/system/base/sysNews/cube/SysNewsView";
+import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";
 
 
 export function AdminSysNewsCube() {
@@ -25,16 +25,22 @@ export function AdminSysNewsCube() {
         {array.map(item => (
           <BaseDrawer
             key={item.id}
+            title="查看新闻详情"
             triggerDom={(
-              <div className="fa-relative fa-link" style={{ width: size?.width, height: size?.height }}>
-                <img style={{ width: size?.width, height: size?.height }} src={fileSaveApi.genLocalGetFile(item.cover)} />
-                <div className="fa-absolute fa-right fa-bottom fa-bg-dark fa-flex-row-center" style={{ color: '#FFF', padding: '2px 4px' }}>
+              <div className="fa-relative fa-link" style={{width: size?.width, height: size?.height}}>
+                <img style={{width: size?.width, height: size?.height}} src={fileSaveApi.genLocalGetFile(item.cover)}/>
+                <div className="fa-absolute fa-right fa-bottom fa-bg-dark fa-flex-row-center" style={{color: '#FFF', padding: '2px 4px'}}>
                   <div>{item.title} / {item.pubTime}</div>
                 </div>
               </div>
             )}
           >
-            <SysNewsView item={item} />
+            <div className="fa-h1 fa-mb12">{item.title}</div>
+            <div className="fa-flex-row-center fa-mb12">
+              <div className="fa-mr12">{item.crtName}</div>
+              <div>{item.crtTime}</div>
+            </div>
+            <FaRichHtmlView html={item.content}/>
           </BaseDrawer>
         ))}
       </Carousel>

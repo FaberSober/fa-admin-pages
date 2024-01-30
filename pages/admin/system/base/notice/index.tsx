@@ -1,10 +1,11 @@
 import React from 'react';
-import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
+import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import {Button, Form, Image, Input, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaUtils, useDelete, useExport, useTableQueryParams,} from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
 import {Admin} from '@/types';
 import {noticeApi} from '@features/fa-admin-pages/services';
 import NoticeModal from './modal/NoticeModal';
+import NoticeView from './cube/NoticeView';
 
 
 const serviceName = '通知与公告';
@@ -24,8 +25,8 @@ export default function NoticeList() {
     const { sorter } = queryParams;
     return [
       // BaseTableUtils.genSimpleSorterColumn('ID', 'id', 70, sorter),
-      BaseTableUtils.genSimpleSorterColumn('标题', 'title', 200, sorter),
-      BaseTableUtils.genSimpleSorterColumn('内容', 'content', undefined, sorter),
+      BaseTableUtils.genSimpleSorterColumn('标题', 'title', undefined, sorter),
+      // BaseTableUtils.genSimpleSorterColumn('内容', 'content', undefined, sorter),
       {
         ...BaseTableUtils.genSimpleSorterColumn('图片', 'url', 100, sorter),
         sorter: false,
@@ -38,13 +39,16 @@ export default function NoticeList() {
       {
         title: '操作',
         dataIndex: 'opr',
-        render: (_, record: Admin.Notice) => (
+        render: (_, r: Admin.Notice) => (
           <Space>
-            <NoticeModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
-            <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+            <BaseDrawer triggerDom={<FaHref text="查看" icon={<EyeOutlined />} />}>
+              <NoticeView item={r} />
+            </BaseDrawer>
+            <NoticeModal editBtn title={`编辑${serviceName}信息`} record={r} fetchFinish={fetchPageList} />
+            <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
           </Space>
         ),
-        width: 120,
+        width: 170,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
