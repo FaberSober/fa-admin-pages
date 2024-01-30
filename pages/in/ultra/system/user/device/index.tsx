@@ -5,8 +5,8 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDel
 import { userDeviceApi as api } from '@features/fa-admin-pages/services';
 import { Admin } from '@/types';
 import UserDeviceModal from './modal/UserDeviceModal';
-import UserSearchSelect from '@fa/ui/src/components/biz-user-select/UserSearchSelect';
 import CommonExcelUploadModal from '@features/fa-admin-pages/components/excel/CommonExcelUploadModal';
+import UserSearchSelect from "@features/fa-admin-pages/components/helper/UserSearchSelect";
 
 const serviceName = 'BASE-用户设备';
 const biz = 'base_user_device';
