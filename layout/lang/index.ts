@@ -1,4 +1,5 @@
-import LangLayout, { LangContext, LangContextProps } from "./LangLayout";
+import LangLayout from "./LangLayout";
+import LangContext, { LangContextProps } from './context/LangContext';
 
 export { LangLayout, LangContext }
 export type { LangContextProps }

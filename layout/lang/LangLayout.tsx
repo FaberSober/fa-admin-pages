@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, { useContext, useState} from 'react';
 import {ConfigProvider, theme} from 'antd';
 
 // antd国际化配置
@@ -14,6 +14,7 @@ import {Fa, ThemeLayoutContext} from '@fa/ui';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
+import LangContext from './context/LangContext';
 
 dayjs.locale('zh-cn');
 
@@ -41,17 +42,6 @@ function handleMessages(lang: string) {
   }
 }
 
-export interface LangContextProps {
-  locale: string;
-  setLocale: (locale: string) => void;
-}
-
-export const LangContext = createContext<LangContextProps>({
-  locale: 'zh_CN',
-  setLocale: () => {
-    console.log('LangContext.setLocale');
-  },
-});
 
 // 全局表单提示校验
 const validateMessages = {

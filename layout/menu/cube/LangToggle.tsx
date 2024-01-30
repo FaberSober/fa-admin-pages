@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import { TranslationOutlined } from '@ant-design/icons';
 import { FormattedMessage } from 'react-intl';
-import { LangContext } from '../../lang/LangLayout';
+import LangContext from '../../lang/context/LangContext';
+
 
 /**
  * 语言国际化切换组件
