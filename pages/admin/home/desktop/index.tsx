@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import * as cubes from '@/cubes/homecubes'
-import { FaGridLayout, FaGridLayoutUtils } from "@/components";
 import { isNil } from "lodash";
 import { Button, List, Space, Spin, Switch } from "antd";
 import { BaseDrawer, FaFlashCard, FaUtils } from "@fa/ui";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import ExportAndImportBtn from "@features/fa-admin-pages/components/utils/ExportAndImportBtn";
+import { FaGridLayout } from '@features/fa-admin-pages/components/grid/FaGridLayout';
+import { FaGridLayoutUtils } from '@features/fa-admin-pages/components/utils';
 
 
 const biz = "HOME_LAYOUT";

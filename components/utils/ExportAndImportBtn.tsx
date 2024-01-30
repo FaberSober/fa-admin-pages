@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Space, Upload } from "antd";
 import { saveAs } from "file-saver";
-import { FaCodeEditModal } from "@features/fa-admin-pages/components";
-import { FaUtils } from "@fa/ui";
+import FaInputEditModal from "@features/fa-admin-pages/components/modal/FaInputEditModal";
 
 
 export interface ExportAndImportBtnProps {
@@ -24,9 +23,9 @@ export default function ExportAndImportBtn({ filename, layout, onUpload }: Expor
 
   return (
     <Space>
-      <FaCodeEditModal value={FaUtils.tryFormatJson(JSON.stringify(layout))} onChange={v => onUpload(v)}>
+      <FaInputEditModal title="编辑配置" value={layout} onChange={v => onUpload(v)}>
         <Button>编辑配置</Button>
-      </FaCodeEditModal>
+      </FaInputEditModal>
       <Button onClick={handleSaveFile}>导出配置</Button>
       <Upload
         beforeUpload={file => {
