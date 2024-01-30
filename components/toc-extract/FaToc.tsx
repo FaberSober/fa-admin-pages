@@ -1,9 +1,19 @@
 import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
 import {useScroll} from "ahooks";
-import {FaUtils} from '@fa/ui'
 import './FaToc.scss'
 import { isNil } from "lodash";
 
+/**
+ * @returns 随机生产长size位的字母[a-z]
+ */
+export function generateId(size = 8) {
+  let str = "";
+  for (let i = 0; i < size; i++) {
+    const code = Math.floor(Math.random() * 26);
+    str += String.fromCharCode("a".charCodeAt(0) + code);
+  }
+  return str;
+}
 
 function extractLevel(heading:Element) {
   if (heading.tagName.length !== 2 || heading.tagName[0].toLowerCase() !== 'h') {
@@ -54,7 +64,7 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
         const nextEle = headings[i + 1]
         bottom = nextEle.offsetTop;
       }
-      const id = FaUtils.generateId();
+      const id = generateId();
       v.setAttribute("id", id)
 
       const level = extractLevel(v); // 识别h1、h2的后缀数字
