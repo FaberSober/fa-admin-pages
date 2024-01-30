@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Button} from 'antd';
-import {ConfigLayoutContext} from "@/layout";
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 
 
 /**

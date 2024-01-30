@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Button, Card, Form, Input } from 'antd';
 import { Admin } from '@/types';
 import { ApiEffectLayoutContext, DictEnumApiSelector, FaUtils, PageLoading, UploadImgLocal } from '@fa/ui';
-import { UserLayoutContext } from "@/layout";
 import { userApi } from '@/services'
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };

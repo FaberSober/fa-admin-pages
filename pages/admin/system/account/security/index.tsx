@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
-import {ConfigLayoutContext, UserLayoutContext} from "@/layout";
 import { userApi } from "@/services";
 import * as FaSecurityUtils from '@features/fa-admin-pages/components/utils/FaSecurityUtils';
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 
 const formItemFullLayout = { labelCol: { span: 8 }, wrapperCol: { span: 16 } };
 const tailLayout = { wrapperCol: { offset: 8, span: 16 } };
