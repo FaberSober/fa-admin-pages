@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FaFlexRestLayout, FaHref, FaUtils} from "@fa/ui";
-import MonacoEditor from "react-monaco-editor";
+// import MonacoEditor from "react-monaco-editor";
 import {useSize, useUpdate} from "ahooks";
 import { Generator } from "@features/fa-admin-pages/types";
 import {Button, Form, Input, Modal, Space, Tree} from "antd";
@@ -345,18 +345,23 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         <FaFlexRestLayout>
           <div ref={domRef} style={{height: '100%'}}>
             {size && size.height && (
-              <MonacoEditor
-                height={size.height}
-                theme="vs-dark"
-                language={codeGen ? codeGen.type.split(".")[0] : ''}
-                value={codeGen && codeGen.code}
-                options={{
-                  readOnly: true,
-                  selectOnLineNumbers: true,
-                  folding: true,
-                  minimap: { enabled: true },
-                }}
+              <Input.TextArea
+                autoSize={{minRows:1, maxRows: 25}}
+                defaultValue={codeGen && codeGen.code}
+                // onChange={e => setData1(e.target.value)}
               />
+              // <MonacoEditor
+              //   height={size.height}
+              //   theme="vs-dark"
+              //   language={codeGen ? codeGen.type.split(".")[0] : ''}
+              //   value={codeGen && codeGen.code}
+              //   options={{
+              //     readOnly: true,
+              //     selectOnLineNumbers: true,
+              //     folding: true,
+              //     minimap: { enabled: true },
+              //   }}
+              // />
             )}
           </div>
         </FaFlexRestLayout>

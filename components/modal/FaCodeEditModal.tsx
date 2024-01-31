@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form } from 'antd';
+import { Form, Input } from 'antd';
 import { DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import MonacoEditor from "react-monaco-editor";
+// import MonacoEditor from "react-monaco-editor";
 
 
 export interface FaCodeEditModal extends DragModalProps {
@@ -51,16 +51,20 @@ export default function FaCodeEditModal({ children, title, value, onChange, ...p
       >
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="code" label="配置项" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <MonacoEditor
-              height={600}
-              language="sql"
-              theme="vs-dark"
-              options={{
-                selectOnLineNumbers: true,
-                folding: true,
-                minimap: { enabled: true },
-              }}
+            <Input.TextArea
+              autoSize={{minRows:1, maxRows: 25}}
             />
+
+            {/*<MonacoEditor*/}
+            {/*  height={600}*/}
+            {/*  language="sql"*/}
+            {/*  theme="vs-dark"*/}
+            {/*  options={{*/}
+            {/*    selectOnLineNumbers: true,*/}
+            {/*    folding: true,*/}
+            {/*    minimap: { enabled: true },*/}
+            {/*  }}*/}
+            {/*/>*/}
           </Form.Item>
         </Form>
       </DragModal>

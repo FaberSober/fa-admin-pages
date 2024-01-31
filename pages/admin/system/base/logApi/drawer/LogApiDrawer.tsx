@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Descriptions, Drawer, DrawerProps } from 'antd';
 import { Admin } from '@/types';
-import ReactJson from 'react-json-view';
+// import ReactJson from 'react-json-view';
 import { FaUtils, FaClickCopyLink } from '@fa/ui';
 
 export interface GateLogDrawerProps extends DrawerProps {
@@ -54,13 +54,14 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="否为移动终端">{record.mobile ? '是' : '否'}</Descriptions.Item>
           <Descriptions.Item label={<FaClickCopyLink copyText={record.request}>请求内容</FaClickCopyLink>}>
             {open && FaUtils.isJson(record.request) ? (
-              <ReactJson
-                src={JSON.parse(record.request)}
-                collapsed={2}
-                displayDataTypes={false}
-                style={{ fontSize: '10px', maxHeight: '90vh', overflow: 'auto' }}
-                // theme="monokai"
-              />
+              <div>{record.request}</div>
+              // <ReactJson
+              //   src={JSON.parse(record.request)}
+              //   collapsed={2}
+              //   displayDataTypes={false}
+              //   style={{ fontSize: '10px', maxHeight: '90vh', overflow: 'auto' }}
+              //   // theme="monokai"
+              // />
             ) : (
               record.request
             )}
@@ -68,13 +69,14 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label="返回码">{record.retStatus}</Descriptions.Item>
           <Descriptions.Item label={<FaClickCopyLink copyText={record.response}>返回内容</FaClickCopyLink>}>
             {open && FaUtils.isJson(record.response) ? (
-              <ReactJson
-                src={JSON.parse(record.response)}
-                collapsed={2}
-                displayDataTypes={false}
-                style={{ fontSize: '10px', maxHeight: '90vh', overflow: 'auto' }}
-                // theme="monokai"
-              />
+              <div>{record.response}</div>
+              // <ReactJson
+              //   src={JSON.parse(record.response)}
+              //   collapsed={2}
+              //   displayDataTypes={false}
+              //   style={{ fontSize: '10px', maxHeight: '90vh', overflow: 'auto' }}
+              //   // theme="monokai"
+              // />
             ) : (
               record.response
             )}

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Admin } from "@/types";
 import { Descriptions } from "antd";
-import MonacoEditor from 'react-monaco-editor';
+// import MonacoEditor from 'react-monaco-editor';
 import { useSize } from "ahooks";
 
 
@@ -27,18 +27,19 @@ export default function SystemUpdateLogView({record}: SystemUpdateLogViewProps) 
       <Descriptions.Item label="SQL执行内容">
         <div ref={domRef} style={{height: 600}}>
           {size && size.height && (
-            <MonacoEditor
-              height={size.height}
-              language="sql"
-              theme="vs-dark"
-              value={record.log}
-              options={{
-                readOnly: true,
-                selectOnLineNumbers: true,
-                folding: true,
-                minimap: { enabled: true },
-              }}
-            />
+            <div className="fa-break-word">{record.log}</div>
+            // <MonacoEditor
+            //   height={size.height}
+            //   language="sql"
+            //   theme="vs-dark"
+            //   value={record.log}
+            //   options={{
+            //     readOnly: true,
+            //     selectOnLineNumbers: true,
+            //     folding: true,
+            //     minimap: { enabled: true },
+            //   }}
+            // />
           )}
         </div>
       </Descriptions.Item>
