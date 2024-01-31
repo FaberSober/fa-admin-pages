@@ -3,6 +3,7 @@ import { trim } from "lodash";
 import { Fa, fileSaveApi } from "@fa/ui";
 import styles from "./VantaLayout.module.scss";
 import ConfigLayoutContext from "../config/context/ConfigLayoutContext";
+// import * as THREE from 'three';
 
 
 /**
@@ -20,25 +21,26 @@ export default function VantaLayout({children}: Fa.BaseChildProps) {
     if (trim(systemConfig.loginBg) !== '') return;
 
     // 使用vanta制作背景效果图
-    const vantaEffect = window.VANTA.WAVES({
-      el: vantaRef.current,
-      // THREE: THREE, // use a custom THREE when initializing
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.0,
-      minWidth: 200.0,
-      scale: 1.0,
-      scaleMobile: 1.0,
-      zoom: 0.79,
-    });
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
-    };
+    // const vantaEffect = window.VANTA.WAVES({
+    //   el: vantaRef.current,
+    //   // FIXME: 高版本会崩溃：https://github.com/tengbao/vanta/issues/177
+    //   THREE: THREE, // use a custom THREE when initializing
+    //   mouseControls: true,
+    //   touchControls: true,
+    //   gyroControls: false,
+    //   minHeight: 200.0,
+    //   minWidth: 200.0,
+    //   scale: 1.0,
+    //   scaleMobile: 1.0,
+    //   zoom: 0.79,
+    // });
+    // return () => {
+    //   if (vantaEffect) vantaEffect.destroy();
+    // };
   }, [systemConfig]);
 
   const bgStyle: CSSProperties = {
-    background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : '',
+    background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : 'url(/file/image/bg/login.png) no-repeat',
     backgroundSize: '100% 100%',
   }
   // console.log(bgStyle)
