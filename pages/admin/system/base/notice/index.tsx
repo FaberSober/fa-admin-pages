@@ -9,7 +9,7 @@ import NoticeView from './cube/NoticeView';
 
 
 const serviceName = '通知与公告';
-const biz = 'base_notice';
+const biz = 'base_notice.v1';
 
 export default function NoticeList() {
   const [form] = Form.useForm();
