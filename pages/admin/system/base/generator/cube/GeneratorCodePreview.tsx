@@ -344,11 +344,11 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
 
         <FaFlexRestLayout>
           <div ref={domRef} style={{height: '100%'}}>
-            {size && size.height && (
+            {size && size.height && codeGen && (
               <Input.TextArea
                 autoSize={{minRows:1, maxRows: 25}}
-                defaultValue={codeGen && codeGen.code}
-                // onChange={e => setData1(e.target.value)}
+                value={codeGen && codeGen.code}
+                onChange={e => setCodeGen({ ...codeGen, code: e.target.value })}
               />
               // <MonacoEditor
               //   height={size.height}
