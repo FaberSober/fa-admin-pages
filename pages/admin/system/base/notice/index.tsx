@@ -1,9 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import {Button, Form, Image, Input, Space} from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
-import {Admin} from '@/types';
-import {noticeApi} from '@features/fa-admin-pages/services';
+import { Button, Form, Input, Space } from 'antd';
+import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
+import { Admin } from '@/types';
+import { noticeApi } from '@features/fa-admin-pages/services';
 import NoticeModal from './modal/NoticeModal';
 import NoticeView from './cube/NoticeView';
 
@@ -27,11 +27,6 @@ export default function NoticeList() {
       // BaseTableUtils.genSimpleSorterColumn('ID', 'id', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('标题', 'title', undefined, sorter),
       // BaseTableUtils.genSimpleSorterColumn('内容', 'content', undefined, sorter),
-      {
-        ...BaseTableUtils.genSimpleSorterColumn('图片', 'url', 100, sorter),
-        sorter: false,
-        render: (val) => (val ? <Image src={FaUtils.previewImageQiniu(val, 200, 200)} width={70} height={70} preview={{ src: val }} /> : null),
-      },
       BaseTableUtils.genBoolSorterColumn('有效', 'status', 70, sorter),
       BaseTableUtils.genBoolSorterColumn('强提醒', 'strongNotice', 90, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
