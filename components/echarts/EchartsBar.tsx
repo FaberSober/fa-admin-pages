@@ -1,7 +1,7 @@
 import React, {CSSProperties, useContext, useEffect, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
-import { ECharts, BarSeriesOption } from 'echarts';
+import { ECharts, BarSeriesOption, EChartsOption } from 'echarts';
 import {Fa, ThemeLayoutContext} from '@fa/ui'
 import { useSize } from "ahooks";
 
@@ -13,13 +13,14 @@ export interface EchartsBarProps {
   dataTitle?: string,
   style?: CSSProperties;
   barSeriesOption?: BarSeriesOption;
+  options?: EChartsOption;
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsBar({title, subTitle, data, dataTitle, style, barSeriesOption}: EchartsBarProps) {
+export default function EchartsBar({title, subTitle, data, dataTitle, style, barSeriesOption, options}: EchartsBarProps) {
   const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
@@ -41,10 +42,8 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
 
     // 基于准备好的dom，初始化echarts实例
     const theme = themeDark ? 'dark' : 'light'
-    // @ts-ignore
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
-    // @ts-ignore
     chartRef.current.setOption({
       backgroundColor: 'transparent',
       title: {
@@ -80,7 +79,8 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
           barWidth: 30,
           ...barSeriesOption,
         }
-      ]
+      ],
+      ...options,
     });
     setReady(true)
   }, [themeDark])
