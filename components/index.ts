@@ -1,5 +1,6 @@
 export * from './area-cascader'
 export * from './base-card'
+export * from './date'
 export * from './echarts'
 export * from './excel'
 export * from './file'
