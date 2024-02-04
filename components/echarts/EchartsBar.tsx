@@ -59,7 +59,10 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
         containLabel: true
       },
       tooltip: {
-        trigger: 'item'
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
       },
       legend: {
         orient: 'vertical',
