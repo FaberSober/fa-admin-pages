@@ -20,6 +20,7 @@ export default function OpenTabs() {
    * @param tabKey
    */
   function remove(tabKey: string) {
+    console.log('remove,tabKey=', tabKey)
     const index = findIndex(openTabs, i => i.key === tabKey)
     if (index === -1) return;
 
@@ -35,6 +36,13 @@ export default function OpenTabs() {
     // 1. decide slide to new tab
     let newActiveKey = curTab?.key;
     if (newPanes.length && newPanes.length > 0 && newActiveKey === tabKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+      selTab(newActiveKey);
+    } else if (newActiveKey === undefined) { // 当前没有选中的菜单Menu
       if (lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
       } else {
