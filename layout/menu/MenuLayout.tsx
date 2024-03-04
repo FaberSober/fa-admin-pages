@@ -75,7 +75,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   }, []);
 
   useEffect(() => {
-    syncOpenMenuById(menuSelMenuId, menuFullTree);
+    // syncOpenMenuById(menuSelMenuId, menuFullTree);
   }, [collapse]);
 
   function transMenuToTabItem(menu: Rbac.RbacMenu): OpenTabsItem {
@@ -121,6 +121,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
    * @param tree
    */
   function syncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[]) {
+    // console.log('syncOpenMenuById', curTab)
     if (openMenuId === undefined) return;
 
     const menuArr = flatTreeList(tree);
@@ -187,8 +188,12 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     menuSelAppId,
     menuSelPath,
     menuSelMenuId,
-    setMenuSelMenuId: (id) => syncOpenMenuById(id, menuFullTree),
+    setMenuSelMenuId: (id) => {
+      // console.log('setMenuSelMenuId')
+      syncOpenMenuById(id, menuFullTree)
+    },
     setMenuSelPath: (key: string) => {
+      // console.log('setMenuSelPath')
       syncOpenMenuById(key, menuFullTree);
     },
     setMenuSelAppId: (id) => {
@@ -206,6 +211,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     openTabs,
     curTab,
     setCurTab: (tab: OpenTabsItem|undefined) => {
+      // console.log('setCurTab')
       syncOpenMenuById(tab?.key, menuFullTree)
     },
     setOpenTabs,
@@ -231,6 +237,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       setOpenTabs(openTabs.filter(i => i.key !== tabKey))
     },
     selTab: (tabKey: string) => {
+      // console.log('selTab')
       syncOpenMenuById(tabKey, menuFullTree)
     },
   };

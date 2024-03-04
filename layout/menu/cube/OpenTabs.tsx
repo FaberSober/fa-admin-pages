@@ -20,7 +20,7 @@ export default function OpenTabs() {
    * @param tabKey
    */
   function remove(tabKey: string) {
-    console.log('remove,tabKey=', tabKey)
+    // console.log('remove,tabKey=', tabKey)
     const index = findIndex(openTabs, i => i.key === tabKey)
     if (index === -1) return;
 
