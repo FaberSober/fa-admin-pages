@@ -12,7 +12,7 @@
 
 .fa-menu-open-tabs .ant-tabs-tab {
   padding: 0px !important;
-  border-radius: 10px 10px 0 0 !important;
+  border-radius: 0 !important;
   position: relative;
 }
 
@@ -31,7 +31,7 @@
   justify-content: center;
   border-radius: 8px;
   position: absolute;
-  top: 7px;
+  top: 9px;
   right: 4px;
 }
 
@@ -40,5 +40,5 @@
 }
 
 .fa-open-tabs-item-title-div {
-  padding: 4px 24px 4px 8px;
+  padding: 6px 28px 6px 12px;
 }
