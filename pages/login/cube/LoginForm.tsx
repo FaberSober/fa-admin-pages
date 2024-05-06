@@ -20,7 +20,7 @@ export default function LoginForm() {
 
   function onFinish(fieldsValue: any) {
     authApi.login(fieldsValue.username, fieldsValue.password).then((res) => {
-      setToken(res.data);
+      setToken(res.data.tokenValue);
       setLoginMode(LoginMode.LOCAL)
       navigate(SITE_INFO.HOME_LINK);
     });
