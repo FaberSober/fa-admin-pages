@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState} from 'react';
-import { Admin, Rbac } from '@/types';
 import Favicon from 'react-favicon'
+import { Modal } from "antd";
+import { Admin, Rbac } from '@/types';
 import { clearToken, Fa, PageLoading } from "@fa/ui";
 import { authApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@features/fa-admin-pages/services';
 import ConfigLayoutContext from "../config/context/ConfigLayoutContext";
@@ -30,9 +31,14 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   }
 
   function logout() {
-    authApi.logout().then(res => {
-      clearToken();
-      window.location.href = res.data;
+    Modal.confirm({
+      title: '登出',
+      content: '确认退出登录？',
+      okText: '退出',
+      onOk: () => authApi.logout().then(res => {
+        clearToken();
+        window.location.href = res.data;
+      })
     })
   }
 

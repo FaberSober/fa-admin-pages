@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input } from 'antd';
 import { trim } from 'lodash';
-import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken } from '@fa/ui';
+import { ApiEffectLayoutContext, Captcha, LoginMode, setLoginMode, setToken, useQs } from '@fa/ui';
 import { authApi } from '@features/fa-admin-pages/services'
 import { SITE_INFO } from '@/configs';
 import { Helmet } from "react-helmet-async";
@@ -15,6 +15,7 @@ export default function LoginForm() {
   const {systemConfig} = useContext(ConfigLayoutContext);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const search:any = useQs();
 
   const [code, setCode] = useState('');
 
@@ -22,7 +23,11 @@ export default function LoginForm() {
     authApi.login(fieldsValue.username, fieldsValue.password).then((res) => {
       setToken(res.data.tokenValue);
       setLoginMode(LoginMode.LOCAL)
-      navigate(SITE_INFO.HOME_LINK);
+      if (search.redirect) {
+        navigate(search.redirect);
+      } else {
+        navigate(SITE_INFO.HOME_LINK);
+      }
     });
   }
 
