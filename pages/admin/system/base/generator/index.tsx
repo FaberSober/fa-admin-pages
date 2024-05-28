@@ -64,6 +64,7 @@ export default function StudentList() {
       </div>
 
       <BaseBizTable
+        showRowNum
         rowKey="tableName"
         biz={biz}
         columns={genColumns()}
