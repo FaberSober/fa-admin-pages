@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState} from 'react';
-import Favicon from 'react-favicon'
-import { Modal } from "antd";
-import { Admin, Rbac } from '@/types';
-import { clearToken, Fa, PageLoading } from "@fa/ui";
-import { authApi, fileSaveApi, msgApi, rbacUserRoleApi, userApi } from '@features/fa-admin-pages/services';
-import ConfigLayoutContext from "../config/context/ConfigLayoutContext";
-import UserLayoutContext, { UserLayoutContextProps } from './context/UserLayoutContext'
+import React, {useEffect, useState} from 'react';
+import {Modal} from "antd";
+import {Admin, Rbac} from '@/types';
+import {clearToken, Fa, PageLoading} from "@fa/ui";
+import {authApi, msgApi, rbacUserRoleApi, userApi} from '@features/fa-admin-pages/services';
+import UserLayoutContext, {UserLayoutContextProps} from './context/UserLayoutContext'
 
 
 /**
@@ -13,9 +11,7 @@ import UserLayoutContext, { UserLayoutContextProps } from './context/UserLayoutC
  * @author xu.pengfei
  * @date 2022/9/21
  */
-export default function UserLayout({ children }: Fa.BaseChildProps) {
-  const {systemConfig} = useContext(ConfigLayoutContext)
-
+export default function UserLayout({children}: Fa.BaseChildProps) {
   const [user, setUser] = useState<Admin.User>();
   const [roles, setRoles] = useState<Rbac.RbacRole[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -46,8 +42,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
     msgApi.countMine().then((res) => setUnreadCount(res.data.unreadCount));
   }
 
-  if (user === undefined) return <PageLoading />;
-  if (systemConfig === undefined) return <PageLoading />;
+  if (user === undefined) return <PageLoading/>;
 
   const contextValue: UserLayoutContextProps = {
     user,
@@ -60,7 +55,6 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
 
   return (
     <UserLayoutContext.Provider value={contextValue}>
-      {systemConfig && systemConfig.logo && <Favicon url={fileSaveApi.genLocalGetFilePreview(systemConfig.logo)} />}
       {children}
     </UserLayoutContext.Provider>
   );

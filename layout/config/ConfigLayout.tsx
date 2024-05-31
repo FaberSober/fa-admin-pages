@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Admin } from '@/types';
-import Favicon from 'react-favicon'
+// import Favicon from 'react-favicon'
+import { Favicon } from '@features/fa-admin-pages/components/icons/Favicon';
 import { Fa, PageLoading } from "@fa/ui";
 import { configSysApi, fileSaveApi } from '@features/fa-admin-pages/services';
 import ConfigLayoutContext, { ConfigLayoutContextProps } from './context/ConfigLayoutContext'
@@ -15,14 +16,19 @@ export default function ConfigLayout({ children }: Fa.BaseChildProps) {
   const [systemConfig, setSystemConfig] = useState<Admin.SystemConfigPo>();
 
   useEffect(() => {
-    // 获取系统配置参数
-    configSysApi.getSystemConfig().then((res) => setSystemConfig(res.data));
+    refreshSystemConfig()
   }, []);
+
+  // 获取系统配置参数
+  function refreshSystemConfig() {
+    configSysApi.getSystemConfig().then((res) => setSystemConfig(res.data));
+  }
 
   if (systemConfig === undefined) return <PageLoading />;
 
   const contextValue: ConfigLayoutContextProps = {
     systemConfig,
+    refreshSystemConfig,
   };
 
   return (
