@@ -74,6 +74,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
   }
 
   useEffect(() => {
+    if (!props.open) return;
     setLevel(record ? record.level : undefined)
     form.setFieldsValue(getInitialValues());
   }, [record]);
