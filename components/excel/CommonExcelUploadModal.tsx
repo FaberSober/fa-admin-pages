@@ -5,8 +5,9 @@ import {Col, Form, Row} from "antd";
 
 export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
-  apiDownloadTplExcel: () => any;
+  apiDownloadTplExcel?: () => any;
   apiImportExcel: (params: {fileId: string}) => Promise<Fa.Ret<boolean>>;
+  templates?: string|ReactNode; // 下载模板
   tips?: string|ReactNode;
   showTemplateDownload?: boolean;
   accept?: string;
@@ -17,7 +18,7 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
  * @author xu.pengfei
  * @date 2023/6/27 14:21
  */
-export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, tips, showTemplateDownload = true, accept, ...props }: CommonExcelUploadModalProps) {
+export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, templates, tips, showTemplateDownload = true, accept, ...props }: CommonExcelUploadModalProps) {
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -63,8 +64,9 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
         <Form form={form} onFinish={onFinish}>
           {showTemplateDownload && (
             <Row className="fa-mb12">
-              <Col offset={4}>
-                <a onClick={apiDownloadTplExcel}>点击下载导入模板Excel文件</a>
+              <Col offset={4} className="fa-flex-column">
+                {apiDownloadTplExcel && <a onClick={apiDownloadTplExcel}>点击下载导入模板Excel文件</a>}
+                {templates}
               </Col>
             </Row>
           )}
@@ -75,7 +77,7 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
 
           {tips && (
             <Row className="fa-mb12">
-              <Col offset={4}>{tips}</Col>
+              <Col offset={4} md={20}>{tips}</Col>
             </Row>
           )}
         </Form>
