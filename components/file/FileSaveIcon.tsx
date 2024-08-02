@@ -1,12 +1,17 @@
 import React, { CSSProperties } from 'react';
 import { Image } from 'antd';
-import { Admin } from '@/types';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import VideoPlainModal from "../video/VideoPlainModal";
 
+export interface FileInfo {
+  id: string;
+  originalFilename: string;
+  ext: string;
+}
+
 export interface FileSaveIconProps {
-  file: Admin.FileSave;
+  file: FileInfo;
   width: number;
   style?: CSSProperties;
 }
