@@ -9,6 +9,7 @@ export interface OpenTabsItem {
   closeable?: boolean; // 是否可以关闭
   icon?: string|ReactNode; // 图标标识
   linkMenuId?: string; // 对应需要打开的菜单ID
+  linkCurrentMenu?: boolean; // TODO 打开tab时是否关联当前菜单，默认设置为true，功能需要开发
 }
 
 export interface MenuLayoutContextProps {
