@@ -52,12 +52,12 @@
     height: 30px;
     margin: 0 10px;
     border-radius: 15px !important;
-    color: var(--fa-text-color);
+    color: #FFF;
   }
 
   .ant-menu-item-active {
     border-radius: 15px !important;
-    background-color: var(--fa-bg-color-hover) !important;
+    background-color: #1c5e88 !important;
   }
 
   .ant-menu-item::after {
