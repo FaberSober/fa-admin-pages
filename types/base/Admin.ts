@@ -120,6 +120,8 @@ namespace Admin {
     phpRedisAdmin: string;
     /** [Web]SocketIO服务地址 */
     socketUrl: string;
+    /** [Web]kkFileViewU服务地址 */
+    kkFileViewUrl: string;
     /** [Web]是否离线环境 */
     offline: boolean;
     /** [安全]是否开启验证码 */
