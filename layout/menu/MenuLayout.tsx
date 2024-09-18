@@ -262,7 +262,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
             <UserAvatar />
           </Layout.Header>
 
-          <Layout style={{ flexDirection: 'row' }}>
+          <Layout style={{ flexDirection: 'row' }} className="fa-main-layout">
             <SideMenu />
 
             <Layout style={{ width }}>

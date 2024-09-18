@@ -29,41 +29,64 @@
 }
 
 
-.fa-menu-header .ant-menu-item {
-  display: flex;
-  align-items: center;
-  border-radius: 0 !important;
-}
+// ------------------------------- 样式一 -------------------------------
+//.fa-menu-header .ant-menu-item {
+//  display: flex;
+//  align-items: center;
+//  border-radius: 0 !important;
+//}
+//
+///*FIXME 这里应该是antd v5的一个bug，horizontal的menu选中效果不对*/
+//.fa-menu-header .ant-menu-item-selected {
+//  background-color: var(--primary-color) !important;
+//  border-radius: 0 !important;
+//  color: #fff !important;
+//}
+//
+///* 顶部菜单样式调整 */
+//.fa-menu-top {
+//  height: 100%;
+//  display: flex;
+//  align-items: center;
+//
+//  .ant-menu-item {
+//    height: 30px;
+//    margin: 0 10px;
+//    border-radius: 15px !important;
+//    color: #FFF;
+//  }
+//
+//  .ant-menu-item-active {
+//    border-radius: 15px !important;
+//    background-color: #1c5e88 !important;
+//  }
+//
+//  .ant-menu-item::after {
+//    border-bottom-width: 0 !important;
+//  }
+//}
 
-/*FIXME 这里应该是antd v5的一个bug，horizontal的menu选中效果不对*/
-.fa-menu-header .ant-menu-item-selected {
-  background-color: var(--primary-color) !important;
-  border-radius: 0 !important;
-  color: #fff !important;
-}
-
-/* 顶部菜单样式调整 */
+// ------------------------------- 样式二 -------------------------------
 .fa-menu-top {
-  height: 100%;
-  display: flex;
-  align-items: center;
-
   .ant-menu-item {
-    height: 30px;
-    margin: 0 10px;
-    border-radius: 15px !important;
-    color: #FFF;
+    color: #333 !important;
+    margin-right: 12px;
   }
 
-  .ant-menu-item-active {
-    border-radius: 15px !important;
-    background-color: #1c5e88 !important;
+  .ant-menu-item-selected {
+    background-color: #F2F7FF !important;
+    border-radius: 0 !important;
   }
 
-  .ant-menu-item::after {
-    border-bottom-width: 0 !important;
+  .ant-menu-item:after {
+    inset-inline: 0 !important;
+  }
+
+  .ant-menu-item-selected:after {
+    inset-inline: 0 !important;
   }
 }
+
 
 .ant-layout-header {
   background-color: var(--fa-bg-color) !important;
