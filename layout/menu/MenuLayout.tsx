@@ -12,6 +12,7 @@ import useRoutePermission from "../../hooks/useRoutePermission";
 import MenuLayoutContext, {MenuLayoutContextProps, OpenTabsItem} from './context/MenuLayoutContext';
 import {ConfigLayoutContext} from "../config/context/ConfigLayoutContext";
 import './MenuLayout.scss';
+import { SITE_INFO } from "@/configs";
 
 
 /**
@@ -35,7 +36,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [menuSelMenuId, setMenuSelMenuId] = useState<string>(); // 当前选中的左侧菜单menu id
   const [menuSelPath, setMenuSelPath] = useState<string[]>([]); // 当前选中的菜单ID数组（不包含顶部block菜单）
   const [collapse, setCollapse] = useLocalStorage<boolean>('MenuLayout.collapse', false); // 是否折叠左侧菜单
-  const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', true); // 是否展示标签栏
+  const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS || true); // 是否展示标签栏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
