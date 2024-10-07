@@ -266,7 +266,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
           <Layout style={{ flexDirection: 'row' }} className="fa-main-layout">
             <SideMenu />
 
-            <Layout style={{ width }}>
+            <Layout style={{ width }} className="fa-main-layout-right">
               <div className="fa-full fa-flex-column">
                 {showTabs && <OpenTabs />}
                 <FaFlexRestLayout>
