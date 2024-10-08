@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Col, Form, Input, Row, Space } from 'antd';
 import { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
@@ -44,17 +44,21 @@ export default function ConfigStorageLocal() {
   const loading = loadingEffect[configSysApi.getUrl('update')];
   return (
     <div className="fa-p12">
-      <Form form={form} onFinish={onFinish} layout="vertical" style={{ width: 700 }}>
+      <Form form={form} onFinish={onFinish} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
         <Form.Item name="storeLocalPath" label="本地存储路径" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
 
-        <Space>
-          <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
-            保存
-          </Button>
-          <Button onClick={handleReset}>重置</Button>
-        </Space>
+        <Row>
+          <Col offset={4}>
+            <Space>
+              <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
+                保存
+              </Button>
+              <Button onClick={handleReset}>重置</Button>
+            </Space>
+          </Col>
+        </Row>
       </Form>
     </div>
   );

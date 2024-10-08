@@ -75,8 +75,18 @@ namespace Admin {
     phpRedisAdmin: string;
     /** [Web]SocketIO服务地址 */
     socketUrl: string;
+    /** [存储]当前激活存储 */
+    storeActive: string;
     /** [存储][本地]目录 */
     storeLocalPath: string;
+    /** ------------------------- [存储][Minio] -------------------------  */
+    minioAk: string;
+    minioSk: string;
+    minioEndPoint: string;
+    minioBucketName: string;
+    minioDomain: string;
+    minioBasePath: string;
+    /** ------------------------- [存储][Minio] -------------------------  */
     /** [安全]是否开启验证码 */
     safeCaptchaOn: boolean;
     /** [安全]密码类型 */

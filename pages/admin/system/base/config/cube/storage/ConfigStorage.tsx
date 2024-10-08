@@ -1,6 +1,8 @@
 import React from 'react';
 import {Tabs} from "antd";
-import ConfigStorageLocal from "./ConfigStorageLocal";
+import ConfigStorageBase from "./cube/ConfigStorageBase";
+import ConfigStorageLocal from "./cube/ConfigStorageLocal";
+import ConfigStorageMinio from "./cube/ConfigStorageMinio";
 
 /**
  * @author xu.pengfei
@@ -10,15 +12,16 @@ export default function ConfigStorage() {
   return (
     <div>
       <Tabs
-        defaultActiveKey="1"
+        defaultActiveKey="base"
         className="fa-bg-white"
         items={[
-          { label: `本地文件`, key: '1', children: <ConfigStorageLocal /> },
-          // { label: `邮件配置`, key: '3', children: `TODO` },
-          // { label: `短信配置`, key: '4', children: `TODO` },
+          { label: '基础配置', key: 'base', children: <ConfigStorageBase /> },
+          { label: '本地文件', key: 'local', children: <ConfigStorageLocal /> },
+          { label: 'Minio', key: 'Minio', children: <ConfigStorageMinio /> },
         ]}
         tabPosition="left"
         destroyInactiveTabPane
+        size="small"
       />
     </div>
   )
