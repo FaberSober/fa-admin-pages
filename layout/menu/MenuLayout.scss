@@ -69,12 +69,12 @@
 // ------------------------------- 样式二 -------------------------------
 .fa-menu-top {
   .ant-menu-item {
-    color: #333 !important;
+    color: var(--fa-text-color) !important;
     margin-right: 12px;
   }
 
   .ant-menu-item-selected {
-    background-color: #F2F7FF !important;
+    background-color: var(--fa-bg-menu) !important;
     border-radius: 0 !important;
   }
 

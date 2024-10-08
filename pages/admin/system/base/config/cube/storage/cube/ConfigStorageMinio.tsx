@@ -51,7 +51,7 @@ export default function ConfigStorageMinio() {
         <Form.Item name="minioSk" label="secret-key" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="minioEndPoint" label="end-point" rules={[{ required: true }]}>
+        <Form.Item name="minioEndPoint" label="end-point" rules={[{ required: false }]}>
           <Input />
         </Form.Item>
         <Form.Item name="minioBucketName" label="bucket-name" rules={[{ required: true }]}>

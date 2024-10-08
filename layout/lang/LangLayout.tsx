@@ -83,6 +83,12 @@ export default function LangLayout({children}: Fa.BaseChildProps) {
             colorPrimary: colorPrimary,
             colorBgContainer: themeDark ? '#05202F' : '#FFF',
           },
+          components: {
+            Segmented: {
+              // itemSelectedBg: themeDark ? '#05202F' : '#ffffff',
+              trackBg: themeDark ? '#000' : '#e1e1e1',
+            },
+          },
         }}
         // getPopupContainer={(trigger) => (trigger ? trigger.parentElement : document.body)}
       >
