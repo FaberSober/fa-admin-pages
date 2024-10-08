@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
-import { Button, Col, Form, Input, Row, Space } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
+import { FaFormColSpace } from "@features/fa-admin-pages/components";
 
 
 /**
@@ -45,35 +46,31 @@ export default function ConfigStorageMinio() {
   return (
     <div className="fa-p12">
       <Form form={form} onFinish={onFinish} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
-        <Form.Item name="minioAk" label="access-key" rules={[{ required: true }]}>
+        <Form.Item name="minioAk" label="access-key" rules={[{ required: true }]} extra="从Minio控制台Access Keys进行创建获取">
           <Input />
         </Form.Item>
-        <Form.Item name="minioSk" label="secret-key" rules={[{ required: true }]}>
+        <Form.Item name="minioSk" label="secret-key" rules={[{ required: true }]} extra="从Minio控制台Access Keys进行创建获取">
           <Input />
         </Form.Item>
-        <Form.Item name="minioEndPoint" label="end-point" rules={[{ required: false }]}>
+        <Form.Item name="minioEndPoint" label="end-point" rules={[{ required: true }]} extra="Minio接口地址，一般为：http://127.0.0.1:9000">
           <Input />
         </Form.Item>
-        <Form.Item name="minioBucketName" label="bucket-name" rules={[{ required: true }]}>
+        <Form.Item name="minioBucketName" label="bucket-name" rules={[{ required: true }]} extra="Minio Bucket桶名称，在Buckets中创建">
           <Input />
         </Form.Item>
-        <Form.Item name="minioDomain" label="domain" rules={[{ required: true }]}>
+        <Form.Item name="minioDomain" label="domain" rules={[{ required: true }]} extra="访问域名，注意“/”结尾，例如：http://minio.abc.com/abc/">
           <Input placeholder="访问域名，注意“/”结尾，例如：http://minio.abc.com/abc/" />
         </Form.Item>
-        <Form.Item name="minioBasePath" label="base-path" rules={[{ required: true }]}>
+        <Form.Item name="minioBasePath" label="base-path" rules={[{ required: true }]} extra="基础路径，注意“/”结尾，例如：prod/">
           <Input placeholder="基础路径" />
         </Form.Item>
 
-        <Row>
-          <Col offset={4}>
-            <Space>
-              <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
-                保存
-              </Button>
-              <Button onClick={handleReset}>重置</Button>
-            </Space>
-          </Col>
-        </Row>
+        <FaFormColSpace offset={4}>
+          <Button htmlType="submit" icon={<SaveOutlined/>} type="primary" loading={loading}>
+            保存
+          </Button>
+          <Button onClick={handleReset}>重置</Button>
+        </FaFormColSpace>
       </Form>
     </div>
   );

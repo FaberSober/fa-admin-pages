@@ -3,6 +3,7 @@ import {Tabs} from "antd";
 import ConfigStorageBase from "./cube/ConfigStorageBase";
 import ConfigStorageLocal from "./cube/ConfigStorageLocal";
 import ConfigStorageMinio from "./cube/ConfigStorageMinio";
+import ConfigStorageQiniu from "./cube/ConfigStorageQiniu";
 
 /**
  * @author xu.pengfei
@@ -17,7 +18,8 @@ export default function ConfigStorage() {
         items={[
           { label: '基础配置', key: 'base', children: <ConfigStorageBase /> },
           { label: '本地文件', key: 'local', children: <ConfigStorageLocal /> },
-          { label: 'Minio', key: 'Minio', children: <ConfigStorageMinio /> },
+          { label: 'Minio', key: 'minio', children: <ConfigStorageMinio /> },
+          { label: '七牛云', key: 'qiniu', children: <ConfigStorageQiniu /> },
         ]}
         tabPosition="left"
         destroyInactiveTabPane

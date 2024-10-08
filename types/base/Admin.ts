@@ -86,7 +86,13 @@ namespace Admin {
     minioBucketName: string;
     minioDomain: string;
     minioBasePath: string;
-    /** ------------------------- [存储][Minio] -------------------------  */
+    /** ------------------------- [存储][七牛云] -------------------------  */
+    qiniuAk: string;
+    qiniuSk: string;
+    qiniuBucketName: string;
+    qiniuDomain: string;
+    qiniuBasePath: string;
+    /** ------------------------- [存储]End -------------------------  */
     /** [安全]是否开启验证码 */
     safeCaptchaOn: boolean;
     /** [安全]密码类型 */

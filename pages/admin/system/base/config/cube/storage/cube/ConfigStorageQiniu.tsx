@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
-import { Button, Form, Select } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
@@ -9,10 +9,10 @@ import { FaFormColSpace } from "@features/fa-admin-pages/components";
 
 /**
  * @author xu.pengfei
- * @date 2022/12/29 15:40
+ * @date 2024/10/08 16:33
  */
-export default function ConfigStorageBase() {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext);
+export default function ConfigStorageQiniu() {
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
   const [configSys, setConfigSys] = useState<Admin.ConfigSys>();
 
@@ -30,7 +30,7 @@ export default function ConfigStorageBase() {
 
     const params = {
       id: configSys.id,
-      data: {...configSys.data, ...v},
+      data: { ...configSys.data, ...v },
     };
     configSysApi.update(configSys.id, params).then((res) => FaUtils.showResponse(res, '更新配置'));
   }
@@ -45,15 +45,21 @@ export default function ConfigStorageBase() {
   const loading = loadingEffect[configSysApi.getUrl('update')];
   return (
     <div className="fa-p12">
-      <Form form={form} onFinish={onFinish} layout="horizontal" style={{width: 700}} labelCol={{span: 4}}>
-        <Form.Item name="storeActive" label="使用存储平台" rules={[{required: true}]}>
-          <Select
-            options={[
-              { label: '本地存储', value: 'local-plus' },
-              { label: 'Minio', value: 'minio' },
-              { label: '七牛云', value: 'qiniu' },
-            ]}
-          />
+      <Form form={form} onFinish={onFinish} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
+        <Form.Item name="qiniuAk" label="access-key" rules={[{ required: true }]} extra="从qiniu控制台Access Keys进行创建获取">
+          <Input />
+        </Form.Item>
+        <Form.Item name="qiniuSk" label="secret-key" rules={[{ required: true }]} extra="从qiniu控制台Access Keys进行创建获取">
+          <Input />
+        </Form.Item>
+        <Form.Item name="qiniuBucketName" label="bucket-name" rules={[{ required: true }]} extra="qiniu Bucket桶名称，在Buckets中创建">
+          <Input />
+        </Form.Item>
+        <Form.Item name="qiniuDomain" label="domain" rules={[{ required: true }]} extra="访问域名，注意“/”结尾，例如：http://qiniu.abc.com/abc/">
+          <Input placeholder="访问域名，注意“/”结尾，例如：http://abc.hn-bkt.clouddn.com/" />
+        </Form.Item>
+        <Form.Item name="qiniuBasePath" label="base-path" rules={[{ required: true }]} extra="基础路径，注意“/”结尾，例如：prod/">
+          <Input placeholder="基础路径" />
         </Form.Item>
 
         <FaFormColSpace offset={4}>

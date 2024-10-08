@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
-import { Button, Col, Form, Input, Row, Space } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
+import { FaFormColSpace } from "@features/fa-admin-pages/components";
 
 
 /**
@@ -49,16 +50,12 @@ export default function ConfigStorageLocal() {
           <Input />
         </Form.Item>
 
-        <Row>
-          <Col offset={4}>
-            <Space>
-              <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
-                保存
-              </Button>
-              <Button onClick={handleReset}>重置</Button>
-            </Space>
-          </Col>
-        </Row>
+        <FaFormColSpace offset={4}>
+          <Button htmlType="submit" icon={<SaveOutlined/>} type="primary" loading={loading}>
+            保存
+          </Button>
+          <Button onClick={handleReset}>重置</Button>
+        </FaFormColSpace>
       </Form>
     </div>
   );
