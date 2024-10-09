@@ -30,7 +30,7 @@ export default function MenuAppHorizontal() {
     key: i.id,
     label: i.name,
     icon: i.sourceData.icon ? (
-      <div className="fa-flex-column-center" style={{width: 20, display: 'inline-block'}}>
+      <div className="fa-flex-column-center" style={{width: 20}}>
         <FaIcon icon={i.sourceData.icon}/>
       </div>
     ) : null,
@@ -44,7 +44,7 @@ export default function MenuAppHorizontal() {
       items={items}
       selectedKeys={menuSelAppId ? [menuSelAppId] : []}
       onSelect={({key}) => setMenuSelAppId(key)}
-      style={{flex: 1, border: 'none'}}
+      style={{flex: 1}}
     />
   );
 }
