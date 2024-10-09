@@ -81,11 +81,10 @@ export default function LangLayout({children}: Fa.BaseChildProps) {
           token: {
             borderRadius: 3,
             colorPrimary: colorPrimary,
-            colorBgContainer: themeDark ? '#05202F' : '#FFF',
+            colorBgContainer: themeDark ? 'var(--fa-bg-color)' : '#FFF',
           },
           components: {
             Segmented: {
-              // itemSelectedBg: themeDark ? '#05202F' : '#ffffff',
               trackBg: themeDark ? '#000' : '#e1e1e1',
             },
           },
