@@ -11,9 +11,14 @@
 }
 
 .fa-menu-open-tabs .ant-tabs-tab {
-  padding: 0px !important;
+  padding: 0 !important;
   border-radius: 0 !important;
   position: relative;
+  border: none !important;
+}
+
+.fa-menu-open-tabs .ant-tabs-nav::before {
+  border: none !important;
 }
 
 .fa-menu-open-tabs .ant-tabs-nav {

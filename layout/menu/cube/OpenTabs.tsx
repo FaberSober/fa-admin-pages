@@ -142,7 +142,7 @@ export default function OpenTabs() {
         className="fa-tab"
       />
 
-      <FaFullscreenBtn target={document.body} />
+      <FaFullscreenBtn target={document.body} style={{ width: 34, height: 34}} />
 
       <Menu id='menu_context_tab_item' className="contextMenu">
         <Item id="menu_close_current" onClick={handleItemClick}>关闭当前</Item>
