@@ -85,7 +85,7 @@ export default function UserDeviceList() {
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
           </Space>
         ),
-        width: 115,
+        width: 120,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',

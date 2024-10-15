@@ -27,7 +27,7 @@ export default function AlertList() {
     return [
       BaseTableUtils.genIdColumn('ID', 'id', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('告警内容', 'content', undefined, sorter),
-      BaseTableUtils.genSimpleSorterColumn('告警类型', 'type', 100, sorter),
+      BaseTableUtils.genSimpleSorterColumn('告警类型', 'type', 150, sorter),
       BaseTableUtils.genBoolSorterColumn('是否处理', 'deal', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('负责人', 'dutyStaff', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('处理人', 'dealStaff', 100, sorter),
@@ -44,7 +44,7 @@ export default function AlertList() {
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
           </Space>
         ),
-        width: 115,
+        width: 120,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',

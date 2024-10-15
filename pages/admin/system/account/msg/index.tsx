@@ -66,7 +66,7 @@ export default function MsgList() {
         render: (val, record) => (
           <div>
             <Badge status={record.isRead ? 'default' : 'success'}/>
-            <span style={{color: record.isRead ? '#999' : '#333', marginLeft: 4}}>{val}</span>
+            <span style={{color: record.isRead ? 'var(--fa-text-color-light100)' : 'var(--fa-text-color)', marginLeft: 4}}>{val}</span>
           </div>
         ),
       },
