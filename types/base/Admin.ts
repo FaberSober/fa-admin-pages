@@ -234,7 +234,7 @@ namespace Admin {
   }
 
   // -------------------------------------------- 系统-部门 --------------------------------------------
-  export interface Department extends Fa.BaseDelEntity {
+  export interface Department extends Fa.BaseTreeDelEntity {
     /** ID */
     id: string;
     /** 上级节点 */
