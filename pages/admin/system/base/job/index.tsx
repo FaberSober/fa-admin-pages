@@ -90,7 +90,7 @@ export default function JobList() {
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
-        width: 220,
+        width: 230,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
