@@ -140,6 +140,7 @@ export default function OpenTabs() {
         onEdit={(targetKey:any) => remove(targetKey)}
         items={items}
         className="fa-tab"
+        tabBarGutter={0}
       />
 
       <FaFullscreenBtn target={document.body} style={{ width: 34, height: 34}} />
