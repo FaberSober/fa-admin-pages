@@ -18,6 +18,14 @@
   border-right: 1px solid var(--fa-border-color) !important;
 }
 
+.fa-menu-open-tabs .ant-tabs-tab-active {
+  background: #FFF !important;
+}
+
+[data-theme=dark] .fa-menu-open-tabs .ant-tabs-tab-active {
+  background: var(--fa-bg-selected) !important;
+}
+
 .fa-menu-open-tabs .ant-tabs-nav::before {
   border: none !important;
 }
