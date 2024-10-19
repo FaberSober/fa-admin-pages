@@ -8,6 +8,8 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   apiDownloadTplExcel?: () => any;
   apiImportExcel: (params: {fileId: string}) => Promise<Fa.Ret<boolean>>;
   templates?: string|ReactNode; // 下载模板
+  formItems?: ReactNode;
+  extraParams?: Record<any, any>;
   tips?: string|ReactNode;
   showTemplateDownload?: boolean;
   accept?: string;
@@ -18,7 +20,7 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
  * @author xu.pengfei
  * @date 2023/6/27 14:21
  */
-export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, templates, tips, showTemplateDownload = true, accept, ...props }: CommonExcelUploadModalProps) {
+export default function CommonExcelUploadModal({ children, title, fetchFinish, apiDownloadTplExcel, apiImportExcel, templates, formItems, extraParams, tips, showTemplateDownload = true, accept, ...props }: CommonExcelUploadModalProps) {
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -27,7 +29,8 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
     const params = {
-      fileId: fieldsValue.fileId,
+      ...fieldsValue,
+      ...extraParams,
     };
 
     setLoading(true)
@@ -70,6 +73,8 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
               </Col>
             </Row>
           )}
+
+          {formItems}
 
           <Form.Item name="fileId" label="导入文件" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <UploadFileLocal accept={accept ? accept : FaUtils.FileAccept.EXCEL} />
