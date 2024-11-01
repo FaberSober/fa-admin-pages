@@ -35,7 +35,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   }, [tree, checkedKeys])
 
   function refreshData() {
-    rbacMenuApi.allTree().then((res) => {
+    rbacMenuApi.getTree({ query: { status: true } }).then((res) => {
       setTree(res.data);
 
       rbacRoleMenuApi.getRoleMenu(record.id).then((res) => {

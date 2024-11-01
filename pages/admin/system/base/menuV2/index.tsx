@@ -5,7 +5,7 @@ import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
 import styles from './index.module.scss';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import {Button, Space, Tag} from 'antd';
+import {Button, Space, Switch, Tag} from 'antd';
 import { useCounter } from "react-use";
 import { rbacMenuApi } from "@features/fa-admin-pages/services";
 
@@ -61,15 +61,31 @@ export default function MenuV2() {
           showTips={false}
           showTopBtn={false}
           // @ts-ignore
-          titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string>) => (
+          titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
             <div className={styles.item}>
               <div style={{ flex: 1 }}>{item.name}</div>
               <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
               <div style={{ width: 100 }}>{item.sourceData.id}</div>
-              <div style={{ width: 100 }}>
+              <div className="fa-plr6">
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && <Tag color="#2db7f5">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && <Tag color="#87d068">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+              </div>
+              <div className="fa-plr6">
+                <Switch
+                  checkedChildren="启用"
+                  unCheckedChildren="禁用"
+                  checked={item.sourceData.status}
+                  loading={item.updating || false}
+                  onChange={(checked) => {
+                    item.sourceData.status = checked;
+                    item.updating = true
+                    rbacMenuApi.update(item.sourceData.id, { ...item.sourceData, status: checked }).then(() => {
+                      // refreshData();
+                      item.updating = false
+                    });
+                  }}
+                />
               </div>
               <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
               <Space>
