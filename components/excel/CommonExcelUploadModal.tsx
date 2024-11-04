@@ -6,7 +6,7 @@ import {Col, Form, Row} from "antd";
 export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
   apiDownloadTplExcel?: () => any;
-  apiImportExcel: (params: {fileId: string}) => Promise<Fa.Ret<boolean>>;
+  apiImportExcel: (params: {fileId: string} & any) => Promise<Fa.Ret<boolean>>;
   templates?: string|ReactNode; // 下载模板
   formItems?: ReactNode;
   extraParams?: Record<any, any>;
@@ -64,7 +64,7 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
         width={700}
         {...props}
       >
-        <Form form={form} onFinish={onFinish}>
+        <Form form={form} onFinish={onFinish} {...FaUtils.formItemFullLayout}>
           {showTemplateDownload && (
             <Row className="fa-mb12">
               <Col offset={4} className="fa-flex-column">
@@ -76,7 +76,7 @@ export default function CommonExcelUploadModal({ children, title, fetchFinish, a
 
           {formItems}
 
-          <Form.Item name="fileId" label="导入文件" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+          <Form.Item name="fileId" label="导入文件" rules={[{ required: true }]}>
             <UploadFileLocal accept={accept ? accept : FaUtils.FileAccept.EXCEL} />
           </Form.Item>
 
