@@ -29,7 +29,7 @@ export function AdminSysNewsCube() {
             triggerDom={(
               <div className="fa-relative fa-link" style={{width: size?.width, height: size?.height}}>
                 <img style={{width: size?.width, height: size?.height}} src={fileSaveApi.genLocalGetFile(item.cover)}/>
-                <div className="fa-absolute fa-right fa-bottom fa-bg-dark fa-flex-row-center" style={{color: '#FFF', padding: '2px 4px'}}>
+                <div className="fa-absolute fa-right fa-bottom fa-bg-dark fa-flex-row-center fa-text" style={{padding: '2px 4px'}}>
                   <div>{item.title} / {item.pubTime}</div>
                 </div>
               </div>
