@@ -19,6 +19,8 @@ class FileSaveApi extends BaseApi<Admin.FileSave, string> {
   /** 文件字符获取 */
   getFileStr = (fileId: string): Promise<Fa.Ret<string>> => this.get(`getFileStr/${fileId}`);
 
+  openFile = (fileId: string) => window.open(this.genLocalGetFile(fileId), '_blank');
+
 }
 
 export default new FileSaveApi(GATE_APP.admin, serviceModule);
