@@ -1,9 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, FaberTable, FaHref, FaUtils, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
 import { Admin } from '@/types';
-import { logApiApi } from '@features/fa-admin-pages/services';
+import { logApiApi as api } from '@features/fa-admin-pages/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
 
 
@@ -14,14 +14,15 @@ export default function LogApiList() {
   const [form] = Form.useForm();
 
   const {queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, dicts, paginationProps} =
-    useTableQueryParams<Admin.LogApi>(logApiApi.page, {}, serviceName);
+    useTableQueryParams<Admin.LogApi>(api.page, {}, serviceName);
 
-  const [handleDelete] = useDelete<string>(logApiApi.remove, fetchPageList, serviceName);
-  const [exporting, fetchExportExcel] = useExport(logApiApi.exportExcel, queryParams);
+  const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
+  const [_, deleteByQuery] = useDeleteByQuery(api.removeByQuery, queryParams, fetchPageList);
+  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
 
   /** 生成表格字段List */
   function genColumns() {
-    const { sorter } = queryParams;
+    const {sorter} = queryParams;
     return [
       BaseTableUtils.genIdColumn('序号', 'id', 70, sorter),
       BaseTableUtils.genEnumSorterColumn('类型', 'crud', 100, sorter, dicts, false),
@@ -58,9 +59,9 @@ export default function LogApiList() {
         render: (_, record) => (
           <Space>
             <LogApiDrawer record={record}>
-              <FaHref icon={<EyeOutlined />} text="查看" />
+              <FaHref icon={<EyeOutlined/>} text="查看"/>
             </LogApiDrawer>
-            <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+            <AuthDelBtn handleDelete={() => handleDelete(record.id)}/>
           </Space>
         ),
         width: 120,
@@ -75,25 +76,25 @@ export default function LogApiList() {
     <div className="fa-full-content fa-flex-column fa-bg-white">
       <div className="fa-flex-row-center fa-p8">
         <div className="fa-h3">{serviceName}</div>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="crud" label="类型">
-              <DictEnumApiSelector enumName="LogCrudEnum" />
+              <DictEnumApiSelector enumName="LogCrudEnum"/>
             </Form.Item>
             <Form.Item name="biz" label="模块">
-              <Input placeholder="请输入模块" allowClear />
+              <Input placeholder="请输入模块" allowClear/>
             </Form.Item>
             <Form.Item name="opr" label="操作">
-              <Input placeholder="请输入操作" allowClear />
+              <Input placeholder="请输入操作" allowClear/>
             </Form.Item>
             <Form.Item name="url" label="URL">
-              <Input placeholder="请输入请求URL" allowClear />
+              <Input placeholder="请输入请求URL" allowClear/>
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined/>}>查询</Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined/>} onClick={fetchExportExcel}>导出</Button>
             </Space>
           </Form>
         </div>
@@ -108,9 +109,11 @@ export default function LogApiList() {
         rowKey={(item) => item.id}
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}
-        batchDelete={(ids) => logApiApi.removeBatchByIds(ids)}
+        batchDelete={(ids) => api.removeBatchByIds(ids)}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
+        showDeleteByQuery
+        onDeleteByQuery={deleteByQuery}
       />
     </div>
   );
