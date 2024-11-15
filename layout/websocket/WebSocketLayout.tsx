@@ -14,7 +14,7 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
   const messageHistory = useRef<any[]>([]);
 
   const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(
-    'ws://' + window.location.host + `/api/websocket/${getToken()}`,
+    'ws://' + window.location.host + `/api/websocket/base/${getToken()}`,
   );
 
   messageHistory.current = useMemo(
