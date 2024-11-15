@@ -3,6 +3,7 @@ import { Descriptions, Drawer, DrawerProps } from 'antd';
 import { Admin } from '@/types';
 // import ReactJson from 'react-json-view';
 import { FaUtils, FaClickCopyLink } from '@fa/ui';
+import { each } from "lodash";
 
 export interface GateLogDrawerProps extends DrawerProps {
   record: Admin.LogApi;
@@ -36,6 +37,9 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
           <Descriptions.Item label={<FaClickCopyLink copyText={record.url}>URL</FaClickCopyLink>}>{record.url}</Descriptions.Item>
           <Descriptions.Item label={<FaClickCopyLink copyText={decode(record.url)}>URL[decodeURI]</FaClickCopyLink>}>{decode(record.url)}</Descriptions.Item>
           <Descriptions.Item label="Method">{record.method}</Descriptions.Item>
+          <Descriptions.Item label="Headers">
+            <JsonView json={FaUtils.tryParseJson(record.headers, {})} />
+          </Descriptions.Item>
           <Descriptions.Item label="User-Agent">{record.agent}</Descriptions.Item>
           <Descriptions.Item label="操作系统">{record.os}</Descriptions.Item>
           <Descriptions.Item label="浏览器">{record.browser}</Descriptions.Item>
@@ -86,4 +90,23 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
       </Drawer>
     </span>
   );
+}
+
+function JsonView({json}: any) {
+  const arr:any[] = []
+  each(json, (v, k) => {
+    arr.push({ k, v })
+  })
+  return (
+    <table className="fa-table">
+      <tbody>
+      {arr.map(i => (
+        <tr>
+          <td style={{ width: 130 }}>{i.k}</td>
+          <td>{i.v}</td>
+        </tr>
+      ))}
+      </tbody>
+    </table>
+  )
 }

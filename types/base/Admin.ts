@@ -517,6 +517,8 @@ namespace Admin {
     city: string;
     /** 地址 */
     addr: string;
+    /** 请求头 */
+    headers: string;
     /** 请求内容 */
     request: string;
     /** 请求体大小 */
