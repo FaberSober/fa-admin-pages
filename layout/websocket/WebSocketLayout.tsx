@@ -48,7 +48,7 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
 
   const contextValue: WebSocketLayoutContextProps = {
     readyState,
-    sendMessage,
+    sendMessage: (msg: Record<any, any>) => sendMessage(JSON.stringify(msg)),
     latestMessage,
     messageHistory: messageHistory.current,
   };
