@@ -73,7 +73,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
           fieldNames={{ title: 'name', key: 'id' }}
           checkedKeys={checkedKeys}
           onCheck={(checked: any, e: any) => {
-            console.log('checked', checked, 'e', e)
+            // console.log('checked', checked, 'e', e)
             setCheckedMenuIds([ ...(checked||[]), ...(e.halfCheckedKeys || [])]);
           }}
         />
