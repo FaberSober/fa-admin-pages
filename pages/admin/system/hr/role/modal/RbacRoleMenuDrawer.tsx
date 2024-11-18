@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Drawer, DrawerProps, Tree } from 'antd';
-import { ApiEffectLayoutContext, calCheckedKey, Fa, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, Fa, FaUtils, treeUtils } from '@fa/ui';
 import { Rbac } from '@/types';
 import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
-import { difference } from "lodash";
 
 
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
@@ -17,50 +16,39 @@ export interface RbacRoleMenuDrawerProps extends DrawerProps {
 export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacRoleMenuDrawerProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [tree, setTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
-  const [halfCheckedKeys, setHalfCheckedKeys] = useState<React.Key[]>([]);
+  const [checkedMenuIds, setCheckedMenuIds] = useState<number[]>([]); // 选中的菜单ID
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]); // 根据选中的菜单ID，计算出的展示全选中的Tree节点ID（过滤掉半选中的节点ID）
 
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const cks = calCheckedKey(tree, checkedKeys)
-    if (cks === undefined) return;
+    const cks = treeUtils.calCheckedKey(tree, checkedMenuIds)
+    // const diffIds = difference(checkedKeys, cks)
+    // console.log('tree', tree, 'checkedMenuIds', checkedMenuIds, 'cks', cks, 'diffIds', diffIds)
+    setCheckedKeys(cks)
+  }, [tree, checkedMenuIds])
 
-    const diffIds = difference(checkedKeys, cks)
-    // console.log('cks', cks, diffIds, checkedKeys)
-    // 有差异
-    if (diffIds.length > 0) {
-      setCheckedKeys(cks)
-    }
-  }, [tree, checkedKeys])
+  async function refreshData() {
+    const res = await rbacMenuApi.getTree({ query: { status: true } });
+    setTree(res.data);
 
-  function refreshData() {
-    rbacMenuApi.getTree({ query: { status: true } }).then((res) => {
-      setTree(res.data);
-
-      rbacRoleMenuApi.getRoleMenu(record.id).then((res) => {
-        setCheckedKeys(res.data.checkedMenuIds);
-        setHalfCheckedKeys(res.data.halfCheckedMenuIds);
-      });
-    });
+    const res2 = await rbacRoleMenuApi.getRoleMenu(record.id);
+    setCheckedMenuIds(res2.data.checkedMenuIds);
   }
 
   function handleSave() {
-    rbacRoleMenuApi
-      .updateRoleMenu({
-        roleId: record.id,
-        checkedMenuIds: checkedKeys.map((i) => Number(i)),
-        halfCheckedMenuIds: halfCheckedKeys.map((i) => Number(i)),
-      })
-      .then((res) => {
-        FaUtils.showResponse(res, '更新角色权限');
-        setOpen(false);
-      });
+    rbacRoleMenuApi.updateRoleMenu({
+      roleId: record.id,
+      checkedMenuIds,
+    }).then((res) => {
+      FaUtils.showResponse(res, '更新角色权限');
+      setOpen(false);
+    });
   }
 
-  function showModal() {
+  async function showModal() {
     setOpen(true);
-    refreshData();
+    await refreshData();
   }
 
   const loading = loadingEffect[rbacRoleMenuApi.getUrl('updateRoleMenu')];
@@ -85,8 +73,8 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
           fieldNames={{ title: 'name', key: 'id' }}
           checkedKeys={checkedKeys}
           onCheck={(checked: any, e: any) => {
-            setCheckedKeys(checked);
-            setHalfCheckedKeys(e.halfCheckedKeys || []);
+            console.log('checked', checked, 'e', e)
+            setCheckedMenuIds([ ...(checked||[]), ...(e.halfCheckedKeys || [])]);
           }}
         />
       </Drawer>
