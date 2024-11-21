@@ -4,6 +4,7 @@ import {SITE_INFO} from "@/configs";
 import LangLayout from "../lang/LangLayout";
 import {Outlet} from "react-router-dom";
 import { ConfigLayout, UserLayout } from "@features/fa-admin-pages/layout";
+import { WebSocketLayout } from "@features/fa-admin-pages/layout/websocket";
 
 
 /**
@@ -18,9 +19,11 @@ export default function CommonUserContainer() {
         <ApiEffectLayout>
           <ConfigLayout>
             <UserLayout>
-              <Suspense fallback={<PageLoading />}>
-                <Outlet />
-              </Suspense>
+              <WebSocketLayout>
+                <Suspense fallback={<PageLoading />}>
+                  <Outlet />
+                </Suspense>
+              </WebSocketLayout>
             </UserLayout>
           </ConfigLayout>
         </ApiEffectLayout>
