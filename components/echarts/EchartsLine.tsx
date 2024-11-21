@@ -75,6 +75,7 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
       },
       legend: {
         data: dataY.map(i => i.name),
+        top: 30,
       },
       xAxis: {
         type: 'category',
