@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Progress, ProgressProps } from "antd";
 import { Fa } from "@/types";
 import { FaUtils } from "@fa/ui";
 import { WebSocketLayoutContext } from "@features/fa-admin-pages/layout/websocket";
-import { webSocketTaskTestApi } from "@features/fa-admin-demo-pages/services";
 import useBus from "use-bus";
 
 
@@ -26,7 +25,7 @@ export default function WebSocketTaskProgress({task, onTaskChange, ...props}: We
 
   useBus(
     ['@@ws/RECEIVE/WebSocketTaskDemo'],
-    ({ type, payload }) => {
+    ({ payload }) => {
       if (payload.taskId !== task?.taskId) return;
       if (onTaskChange) {
         onTaskChange(payload)

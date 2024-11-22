@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Fa, FaUtils, getToken } from "@fa/ui";
 import WebSocketLayoutContext, { WebSocketLayoutContextProps } from './context/WebSocketLayoutContext';
 import { useInterval, useWebSocket } from "ahooks";
@@ -17,12 +17,14 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
   const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(
     'ws://' + window.location.host + `/api/websocket/base/${getToken()}`,
   );
+  const [latestMessageObj, setLatestMessageObj] = useState<any>()
 
   messageHistory.current = useMemo(
     () => {
       // parse message
       try {
         const ret = FaUtils.tryParseJson(latestMessage?.data, {});
+        setLatestMessageObj(ret)
         const { type, code, msg, data } = ret;
         // send msg throw bus event
         dispatch({ type: `@@ws/RECEIVE/${type}`, payload: data, code, msg })
@@ -50,6 +52,7 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
     readyState,
     sendMessage: (msg: Record<any, any>) => sendMessage(JSON.stringify(msg)),
     latestMessage,
+    latestMessageObj,
     messageHistory: messageHistory.current,
   };
 
