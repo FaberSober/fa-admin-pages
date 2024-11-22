@@ -16,6 +16,7 @@ export interface EchartsLineProps {
   subTitle?: string,
   dataX: string[];
   dataY: serie[];
+  unit?: string;
   dataTitle?: string,
   style?: CSSProperties;
   lineSeriesOption?: LineSeriesOption;
@@ -26,7 +27,7 @@ export interface EchartsLineProps {
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsLine({title, subTitle, dataX, dataY, style, lineSeriesOption, restOption}: EchartsLineProps) {
+export default function EchartsLine({title, subTitle, dataX, dataY, unit, style, lineSeriesOption, restOption}: EchartsLineProps) {
   const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
@@ -89,6 +90,9 @@ export default function EchartsLine({title, subTitle, dataX, dataY, style, lineS
         smooth: true,
         emphasis: {
           focus: 'series'
+        },
+        tooltip: { //鼠标移入图上数值显示格式
+          valueFormatter: (value:any) => value + (unit ? ` ${unit}` : '')
         },
         ...lineSeriesOption
       })),

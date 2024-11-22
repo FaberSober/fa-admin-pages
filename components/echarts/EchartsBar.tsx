@@ -11,6 +11,8 @@ export interface EchartsBarProps {
   subTitle?: string,
   data: Fa.ChartArrayData[];
   dataTitle?: string,
+  unit?: string,
+  barWidth?: number,
   style?: CSSProperties;
   barSeriesOption?: BarSeriesOption;
   options?: EChartsOption;
@@ -20,7 +22,7 @@ export interface EchartsBarProps {
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsBar({title, subTitle, data, dataTitle, style, barSeriesOption, options}: EchartsBarProps) {
+export default function EchartsBar({title, subTitle, data, dataTitle, unit, barWidth = 30, style, barSeriesOption, options}: EchartsBarProps) {
   const {themeDark} = useContext(ThemeLayoutContext)
 
   const chartRef = useRef<ECharts>()
@@ -79,7 +81,10 @@ export default function EchartsBar({title, subTitle, data, dataTitle, style, bar
           type: 'bar',
           // data: [5, 20, 36, 10, 10, 20]
           data: data.map(i => i.value),
-          barWidth: 30,
+          barWidth,
+          tooltip: { //鼠标移入图上数值显示格式
+            valueFormatter: (value:any) => value + (unit ? ` ${unit}` : '')
+          },
           ...barSeriesOption,
         }
       ],
