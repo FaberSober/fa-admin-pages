@@ -11,7 +11,7 @@ import WebSocketLayout from "../websocket/WebSocketLayout";
 
 export default function MenuContainer() {
   return (
-    <ThemeLayout colorPrimary={SITE_INFO.PRIMARY_COLOR}>
+    <ThemeLayout colorPrimary={SITE_INFO.PRIMARY_COLOR} initThemeDark={SITE_INFO.THEME === 'dark'}>
       <LangLayout>
         <ApiEffectLayout>
           <ConfigLayout>
