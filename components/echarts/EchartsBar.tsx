@@ -88,6 +88,13 @@ export default function EchartsBar({title, subTitle, data, dataTitle, unit, barW
           ...barSeriesOption,
         }
       ],
+      dataZoom: [
+        {
+          type: 'inside',
+          start: 0,
+          end: 100,
+        },
+      ],
       ...options,
     });
     setReady(true)

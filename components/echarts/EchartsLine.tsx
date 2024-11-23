@@ -96,6 +96,13 @@ export default function EchartsLine({title, subTitle, dataX, dataY, unit, style,
         },
         ...lineSeriesOption
       })),
+      dataZoom: [
+        {
+          type: 'inside',
+          start: 0,
+          end: 100,
+        },
+      ],
       ...restOption
     });
     setReady(true)
