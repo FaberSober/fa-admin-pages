@@ -3,6 +3,7 @@ import { Image } from 'antd';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import VideoPlainModal from "../video/VideoPlainModal";
+import { FaFileViewModal } from "@features/fa-admin-pages/components";
 
 export interface FileInfo {
   id: string;
@@ -54,6 +55,8 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
   }
 
   return (
-    <a href={fileSaveApi.genLocalGetFile(file.id)} target="_blank">{file.originalFilename}</a>
+    <FaFileViewModal fileId={file.id}>
+      <a>{file.originalFilename}</a>
+    </FaFileViewModal>
   );
 }
