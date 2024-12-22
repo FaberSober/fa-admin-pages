@@ -14,8 +14,9 @@ import {dispatch} from 'use-bus'
 export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
   const messageHistory = useRef<any[]>([]);
 
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
   const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(
-    'ws://' + window.location.host + `/api/websocket/base/${getToken()}`,
+    wsProtocol + '://' + window.location.host + `/api/websocket/base/${getToken()}`,
   );
   const [latestMessageObj, setLatestMessageObj] = useState<any>()
 
