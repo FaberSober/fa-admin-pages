@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Drawer, DrawerProps, Tree } from 'antd';
 import { ApiEffectLayoutContext, Fa, FaUtils, treeUtils } from '@fa/ui';
-import { Rbac } from '@/types';
+import { FaEnums, Rbac } from '@/types';
 import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
+import { MobileOutlined } from '@ant-design/icons';
 
 
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
@@ -75,6 +76,14 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
           onCheck={(checked: any, e: any) => {
             // console.log('checked', checked, 'e', e)
             setCheckedMenuIds([ ...(checked||[]), ...(e.halfCheckedKeys || [])]);
+          }}
+          titleRender={node => {
+            return (
+              <div className="fa-flex-row fa-flex-row-center">
+                {node.level === 1 && node.sourceData.scope === FaEnums.RbacMenuScopeEnum.APP && <MobileOutlined />}
+                <div>{node.name}</div>
+              </div>
+            )
           }}
         />
       </Drawer>

@@ -7,6 +7,8 @@ namespace Rbac {
     id: string;
     /** 父级ID */
     parentId: string;
+    /** 模块：1-web/2-app */
+    scope: FaEnums.RbacMenuScopeEnum;
     /** 名称 */
     name: string;
     /** 排序 */
