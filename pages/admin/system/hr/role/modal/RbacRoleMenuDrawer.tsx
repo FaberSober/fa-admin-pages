@@ -30,7 +30,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   }, [tree, checkedMenuIds])
 
   async function refreshData() {
-    const res = await rbacMenuApi.getTree({ query: { status: true } });
+    const res = await rbacMenuApi.getTree({ query: { status: true }, sorter: 'scope ASC' });
     setTree(res.data);
 
     const res2 = await rbacRoleMenuApi.getRoleMenu(record.id);

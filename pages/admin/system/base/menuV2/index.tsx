@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
@@ -116,7 +116,7 @@ export default function MenuV2() {
                   }}
                 />
               </div>
-              <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
+              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>{item.sourceData.linkUrl}</div>
               <Space>
                 <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
                 <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
