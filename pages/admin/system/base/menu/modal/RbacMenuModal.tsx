@@ -12,17 +12,18 @@ const serviceName = '菜单';
 
 interface RbacMenuModalProps extends CommonModalProps<Rbac.RbacMenu> {
   scope: FaEnums.RbacMenuScopeEnum;
+  parentId?: string;
 }
 
 /**
  * BASE-权限表实体新增、编辑弹框
  */
-export default function RbacMenuModal({ children, title, record, scope, fetchFinish, ...props }: RbacMenuModalProps) {
+export default function RbacMenuModal({ children, title, record, scope, parentId, fetchFinish, ...props }: RbacMenuModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
-  const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
+  const [_level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
     return record ? record.level : undefined;
   });
   const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum|undefined>(() => {
@@ -62,7 +63,7 @@ export default function RbacMenuModal({ children, title, record, scope, fetchFin
 
   function getInitialValues() {
     return {
-      parentId: get(record, 'parentId'),
+      parentId: get(record, 'parentId', parentId),
       name: get(record, 'name'),
       level: get(record, 'level', FaEnums.RbacMenuLevelEnum.MENU),
       icon: get(record, 'icon'),

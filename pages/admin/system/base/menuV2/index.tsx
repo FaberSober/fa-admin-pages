@@ -3,7 +3,7 @@ import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLa
 import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
-import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
 import { Button, Segmented, Space, Switch, Tag } from 'antd';
 import { useCounter } from "react-use";
 import { rbacMenuApi } from "@features/fa-admin-pages/services";
@@ -118,6 +118,9 @@ export default function MenuV2() {
               </div>
               <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>{item.sourceData.linkUrl}</div>
               <Space>
+                <RbacMenuModal title="新增菜单" scope={scope} parentId={item.id} fetchFinish={refreshData}>
+                  <FaHref icon={<SisternodeOutlined />} text="新增子节点" />
+                </RbacMenuModal>
                 <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
                 <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
               </Space>
