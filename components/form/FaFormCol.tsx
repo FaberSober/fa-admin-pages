@@ -14,7 +14,7 @@ export interface FaFormColProps extends Fa.BaseChildProps {
 export default function FaFormCol({ offset = 4, children }: FaFormColProps) {
   return (
     <Row>
-      <Col offset={offset}>
+      <Col offset={offset} md={24 - 4}>
         {children}
       </Col>
     </Row>

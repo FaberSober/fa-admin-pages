@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, useDelete } from '@fa/ui';
+import React, { useContext, useEffect, useState } from 'react';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '../menu/modal/RbacMenuModal';
 import { Rbac } from '@/types';
-import styles from './index.module.scss';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import {Button, Space, Switch, Tag} from 'antd';
+import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
+import { Button, Segmented, Space, Switch, Tag } from 'antd';
 import { useCounter } from "react-use";
 import { rbacMenuApi } from "@features/fa-admin-pages/services";
+import './index.scss';
 
 
 /**
@@ -20,6 +20,11 @@ export default function MenuV2() {
   const [edit, setEdit] = useState<Fa.TreeNode<Rbac.RbacMenu, string>>();
   const [open, setOpen] = useState(false);
   const [current, { inc }] = useCounter(0);
+  const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
+
+  useEffect(() => {
+      refreshData()
+  }, [scope])
 
   function refreshData() {
     setOpen(false);
@@ -35,17 +40,38 @@ export default function MenuV2() {
 
   const loadingTree = loadingEffect[rbacMenuApi.getUrl('allTree')];
   return (
-    <div className={['fa-full-content', 'fa-flex-column', styles.menuDiv].join(' ')}>
-      <Space style={{ margin: 12 }}>
-        <Button onClick={refreshData} loading={loadingTree}>
-          刷新
-        </Button>
-        <RbacMenuModal title="新增菜单" fetchFinish={refreshData}>
-          <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
-            新增菜单
+    <div className="fa-full-content fa-flex-column fa-menu-div">
+      <div className="fa-p12 fa-flex-column">
+        <div>
+          <Segmented
+            value={scope}
+            onChange={(v: any) => setScope(v)}
+            options={[
+              {
+                label: '网页',
+                value: FaEnums.RbacMenuScopeEnum.WEB,
+                icon: <SettingOutlined />,
+              },
+              {
+                label: 'APP',
+                value: FaEnums.RbacMenuScopeEnum.APP,
+                icon: <SafetyCertificateOutlined />,
+              },
+            ]}
+          />
+        </div>
+
+        <Space style={{ marginTop: 12 }}>
+          <Button onClick={refreshData} loading={loadingTree}>
+            刷新
           </Button>
-        </RbacMenuModal>
-      </Space>
+          <RbacMenuModal title="新增菜单" scope={scope} fetchFinish={refreshData}>
+            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
+              新增菜单
+            </Button>
+          </RbacMenuModal>
+        </Space>
+      </div>
 
       <FaFlexRestLayout>
         <BaseTree
@@ -56,13 +82,16 @@ export default function MenuV2() {
           // 自定义配置
           serviceName="Tree"
           ServiceModal={RbacMenuModal}
-          serviceApi={rbacMenuApi}
+          serviceApi={{
+            ...rbacMenuApi,
+            allTree: () => rbacMenuApi.getTree(({ query: { scope } }))
+          }}
           bodyStyle={{ width: '100%', height: '100%' }}
           showTips={false}
           showTopBtn={false}
           // @ts-ignore
           titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
-            <div className={styles.item}>
+            <div className="fa-menu-item">
               <div style={{ flex: 1 }}>{item.name}</div>
               <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
               <div style={{ width: 100 }}>{item.sourceData.id}</div>
@@ -87,8 +116,11 @@ export default function MenuV2() {
                   }}
                 />
               </div>
-              <div style={{ width: 400 }}>{item.sourceData.linkUrl}</div>
+              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>{item.sourceData.linkUrl}</div>
               <Space>
+                <RbacMenuModal title="新增菜单" scope={scope} parentId={item.id} fetchFinish={refreshData}>
+                  <FaHref icon={<SisternodeOutlined />} text="新增子节点" />
+                </RbacMenuModal>
                 <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
                 <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
               </Space>
@@ -100,7 +132,7 @@ export default function MenuV2() {
         />
       </FaFlexRestLayout>
 
-      <RbacMenuModal title="编辑菜单" record={edit?.sourceData} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
+      <RbacMenuModal title="编辑菜单" record={edit?.sourceData} scope={scope} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
     </div>
   );
 }

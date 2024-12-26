@@ -10,15 +10,20 @@ import RouteCascader from '@features/fa-admin-pages/components/route/RouteCascad
 
 const serviceName = '菜单';
 
+interface RbacMenuModalProps extends CommonModalProps<Rbac.RbacMenu> {
+  scope: FaEnums.RbacMenuScopeEnum;
+  parentId?: string;
+}
+
 /**
  * BASE-权限表实体新增、编辑弹框
  */
-export default function RbacMenuModal({ children, title, record, fetchFinish, ...props }: CommonModalProps<Rbac.RbacMenu>) {
+export default function RbacMenuModal({ children, title, record, scope, parentId, fetchFinish, ...props }: RbacMenuModalProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
-  const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
+  const [_level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
     return record ? record.level : undefined;
   });
   const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum|undefined>(() => {
@@ -47,6 +52,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
   function onFinish(fieldsValue: any) {
     const values = {
       ...fieldsValue,
+      scope,
     };
     if (record) {
       invokeUpdateTask({ ...record, ...values });
@@ -57,7 +63,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
 
   function getInitialValues() {
     return {
-      parentId: get(record, 'parentId'),
+      parentId: get(record, 'parentId', parentId),
       name: get(record, 'name'),
       level: get(record, 'level', FaEnums.RbacMenuLevelEnum.MENU),
       icon: get(record, 'icon'),
@@ -114,6 +120,7 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
                 form.setFieldValue('linkUrl', raw ? raw.linkUrl : '');
               }}
               disabledIds={record ? [record.id] : undefined}
+              scope={scope}
             />
           </Form.Item>
           <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
@@ -126,11 +133,12 @@ export default function RbacMenuModal({ children, title, record, fetchFinish, ..
             <Select>
               <Select.Option value={FaEnums.RbacLinkTypeEnum.INNER}>内部链接</Select.Option>
               <Select.Option value={FaEnums.RbacLinkTypeEnum.OUT}>外部链接</Select.Option>
+              <Select.Option value={FaEnums.RbacLinkTypeEnum.PATH}>自定义路径</Select.Option>
             </Select>
           </Form.Item>
 
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {(linkType === FaEnums.RbacLinkTypeEnum.OUT || level === FaEnums.RbacMenuLevelEnum.BUTTON) ? <Input placeholder="请输入菜单的权限点" /> : <RouteCascader />}
+            {(linkType === FaEnums.RbacLinkTypeEnum.INNER) ? <RouteCascader /> : <Input placeholder="请输入菜单的链接地址\权限点" />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
