@@ -121,6 +121,14 @@ export default function ConfigSystem() {
           </Col>
         </Row>
 
+        <Row gutter={12}>
+          <Col md={8}>
+            <Form.Item name="wxminiapp" label="微信小程序" rules={[{ required: true }]}>
+              <UploadImgLocal />
+            </Form.Item>
+          </Col>
+        </Row>
+
         <Space>
           <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
             保存

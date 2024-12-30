@@ -5,7 +5,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Helmet} from 'react-helmet-async';
 import {useLocalStorage} from 'react-use';
 import {Fa, FaEnums, FaFlexRestLayout, FaUiContext, FaUiContextProps, findTreePath, flatTreeList} from "@fa/ui";
-import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar } from "./cube";
+import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from "./cube";
 import {Rbac} from '@/types';
 import {rbacUserRoleApi} from '@features/fa-admin-pages/services';
 import useRoutePermission from "../../hooks/useRoutePermission";
@@ -258,6 +258,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
             <Logo />
             <MenuAppHorizontal />
             {/*<LangToggle />*/}
+            <WxMiniApp />
             <HelpCube />
             <MsgBadgeCube />
             <UserAvatar />

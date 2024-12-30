@@ -69,6 +69,8 @@ namespace Admin {
     logo: string;
     /** [网站]logo带文字 */
     logoWithText: string;
+    /** [网站]微信小程序 */
+    wxminiapp: string;
     /** [官网]地址 */
     portalLink: string;
     /** [Web]redis web管理页面地址 */
@@ -130,6 +132,8 @@ namespace Admin {
     logo: string;
     /** [网站]logo带文字 */
     logoWithText: string;
+    /** [网站]微信小程序 */
+    wxminiapp: string;
     /** [官网]地址 */
     portalLink: string;
     /** [Web]redis web管理页面地址 */
