@@ -26,6 +26,10 @@
   flex-direction: row;
   align-items: center;
   background-color: var(--fa-bg-color);
+
+  .ant-menu-horizontal {
+    border-bottom: none;
+  }
 }
 
 
