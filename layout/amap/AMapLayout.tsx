@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Fa } from "@fa/ui";
+import type { Fa } from "@fa/ui";
 import { APILoader } from '@uiw/react-amap';
 import { ConfigLayoutContext } from "../config/context/ConfigLayoutContext";
 

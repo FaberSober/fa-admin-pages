@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { Tabs } from 'antd';
 import { findIndex } from "lodash";
-import { Item, ItemParams, Menu, useContextMenu } from 'react-contexify';
+import { Item, type ItemParams, Menu, useContextMenu } from 'react-contexify';
 import { FaFullscreenBtn } from "@fa/ui";
-import MenuLayoutContext, { OpenTabsItem } from "../context/MenuLayoutContext";
+import MenuLayoutContext, { type OpenTabsItem } from "../context/MenuLayoutContext";
 import './OpenTabs.scss'
 
 

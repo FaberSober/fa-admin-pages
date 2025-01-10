@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {cloneDeep, isNil, remove} from 'lodash';
 import {Cascader, message} from 'antd';
-import {BaseCascaderProps, Fa} from "@fa/ui";
-import {Admin} from '@/types';
-import { BaseOptionType } from "antd/es/cascader";
+import {type BaseCascaderProps, Fa} from "@fa/ui";
+import type {Admin} from '@/types';
+import type { BaseOptionType } from "antd/es/cascader";
 import { areaApi } from '@features/fa-admin-pages/services';
 
 

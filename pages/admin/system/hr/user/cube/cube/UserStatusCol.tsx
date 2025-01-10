@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { userApi as api } from "@features/fa-admin-pages/services";
 import { Switch } from "antd";
 

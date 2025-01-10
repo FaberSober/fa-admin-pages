@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, DatePicker, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ApiEffectLayoutContext, BaseTinyMCE, CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseTinyMCE, type CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal } from '@fa/ui';
 import { sysNewsApi as api } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 
 
 /**

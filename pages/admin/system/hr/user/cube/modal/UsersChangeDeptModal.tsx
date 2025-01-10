@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Button, Form } from 'antd';
-import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, DragModal, type DragModalProps, FaUtils } from '@fa/ui';
 import { userApi } from '@features/fa-admin-pages/services';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 

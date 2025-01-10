@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import { Progress, ProgressProps } from "antd";
-import { Fa } from "@/types";
+import { Progress, type ProgressProps } from "antd";
+import type { Fa } from "@/types";
 import { FaUtils } from "@fa/ui";
 import { WebSocketLayoutContext } from "@features/fa-admin-pages/layout/websocket";
 import useBus from "use-bus";

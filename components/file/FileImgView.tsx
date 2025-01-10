@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { type CSSProperties } from 'react';
 import { Image } from 'antd';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 

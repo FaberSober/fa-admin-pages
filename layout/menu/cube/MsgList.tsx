@@ -1,6 +1,6 @@
-import React, { CSSProperties, useContext, useEffect, useState } from 'react';
+import React, { type CSSProperties, useContext, useEffect, useState } from 'react';
 import { fileSaveApi, msgApi } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import { Avatar, List } from 'antd';
 import { get } from 'lodash';
 import { ApiEffectLayoutContext } from "@fa/ui";

@@ -1,8 +1,8 @@
 import React, {useContext, useEffect} from 'react';
 import {CheckOutlined, SearchOutlined} from '@ant-design/icons';
 import { Badge, Button, Form, Input, Modal, Space } from 'antd';
-import {ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, FaberTable, FaHref, FaUtils, useTableQueryParams} from '@fa/ui';
-import {Admin} from '@/types';
+import {ApiEffectLayoutContext, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, type FaberTable, FaHref, FaUtils, useTableQueryParams} from '@fa/ui';
+import type {Admin} from '@/types';
 import {msgApi} from '@features/fa-admin-pages/services';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 

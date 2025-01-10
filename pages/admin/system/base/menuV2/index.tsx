@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import RbacMenuModal from '../menu/modal/RbacMenuModal';
-import { Rbac } from '@/types';
+import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
 import { Button, Segmented, Space, Switch, Tag } from 'antd';
 import { useCounter } from "react-use";

@@ -1,4 +1,4 @@
-import { ConditionQuery, Fa, FaEnums } from '@fa/ui';
+import type { ConditionQuery, Fa, FaEnums } from '@fa/ui';
 
 namespace Admin {
   // -------------------------------------------- 系统-配置表 --------------------------------------------

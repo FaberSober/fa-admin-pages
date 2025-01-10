@@ -1,4 +1,4 @@
-import { Fa } from "@fa/ui";
+import type { Fa } from "@fa/ui";
 
 export default {
   /** -------------------------------- 网关配置 -------------------------------- */

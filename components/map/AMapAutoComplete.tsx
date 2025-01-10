@@ -1,6 +1,6 @@
-import React, {CSSProperties, useEffect, useRef, useState} from 'react';
+import React, {type CSSProperties, useEffect, useRef, useState} from 'react';
 import {AutoComplete} from "@uiw/react-amap";
-import {Fa} from "@fa/ui";
+import type {Fa} from "@fa/ui";
 import {message} from "antd";
 
 
@@ -29,7 +29,7 @@ export default function AMapAutoComplete({onSelect, style}: AMapAutoCompleteProp
             input={input}
             onSelect={(opts: any) => {
               console.log('opts', opts)
-              if (opts.poi.location == undefined || opts.poi.location.lng === undefined || opts.poi.location.lat === undefined) {
+              if (opts.poi.location === undefined || opts.poi.location.lng === undefined || opts.poi.location.lat === undefined) {
                 message.error("该位置没有坐标信息，请选择其他位置")
                 return
               }

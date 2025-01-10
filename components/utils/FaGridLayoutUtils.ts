@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { Layout } from "react-grid-layout";
+import type { Layout } from "react-grid-layout";
 import { each } from "lodash";
 import { ApiEffectLayoutContext, FaUtils } from "@fa/ui";
 import { configApi } from "@features/fa-admin-pages/services";
-import { Admin } from "@/types";
+import type { Admin } from "@/types";
 import { Modal } from "antd";
 import MenuLayoutContext from "@features/fa-admin-pages/layout/menu/context/MenuLayoutContext";
 
@@ -51,7 +51,8 @@ export function useAllLayout(cubes: any): { allLayout: Layout[] } {
 export function calAddLayout(cubes: any, layout: Layout[], addId: string) {
   const Component = (cubes as any)[addId];
 
-  let x = 0, y = 0;
+  let x = 0;
+  let y = 0;
 
   // 循环layout找到摆放位置
   each(layout, l => {

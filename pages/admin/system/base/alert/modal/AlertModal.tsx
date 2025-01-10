@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictDataSelector, DragModal, FaHref, FaUtils } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, type CommonModalProps, DictDataSelector, DragModal, FaHref, FaUtils } from '@fa/ui';
 import { alertApi as api } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 
 
 /**

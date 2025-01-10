@@ -1,4 +1,4 @@
-import {BaseZeroApi, Fa} from "@fa/ui";
+import {BaseZeroApi, type Fa} from "@fa/ui";
 import {GATE_APP} from "@/configs";
 
 

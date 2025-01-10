@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, DragModal, DragModalProps, FaUtils } from '@fa/ui';
-import { Admin } from '@/types';
+import { ApiEffectLayoutContext, DragModal, type DragModalProps, FaUtils } from '@fa/ui';
+import type { Admin } from '@/types';
 import { dictApi } from '@features/fa-admin-pages/services';
 import DictCascade from '../helper/DictCascade';
 

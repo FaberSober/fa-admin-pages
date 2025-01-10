@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
-import { Admin, ApiEffectLayoutContext, BaseBoolRadio, BaseTinyMCE, CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
+import { type Admin, ApiEffectLayoutContext, BaseBoolRadio, BaseTinyMCE, type CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
 import { noticeApi } from '@features/fa-admin-pages/services';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 

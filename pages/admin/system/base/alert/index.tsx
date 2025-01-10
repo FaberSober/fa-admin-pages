@@ -1,9 +1,9 @@
 import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { alertApi as api } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import AlertModal from './modal/AlertModal';
 
 const serviceName = '告警信息';

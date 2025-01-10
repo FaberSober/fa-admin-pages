@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Rbac } from '@/types';
+import type { Rbac } from '@/types';
 import { Button, Modal, Space, Table } from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { ColumnsType } from 'antd/es/table';
-import { ApiEffectLayoutContext, AuthDelBtn, Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
+import type { ColumnsType } from 'antd/es/table';
+import { ApiEffectLayoutContext, AuthDelBtn, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import RbacMenuModal from './modal/RbacMenuModal';

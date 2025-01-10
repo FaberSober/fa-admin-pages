@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useSocketIO} from "@features/fa-admin-pages/hooks";
-import {Progress, ProgressProps} from "antd";
-import {Fa} from "@/types";
+import {Progress, type ProgressProps} from "antd";
+import type {Fa} from "@/types";
 import {FaUtils} from "@fa/ui";
 
 

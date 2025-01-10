@@ -1,8 +1,8 @@
 import React from 'react';
 import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
 import {Button, Form, Input, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams} from '@fa/ui';
-import {Admin} from '@/types';
+import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, useDelete, useExport, useTableQueryParams} from '@fa/ui';
+import type {Admin} from '@/types';
 import {logLoginApi} from '@features/fa-admin-pages/services';
 
 const serviceName = '登录日志';

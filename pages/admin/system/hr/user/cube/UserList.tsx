@@ -8,13 +8,13 @@ import {
   BaseTableUtils,
   clearForm,
   DictEnumApiSelector,
-  FaberTable,
+  type FaberTable,
   useDelete,
   useExport,
   useTableQueryParams,
   useViewItem
 } from '@fa/ui';
-import {Admin, FaEnums} from '@/types';
+import {type Admin, FaEnums} from '@/types';
 import {userApi} from '@features/fa-admin-pages/services';
 import UserModal from '../modal/UserModal';
 import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";

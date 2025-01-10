@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react';
 import {find, get} from 'lodash';
 import {Button, Form, Input, Select} from 'antd';
-import {ApiEffectLayoutContext, CommonModalProps, CronModal, DragModal, FaHref, FaUtils} from '@fa/ui';
-import {Admin} from '@/types';
+import {ApiEffectLayoutContext, type CommonModalProps, CronModal, DragModal, FaHref, FaUtils} from '@fa/ui';
+import type {Admin} from '@/types';
 import {jobApi} from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 

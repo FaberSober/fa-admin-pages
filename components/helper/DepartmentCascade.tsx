@@ -1,6 +1,6 @@
 import React from 'react';
-import { BaseCascader, BaseCascaderProps } from '@fa/ui';
-import { Admin } from '@/types';
+import { BaseCascader, type BaseCascaderProps } from '@fa/ui';
+import type { Admin } from '@/types';
 import { departmentApi } from '@features/fa-admin-pages/services';
 
 export interface DepartmentCascadeProps extends Omit<BaseCascaderProps<Admin.Department, string>, 'serviceApi'> {}

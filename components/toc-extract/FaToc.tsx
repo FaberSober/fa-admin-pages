@@ -1,4 +1,4 @@
-import React, {CSSProperties, HTMLAttributes, useEffect, useState} from 'react';
+import React, {type CSSProperties, type HTMLAttributes, useEffect, useState} from 'react';
 import {useScroll} from "ahooks";
 import './FaToc.scss'
 import { isNil } from "lodash";

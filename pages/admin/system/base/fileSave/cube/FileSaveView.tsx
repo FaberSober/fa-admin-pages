@@ -1,5 +1,5 @@
 import React from 'react';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import { Descriptions, Divider } from "antd";
 import { FaUtils } from "@fa/ui";
 import { fileSaveApi } from "@features/fa-admin-pages/services";
@@ -21,7 +21,7 @@ export default function FileSaveView({ item }: FileSaveViewProps) {
   return (
     <Descriptions column={1} bordered>
       <Descriptions.Item label="URL">
-          <a href={fileSaveApi.genLocalGetFile(item.id)} target="_blank">打开链接</a>
+          <a href={fileSaveApi.genLocalGetFile(item.id)} target="_blank" rel="noreferrer">打开链接</a>
           <Divider type="vertical" />
           <a onClick={handleCopy}>复制链接</a>
       </Descriptions.Item>

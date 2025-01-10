@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import {Button, Form, Input} from 'antd';
-import {ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils} from '@fa/ui';
-import { Rbac } from '@/types';
+import {ApiEffectLayoutContext, BaseBoolRadio, type CommonModalProps, DragModal, FaHref, FaUtils} from '@fa/ui';
+import type { Rbac } from '@/types';
 import { rbacRoleApi } from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 

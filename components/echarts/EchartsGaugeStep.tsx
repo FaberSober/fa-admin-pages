@@ -1,7 +1,7 @@
-import React, {CSSProperties, ReactNode, useContext, useEffect, useRef, useState} from 'react';
+import React, {type CSSProperties, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid'
 import * as echarts from 'echarts';
-import {ECharts} from 'echarts';
+import type {ECharts} from 'echarts';
 import {useSize} from "ahooks";
 import {ThemeLayoutContext} from "@fa/ui";
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Avatar, AvatarProps } from 'antd';
+import { Avatar, type AvatarProps } from 'antd';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import UserLayoutContext from '../../user/context/UserLayoutContext'
 

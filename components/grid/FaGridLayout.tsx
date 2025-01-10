@@ -1,5 +1,5 @@
-import React, { CSSProperties, ReactNode } from 'react';
-import RGL, { Layout, ReactGridLayoutProps, WidthProvider } from "react-grid-layout";
+import React, { type CSSProperties, type ReactNode } from 'react';
+import RGL, { type Layout, type ReactGridLayoutProps, WidthProvider } from "react-grid-layout";
 import 'react-grid-layout/css/styles.css'
 
 

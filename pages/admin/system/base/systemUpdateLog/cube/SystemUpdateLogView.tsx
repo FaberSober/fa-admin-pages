@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Admin } from "@/types";
+import type { Admin } from "@/types";
 import { Descriptions } from "antd";
 // import MonacoEditor from 'react-monaco-editor';
 import { useSize } from "ahooks";

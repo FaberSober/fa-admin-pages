@@ -3,7 +3,7 @@ import {ApiEffectLayoutContext, FaUtils, InputColor, UploadImgLocal} from '@fa/u
 import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 import {SaveOutlined} from '@ant-design/icons';
 import {configSysApi} from '@features/fa-admin-pages/services';
-import {Admin} from '@/types';
+import type {Admin} from '@/types';
 
 
 /**

@@ -25,7 +25,7 @@ export default function OnlyofficeEditor({fileId, mode}: OnlyofficeEditorProps) 
     })
   }, [fileId])
 
-  const onDocumentReady = function (event:any) {
+  const onDocumentReady = (event:any) => {
     console.log("Document is loaded", event);
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Fa, FaUtils, getToken } from "@fa/ui";
-import WebSocketLayoutContext, { WebSocketLayoutContextProps } from './context/WebSocketLayoutContext';
+import { type Fa, FaUtils, getToken } from "@fa/ui";
+import WebSocketLayoutContext, { type WebSocketLayoutContextProps } from './context/WebSocketLayoutContext';
 import { useInterval, useWebSocket } from "ahooks";
 import { ReadyState } from "ahooks/lib/useWebSocket";
 import {dispatch} from 'use-bus'

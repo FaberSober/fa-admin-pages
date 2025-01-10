@@ -1,6 +1,6 @@
 import {GATE_APP} from '@/configs';
 import {BaseTreeApi} from '@fa/ui';
-import {Admin} from '@/types';
+import type {Admin} from '@/types';
 
 /** ------------------------------------------ xx 操作接口 ------------------------------------------ */
 const serviceModule = 'department';

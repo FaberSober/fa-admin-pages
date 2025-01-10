@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaFlexRestLayout, FaSortList, FaUtils } from "@fa/ui";
-import { Admin } from "@/types";
+import type { Admin } from "@/types";
 import { dictApi } from "@features/fa-admin-pages/services";
 import DictForm from "./DictForm";
 

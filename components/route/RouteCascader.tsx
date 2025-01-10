@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Cascader } from "antd";
 import { trim } from "lodash";
-import { CascaderProps } from "antd/es/cascader";
+import type { CascaderProps } from "antd/es/cascader";
 import useRoutesTree from '@features/fa-admin-pages/hooks/useRoutesTree';
 
 export interface RouteCascaderProps extends Omit<CascaderProps<any>, 'value' | 'onChange'> {

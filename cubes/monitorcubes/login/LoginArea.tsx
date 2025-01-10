@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Fa} from "@/types";
+import type {Fa} from "@/types";
 import {logLoginApi} from "@features/fa-admin-pages/services";
 import EchartsPie from '@features/fa-admin-pages/components/echarts/EchartsPie';
 
 
-export interface LoginAreaProps {
-}
+export type LoginAreaProps = {}
 
 export function LoginArea() {
   const [array, setArray] = useState<Fa.ChartSeriesVo[]>([])

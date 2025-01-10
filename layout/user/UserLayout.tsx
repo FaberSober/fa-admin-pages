@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Modal} from "antd";
-import {Admin, Rbac} from '@/types';
-import {clearToken, Fa, PageLoading} from "@fa/ui";
+import type {Admin, Rbac} from '@/types';
+import {clearToken, type Fa, PageLoading} from "@fa/ui";
 import {authApi, msgApi, rbacUserRoleApi, userApi} from '@features/fa-admin-pages/services';
-import UserLayoutContext, {UserLayoutContextProps} from './context/UserLayoutContext'
+import UserLayoutContext, {type UserLayoutContextProps} from './context/UserLayoutContext'
 
 
 /**

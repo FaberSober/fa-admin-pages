@@ -1,9 +1,9 @@
 import React from 'react';
 import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Image, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, FaHref, useDelete, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useDelete, useTableQueryParams } from '@fa/ui';
 import { fileSaveApi, sysNewsApi as api } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import SysNewsModal from './modal/SysNewsModal';
 import SysNewsView from "./cube/SysNewsView";
 

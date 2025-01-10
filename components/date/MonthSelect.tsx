@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectProps } from "antd";
+import { Select, type SelectProps } from "antd";
 
 
 /**

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { noticeApi } from "@features/fa-admin-pages/services";
 import { BaseDrawer } from "@fa/ui";
 import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";

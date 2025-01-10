@@ -1,5 +1,6 @@
-import React, { createContext, ReactNode } from 'react';
-import { Fa, Rbac } from '@/types';
+import type React from 'react';
+import { createContext, type ReactNode } from 'react'
+import type { Fa, Rbac } from '@/types';
 
 export interface OpenTabsItem {
   key: string; // 唯一key

@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Button, Card, Col, Descriptions, Row, Space} from 'antd';
-import {Admin} from '@/types';
+import type {Admin} from '@/types';
 import {ApiEffectLayoutContext, FaUtils} from '@fa/ui';
 import {ReloadOutlined} from '@ant-design/icons';
 import {systemApi} from '@features/fa-admin-pages/services';

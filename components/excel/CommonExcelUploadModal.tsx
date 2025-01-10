@@ -1,5 +1,5 @@
-import React, { ReactNode, useState } from 'react';
-import {DragModal, DragModalProps, FaUtils, Fa, UploadFileLocal} from '@fa/ui';
+import React, { type ReactNode, useState } from 'react';
+import {DragModal, type DragModalProps, FaUtils, type Fa, UploadFileLocal} from '@fa/ui';
 import {Col, Form, Row} from "antd";
 
 

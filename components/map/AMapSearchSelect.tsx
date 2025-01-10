@@ -1,6 +1,6 @@
-import React, {CSSProperties, useEffect, useState} from 'react';
+import React, {type CSSProperties, useEffect, useState} from 'react';
 import {Map, Marker, MapTypeControl} from "@uiw/react-amap";
-import {Fa} from "@/types";
+import type {Fa} from "@/types";
 import useAMapGeocoder from "./useAMapGeocoder";
 import AMapAutoComplete from "./AMapAutoComplete";
 

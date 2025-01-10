@@ -1,5 +1,5 @@
 import React from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import FileSaveIcon from "./FileSaveIcon";
 import { FaUtils } from "@fa/ui";
 

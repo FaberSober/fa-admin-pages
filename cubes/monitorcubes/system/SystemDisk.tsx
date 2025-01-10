@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useInterval} from "ahooks";
-import {Admin} from "@/types";
+import type {Admin} from "@/types";
 import {systemApi} from "@features/fa-admin-pages/services";
 import {FaUtils} from "@fa/ui";
 
 
-export interface SystemDiskProps {
-}
+export type SystemDiskProps = {}
 
 export function SystemDisk() {
   const [data, setData] = useState<Admin.ServerInfo>();

@@ -3,7 +3,7 @@ import {fileSaveApi, fileBizApi} from '@features/fa-admin-pages/services';
 import {ApiEffectLayoutContext, AuthDelBtn, useDelete, UploadFileModal, FaUtils} from "@fa/ui";
 import {Button, Space, Table} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
-import {Admin} from "@features/fa-admin-pages/types";
+import type {Admin} from "@features/fa-admin-pages/types";
 
 
 export interface FileBizListProps {
@@ -63,7 +63,7 @@ export default function FileBizList({mainBizId, bizId, type}: FileBizListProps) 
           {
             dataIndex: 'fileName',
             title: '附件名称',
-            render: (_, r) => <a href={fileSaveApi.genLocalGetFile(r.fileId)} target="_blank">{r.fileName}</a>
+            render: (_, r) => <a href={fileSaveApi.genLocalGetFile(r.fileId)} target="_blank" rel="noreferrer">{r.fileName}</a>
           },
           {dataIndex: 'crtTime', title: '创建时间'},
           {dataIndex: 'crtName', title: '创建用户'},

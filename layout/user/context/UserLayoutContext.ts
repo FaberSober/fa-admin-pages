@@ -1,4 +1,4 @@
-import { Admin, Rbac } from "@features/fa-admin-pages/types";
+import type { Admin, Rbac } from "@features/fa-admin-pages/types";
 import { createContext } from "react";
 
 export interface UserLayoutContextProps {

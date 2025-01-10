@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { Menu } from 'antd';
 import { isNil } from 'lodash';
-import { Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
+import { type Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
-import { Rbac } from '@/types';
+import type { Rbac } from '@/types';
 import MenuLayoutContext from "../context/MenuLayoutContext";
 
 

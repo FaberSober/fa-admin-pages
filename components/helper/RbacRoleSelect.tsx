@@ -1,6 +1,6 @@
 import React from 'react';
-import { BaseSelect, BaseSelectProps } from '@fa/ui';
-import { Rbac } from '@/types';
+import { BaseSelect, type BaseSelectProps } from '@fa/ui';
+import type { Rbac } from '@/types';
 import { rbacRoleApi as api } from '@features/fa-admin-pages/services';
 
 /**

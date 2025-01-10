@@ -1,9 +1,9 @@
 import React, {useContext, useState} from 'react';
 import {get} from 'lodash';
 import {Button, Form, Input, Switch} from 'antd';
-import {ApiEffectLayoutContext, CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector} from '@fa/ui';
+import {ApiEffectLayoutContext, type CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector} from '@fa/ui';
 import useBus from 'use-bus';
-import {Admin} from '@/types';
+import type {Admin} from '@/types';
 import {rbacUserRoleApi, userApi} from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';

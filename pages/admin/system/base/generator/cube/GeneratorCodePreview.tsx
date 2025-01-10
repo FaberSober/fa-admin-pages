@@ -2,11 +2,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FaFlexRestLayout, FaHref, FaUtils} from "@fa/ui";
 // import MonacoEditor from "react-monaco-editor";
 import {useSize, useUpdate} from "ahooks";
-import { Generator } from "@features/fa-admin-pages/types";
+import type { Generator } from "@features/fa-admin-pages/types";
 import {Button, Form, Input, Modal, Space, Tree} from "antd";
 import {CopyOutlined} from "@ant-design/icons";
 import {useLocalStorage} from "react-use";
-import {DataNode, DirectoryTreeProps} from "antd/es/tree";
+import type {DataNode, DirectoryTreeProps} from "antd/es/tree";
 import {camelCase, get, isNil, trim} from "lodash";
 import {generatorApi} from "@features/fa-admin-pages/services";
 import CodeCopyToModal from '../modal/CodeCopyToModal'

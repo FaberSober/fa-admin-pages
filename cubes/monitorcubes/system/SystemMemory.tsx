@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {useInterval} from "ahooks";
 import {FaUtils} from "@fa/ui";
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { systemApi } from "@features/fa-admin-pages/services";
 import EchartsGaugeStep from "@features/fa-admin-pages/components/echarts/EchartsGaugeStep";
 
 
-export interface SystemMemoryProps {
-}
+export type SystemMemoryProps = {}
 
 export function SystemMemory() {
   const [data, setData] = useState<Admin.ServerInfo>();

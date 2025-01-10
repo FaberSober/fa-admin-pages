@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fa } from "@fa/ui";
+import type { Fa } from "@fa/ui";
 import { Col, Row, Space } from "antd";
 
 

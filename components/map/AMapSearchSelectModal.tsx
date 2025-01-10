@@ -1,5 +1,5 @@
-import React, {CSSProperties, useEffect, useState} from 'react';
-import {DragModal, DragModalProps, Fa} from "@fa/ui";
+import React, {type CSSProperties, useEffect, useState} from 'react';
+import {DragModal, type DragModalProps, type Fa} from "@fa/ui";
 import AMapSearchSelect from "./AMapSearchSelect";
 
 

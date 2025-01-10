@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
-import { Rbac } from '@/types';
+import { ApiEffectLayoutContext, BaseBoolRadio, type CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
+import type { Rbac } from '@/types';
 import { rbacMenuApi } from "@features/fa-admin-pages/services";
 import RbacMenuCascader from '../helper/RbacMenuCascader';
 import IconSelect from '@features/fa-admin-pages/components/icons/IconSelect';

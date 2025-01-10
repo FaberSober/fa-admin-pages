@@ -1,5 +1,5 @@
 import React from 'react';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import { Descriptions } from "antd";
 import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";
 

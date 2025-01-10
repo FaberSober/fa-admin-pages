@@ -1,8 +1,8 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, FaberTable, FaHref, FaUtils, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
-import { Admin } from '@/types';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, DictEnumApiSelector, type FaberTable, FaHref, FaUtils, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
+import type { Admin } from '@/types';
 import { logApiApi as api } from '@features/fa-admin-pages/services';
 import LogApiDrawer from './drawer/LogApiDrawer';
 

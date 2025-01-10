@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
 import { Button, Form, Input } from 'antd';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
 import { FaFormColSpace } from "@features/fa-admin-pages/components";

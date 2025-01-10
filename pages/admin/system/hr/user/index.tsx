@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BaseTree } from '@fa/ui';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import DepartmentModal from './modal/DepartmentModal';
 import UserList from './cube/UserList';

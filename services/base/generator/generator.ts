@@ -1,6 +1,6 @@
-import {BaseZeroApi, Fa} from "@fa/ui";
+import {BaseZeroApi, type Fa} from "@fa/ui";
 import {GATE_APP} from "@/configs";
-import {Generator} from "@/types";
+import type {Generator} from "@/types";
 
 
 class Api extends BaseZeroApi {

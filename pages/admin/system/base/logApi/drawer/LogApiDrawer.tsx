@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Descriptions, Drawer, DrawerProps } from 'antd';
-import { Admin } from '@/types';
+import { Descriptions, Drawer, type DrawerProps } from 'antd';
+import type { Admin } from '@/types';
 // import ReactJson from 'react-json-view';
 import { FaUtils, FaClickCopyLink } from '@fa/ui';
 import { each } from "lodash";
@@ -101,7 +101,7 @@ function JsonView({json}: any) {
     <table className="fa-table">
       <tbody>
       {arr.map(i => (
-        <tr>
+        <tr key={i.k}>
           <td style={{ width: 130 }}>{i.k}</td>
           <td>{i.v}</td>
         </tr>

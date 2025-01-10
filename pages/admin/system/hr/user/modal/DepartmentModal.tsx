@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
-import { ApiEffectLayoutContext, CommonModalProps, DragModal, FaUtils, UserSearchSelect } from '@fa/ui';
-import { Admin } from '@/types';
+import { ApiEffectLayoutContext, type CommonModalProps, DragModal, FaUtils, UserSearchSelect } from '@fa/ui';
+import type { Admin } from '@/types';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 

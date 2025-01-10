@@ -5,8 +5,7 @@ import { useInterval } from "ahooks";
 import './HelloBanner.scss'
 
 
-export interface HelloBannerProps {
-}
+export type HelloBannerProps = {}
 
 export function HelloBanner() {
   const {user} = useContext(UserLayoutContext)

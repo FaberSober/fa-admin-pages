@@ -1,8 +1,8 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, FaberTable, FaHref, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
-import { Admin } from '@/types';
+import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
+import type { Admin } from '@/types';
 import { noticeApi } from '@features/fa-admin-pages/services';
 import NoticeModal from './modal/NoticeModal';
 import NoticeView from './cube/NoticeView';

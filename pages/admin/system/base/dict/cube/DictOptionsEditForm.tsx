@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { isNil } from "lodash";
 import { PageLoading } from "@fa/ui";
-import { Admin } from "@/types";
+import type { Admin } from "@/types";
 import { dictApi } from "@features/fa-admin-pages/services";
 import DictOptionsEdit from "./DictOptionsEdit";
 

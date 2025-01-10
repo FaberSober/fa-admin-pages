@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Switch } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { userDeviceApi as api } from '@features/fa-admin-pages/services';
-import { Admin } from '@/types';
+import type { Admin } from '@/types';
 import UserDeviceModal from './modal/UserDeviceModal';
 import CommonExcelUploadModal from '@features/fa-admin-pages/components/excel/CommonExcelUploadModal';
 import UserSearchSelect from "@features/fa-admin-pages/components/helper/UserSearchSelect";

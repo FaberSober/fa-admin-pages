@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { type CSSProperties, useState } from 'react';
 import useBus from "use-bus";
 import { FaUtils } from "@fa/ui";
 

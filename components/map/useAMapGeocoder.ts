@@ -1,5 +1,5 @@
 import {useEffect, useRef} from "react";
-import {Fa} from "@/types";
+import type {Fa} from "@/types";
 
 
 type addressToPosCallback = (lnglat: Fa.LngLat) => void

@@ -1,6 +1,6 @@
 import { findIndex } from 'lodash'
 import * as FaRouteUtils from "@features/fa-admin-pages/components/utils/FaRouteUtils";
-import { Rbac } from "@/types";
+import type { Rbac } from "@/types";
 import useRoutesList from "./useRoutesList";
 
 

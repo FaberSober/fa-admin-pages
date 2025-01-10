@@ -1,6 +1,6 @@
 import {GATE_APP} from '@/configs';
-import {BaseZeroApi, Fa} from '@fa/ui';
-import {Admin} from '@/types';
+import {BaseZeroApi, type Fa} from '@fa/ui';
+import type {Admin} from '@/types';
 
 /** ------------------------------------------ xx 操作接口 ------------------------------------------ */
 class SystemApi extends BaseZeroApi {

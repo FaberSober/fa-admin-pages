@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { fileSaveApi, sysNewsApi } from "@features/fa-admin-pages/services";
 import { Carousel } from "antd";
 import { useSize } from "ahooks";

@@ -1,6 +1,6 @@
 import { GATE_APP } from '@/configs';
 import { BaseZeroApi } from '@fa/ui';
-import { Fa } from '@fa/ui';
+import type { Fa } from '@fa/ui';
 
 /** ------------------------------------------ xx 操作接口 ------------------------------------------ */
 class Api extends BaseZeroApi {

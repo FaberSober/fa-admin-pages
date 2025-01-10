@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Form, Input} from 'antd';
-import {DragModal, DragModalProps, FaUtils} from '@fa/ui';
+import {DragModal, type DragModalProps, FaUtils} from '@fa/ui';
 
 
 export interface CodeCopyToModalProps extends DragModalProps {

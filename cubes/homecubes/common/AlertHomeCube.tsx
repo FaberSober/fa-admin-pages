@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { alertApi } from "@features/fa-admin-pages/services";
 import AlertModal from "@features/fa-admin-pages/pages/admin/system/base/alert/modal/AlertModal";
 import { useNavigate } from "react-router-dom";

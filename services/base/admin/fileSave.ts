@@ -1,7 +1,7 @@
 import {GATE_APP} from '@/configs';
-import {BaseApi, Fa} from '@fa/ui';
+import {BaseApi, type Fa} from '@fa/ui';
 import {trim} from 'lodash';
-import {Admin} from '@/types';
+import type {Admin} from '@/types';
 
 const serviceModule = 'fileSave';
 

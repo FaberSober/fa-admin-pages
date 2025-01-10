@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button, Drawer, DrawerProps, Tree } from 'antd';
-import { ApiEffectLayoutContext, Fa, FaUtils, treeUtils } from '@fa/ui';
-import { FaEnums, Rbac } from '@/types';
+import type React from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { Button, Drawer, type DrawerProps, Tree } from 'antd';
+import { ApiEffectLayoutContext, type Fa, FaUtils, treeUtils } from '@fa/ui';
+import { FaEnums, type Rbac } from '@/types';
 import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
 import { MobileOutlined } from '@ant-design/icons';
 

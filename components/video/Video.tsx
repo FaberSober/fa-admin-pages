@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { FaUtils } from '@fa/ui'
 
 
@@ -31,10 +31,11 @@ export default function Video({poster, url, onReady, style}: VideoProps) {
         type: 'video/mp4'
       }]
     }
-    const player = playerRef.current = window.videojs(id, options, () => {
+    const player = window.videojs(id, options, () => {
       window.videojs.log('player is ready');
       onReady && onReady(player);
     });
+    playerRef.current = player
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose()

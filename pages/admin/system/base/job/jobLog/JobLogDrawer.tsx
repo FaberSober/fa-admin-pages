@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Drawer, DrawerProps } from 'antd';
+import { Drawer, type DrawerProps } from 'antd';
 import JobLogList from './JobLogList';
 
 export interface JobLogDrawerProps extends DrawerProps {

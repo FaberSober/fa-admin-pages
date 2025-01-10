@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ConfigLayoutContext, UserLayoutContext } from "@features/fa-admin-pages/layout";
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { FaCipher, PageLoading } from "@fa/ui";
 import { fileSaveApi } from "@features/fa-admin-pages/services";
 import { Empty } from "antd";

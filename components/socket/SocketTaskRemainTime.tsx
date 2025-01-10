@@ -1,5 +1,5 @@
 import React from 'react';
-import {Fa} from "@/types";
+import type {Fa} from "@/types";
 import dayjs from "dayjs";
 
 

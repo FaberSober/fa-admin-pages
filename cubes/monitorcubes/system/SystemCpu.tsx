@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useInterval} from "ahooks";
-import { Admin } from "@features/fa-admin-pages/types";
+import type { Admin } from "@features/fa-admin-pages/types";
 import { systemApi } from "@features/fa-admin-pages/services";
 import EchartsGaugeStep from '@features/fa-admin-pages/components/echarts/EchartsGaugeStep';
 
 
-export interface SystemCpuProps {
-}
+// export type SystemCpuProps = {}
 
 export function SystemCpu() {
   const [data, setData] = useState<Admin.ServerInfo>();

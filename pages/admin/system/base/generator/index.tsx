@@ -1,9 +1,9 @@
 import React from 'react';
 import {CodepenOutlined, SearchOutlined} from '@ant-design/icons';
 import {Button, Form, Input, Space} from 'antd';
-import {BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, FaberTable, useTableQueryParams} from '@fa/ui';
+import {BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, useTableQueryParams} from '@fa/ui';
 import {generatorApi} from '@features/fa-admin-pages/services';
-import {Generator} from '@/types';
+import type {Generator} from '@/types';
 import GeneratorCodePreview from "./cube/GeneratorCodePreview";
 
 

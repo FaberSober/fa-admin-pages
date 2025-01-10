@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Fa} from '@/types'
+import type {Fa} from '@/types'
 import {FaUtils} from '@fa/ui'
 import dayjs from "dayjs";
 import EchartsLine from '@features/fa-admin-pages/components/echarts/EchartsLine';
 import { logLoginApi } from "@features/fa-admin-pages/services";
 
 
-export interface LoginLineProps {
-}
+export type LoginLineProps = {}
 
 export function LoginLine() {
   const [array, setArray] = useState<Fa.ChartSeriesVo[]>([])

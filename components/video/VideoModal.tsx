@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DragModal, DragModalProps } from "@fa/ui";
+import { DragModal, type DragModalProps } from "@fa/ui";
 import Video from "./Video";
 
 

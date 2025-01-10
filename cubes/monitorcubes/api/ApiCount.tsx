@@ -6,8 +6,7 @@ import {useInterval} from "ahooks";
 import NumBlock from '@features/fa-admin-pages/components/base-card/NumBlock';
 
 
-export interface ApiCountProps {
-}
+export type ApiCountProps = {}
 
 export function ApiCount() {
   const [apiCount, setApiCount] = useState<number>(0)

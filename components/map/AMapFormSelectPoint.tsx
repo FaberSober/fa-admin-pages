@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, FormInstance, Row} from "antd";
+import {Button, Col, type FormInstance, Row} from "antd";
 import AMapSearchSelectModal from "./AMapSearchSelectModal";
 import useAMapGeocoder from "./useAMapGeocoder";
 
