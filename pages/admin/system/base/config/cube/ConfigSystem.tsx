@@ -123,7 +123,7 @@ export default function ConfigSystem() {
 
         <Row gutter={12}>
           <Col md={8}>
-            <Form.Item name="wxminiapp" label="微信小程序" rules={[{ required: true }]}>
+            <Form.Item name="wxminiapp" label="微信小程序">
               <UploadImgLocal />
             </Form.Item>
           </Col>
