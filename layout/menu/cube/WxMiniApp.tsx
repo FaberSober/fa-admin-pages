@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { ConfigLayoutContext } from "@features/fa-admin-pages/layout";
 import { isNil } from "lodash";
 import { Avatar, Image, Popover } from "antd";
 import { fileSaveApi } from "@features/fa-admin-pages/services";
+import ConfigLayoutContext from "@features/fa-admin-pages/layout/config/context/ConfigLayoutContext";
 
 /**
  * @author xu.pengfei

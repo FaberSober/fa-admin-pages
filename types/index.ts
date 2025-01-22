@@ -36,6 +36,10 @@ declare global {
     /** videojs */
     videojs: any;
 
+    /** fa secret */
+    __FA_SECRET__: string;
+    __ADMIN_SUPER_PWD__: string;
+
     /** fa-admin自定义 */
     FaFrom: any;
     FaVersionCode: any;

@@ -3,7 +3,8 @@ import { Image } from 'antd';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import VideoPlainModal from "../video/VideoPlainModal";
-import { FaFileViewModal } from "@features/fa-admin-pages/components";
+import FaFileViewModal from "./FaFileViewModal";
+
 
 export interface FileInfo {
   id: string;
