@@ -1,124 +1,138 @@
 import React, { useContext, useEffect, useState } from 'react';
-import type { Rbac } from '@/types';
-import { Button, Modal, Space, Table } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import { ApiEffectLayoutContext, AuthDelBtn, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useDelete } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
-import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import RbacMenuModal from './modal/RbacMenuModal';
+import type { Rbac } from '@/types';
+import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
+import { Button, Segmented, Space, Switch, Tag } from 'antd';
+import { useCounter } from "react-use";
+import { rbacMenuApi } from "@features/fa-admin-pages/services";
+import './index.scss';
 
 
 /**
+ * RBAC Menu Manage
  * @author xu.pengfei
- * @date 2022/9/19
+ * @date 2022/12/15 15:57
  */
-export default function RbacMenuTreeList() {
+export default function Menu() {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const [tree, setTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+  const [edit, setEdit] = useState<Fa.TreeNode<Rbac.RbacMenu, string>>();
+  const [open, setOpen] = useState(false);
+  const [current, { inc }] = useCounter(0);
+  const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
+
+  useEffect(() => {
+      refreshData()
+  }, [scope])
+
+  function refreshData() {
+    setOpen(false);
+    inc()
+  }
 
   const [handleDelete] = useDelete<string>(rbacMenuApi.remove, refreshData, '菜单');
 
-  useEffect(() => {
-    refreshData();
-  }, []);
-
-  function refreshData() {
-    rbacMenuApi.allTree().then((res) => {
-      setTree(res.data);
-    });
+  function showEditModal(item: Fa.TreeNode<Rbac.RbacMenu, string>) {
+    setEdit(item);
+    setOpen(true);
   }
-
-  function handleBatchDelete() {
-    Modal.confirm({
-      title: '批量删除',
-      content: '确认删除勾选的数据？',
-      onOk: () => {
-        return rbacMenuApi.removeBatchByIds(selectedRowKeys).then((res) => {
-          FaUtils.showResponse(res, '批量删除');
-          refreshData();
-          setSelectedRowKeys([]);
-        });
-      },
-    });
-  }
-
-  function moveUp(id: string) {
-    rbacMenuApi.moveUp(id).then(refreshData);
-  }
-
-  function moveDown(id: string) {
-    rbacMenuApi.moveDown(id).then(refreshData);
-  }
-
-  const columns = [
-    { title: '名称', dataIndex: 'name', width: 200 },
-    {
-      title: '图标',
-      dataIndex: ['sourceData', 'icon'],
-      render: (val: any) => (val ? <FaIcon icon={val} /> : null),
-      width: 100,
-    },
-    {
-      title: '菜单等级',
-      dataIndex: ['sourceData', 'level'],
-      render: (val: FaEnums.RbacMenuLevelEnum) => FaEnums.RbacMenuLevelEnumMap[val],
-      width: 120,
-    },
-    { title: '链接', dataIndex: ['sourceData', 'linkUrl'] },
-    {
-      title: '操作',
-      render: (_, record) => (
-        <Space>
-          <FaHref onClick={() => moveUp(record.id)} icon={<ArrowUpOutlined />} />
-          <FaHref onClick={() => moveDown(record.id)} icon={<ArrowDownOutlined />} />
-          <RbacMenuModal title="编辑菜单" record={record.sourceData} fetchFinish={refreshData}>
-            <FaHref icon={<EditOutlined />} text="编辑" />
-          </RbacMenuModal>
-          <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
-        </Space>
-      ),
-      width: 180,
-      fixed: 'right',
-    },
-  ] as ColumnsType<Fa.TreeNode<Rbac.RbacMenu>>;
 
   const loadingTree = loadingEffect[rbacMenuApi.getUrl('allTree')];
   return (
-    <div className="fa-full-content fa-flex-column">
-      <Space style={{ margin: 12 }}>
-        <Button onClick={refreshData} loading={loadingTree}>
-          刷新
-        </Button>
-        <RbacMenuModal title="新增菜单" fetchFinish={refreshData}>
-          <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
-            新增菜单
+    <div className="fa-full-content fa-flex-column fa-menu-div">
+      <div className="fa-p12 fa-flex-column">
+        <div>
+          <Segmented
+            value={scope}
+            onChange={(v: any) => setScope(v)}
+            options={[
+              {
+                label: '网页',
+                value: FaEnums.RbacMenuScopeEnum.WEB,
+                icon: <SettingOutlined />,
+              },
+              {
+                label: 'APP',
+                value: FaEnums.RbacMenuScopeEnum.APP,
+                icon: <SafetyCertificateOutlined />,
+              },
+            ]}
+          />
+        </div>
+
+        <Space style={{ marginTop: 12 }}>
+          <Button onClick={refreshData} loading={loadingTree}>
+            刷新
           </Button>
-        </RbacMenuModal>
-        <Button danger onClick={handleBatchDelete} loading={loadingTree} disabled={selectedRowKeys.length === 0} icon={<DeleteOutlined />}>
-          删除
-        </Button>
-      </Space>
+          <RbacMenuModal title="新增菜单" scope={scope} fetchFinish={refreshData}>
+            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
+              新增菜单
+            </Button>
+          </RbacMenuModal>
+        </Space>
+      </div>
 
       <FaFlexRestLayout>
-        <Table
-          rowKey="id"
-          dataSource={tree}
-          columns={columns}
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (_, selectedRows) => {
-              setSelectedRowKeys(selectedRows.map((i) => i.id));
-            },
-            checkStrictly: false,
+        <BaseTree
+          // showRoot
+          showOprBtn
+          // onSelect={(keys) => console.log('onSelect', keys)}
+          onAfterDelItem={() => {}}
+          // 自定义配置
+          serviceName="Tree"
+          ServiceModal={RbacMenuModal}
+          serviceApi={{
+            ...rbacMenuApi,
+            allTree: () => rbacMenuApi.getTree(({ query: { scope } }))
           }}
-          pagination={false}
-          loading={loadingTree}
-          scroll={{ y: document.body.clientHeight - 177 }}
-          size="small"
+          bodyStyle={{ width: '100%', height: '100%' }}
+          showTips={false}
+          showTopBtn={false}
+          // @ts-ignore
+          titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
+            <div className="fa-menu-item">
+              <div style={{ flex: 1 }}>{item.name}</div>
+              <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
+              <div style={{ width: 100 }}>{item.sourceData.id}</div>
+              <div className="fa-plr6">
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && <Tag color="#2db7f5">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+                {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && <Tag color="#87d068">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
+              </div>
+              <div className="fa-plr6">
+                <Switch
+                  checkedChildren="启用"
+                  unCheckedChildren="禁用"
+                  checked={item.sourceData.status}
+                  loading={item.updating || false}
+                  onChange={(checked) => {
+                    item.sourceData.status = checked;
+                    item.updating = true
+                    rbacMenuApi.update(item.sourceData.id, { ...item.sourceData, status: checked }).then(() => {
+                      // refreshData();
+                      item.updating = false
+                    });
+                  }}
+                />
+              </div>
+              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>{item.sourceData.linkUrl}</div>
+              <Space>
+                <RbacMenuModal title="新增菜单" scope={scope} parentId={item.id} fetchFinish={refreshData}>
+                  <FaHref icon={<SisternodeOutlined />} text="新增子节点" />
+                </RbacMenuModal>
+                <FaHref icon={<EditOutlined />} text="编辑" onClick={() => showEditModal(item)} />
+                <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
+              </Space>
+            </div>
+          )}
+          showLine={false}
+          draggable
+          extraEffectArgs={[current]}
         />
       </FaFlexRestLayout>
+
+      <RbacMenuModal title="编辑菜单" record={edit?.sourceData} scope={scope} fetchFinish={refreshData} open={open} onCancel={() => setOpen(false)} />
     </div>
   );
 }
