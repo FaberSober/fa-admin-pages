@@ -24,10 +24,10 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
 
   const [open, setOpen] = useState(false);
   const [_level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
-    return record ? record.level : undefined;
+    return record ? record.level : FaEnums.RbacMenuLevelEnum.MENU;
   });
   const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum|undefined>(() => {
-    return record ? record.linkType : undefined;
+    return record ? record.linkType : FaEnums.RbacLinkTypeEnum.INNER;
   });
 
   /** 新增Item */
@@ -107,6 +107,9 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
             }
             if (cv.linkType) {
               setLinkType(cv.linkType)
+            }
+            if (cv.level === FaEnums.RbacMenuLevelEnum.BUTTON) {
+              form.setFieldsValue({ linkType: FaEnums.RbacLinkTypeEnum.PATH })
             }
           }}
         >
