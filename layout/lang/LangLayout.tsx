@@ -89,7 +89,7 @@ export default function LangLayout({children}: Fa.BaseChildProps) {
             },
           },
         }}
-        // getPopupContainer={(trigger) => (trigger ? trigger.parentElement : document.body)}
+        // getPopupContainer={(trigger) => (trigger ? trigger.parentElement as HTMLElement : document.body)}
       >
         <IntlProvider messages={handleMessages(locale)} locale={locale.split('_')[0]}>
           {children}

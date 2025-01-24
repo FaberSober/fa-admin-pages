@@ -39,7 +39,7 @@ export default function MsgBadgeCube() {
         placement="bottomRight"
         content={<MsgList onClose={() => setOpen(false)} />}
         trigger="click"
-        overlayInnerStyle={{padding: 0}}
+        styles={{ body: {padding: 0} }}
         open={open}
         onOpenChange={setOpen}
       >
