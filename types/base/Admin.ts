@@ -107,7 +107,6 @@ namespace Admin {
     safeTokenExpireHour: number;
   }
 
-
   // -------------------------------------------- 系统配置参数 --------------------------------------------
   export interface SystemConfigPo {
     /** [网站]标题 */
@@ -635,7 +634,6 @@ namespace Admin {
     /** 发布时间 */
     pubTime: string;
   }
-
 }
 
 export default Admin;

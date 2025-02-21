@@ -1,8 +1,7 @@
 import React from 'react';
 import type { Admin } from '@/types';
-import { Descriptions } from "antd";
-import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";
-
+import { Descriptions } from 'antd';
+import FaRichHtmlView from '@features/fa-admin-pages/components/rich-html/FaRichHtmlView';
 
 export interface NoticeViewProps {
   item: Admin.Notice;
@@ -11,7 +10,7 @@ export interface NoticeViewProps {
 /**
  * BASE-系统-新闻实体详情查看
  */
-export default function NoticeView({item}: NoticeViewProps) {
+export default function NoticeView({ item }: NoticeViewProps) {
   return (
     <Descriptions column={1} bordered labelStyle={{ width: 80 }}>
       <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
@@ -26,5 +25,5 @@ export default function NoticeView({item}: NoticeViewProps) {
       <Descriptions.Item label="更新用户">{item.updName}</Descriptions.Item>
       <Descriptions.Item label="更新IP">{item.updHost}</Descriptions.Item>
     </Descriptions>
-  )
+  );
 }

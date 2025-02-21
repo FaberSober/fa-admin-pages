@@ -1,12 +1,23 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, DictDataSelector, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
+import {
+  AuthDelBtn,
+  BaseBizTable,
+  BaseDrawer,
+  BaseTableUtils,
+  clearForm,
+  DictDataSelector,
+  type FaberTable,
+  FaHref,
+  useDelete,
+  useExport,
+  useTableQueryParams,
+} from '@fa/ui';
 import type { Admin } from '@/types';
 import { noticeApi } from '@features/fa-admin-pages/services';
 import NoticeModal from './modal/NoticeModal';
 import NoticeView from './cube/NoticeView';
-
 
 const serviceName = '通知与公告';
 const biz = 'base_notice.v1';
@@ -56,7 +67,7 @@ export default function NoticeList() {
       <div className="fa-flex-row-center fa-p8">
         <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form  form={form} layout="inline" onFinish={setFormValues}>
+          <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="status" label="状态">
               <DictDataSelector dictLabel="common.enum.true_or_false" />
             </Form.Item>
@@ -65,10 +76,14 @@ export default function NoticeList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <NoticeModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>

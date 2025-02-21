@@ -1,1 +1,1 @@
-export { default as ReactPdfView } from './ReactPdfView'
+export { default as ReactPdfView } from './ReactPdfView';

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Image } from "antd";
-import { fileSaveApi } from "@fa/ui";
-
+import { Image } from 'antd';
+import { fileSaveApi } from '@fa/ui';
 
 export interface ImagesViewProps {
   imgs: string[]; // 图片附件ID数组
@@ -23,8 +22,8 @@ export default function ImagesView({ imgs }: ImagesViewProps) {
             src={fileSaveApi.genLocalGetFilePreview(img)}
             preview={{ src: fileSaveApi.genLocalGetFile(img) }}
           />
-        )
+        );
       })}
     </Image.PreviewGroup>
-  )
+  );
 }

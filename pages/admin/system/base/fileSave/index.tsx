@@ -5,7 +5,7 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, F
 import { fileSaveApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import FileSaveModal from './modal/FileSaveModal';
-import FileSaveView from "./cube/FileSaveView";
+import FileSaveView from './cube/FileSaveView';
 import FileSaveIcon from '@features/fa-admin-pages/components/file/FileSaveIcon';
 
 const serviceName = '附件管理';
@@ -18,11 +18,11 @@ export default function FileSaveList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<Admin.FileSave>(api.page, {sorter: {field: 'crtTime', order: "descend"}}, serviceName)
+    useTableQueryParams<Admin.FileSave>(api.page, { sorter: { field: 'crtTime', order: 'descend' } }, serviceName);
 
-  const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName)
-  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
-  const {show, hide, open, item} = useViewItem<Admin.FileSave>()
+  const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
+  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
+  const { show, hide, open, item } = useViewItem<Admin.FileSave>();
 
   /** 生成表格字段List */
   function genColumns() {
@@ -31,12 +31,12 @@ export default function FileSaveList() {
       BaseTableUtils.genIdColumn('ID', 'id', 280, sorter, false),
       {
         ...BaseTableUtils.genSimpleSorterColumn('原始文件名', 'originalFilename', undefined, sorter),
-        render: (_, r) => <FileSaveIcon file={r} width={25} />
+        render: (_, r) => <FileSaveIcon file={r} width={25} />,
       },
       BaseTableUtils.genSimpleSorterColumn('文件存储地址', 'url', undefined, sorter),
       {
         ...BaseTableUtils.genSimpleSorterColumn('文件大小', 'size', 100, sorter),
-        render: v => FaUtils.sizeToHuman(v),
+        render: (v) => FaUtils.sizeToHuman(v),
       },
       BaseTableUtils.genSimpleSorterColumn('文件名', 'filename', 100, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('基础存储路径', 'basePath', 100, sorter, false),
@@ -88,10 +88,14 @@ export default function FileSaveList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <FileSaveModal addBtn title="上传附件" fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>
@@ -109,11 +113,11 @@ export default function FileSaveList() {
         batchDelete={(ids) => api.removeBatchByIds(ids)}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
-        onRow={r => ({ onDoubleClick: () => show(r) })}
+        onRow={(r) => ({ onDoubleClick: () => show(r) })}
       />
 
       <Drawer title="查看详情" open={open} onClose={hide} width={1000} styles={{ body: { position: 'relative' } }}>
-        {open && item && <FileSaveView item={item} /> }
+        {open && item && <FileSaveView item={item} />}
       </Drawer>
     </div>
   );

@@ -16,10 +16,10 @@ export default function UserTokenList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<Admin.UserToken>(api.minePage, {}, serviceName)
+    useTableQueryParams<Admin.UserToken>(api.minePage, {}, serviceName);
 
-  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
-  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
+  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName);
+  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
 
   /** 生成表格字段List */
   function genColumns() {
@@ -60,10 +60,14 @@ export default function UserTokenList() {
           </Form>
 
           <Space>
-            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>查询</Button>
+            <Button onClick={() => form.submit()} loading={loading} icon={<SearchOutlined />}>
+              查询
+            </Button>
             <Button onClick={() => clearForm(form)}>重置</Button>
             <UserTokenModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+              导出
+            </Button>
           </Space>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { type ReactNode, useContext, useEffect } from 'react';
 import SocketLayoutContext, { type SocketLayoutContextProps } from './context/SocketLayoutContext';
-import { UserLayoutContext } from "../user/context/UserLayoutContext";
+import { UserLayoutContext } from '../user/context/UserLayoutContext';
 import useSocketIO from '@features/fa-admin-pages/hooks/useSocketIO';
 
 export interface SocketLayoutProps {
@@ -31,9 +31,5 @@ export default function SocketLayout({ children }: SocketLayoutProps) {
     sendSocketMsg: socketEmit,
   };
 
-  return (
-    <SocketLayoutContext.Provider value={contextValue}>
-      {children}
-    </SocketLayoutContext.Provider>
-  );
+  return <SocketLayoutContext.Provider value={contextValue}>{children}</SocketLayoutContext.Provider>;
 }

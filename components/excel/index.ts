@@ -1,1 +1,1 @@
-export { default as CommonExcelUploadModal } from './CommonExcelUploadModal'
+export { default as CommonExcelUploadModal } from './CommonExcelUploadModal';

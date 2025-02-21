@@ -1,4 +1,4 @@
-import { type Admin, FaEnums } from "@/types";
+import { type Admin, FaEnums } from '@/types';
 
 /**
  * 校验安全密码逻辑

@@ -1,11 +1,10 @@
-
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
-import {Button, Form, Input} from 'antd';
-import {ApiEffectLayoutContext, type CommonModalProps, DictEnumApiSelector, DragModal, FaHref, FaUtils} from '@fa/ui';
+import { Button, Form, Input } from 'antd';
+import { ApiEffectLayoutContext, type CommonModalProps, DictEnumApiSelector, DragModal, FaHref, FaUtils } from '@fa/ui';
 import type { Admin } from '@/types';
 import { areaApi } from '@features/fa-admin-pages/services';
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 const serviceName = '中国行政地区表';
 
@@ -71,18 +70,14 @@ export default function AreaModal({ children, title, record, fetchFinish, addBtn
     <span>
       <span onClick={showModal}>
         {children}
-        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {addBtn && (
+          <Button icon={<PlusOutlined />} type="primary">
+            新增
+          </Button>
+        )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
       </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="level" label="层级" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <DictEnumApiSelector enumName="AreaLevelEnum" />

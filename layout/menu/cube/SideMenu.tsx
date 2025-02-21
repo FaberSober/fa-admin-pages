@@ -4,16 +4,14 @@ import { isNil } from 'lodash';
 import { type Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import type { Rbac } from '@/types';
-import MenuLayoutContext from "../context/MenuLayoutContext";
-
+import MenuLayoutContext from '../context/MenuLayoutContext';
 
 /**
  * @author xu.pengfei
  * @date 2022/9/22 22:29
  */
 export default function SideMenu() {
-  const { menuTree, collapse, setCollapse, openSideMenuKeys, setOpenSideMenuKeys, menuSelPath, setMenuSelPath } =
-    useContext(MenuLayoutContext);
+  const { menuTree, collapse, setCollapse, openSideMenuKeys, setOpenSideMenuKeys, menuSelPath, setMenuSelPath } = useContext(MenuLayoutContext);
 
   function loop(list: Fa.TreeNode<Rbac.RbacMenu>[] | undefined): any[] | undefined {
     if (isNil(list) || list.length === 0) return undefined;
@@ -59,14 +57,14 @@ export default function SideMenu() {
         selectedKeys={menuSelPath}
         onClick={({ key, keyPath }) => {
           // console.log(key, keyPath, item)
-          const menuItem = treeUtils.findTreeNode(menuTree, i => i.id === key)
+          const menuItem = treeUtils.findTreeNode(menuTree, (i) => i.id === key);
           // console.log('menuItem', menuItem)
           // 打开外部网址
           if (menuItem && menuItem.sourceData?.linkType === FaEnums.RbacLinkTypeEnum.OUT) {
-            window.open(menuItem.sourceData.linkUrl, '_blank')
+            window.open(menuItem.sourceData.linkUrl, '_blank');
             return;
           }
-          setMenuSelPath(key, keyPath)
+          setMenuSelPath(key, keyPath);
         }}
         // onSelect={({ key, keyPath }) => setMenuSelPath(key, keyPath)}
       />

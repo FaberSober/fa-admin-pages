@@ -2,9 +2,8 @@ import React, { type CSSProperties } from 'react';
 import { Image } from 'antd';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
-import VideoPlainModal from "../video/VideoPlainModal";
-import FaFileViewModal from "./FaFileViewModal";
-
+import VideoPlainModal from '../video/VideoPlainModal';
+import FaFileViewModal from './FaFileViewModal';
 
 export interface FileInfo {
   id: string;
@@ -52,7 +51,7 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
       <VideoPlainModal url={fileSaveApi.genLocalGetFile(file.id)}>
         <span>{file.originalFilename}</span>
       </VideoPlainModal>
-    )
+    );
   }
 
   return (

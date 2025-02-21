@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Button, Card, Form, Input, message } from 'antd';
 import { ApiEffectLayoutContext } from '@fa/ui';
-import { userApi } from "@features/fa-admin-pages/services";
+import { userApi } from '@features/fa-admin-pages/services';
 import * as FaSecurityUtils from '@features/fa-admin-pages/components/utils/FaSecurityUtils';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
@@ -53,12 +53,7 @@ export default function AccountPwdUpdate() {
         <Form.Item name="newPwd" label="新密码" rules={[{ required: true }, { validator: validateNewPwd }]} {...formItemFullLayout}>
           <Input.Password placeholder="请输入新密码" />
         </Form.Item>
-        <Form.Item
-          name="newPwdConfirm"
-          label="新密码确认"
-          rules={[{ required: true }, { validator: validateNewPwdConfirm }]}
-          {...formItemFullLayout}
-        >
+        <Form.Item name="newPwdConfirm" label="新密码确认" rules={[{ required: true }, { validator: validateNewPwdConfirm }]} {...formItemFullLayout}>
           <Input.Password placeholder="请再次输入新密码" />
         </Form.Item>
 

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { createContext, type ReactNode } from 'react'
+import { createContext, type ReactNode } from 'react';
 import type { Fa, Rbac } from '@/types';
 
 export interface OpenTabsItem {
@@ -8,7 +8,7 @@ export interface OpenTabsItem {
   name: string; // 名称
   type?: 'iframe' | 'inner'; // 打开页面类型，默认为inner
   closeable?: boolean; // 是否可以关闭
-  icon?: string|ReactNode; // 图标标识
+  icon?: string | ReactNode; // 图标标识
   linkMenuId?: string; // 对应需要打开的菜单ID
   linkCurrentMenu?: boolean; // TODO 打开tab时是否关联当前菜单，默认设置为true，功能需要开发
 }
@@ -27,11 +27,11 @@ export interface MenuLayoutContextProps {
   setCollapse: (v: boolean) => void;
   openSideMenuKeys: string[];
   setOpenSideMenuKeys: (v: string[]) => void;
-  showTabs: boolean|undefined; // 是否展示标签栏
-  setShowTabs: (v:boolean) => void; // 改变展示标签栏
+  showTabs: boolean | undefined; // 是否展示标签栏
+  setShowTabs: (v: boolean) => void; // 改变展示标签栏
   openTabs: OpenTabsItem[]; // 打开的菜单历史记录
   curTab: OpenTabsItem | undefined; // 当前选中的tab
-  setCurTab: (v: OpenTabsItem|undefined) => void;
+  setCurTab: (v: OpenTabsItem | undefined) => void;
   setOpenTabs: (v: OpenTabsItem[]) => void;
   addTab: (tab: OpenTabsItem) => void; // 添加新的tab
   removeTab: (key: string) => void; // 添加新的tab

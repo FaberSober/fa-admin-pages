@@ -1,17 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, DatePicker, Form, Input } from 'antd';
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { ApiEffectLayoutContext, BaseTinyMCE, type CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal } from '@fa/ui';
 import { sysNewsApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
-
 
 /**
  * BASE-系统-新闻实体新增、编辑弹框
  */
 export default function SysNewsModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.SysNews>) {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext)
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -22,7 +21,7 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
       FaUtils.showResponse(res, '新增系统新闻');
       setOpen(false);
       if (fetchFinish) fetchFinish();
-    })
+    });
   }
 
   /** 更新Item */
@@ -31,7 +30,7 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
       FaUtils.showResponse(res, '更新系统新闻');
       setOpen(false);
       if (fetchFinish) fetchFinish();
-    })
+    });
   }
 
   /** 提交表单 */
@@ -54,12 +53,12 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
       cover: get(record, 'cover'),
       author: get(record, 'author'),
       pubTime: FaUtils.getInitialKeyTimeValue(record, 'pubTime'),
-    }
+    };
   }
 
   function showModal() {
-    setOpen(true)
-    form.setFieldsValue(getInitialValues())
+    setOpen(true);
+    form.setFieldsValue(getInitialValues());
   }
 
   const loading = loadingEffect[api.getUrl('save')] || loadingEffect[api.getUrl('update')];
@@ -67,18 +66,14 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
     <span>
       <span onClick={showModal}>
         {children}
-        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {addBtn && (
+          <Button icon={<PlusOutlined />} type="primary">
+            新增
+          </Button>
+        )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
       </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={1000}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={1000} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input placeholder="请输入标题" />
@@ -98,5 +93,5 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
         </Form>
       </DragModal>
     </span>
-  )
+  );
 }

@@ -1,8 +1,7 @@
 import React from 'react';
-import type { Admin } from "@features/fa-admin-pages/types";
-import FileSaveIcon from "./FileSaveIcon";
-import { FaUtils } from "@fa/ui";
-
+import type { Admin } from '@features/fa-admin-pages/types';
+import FileSaveIcon from './FileSaveIcon';
+import { FaUtils } from '@fa/ui';
 
 export interface FileBizListViewProps {
   fileBizList: Admin.FileBiz[];
@@ -16,7 +15,7 @@ export interface FileBizListViewProps {
 export default function FileBizListView({ fileBizList = [] }: FileBizListViewProps) {
   return (
     <div className="fa-flex-column">
-      {fileBizList.map(item => {
+      {fileBizList.map((item) => {
         return (
           <FileSaveIcon
             key={item.id}
@@ -27,8 +26,8 @@ export default function FileBizListView({ fileBizList = [] }: FileBizListViewPro
             }}
             width={25}
           />
-        )
+        );
       })}
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, useDelete, useExport, useTableQueryParams, } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 
@@ -15,18 +15,8 @@ export interface JobLogListProps {
 export default function JobLogList({ jobId }: JobLogListProps) {
   const [form] = Form.useForm();
 
-  const {
-    queryParams,
-    setFormValues,
-    handleTableChange,
-    setSceneId,
-    setConditionList,
-    setExtraParams,
-    fetchPageList,
-    loading,
-    list,
-    paginationProps,
-  } = useTableQueryParams<Admin.JobLog>(jobLogApi.page, { extraParams: { jobId } }, serviceName);
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
+    useTableQueryParams<Admin.JobLog>(jobLogApi.page, { extraParams: { jobId } }, serviceName);
 
   const [handleDelete] = useDelete<number>(jobLogApi.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(jobLogApi.exportExcel, queryParams);

@@ -2,8 +2,6 @@ export type { default as Admin } from './base/Admin';
 export type { default as Rbac } from './base/Rbac';
 export type { default as Generator } from './base/Generator';
 
-
-
 /** -------------------------------- declare global -------------------------------- */
 declare global {
   interface Window {

@@ -1,8 +1,7 @@
 import React from 'react';
-import {isNil} from "lodash";
-import {Image} from "antd";
-import {fileSaveApi} from "@features/fa-admin-pages/services";
-
+import { isNil } from 'lodash';
+import { Image } from 'antd';
+import { fileSaveApi } from '@features/fa-admin-pages/services';
 
 export interface TableImageProps {
   imgFileId: string;

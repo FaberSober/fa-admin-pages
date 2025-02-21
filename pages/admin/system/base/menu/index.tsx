@@ -5,10 +5,9 @@ import RbacMenuModal from './modal/RbacMenuModal';
 import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
 import { Button, Segmented, Space, Switch, Tag } from 'antd';
-import { useCounter } from "react-use";
-import { rbacMenuApi } from "@features/fa-admin-pages/services";
+import { useCounter } from 'react-use';
+import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import './index.scss';
-
 
 /**
  * RBAC Menu Manage
@@ -23,12 +22,12 @@ export default function Menu() {
   const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
 
   useEffect(() => {
-      refreshData()
-  }, [scope])
+    refreshData();
+  }, [scope]);
 
   function refreshData() {
     setOpen(false);
-    inc()
+    inc();
   }
 
   const [handleDelete] = useDelete<string>(rbacMenuApi.remove, refreshData, '菜单');
@@ -84,7 +83,7 @@ export default function Menu() {
           ServiceModal={RbacMenuModal}
           serviceApi={{
             ...rbacMenuApi,
-            allTree: () => rbacMenuApi.getTree(({ query: { scope } }))
+            allTree: () => rbacMenuApi.getTree({ query: { scope } }),
           }}
           bodyStyle={{ width: '100%', height: '100%' }}
           showTips={false}
@@ -108,15 +107,17 @@ export default function Menu() {
                   loading={item.updating || false}
                   onChange={(checked) => {
                     item.sourceData.status = checked;
-                    item.updating = true
+                    item.updating = true;
                     rbacMenuApi.update(item.sourceData.id, { ...item.sourceData, status: checked }).then(() => {
                       // refreshData();
-                      item.updating = false
+                      item.updating = false;
                     });
                   }}
                 />
               </div>
-              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>{item.sourceData.linkUrl}</div>
+              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>
+                {item.sourceData.linkUrl}
+              </div>
               <Space>
                 <RbacMenuModal title="新增菜单" scope={scope} parentId={item.id} fetchFinish={refreshData}>
                   <FaHref icon={<SisternodeOutlined />} text="新增子节点" />

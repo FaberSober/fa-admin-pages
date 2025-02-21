@@ -1,12 +1,11 @@
 import React, { type CSSProperties, useEffect, useRef, useState } from 'react';
-import { FaUtils } from '@fa/ui'
-
+import { FaUtils } from '@fa/ui';
 
 export interface VideoProps {
   poster?: string; // 视频地址
   url: string; // 视频地址
   style?: CSSProperties;
-  onReady?: (player:any) => void;
+  onReady?: (player: any) => void;
 }
 
 /**
@@ -14,8 +13,8 @@ export interface VideoProps {
  * @author xu.pengfei
  * @date 2023/8/6 20:00
  */
-export default function Video({poster, url, onReady, style}: VideoProps) {
-  const playerRef = useRef<any>()
+export default function Video({ poster, url, onReady, style }: VideoProps) {
+  const playerRef = useRef<any>();
 
   const [id] = useState(`my-video-player-${FaUtils.generateId()}`);
 
@@ -26,27 +25,29 @@ export default function Video({poster, url, onReady, style}: VideoProps) {
       responsive: true,
       fluid: true,
       poster,
-      sources: [{
-        src: url, // '/path/to/video.mp4',
-        type: 'video/mp4'
-      }]
-    }
+      sources: [
+        {
+          src: url, // '/path/to/video.mp4',
+          type: 'video/mp4',
+        },
+      ],
+    };
     const player = window.videojs(id, options, () => {
       window.videojs.log('player is ready');
       onReady && onReady(player);
     });
-    playerRef.current = player
+    playerRef.current = player;
     return () => {
       if (playerRef.current) {
-        playerRef.current.dispose()
-        playerRef.current = null
+        playerRef.current.dispose();
+        playerRef.current = null;
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div style={style}>
-      <video id={id} className="video-js" style={{width: '100%', height: '100%'}} />
+      <video id={id} className="video-js" style={{ width: '100%', height: '100%' }} />
     </div>
-  )
+  );
 }

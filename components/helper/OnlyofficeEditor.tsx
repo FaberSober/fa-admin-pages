@@ -1,35 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import {PageLoading} from "@fa/ui";
-import {DocumentEditor} from "@onlyoffice/document-editor-react";
-import {onlyofficeApi} from "@features/fa-admin-pages/services";
-
+import React, { useEffect, useState } from 'react';
+import { PageLoading } from '@fa/ui';
+import { DocumentEditor } from '@onlyoffice/document-editor-react';
+import { onlyofficeApi } from '@features/fa-admin-pages/services';
 
 export interface OnlyofficeEditorProps {
   fileId: string; // fileSave表的ID
-  mode: 'edit'|'view';
+  mode: 'edit' | 'view';
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/3/13 19:01
  */
-export default function OnlyofficeEditor({fileId, mode}: OnlyofficeEditorProps) {
-
-  const [documentServerUrl, setDocumentServerUrl] = useState<string>()
-  const [config, setConfig] = useState<any>()
+export default function OnlyofficeEditor({ fileId, mode }: OnlyofficeEditorProps) {
+  const [documentServerUrl, setDocumentServerUrl] = useState<string>();
+  const [config, setConfig] = useState<any>();
 
   useEffect(() => {
-    onlyofficeApi.openFile(fileId, mode).then(res => {
-      setDocumentServerUrl(res.data.documentApi)
-      setConfig(res.data.fileModel)
-    })
-  }, [fileId])
+    onlyofficeApi.openFile(fileId, mode).then((res) => {
+      setDocumentServerUrl(res.data.documentApi);
+      setConfig(res.data.fileModel);
+    });
+  }, [fileId]);
 
-  const onDocumentReady = (event:any) => {
-    console.log("Document is loaded", event);
+  const onDocumentReady = (event: any) => {
+    console.log('Document is loaded', event);
   };
 
-  if (config === undefined || documentServerUrl === undefined) return <PageLoading />
+  if (config === undefined || documentServerUrl === undefined) return <PageLoading />;
 
   return (
     <div className="fa-full">
@@ -60,5 +58,5 @@ export default function OnlyofficeEditor({fileId, mode}: OnlyofficeEditorProps) 
         events_onDocumentReady={onDocumentReady}
       />
     </div>
-  )
+  );
 }

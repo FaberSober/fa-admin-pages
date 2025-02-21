@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Form, Input, Select } from 'antd';
 import { ApiEffectLayoutContext, BaseBoolRadio, type CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
 import type { Rbac } from '@/types';
-import { rbacMenuApi } from "@features/fa-admin-pages/services";
+import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import RbacMenuCascader from '../helper/RbacMenuCascader';
 import IconSelect from '@features/fa-admin-pages/components/icons/IconSelect';
 import RouteCascader from '@features/fa-admin-pages/components/route/RouteCascader';
@@ -23,10 +23,10 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
-  const [_level, setLevel] = useState<FaEnums.RbacMenuLevelEnum|undefined>(() => {
+  const [_level, setLevel] = useState<FaEnums.RbacMenuLevelEnum | undefined>(() => {
     return record ? record.level : FaEnums.RbacMenuLevelEnum.MENU;
   });
-  const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum|undefined>(() => {
+  const [linkType, setLinkType] = useState<FaEnums.RbacLinkTypeEnum | undefined>(() => {
     return record ? record.linkType : FaEnums.RbacLinkTypeEnum.INNER;
   });
 
@@ -75,13 +75,13 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
 
   function showModal() {
     setOpen(true);
-    setLevel(record ? record.level : undefined)
+    setLevel(record ? record.level : undefined);
     form.setFieldsValue(getInitialValues());
   }
 
   useEffect(() => {
     if (!props.open) return;
-    setLevel(record ? record.level : undefined)
+    setLevel(record ? record.level : undefined);
     form.setFieldsValue(getInitialValues());
   }, [record]);
 
@@ -89,27 +89,19 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form
           form={form}
           onFinish={onFinish}
-          onValuesChange={(cv:any) => {
+          onValuesChange={(cv: any) => {
             if (cv.level) {
-              setLevel(cv.level)
+              setLevel(cv.level);
             }
             if (cv.linkType) {
-              setLinkType(cv.linkType)
+              setLinkType(cv.linkType);
             }
             if (cv.level === FaEnums.RbacMenuLevelEnum.BUTTON) {
-              form.setFieldsValue({ linkType: FaEnums.RbacLinkTypeEnum.PATH })
+              form.setFieldsValue({ linkType: FaEnums.RbacLinkTypeEnum.PATH });
             }
           }}
         >
@@ -119,7 +111,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
           <Form.Item name="parentId" label="上级菜单" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <RbacMenuCascader
               showRoot
-              onChangeWithItem={(_: any, raw: Rbac.RbacMenu|undefined) => {
+              onChangeWithItem={(_: any, raw: Rbac.RbacMenu | undefined) => {
                 form.setFieldValue('linkUrl', raw ? raw.linkUrl : '');
               }}
               disabledIds={record ? [record.id] : undefined}
@@ -141,7 +133,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
           </Form.Item>
 
           <Form.Item name="linkUrl" label="链接地址" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            {(linkType === FaEnums.RbacLinkTypeEnum.INNER) ? <RouteCascader /> : <Input placeholder="请输入菜单的链接地址\权限点" />}
+            {linkType === FaEnums.RbacLinkTypeEnum.INNER ? <RouteCascader /> : <Input placeholder="请输入菜单的链接地址\权限点" />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>

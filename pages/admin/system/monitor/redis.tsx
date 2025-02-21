@@ -1,7 +1,6 @@
-import React, {useContext} from 'react';
-import {Button} from 'antd';
+import React, { useContext } from 'react';
+import { Button } from 'antd';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
-
 
 /**
  * phpRedisAdmin

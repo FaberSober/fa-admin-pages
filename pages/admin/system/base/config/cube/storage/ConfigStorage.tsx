@@ -1,9 +1,9 @@
 import React from 'react';
-import {Tabs} from "antd";
-import ConfigStorageBase from "./cube/ConfigStorageBase";
-import ConfigStorageLocal from "./cube/ConfigStorageLocal";
-import ConfigStorageMinio from "./cube/ConfigStorageMinio";
-import ConfigStorageQiniu from "./cube/ConfigStorageQiniu";
+import { Tabs } from 'antd';
+import ConfigStorageBase from './cube/ConfigStorageBase';
+import ConfigStorageLocal from './cube/ConfigStorageLocal';
+import ConfigStorageMinio from './cube/ConfigStorageMinio';
+import ConfigStorageQiniu from './cube/ConfigStorageQiniu';
 
 /**
  * @author xu.pengfei
@@ -26,5 +26,5 @@ export default function ConfigStorage() {
         size="small"
       />
     </div>
-  )
+  );
 }

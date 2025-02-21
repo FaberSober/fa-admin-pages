@@ -6,7 +6,6 @@ import { FaEnums, type Rbac } from '@/types';
 import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
 import { MobileOutlined } from '@ant-design/icons';
 
-
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
   record: Rbac.RbacRole;
   success?: () => void;
@@ -24,11 +23,11 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const cks = treeUtils.calCheckedKey(tree, checkedMenuIds)
+    const cks = treeUtils.calCheckedKey(tree, checkedMenuIds);
     // const diffIds = difference(checkedKeys, cks)
     // console.log('tree', tree, 'checkedMenuIds', checkedMenuIds, 'cks', cks, 'diffIds', diffIds)
-    setCheckedKeys(cks)
-  }, [tree, checkedMenuIds])
+    setCheckedKeys(cks);
+  }, [tree, checkedMenuIds]);
 
   async function refreshData() {
     const res = await rbacMenuApi.getTree({ query: { status: true }, sorter: 'scope ASC' });
@@ -39,13 +38,15 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   }
 
   function handleSave() {
-    rbacRoleMenuApi.updateRoleMenu({
-      roleId: record.id,
-      checkedMenuIds,
-    }).then((res) => {
-      FaUtils.showResponse(res, '更新角色权限');
-      setOpen(false);
-    });
+    rbacRoleMenuApi
+      .updateRoleMenu({
+        roleId: record.id,
+        checkedMenuIds,
+      })
+      .then((res) => {
+        FaUtils.showResponse(res, '更新角色权限');
+        setOpen(false);
+      });
   }
 
   async function showModal() {
@@ -76,15 +77,15 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
           checkedKeys={checkedKeys}
           onCheck={(checked: any, e: any) => {
             // console.log('checked', checked, 'e', e)
-            setCheckedMenuIds([ ...(checked||[]), ...(e.halfCheckedKeys || [])]);
+            setCheckedMenuIds([...(checked || []), ...(e.halfCheckedKeys || [])]);
           }}
-          titleRender={node => {
+          titleRender={(node) => {
             return (
               <div className="fa-flex-row fa-flex-row-center">
                 {node.level === 1 && node.sourceData.scope === FaEnums.RbacMenuScopeEnum.APP && <MobileOutlined />}
                 <div>{node.name}</div>
               </div>
-            )
+            );
           }}
         />
       </Drawer>

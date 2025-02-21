@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 import { Tabs } from 'antd';
-import { findIndex } from "lodash";
+import { findIndex } from 'lodash';
 import { Item, type ItemParams, Menu, useContextMenu } from 'react-contexify';
-import { FaFullscreenBtn } from "@fa/ui";
-import MenuLayoutContext, { type OpenTabsItem } from "../context/MenuLayoutContext";
-import './OpenTabs.scss'
-
+import { FaFullscreenBtn } from '@fa/ui';
+import MenuLayoutContext, { type OpenTabsItem } from '../context/MenuLayoutContext';
+import './OpenTabs.scss';
 
 /**
  * @author xu.pengfei
@@ -21,7 +20,7 @@ export default function OpenTabs() {
    */
   function remove(tabKey: string) {
     // console.log('remove,tabKey=', tabKey)
-    const index = findIndex(openTabs, i => i.key === tabKey)
+    const index = findIndex(openTabs, (i) => i.key === tabKey);
     if (index === -1) return;
 
     // 0. remove key
@@ -42,7 +41,8 @@ export default function OpenTabs() {
         newActiveKey = newPanes[0].key;
       }
       selTab(newActiveKey);
-    } else if (newActiveKey === undefined) { // 当前没有选中的菜单Menu
+    } else if (newActiveKey === undefined) {
+      // 当前没有选中的菜单Menu
       if (lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
       } else {
@@ -51,14 +51,14 @@ export default function OpenTabs() {
       selTab(newActiveKey);
     }
     setOpenTabs(newPanes);
-  };
+  }
 
   /**
    * 关闭其他标签页
    * @param tabKey
    */
   function closeOthers(tabKey: string) {
-    const index = findIndex(openTabs, i => i.key === tabKey)
+    const index = findIndex(openTabs, (i) => i.key === tabKey);
     if (index === -1) return;
 
     const newPanes = openTabs.filter((item) => item.key === tabKey);
@@ -70,11 +70,11 @@ export default function OpenTabs() {
    * @param tabKey
    */
   function closeLeft(tabKey: string) {
-    const index = findIndex(openTabs, i => i.key === tabKey)
+    const index = findIndex(openTabs, (i) => i.key === tabKey);
     if (index === -1) return;
 
-    const newPanes = [...openTabs]
-    newPanes.splice(0, index)
+    const newPanes = [...openTabs];
+    newPanes.splice(0, index);
     setOpenTabs(newPanes);
   }
 
@@ -83,11 +83,11 @@ export default function OpenTabs() {
    * @param tabKey
    */
   function closeRight(tabKey: string) {
-    const index = findIndex(openTabs, i => i.key === tabKey)
+    const index = findIndex(openTabs, (i) => i.key === tabKey);
     if (index === -1) return;
 
-    const newPanes = [...openTabs]
-    newPanes.splice(index + 1, newPanes.length - index - 1)
+    const newPanes = [...openTabs];
+    newPanes.splice(index + 1, newPanes.length - index - 1);
     setOpenTabs(newPanes);
   }
 
@@ -104,16 +104,16 @@ export default function OpenTabs() {
     const item = props as OpenTabsItem;
     switch (id) {
       case 'menu_close_current':
-        remove(item.key)
+        remove(item.key);
         break;
       case 'menu_close_other':
-        closeOthers(item.key)
+        closeOthers(item.key);
         break;
       case 'menu_close_left':
-        closeLeft(item.key)
+        closeLeft(item.key);
         break;
       case 'menu_close_right':
-        closeRight(item.key)
+        closeRight(item.key);
         break;
     }
   };
@@ -136,20 +136,28 @@ export default function OpenTabs() {
         hideAdd
         type="editable-card"
         activeKey={curTab?.key}
-        onChange={(key:string) => selTab(key)}
-        onEdit={(targetKey:any) => remove(targetKey)}
+        onChange={(key: string) => selTab(key)}
+        onEdit={(targetKey: any) => remove(targetKey)}
         items={items}
         className="fa-tab"
         tabBarGutter={0}
       />
 
-      <FaFullscreenBtn target={document.body} style={{ width: 34, height: 34}} />
+      <FaFullscreenBtn target={document.body} style={{ width: 34, height: 34 }} />
 
-      <Menu id='menu_context_tab_item' className="contextMenu">
-        <Item id="menu_close_current" onClick={handleItemClick}>关闭当前</Item>
-        <Item id="menu_close_other" onClick={handleItemClick}>关闭其他</Item>
-        <Item id="menu_close_left" onClick={handleItemClick}>关闭左边</Item>
-        <Item id="menu_close_right" onClick={handleItemClick}>关闭右边</Item>
+      <Menu id="menu_context_tab_item" className="contextMenu">
+        <Item id="menu_close_current" onClick={handleItemClick}>
+          关闭当前
+        </Item>
+        <Item id="menu_close_other" onClick={handleItemClick}>
+          关闭其他
+        </Item>
+        <Item id="menu_close_left" onClick={handleItemClick}>
+          关闭左边
+        </Item>
+        <Item id="menu_close_right" onClick={handleItemClick}>
+          关闭右边
+        </Item>
       </Menu>
     </div>
   );

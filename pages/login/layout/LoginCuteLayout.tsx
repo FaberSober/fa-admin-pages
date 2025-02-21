@@ -1,22 +1,20 @@
 import React, { type CSSProperties, useContext, useEffect, useRef } from 'react';
-import { trim } from "lodash";
-import { type Fa, fileSaveApi } from "@fa/ui";
-import { ConfigLayoutContext } from "@features/fa-admin-pages/layout/config/context/ConfigLayoutContext";
-import styles from "./LoginCuteLayout.module.scss";
-
+import { trim } from 'lodash';
+import { type Fa, fileSaveApi } from '@fa/ui';
+import { ConfigLayoutContext } from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
+import styles from './LoginCuteLayout.module.scss';
 
 /**
  *
  * @author xu.pengfei
  * @date 2023/2/6 10:26
  */
-export default function LoginCuteLayout({children}: Fa.BaseChildProps) {
+export default function LoginCuteLayout({ children }: Fa.BaseChildProps) {
   const vantaRef = useRef<any>();
-  const {systemConfig} = useContext(ConfigLayoutContext);
-
+  const { systemConfig } = useContext(ConfigLayoutContext);
 
   useEffect(() => {
-    if (systemConfig === undefined) return
+    if (systemConfig === undefined) return;
     // 表示有背景图片
     if (trim(systemConfig.loginBg) !== '') return;
 
@@ -41,7 +39,7 @@ export default function LoginCuteLayout({children}: Fa.BaseChildProps) {
   const bgStyle: CSSProperties = {
     background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : 'url(/file/image/bg/login.png) no-repeat',
     backgroundSize: '100% 100%',
-  }
+  };
   // console.log(bgStyle)
 
   return (
@@ -49,11 +47,9 @@ export default function LoginCuteLayout({children}: Fa.BaseChildProps) {
       <div className="fa-full-content" style={bgStyle}>
         {/* right panel slot */}
         <div className={styles.mainDiv}>
-          <div className={styles.main}>
-            {children}
-          </div>
+          <div className={styles.main}>{children}</div>
         </div>
       </div>
     </div>
-  )
+  );
 }

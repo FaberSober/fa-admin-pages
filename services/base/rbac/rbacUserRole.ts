@@ -23,7 +23,7 @@ class RbacUserRoleApi extends BaseApi<Rbac.RbacUserRole, string> {
   addUsers = (userIds: string[], roleId: string): Promise<Fa.Ret<boolean>> => this.post('addUsers', { userIds, roleId });
 
   /** 添加用户角色 */
-  updateUserRoles = (params: {userId: string, roleIds: string[]}): Promise<Fa.Ret<boolean>> => this.post('updateUserRoles', params);
+  updateUserRoles = (params: { userId: string; roleIds: string[] }): Promise<Fa.Ret<boolean>> => this.post('updateUserRoles', params);
 }
 
 export default new RbacUserRoleApi(GATE_APP.rbac, 'rbacUserRole');

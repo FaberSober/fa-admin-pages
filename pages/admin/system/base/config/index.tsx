@@ -38,9 +38,9 @@ export default function Config() {
       />
 
       <div className="fa-mt12 fa-bg-white">
-        {tab === 'system'   && <ConfigSystem />}
-        {tab === 'safe'     && <ConfigSafe />}
-        {tab === 'file'     && <ConfigStorage />}
+        {tab === 'system' && <ConfigSystem />}
+        {tab === 'safe' && <ConfigSafe />}
+        {tab === 'file' && <ConfigStorage />}
       </div>
     </div>
   );

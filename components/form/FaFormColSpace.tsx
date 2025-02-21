@@ -1,7 +1,6 @@
 import React from 'react';
-import type { Fa } from "@fa/ui";
-import { Col, Row, Space } from "antd";
-
+import type { Fa } from '@fa/ui';
+import { Col, Row, Space } from 'antd';
 
 export interface FaFormColProps extends Fa.BaseChildProps {
   offset?: number;
@@ -15,10 +14,8 @@ export default function FaFormCol({ offset = 3, children }: FaFormColProps) {
   return (
     <Row>
       <Col offset={offset}>
-        <Space>
-          {children}
-        </Space>
+        <Space>{children}</Space>
       </Col>
     </Row>
-  )
+  );
 }

@@ -1,19 +1,18 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Empty, Layout} from 'antd';
-import {find, isNil} from 'lodash';
-import {useLocation, useNavigate} from 'react-router-dom';
-import {Helmet} from 'react-helmet-async';
-import {useLocalStorage} from 'react-use';
-import {type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps, findTreePath, flatTreeList} from "@fa/ui";
-import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from "./cube";
-import type {Rbac} from '@/types';
-import {rbacUserRoleApi} from '@features/fa-admin-pages/services';
-import useRoutePermission from "../../hooks/useRoutePermission";
-import MenuLayoutContext, {type MenuLayoutContextProps, type OpenTabsItem} from './context/MenuLayoutContext';
-import {ConfigLayoutContext} from "../config/context/ConfigLayoutContext";
+import React, { useContext, useEffect, useState } from 'react';
+import { Empty, Layout } from 'antd';
+import { find, isNil } from 'lodash';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { useLocalStorage } from 'react-use';
+import { type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps, findTreePath, flatTreeList } from '@fa/ui';
+import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from './cube';
+import type { Rbac } from '@/types';
+import { rbacUserRoleApi } from '@features/fa-admin-pages/services';
+import useRoutePermission from '../../hooks/useRoutePermission';
+import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
+import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import './MenuLayout.scss';
-import { SITE_INFO } from "@/configs";
-
+import { SITE_INFO } from '@/configs';
 
 /**
  * 厂字形菜单布局
@@ -23,7 +22,7 @@ import { SITE_INFO } from "@/configs";
 export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const {systemConfig} = useContext(ConfigLayoutContext)
+  const { systemConfig } = useContext(ConfigLayoutContext);
 
   // 将tree平铺的menu list
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);
@@ -41,9 +40,9 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
 
-  const [hasPermission] = useRoutePermission(menuList)
+  const [hasPermission] = useRoutePermission(menuList);
 
-  const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {})
+  const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
   useEffect(() => {
     rbacUserRoleApi.getMyMenusTree().then((res) => {
@@ -60,17 +59,19 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
         // 未找到菜单，解析打开的菜单
         try {
           // console.log('faTabCache', faTabCache)
-          const cacheTabItem = faTabCache[location.pathname]
+          const cacheTabItem = faTabCache[location.pathname];
           if (!isNil(cacheTabItem)) {
-            const itemFind = find(openTabs, i => i.key === cacheTabItem.key)
+            const itemFind = find(openTabs, (i) => i.key === cacheTabItem.key);
             if (isNil(itemFind)) {
-              setOpenTabs([ ...openTabs, cacheTabItem ])
+              setOpenTabs([...openTabs, cacheTabItem]);
             }
-            setCurTab(cacheTabItem)
-            navigateTab(cacheTabItem)
+            setCurTab(cacheTabItem);
+            navigateTab(cacheTabItem);
             // justSyncOpenMenuById(cacheTabItem.linkMenuId, res.data);
           }
-        } catch (e) { /* empty */ }
+        } catch (e) {
+          /* empty */
+        }
       }
     });
   }, []);
@@ -85,7 +86,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
       path: menu.linkUrl,
       name: menu.name,
       closeable: true,
-    }
+    };
   }
 
   // function justSyncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[]) {
@@ -129,12 +130,12 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     const menu = find(menuArr, (i) => i.id === openMenuId) as Rbac.RbacMenu;
     if (menu === undefined) {
       // 未找到对应的菜单，说明不是菜单页，是新开的自定义tab，无需同步菜单
-      const tabItem = find(openTabs, i => i.key === openMenuId);
-      setCurTab(tabItem)
+      const tabItem = find(openTabs, (i) => i.key === openMenuId);
+      setCurTab(tabItem);
       if (tabItem) {
-        navigateTab(tabItem)
+        navigateTab(tabItem);
       }
-      setMenuSelPath([])
+      setMenuSelPath([]);
       return;
     }
 
@@ -166,19 +167,19 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     if (isNil(tab)) {
       const tabItem = transMenuToTabItem(menu);
       setOpenTabs([...openTabs, tabItem]);
-      setCurTab(tabItem)
+      setCurTab(tabItem);
     } else {
-      setCurTab(tab)
+      setCurTab(tab);
     }
   }
 
-  function navigateTab(tabItem: OpenTabsItem|undefined) {
+  function navigateTab(tabItem: OpenTabsItem | undefined) {
     if (tabItem === undefined) return;
     if (tabItem.type === 'iframe') {
-      window.FaIframeUrl = tabItem.path
-      navigate(`/admin/iframe`)
+      window.FaIframeUrl = tabItem.path;
+      navigate(`/admin/iframe`);
     } else {
-      navigate(tabItem.path)
+      navigate(tabItem.path);
     }
   }
 
@@ -191,7 +192,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     menuSelMenuId,
     setMenuSelMenuId: (id) => {
       // console.log('setMenuSelMenuId')
-      syncOpenMenuById(id, menuFullTree)
+      syncOpenMenuById(id, menuFullTree);
     },
     setMenuSelPath: (key: string) => {
       // console.log('setMenuSelPath')
@@ -211,35 +212,35 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
     setShowTabs,
     openTabs,
     curTab,
-    setCurTab: (tab: OpenTabsItem|undefined) => {
+    setCurTab: (tab: OpenTabsItem | undefined) => {
       // console.log('setCurTab')
-      syncOpenMenuById(tab?.key, menuFullTree)
+      syncOpenMenuById(tab?.key, menuFullTree);
     },
     setOpenTabs,
     addTab: (tab1: OpenTabsItem) => {
-      const newTab: OpenTabsItem = { ...tab1, linkMenuId: menuSelMenuId }
+      const newTab: OpenTabsItem = { ...tab1, linkMenuId: menuSelMenuId };
       // console.log('add tab', newTab)
-      const tabFind = find(openTabs, i => i.key === newTab.key); // 查找已打开的tab
+      const tabFind = find(openTabs, (i) => i.key === newTab.key); // 查找已打开的tab
       if (tabFind) {
-        syncOpenMenuById(tabFind.key, menuFullTree)
+        syncOpenMenuById(tabFind.key, menuFullTree);
       } else {
-        setOpenTabs([ ...openTabs, newTab ])
-        setCurTab(newTab)
-        navigateTab(newTab)
+        setOpenTabs([...openTabs, newTab]);
+        setCurTab(newTab);
+        navigateTab(newTab);
         setTimeout(() => {
-          syncOpenMenuById(newTab.key, menuFullTree)
-        }, 100)
+          syncOpenMenuById(newTab.key, menuFullTree);
+        }, 100);
       }
       // cache tab info
-      setFaTabCache({ ...faTabCache, [newTab.path]: newTab })
+      setFaTabCache({ ...faTabCache, [newTab.path]: newTab });
     },
     removeTab: (tabKey: string) => {
       // console.log('close tab', tabKey)
-      setOpenTabs(openTabs.filter(i => i.key !== tabKey))
+      setOpenTabs(openTabs.filter((i) => i.key !== tabKey));
     },
     selTab: (tabKey: string) => {
       // console.log('selTab')
-      syncOpenMenuById(tabKey, menuFullTree)
+      syncOpenMenuById(tabKey, menuFullTree);
     },
   };
 

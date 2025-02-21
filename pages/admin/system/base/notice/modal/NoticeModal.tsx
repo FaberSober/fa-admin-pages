@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { type Admin, ApiEffectLayoutContext, BaseBoolRadio, BaseTinyMCE, type CommonModalProps, DragModal, FaHref, FaUtils } from '@fa/ui';
 import { noticeApi } from '@features/fa-admin-pages/services';
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 const serviceName = '通知与公告';
 
@@ -54,12 +54,12 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
       status: get(record, 'status'),
       forApp: get(record, 'forApp'),
       strongNotice: get(record, 'strongNotice'),
-    }
+    };
   }
 
   function showModal() {
-    setOpen(true)
-    form.setFieldsValue(getInitialValues())
+    setOpen(true);
+    form.setFieldsValue(getInitialValues());
   }
 
   const loading = loadingEffect[noticeApi.getUrl('save')] || loadingEffect[noticeApi.getUrl('update')];
@@ -67,18 +67,14 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
     <span>
       <span onClick={showModal}>
         {children}
-        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {addBtn && (
+          <Button icon={<PlusOutlined />} type="primary">
+            新增
+          </Button>
+        )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
       </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={1000}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={1000} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input maxLength={50} />

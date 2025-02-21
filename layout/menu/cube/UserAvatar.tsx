@@ -1,11 +1,11 @@
 import React, { useContext, useMemo } from 'react';
 import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
-import {Avatar, Menu, Popover, Switch} from 'antd';
+import { Avatar, Menu, Popover, Switch } from 'antd';
 import { useIntl } from 'react-intl';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
-import {InputColor, ThemeLayoutContext} from "@fa/ui";
-import UserLayoutContext from '../../user/context/UserLayoutContext'
-import MenuLayoutContext from "../context/MenuLayoutContext";
+import { InputColor, ThemeLayoutContext } from '@fa/ui';
+import UserLayoutContext from '../../user/context/UserLayoutContext';
+import MenuLayoutContext from '../context/MenuLayoutContext';
 
 const UserPopoverContent = () => {
   const intl = useIntl();
@@ -22,21 +22,21 @@ const UserPopoverContent = () => {
           key: key,
           path: '/admin/system/account/base',
           name: intl.formatMessage({ id: 'menu.account.center' }),
-        })
+        });
         break;
       case 'security':
         addTab({
           key: key,
           path: '/admin/system/account/security',
           name: intl.formatMessage({ id: 'menu.account.security' }),
-        })
+        });
         break;
       case 'msg':
         addTab({
           key: key,
           path: '/admin/system/account/msg',
           name: intl.formatMessage({ id: 'menu.account.msg' }),
-        })
+        });
         break;
       case 'logout':
         logout();
@@ -84,7 +84,7 @@ const UserPopoverContent = () => {
   return (
     <div style={{ minWidth: 160 }}>
       <div className="fa-flex-row-center">
-        <InputColor value={primaryColor} onChange={(v:string) => handleChangeThemeColor(v)} style={{width: 25, height: 25}} />
+        <InputColor value={primaryColor} onChange={(v: string) => handleChangeThemeColor(v)} style={{ width: 25, height: 25 }} />
 
         <div className="fa-flex-row-center fa-mr8">
           {['#F5222D', '#faad14', '#50CEE3', '#1677ff', '#722ED1', '#053553'].map((i) => (
@@ -96,7 +96,9 @@ const UserPopoverContent = () => {
       </div>
 
       <div className="fa-flex-row-center fa-mt12 fa-mb12">
-        <div className="fa-flex-1" style={{paddingLeft: 20}}>是否展示标签栏</div>
+        <div className="fa-flex-1" style={{ paddingLeft: 20 }}>
+          是否展示标签栏
+        </div>
         <div>
           <Switch checkedChildren="展示" unCheckedChildren="隐藏" checked={showTabs} onChange={setShowTabs} />
         </div>

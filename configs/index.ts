@@ -1,4 +1,4 @@
-import type { Fa } from "@fa/ui";
+import type { Fa } from '@fa/ui';
 
 export default {
   /** -------------------------------- 网关配置 -------------------------------- */
@@ -11,5 +11,5 @@ export default {
     generator: '/api/base/generator',
     /** doc服务 */
     doc: '/api/base/doc',
-  }
-} as Fa.ConfigApp
+  },
+} as Fa.ConfigApp;

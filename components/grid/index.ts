@@ -1,1 +1,1 @@
-export * from './FaGridLayout'
+export * from './FaGridLayout';

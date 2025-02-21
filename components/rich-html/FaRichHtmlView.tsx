@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { FaUtils } from '@fa/ui'
-import './docview.scss'
-import FaRichHtmlImgPreview from "./FaRichHtmlImgPreview";
-
+import { FaUtils } from '@fa/ui';
+import './docview.scss';
+import FaRichHtmlImgPreview from './FaRichHtmlImgPreview';
 
 export interface FaRichHtmlViewProps {
   html: string;
@@ -15,14 +14,14 @@ export interface FaRichHtmlViewProps {
  * @date 2024/1/30 14:39
  */
 export default function FaRichHtmlView({ html }: FaRichHtmlViewProps) {
-  const [id] = useState(FaUtils.uuid())
+  const [id] = useState(FaUtils.uuid());
 
   return (
     <div className="fa-rich-html-view">
-      <div id={id} dangerouslySetInnerHTML={{__html: html}}/>
+      <div id={id} dangerouslySetInnerHTML={{ __html: html }} />
 
       {/* img 图片预览 */}
-      <FaRichHtmlImgPreview domId={id}/>
+      <FaRichHtmlImgPreview domId={id} />
     </div>
-  )
+  );
 }

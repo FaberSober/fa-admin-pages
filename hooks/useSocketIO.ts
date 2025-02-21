@@ -1,7 +1,7 @@
-import {useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {trim} from 'lodash';
-import {getToken} from '@fa/ui';
-import {ConfigLayoutContext} from '../layout/config/context/ConfigLayoutContext';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { trim } from 'lodash';
+import { getToken } from '@fa/ui';
+import { ConfigLayoutContext } from '../layout/config/context/ConfigLayoutContext';
 
 export interface Props {
   query?: any;
@@ -57,7 +57,7 @@ export default function useSocketIO({ query = { from: 'web', token: getToken() }
   const socketEmit = useCallback(
     (event: string, ...args: any[]) => {
       if (!ready) {
-        console.error('socket接口尚未准备好，请稍等')
+        console.error('socket接口尚未准备好，请稍等');
         // message.error('socket接口尚未准备好，请稍等');
         return;
       }

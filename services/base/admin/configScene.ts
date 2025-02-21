@@ -11,8 +11,7 @@ class Api extends BaseApi<Admin.ConfigScene, number> {
   findByScene = (params: { biz: string }): Promise<Fa.Ret<Admin.ConfigScene>> => this.get(`findByScene`, params);
 
   /** 批量更新场景配置-更新排序 */
-  batchUpdate = (params: { id: number; hide: boolean; defaultScene: boolean }[]): Promise<Fa.Ret> =>
-    this.post(`batchUpdate`, params);
+  batchUpdate = (params: { id: number; hide: boolean; defaultScene: boolean }[]): Promise<Fa.Ret> => this.post(`batchUpdate`, params);
 }
 
 export default new Api(GATE_APP.admin, 'configScene');

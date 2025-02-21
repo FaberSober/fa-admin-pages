@@ -1,11 +1,11 @@
-import React, {useContext, useState} from 'react';
-import {get} from 'lodash';
-import {Button, Form, Input, Switch} from 'antd';
-import {ApiEffectLayoutContext, type CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector} from '@fa/ui';
+import React, { useContext, useState } from 'react';
+import { get } from 'lodash';
+import { Button, Form, Input, Switch } from 'antd';
+import { ApiEffectLayoutContext, type CommonModalProps, DictEnumApiRadio, DragModal, FaHref, FaUtils, UploadImgLocal, DictEnumApiSelector } from '@fa/ui';
 import useBus from 'use-bus';
-import type {Admin} from '@/types';
-import {rbacUserRoleApi, userApi} from '@features/fa-admin-pages/services';
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import type { Admin } from '@/types';
+import { rbacUserRoleApi, userApi } from '@features/fa-admin-pages/services';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 
@@ -94,18 +94,14 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     <span>
       <span onClick={showModal}>
         {children}
-        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {addBtn && (
+          <Button icon={<PlusOutlined />} type="primary">
+            新增
+          </Button>
+        )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
       </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="departmentId" label="部门" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <DepartmentCascade />
@@ -137,7 +133,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <DictEnumApiRadio enumName="SexEnum" />
           </Form.Item>
           <Form.Item name="workStatus" label="工作状态" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DictEnumApiSelector enumName='UserWorkStatusEnum' />
+            <DictEnumApiSelector enumName="UserWorkStatusEnum" />
           </Form.Item>
           <Form.Item name="img" label="头像" {...FaUtils.formItemFullLayout}>
             <UploadImgLocal />

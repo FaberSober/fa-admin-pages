@@ -4,8 +4,7 @@ import { Button, Form, Input } from 'antd';
 import type { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
-import { FaFormColSpace } from "@features/fa-admin-pages/components";
-
+import { FaFormColSpace } from '@features/fa-admin-pages/components';
 
 /**
  * @author xu.pengfei
@@ -63,7 +62,7 @@ export default function ConfigStorageQiniu() {
         </Form.Item>
 
         <FaFormColSpace offset={4}>
-          <Button htmlType="submit" icon={<SaveOutlined/>} type="primary" loading={loading}>
+          <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
             保存
           </Button>
           <Button onClick={handleReset}>重置</Button>

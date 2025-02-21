@@ -1,18 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Button, Card, Col, Descriptions, Row, Space} from 'antd';
-import type {Admin} from '@/types';
-import {ApiEffectLayoutContext, FaUtils} from '@fa/ui';
-import {ReloadOutlined} from '@ant-design/icons';
-import {systemApi} from '@features/fa-admin-pages/services';
-import {useInterval} from "ahooks";
-
+import React, { useContext, useEffect, useState } from 'react';
+import { Button, Card, Col, Descriptions, Row, Space } from 'antd';
+import type { Admin } from '@/types';
+import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
+import { ReloadOutlined } from '@ant-design/icons';
+import { systemApi } from '@features/fa-admin-pages/services';
+import { useInterval } from 'ahooks';
 
 /**
  * @author xu.pengfei
  * @date 2022/10/17
  */
 export default function Server() {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext);
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [data, setData] = useState<Admin.ServerInfo>();
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function Server() {
   return (
     <div className="fa-full-content fa-p12">
       <Space className="fa-mb12">
-        <Button onClick={fetchData} loading={loading} icon={<ReloadOutlined/>}>
+        <Button onClick={fetchData} loading={loading} icon={<ReloadOutlined />}>
           刷新
         </Button>
       </Space>
@@ -57,28 +56,30 @@ export default function Server() {
         </Row>
       )}
 
-
       {data !== undefined && (
         <Row gutter={12} className="fa-mt12">
           <Col md={12}>
             <Card title="磁盘">
-              {data.fileStoreList.map(i => {
+              {data.fileStoreList.map((i) => {
                 const freePer = i.freeSpace / i.totalSpace;
                 const totalWidth = 400;
-                const freePerWidth = (freePer * totalWidth).toFixed(0)
+                const freePerWidth = (freePer * totalWidth).toFixed(0);
                 return (
                   <div key={i.uuid} className="fa-flex-row-center fa-mb12">
                     <div className="fa-flex-1 fa-keep-word">{i.volume}</div>
                     <div className="fa-mr12">{i.name}</div>
-                    <div className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative" style={{width: totalWidth, background: 'darkblue', color: '#FFF'}}>
-                      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey'  }} />
+                    <div
+                      className="fa-flex-row-center fa-p8 fa-border fa-border-r fa-relative"
+                      style={{ width: totalWidth, background: 'darkblue', color: '#FFF' }}
+                    >
+                      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${freePerWidth}px`, background: 'grey' }} />
                       <div className="fa-flex-1" />
                       <div>{FaUtils.sizeToHuman(i.freeSpace, 1)}</div>
                       <div>&nbsp;/&nbsp;</div>
                       <div>{FaUtils.sizeToHuman(i.totalSpace, 1)}</div>
                     </div>
                   </div>
-                )
+                );
               })}
             </Card>
           </Col>
