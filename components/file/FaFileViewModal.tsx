@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input } from 'antd';
-import { DragModal, type DragModalProps, FaUtils } from '@fa/ui';
+import { DragModal, type DragModalProps } from '@fa/ui';
 import FaFileView from './FaFileView';
 
 interface FaFileViewModalModal extends DragModalProps {
@@ -21,7 +20,7 @@ export default function FaFileViewModal({ children, title, fileId, waterMark, ..
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal title={title || '查看文件'} open={open} onOk={() => form.submit()} onCancel={() => setOpen(false)} width={1000} {...props}>
+      <DragModal title={title || '查看文件'} open={open} onCancel={() => setOpen(false)} width={1000} {...props}>
         <div style={{ height: 600 }}>
           <FaFileView fileId={fileId} waterMark={waterMark} />
         </div>
