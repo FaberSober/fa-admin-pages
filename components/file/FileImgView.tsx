@@ -5,6 +5,7 @@ import { fileSaveApi } from '@features/fa-admin-pages/services';
 export interface FileImgViewProps {
   fileId: string;
   width?: number;
+  height?: number;
   style?: CSSProperties;
 }
 
@@ -12,7 +13,7 @@ export interface FileImgViewProps {
  * @author xu.pengfei
  * @date 2022/12/29 13:58
  */
-export default function FileImgView({ fileId, width = 20, style }: FileImgViewProps) {
+export default function FileImgView({ fileId, width = 20, height, style }: FileImgViewProps) {
   const divStyle = {
     // height: width,
     ...style,
@@ -22,11 +23,12 @@ export default function FileImgView({ fileId, width = 20, style }: FileImgViewPr
     <div className="fa-flex-row fa-flex-row-center" style={divStyle}>
       <Image
         width={width}
-        // height={width}
+        height={height}
         src={fileSaveApi.genLocalGetFilePreview(fileId)}
         preview={{
           src: fileSaveApi.genLocalGetFile(fileId),
         }}
+        style={{ objectFit: 'cover' }}
       />
     </div>
   );
