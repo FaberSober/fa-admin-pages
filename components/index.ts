@@ -3,6 +3,7 @@ export * from './base-card';
 export * from './date';
 export * from './echarts';
 export * from './excel';
+export * from './exception';
 export * from './file';
 export * from './form';
 export * from './grid';
