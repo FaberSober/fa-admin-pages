@@ -6,7 +6,7 @@ import type { Admin } from '@/types';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 
-const serviceName = '部门';
+const serviceName = '';
 
 interface DepartmentModalProps extends CommonModalProps<Admin.Department> {
   parentId?: number;

@@ -6,7 +6,7 @@ import type {Admin} from '@/types';
 import {areaApi} from '@features/fa-admin-pages/services';
 import AreaModal from './modal/AreaModal';
 
-const serviceName = '中国行政地区表';
+const serviceName = '';
 const biz = 'base_area';
 
 export default function AreaList() {

@@ -6,7 +6,7 @@ import type { Rbac } from '@/types';
 import { rbacRoleApi } from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
-const serviceName = '角色';
+const serviceName = '';
 
 /**
  * BASE-角色表实体新增、编辑弹框

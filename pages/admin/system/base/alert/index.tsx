@@ -6,7 +6,7 @@ import { alertApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import AlertModal from './modal/AlertModal';
 
-const serviceName = '告警信息';
+const serviceName = '';
 const biz = 'base_alert';
 
 /**

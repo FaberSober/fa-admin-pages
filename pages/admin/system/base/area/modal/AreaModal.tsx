@@ -7,7 +7,7 @@ import type { Admin } from '@/types';
 import { areaApi } from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
-const serviceName = '中国行政地区表';
+const serviceName = '';
 
 /**
  * 中国行政地区表实体新增、编辑弹框
@@ -99,7 +99,7 @@ export default function AreaModal({ children, title, record, fetchFinish, addBtn
           <Form.Item name="cityCode" label="区号" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
             <Input />
           </Form.Item>
-          <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input />
           </Form.Item>
           <Form.Item name="shortName" label="简称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>

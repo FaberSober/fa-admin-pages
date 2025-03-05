@@ -6,7 +6,7 @@ import type {Admin} from '@/types';
 import {jobApi} from '@features/fa-admin-pages/services';
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 
-const serviceName = '系统定时任务';
+const serviceName = '';
 
 /**
  * 系统定时任务实体新增、编辑弹框

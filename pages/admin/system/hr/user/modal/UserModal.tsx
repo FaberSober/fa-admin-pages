@@ -9,7 +9,7 @@ import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 
-const serviceName = '用户';
+const serviceName = '';
 
 /**
  * 用户实体新增、编辑弹框

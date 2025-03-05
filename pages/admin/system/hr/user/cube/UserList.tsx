@@ -24,7 +24,7 @@ import UserView from "./cube/UserView";
 import UserStatusCol from "./cube/UserStatusCol";
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 
-const serviceName = '用户';
+const serviceName = '';
 const biz = 'UserList-v3';
 
 interface IProps {

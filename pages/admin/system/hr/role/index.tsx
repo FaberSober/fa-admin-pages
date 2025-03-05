@@ -8,7 +8,7 @@ import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
 import RbacUserRoleList from './list/RbacUserRoleList';
 
-const serviceName = '角色';
+const serviceName = '';
 const biz = 'base_rbac_role';
 
 export default function RbacRoleList() {

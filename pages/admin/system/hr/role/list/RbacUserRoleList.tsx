@@ -5,7 +5,7 @@ import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, typ
 import type { Rbac } from '@/types';
 import { rbacUserRoleApi as api } from '@features/fa-admin-pages/services';
 
-const serviceName = '角色用户';
+const serviceName = '';
 const biz = 'RbacUserRoleList';
 
 export interface RbacUserRoleListProps {

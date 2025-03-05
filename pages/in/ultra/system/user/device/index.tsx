@@ -8,7 +8,7 @@ import UserDeviceModal from './modal/UserDeviceModal';
 import CommonExcelUploadModal from '@features/fa-admin-pages/components/excel/CommonExcelUploadModal';
 import UserSearchSelect from "@features/fa-admin-pages/components/helper/UserSearchSelect";
 
-const serviceName = 'BASE-用户设备';
+const serviceName = '';
 const biz = 'base_user_device';
 
 
