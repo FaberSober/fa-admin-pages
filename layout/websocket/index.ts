@@ -1,5 +1,5 @@
-import WebSocketLayout from './WebSocketLayout'
-import WebSocketLayoutContext, { type WebSocketLayoutContextProps } from './context/WebSocketLayoutContext'
+import WebSocketLayout from './WebSocketLayout';
+import WebSocketLayoutContext, { type WebSocketLayoutContextProps } from './context/WebSocketLayoutContext';
 
-export { WebSocketLayout, WebSocketLayoutContext }
-export type { WebSocketLayoutContextProps }
+export { WebSocketLayout, WebSocketLayoutContext };
+export type { WebSocketLayoutContextProps };

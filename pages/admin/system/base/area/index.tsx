@@ -1,9 +1,20 @@
 import React from 'react';
-import {DownloadOutlined, EditOutlined, SearchOutlined} from '@ant-design/icons';
-import {Button, Form, Input, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseTableUtils, DictEnumApiSelector, clearForm, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams} from '@fa/ui';
-import type {Admin} from '@/types';
-import {areaApi} from '@features/fa-admin-pages/services';
+import { DownloadOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space } from 'antd';
+import {
+  AuthDelBtn,
+  BaseBizTable,
+  BaseTableUtils,
+  DictEnumApiSelector,
+  clearForm,
+  type FaberTable,
+  FaHref,
+  useDelete,
+  useExport,
+  useTableQueryParams,
+} from '@fa/ui';
+import type { Admin } from '@/types';
+import { areaApi } from '@features/fa-admin-pages/services';
 import AreaModal from './modal/AreaModal';
 
 const serviceName = '';
@@ -12,18 +23,8 @@ const biz = 'base_area';
 export default function AreaList() {
   const [form] = Form.useForm();
 
-  const {
-    queryParams,
-    setFormValues,
-    handleTableChange,
-    setSceneId,
-    setConditionList,
-    fetchPageList,
-    loading,
-    list,
-    dicts,
-    paginationProps,
-  } = useTableQueryParams<Admin.Area>(areaApi.page, { sorter: { field: 'areaCode', order: 'ascend' } }, serviceName);
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, dicts, paginationProps } =
+    useTableQueryParams<Admin.Area>(areaApi.page, { sorter: { field: 'areaCode', order: 'ascend' } }, serviceName);
 
   const [exporting, fetchExportExcel] = useExport(areaApi.exportExcel, queryParams);
   const [handleDelete] = useDelete<number>(areaApi.remove, fetchPageList, serviceName);
@@ -77,10 +78,14 @@ export default function AreaList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <AreaModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>
@@ -102,4 +107,3 @@ export default function AreaList() {
     </div>
   );
 }
-

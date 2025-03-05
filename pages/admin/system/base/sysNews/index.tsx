@@ -5,7 +5,7 @@ import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type F
 import { fileSaveApi, sysNewsApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import SysNewsModal from './modal/SysNewsModal';
-import SysNewsView from "./cube/SysNewsView";
+import SysNewsView from './cube/SysNewsView';
 
 const serviceName = '系统新闻';
 const biz = 'base_sys_news';
@@ -17,9 +17,9 @@ export default function SysNewsList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<Admin.SysNews>(api.page, {}, serviceName)
+    useTableQueryParams<Admin.SysNews>(api.page, {}, serviceName);
 
-  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
+  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName);
 
   /** 生成表格字段List */
   function genColumns() {
@@ -79,7 +79,9 @@ export default function SysNewsList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <SysNewsModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
             </Space>

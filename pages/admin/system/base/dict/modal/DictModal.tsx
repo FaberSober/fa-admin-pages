@@ -75,15 +75,7 @@ export default function DictModal({ children, parentId, title, record, ...props 
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="parentId" label="上级节点" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <DictCascade />

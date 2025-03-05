@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Admin } from '@/types';
-import { Descriptions } from "antd";
-
+import { Descriptions } from 'antd';
 
 export interface UserViewProps {
   item: Admin.User;
@@ -10,10 +9,7 @@ export interface UserViewProps {
 /**
  * BASE-用户实体详情查看
  */
-export default function UserView({item}: UserViewProps) {
-
-  
-
+export default function UserView({ item }: UserViewProps) {
   return (
     <Descriptions column={2} bordered>
       <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
@@ -43,5 +39,5 @@ export default function UserView({item}: UserViewProps) {
       <Descriptions.Item label="更新IP">{item.updHost}</Descriptions.Item>
       <Descriptions.Item label="是否删除">{item.deleted}</Descriptions.Item>
     </Descriptions>
-  )
+  );
 }

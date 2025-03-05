@@ -1,10 +1,8 @@
-import {BaseZeroApi, type Fa} from "@fa/ui";
-import {GATE_APP} from "@/configs";
-import type {Generator} from "@/types";
-
+import { BaseZeroApi, type Fa } from '@fa/ui';
+import { GATE_APP } from '@/configs';
+import type { Generator } from '@/types';
 
 class Api extends BaseZeroApi {
-
   /** 查询表 */
   pageTable = (params: Fa.BasePageQuery<Generator.TableQueryVo>): Promise<Fa.Ret<Fa.Page<Generator.TableVo>>> => this.post('pageTable', params);
 
@@ -22,7 +20,6 @@ class Api extends BaseZeroApi {
 
   /** 复制全部文件 */
   copyAll = (params: Generator.CodeCopyVo): Promise<Fa.Ret<boolean>> => this.post('copyAll', params);
-
 }
 
 export default new Api(GATE_APP.generator, 'generator');

@@ -1,1 +1,1 @@
-export { default as FaToc } from './FaToc'
+export { default as FaToc } from './FaToc';

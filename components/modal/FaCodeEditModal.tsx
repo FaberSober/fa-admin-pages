@@ -3,10 +3,9 @@ import { Form, Input } from 'antd';
 import { DragModal, type DragModalProps, FaUtils } from '@fa/ui';
 // import MonacoEditor from "react-monaco-editor";
 
-
 export interface FaCodeEditModal extends DragModalProps {
   value?: string;
-  onChange?: (v:string) => void;
+  onChange?: (v: string) => void;
 }
 
 /**
@@ -20,9 +19,9 @@ export default function FaCodeEditModal({ children, title, value, onChange, ...p
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
     if (onChange) {
-      onChange(fieldsValue.code)
+      onChange(fieldsValue.code);
     }
-    setOpen(false)
+    setOpen(false);
   }
 
   function getInitialValues() {
@@ -38,22 +37,11 @@ export default function FaCodeEditModal({ children, title, value, onChange, ...p
 
   return (
     <span>
-      <span onClick={showModal}>
-        {children}
-      </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <span onClick={showModal}>{children}</span>
+      <DragModal title={title} open={open} onOk={() => form.submit()} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="code" label="配置项" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input.TextArea
-              autoSize={{minRows:1, maxRows: 25}}
-            />
+            <Input.TextArea autoSize={{ minRows: 1, maxRows: 25 }} />
 
             {/*<MonacoEditor*/}
             {/*  height={600}*/}

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import type { Admin } from '@/types';
 // import Favicon from 'react-favicon'
 import { Favicon } from '@features/fa-admin-pages/components/icons/Favicon';
-import { type Fa, PageLoading } from "@fa/ui";
+import { type Fa, PageLoading } from '@fa/ui';
 import { configSysApi, fileSaveApi } from '@features/fa-admin-pages/services';
-import ConfigLayoutContext, { type ConfigLayoutContextProps } from './context/ConfigLayoutContext'
-
+import ConfigLayoutContext, { type ConfigLayoutContextProps } from './context/ConfigLayoutContext';
 
 /**
  * 系统配置的上下文
@@ -16,7 +15,7 @@ export default function ConfigLayout({ children }: Fa.BaseChildProps) {
   const [systemConfig, setSystemConfig] = useState<Admin.SystemConfigPo>();
 
   useEffect(() => {
-    refreshSystemConfig()
+    refreshSystemConfig();
   }, []);
 
   // 获取系统配置参数

@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {cloneDeep, isNil, remove} from 'lodash';
-import {Cascader, message} from 'antd';
-import {type BaseCascaderProps, Fa} from "@fa/ui";
-import type {Admin} from '@/types';
-import type { BaseOptionType } from "antd/es/cascader";
+import React, { useEffect, useState } from 'react';
+import { cloneDeep, isNil, remove } from 'lodash';
+import { Cascader, message } from 'antd';
+import { type BaseCascaderProps, Fa } from '@fa/ui';
+import type { Admin } from '@/types';
+import type { BaseOptionType } from 'antd/es/cascader';
 import { areaApi } from '@features/fa-admin-pages/services';
-
 
 function getLastValue(values: number[]) {
   if (isNil(values)) return undefined;
@@ -31,15 +30,7 @@ export interface AreaCascaderProps<T extends BaseOptionType> extends Omit<BaseCa
  * @author xu.pengfei
  * @date 2020/12/28
  */
-export default function AreaCascader({
-  showRoot,
-  leafLevel = 4,
-  leafPath,
-  value,
-  onChange,
-  onChangeWithItem,
-  ...props
-}: AreaCascaderProps<Admin.Area>) {
+export default function AreaCascader({ showRoot, leafLevel = 4, leafPath, value, onChange, onChangeWithItem, ...props }: AreaCascaderProps<Admin.Area>) {
   const [array, setArray] = useState<any[] | undefined>([]);
   const [innerValue, setInnerValue] = useState<any[]>();
 

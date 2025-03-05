@@ -1,11 +1,10 @@
-import React, {Suspense} from 'react';
-import {ApiEffectLayout, PageLoading, ThemeLayout} from "@fa/ui";
-import {SITE_INFO} from "@/configs";
-import LangLayout from "../lang/LangLayout";
-import {Outlet} from "react-router-dom";
-import { ConfigLayout, UserLayout } from "@features/fa-admin-pages/layout";
-import { WebSocketLayout } from "@features/fa-admin-pages/layout/websocket";
-
+import React, { Suspense } from 'react';
+import { ApiEffectLayout, PageLoading, ThemeLayout } from '@fa/ui';
+import { SITE_INFO } from '@/configs';
+import LangLayout from '../lang/LangLayout';
+import { Outlet } from 'react-router-dom';
+import { ConfigLayout, UserLayout } from '@features/fa-admin-pages/layout';
+import { WebSocketLayout } from '@features/fa-admin-pages/layout/websocket';
 
 /**
  * 通用的包裹组件，基本上所有的页面都需要这些容器包裹
@@ -29,5 +28,5 @@ export default function CommonUserContainer() {
         </ApiEffectLayout>
       </LangLayout>
     </ThemeLayout>
-  )
+  );
 }

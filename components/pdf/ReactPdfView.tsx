@@ -11,7 +11,6 @@ import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import { FaUtils } from '@fa/ui';
 import './ReactPdfView.scss';
 
-
 export interface ReactPdfViewProps {
   fileUrl: string; // 文件Url
 }
@@ -25,7 +24,7 @@ export default function ReactPdfView({ fileUrl }: ReactPdfViewProps) {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   // 释放鼠标处理函数
-  const mouseUp = useCallback((ev:any) => {
+  const mouseUp = useCallback((ev: any) => {
     // console.log('ReactPdfView#mouseUp')
     let text = '';
     if (window.getSelection) {
@@ -73,7 +72,7 @@ export default function ReactPdfView({ fileUrl }: ReactPdfViewProps) {
   return (
     <Worker workerUrl="/plugins/pdfjs/pdfjs-dist@3.3.122/build/pdf.worker.min.js">
       <div id="react-pdf-viewer" style={{ height: '100%', position: 'relative' }}>
-        <Viewer fileUrl={fileUrl} plugins={[ defaultLayoutPluginInstance ]} />
+        <Viewer fileUrl={fileUrl} plugins={[defaultLayoutPluginInstance]} />
 
         {copyPanelVisible && (
           <div style={{ position: 'absolute', left: position[0], top: position[1] }} className="react-pdf-viewer-copy-div">

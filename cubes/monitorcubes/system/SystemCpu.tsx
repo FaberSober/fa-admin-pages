@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {useInterval} from "ahooks";
-import type { Admin } from "@features/fa-admin-pages/types";
-import { systemApi } from "@features/fa-admin-pages/services";
+import React, { useEffect, useState } from 'react';
+import { useInterval } from 'ahooks';
+import type { Admin } from '@features/fa-admin-pages/types';
+import { systemApi } from '@features/fa-admin-pages/services';
 import EchartsGaugeStep from '@features/fa-admin-pages/components/echarts/EchartsGaugeStep';
-
 
 // export type SystemCpuProps = {}
 
@@ -38,10 +37,10 @@ export function SystemCpu() {
   );
 }
 
-SystemCpu.displayName = "SystemCpu"; // 必须与方法名称一致
-SystemCpu.title = "CPU";
-SystemCpu.description = "CPU运行状态指标图";
+SystemCpu.displayName = 'SystemCpu'; // 必须与方法名称一致
+SystemCpu.title = 'CPU';
+SystemCpu.description = 'CPU运行状态指标图';
 SystemCpu.showTitle = true; // 是否展示Card的Title
-SystemCpu.permission = ""; // 需要的权限
+SystemCpu.permission = ''; // 需要的权限
 SystemCpu.w = 4; // 宽度-max=16
 SystemCpu.h = 12; // 高度

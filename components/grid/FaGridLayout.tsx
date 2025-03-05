@@ -1,7 +1,6 @@
 import React, { type CSSProperties, type ReactNode } from 'react';
-import RGL, { type Layout, type ReactGridLayoutProps, WidthProvider } from "react-grid-layout";
-import 'react-grid-layout/css/styles.css'
-
+import RGL, { type Layout, type ReactGridLayoutProps, WidthProvider } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -17,15 +16,12 @@ export interface FaGridLayoutProps extends ReactGridLayoutProps {
  */
 export function FaGridLayout({ layout, renderItem, itemDivStyle, ...props }: FaGridLayoutProps) {
   return (
-    <ReactGridLayout
-      layout={layout}
-      {...props}
-    >
-      {layout.map(i => (
+    <ReactGridLayout layout={layout} {...props}>
+      {layout.map((i) => (
         <div key={i.i} style={{ ...itemDivStyle }}>
           {renderItem(i)}
         </div>
       ))}
     </ReactGridLayout>
-  )
+  );
 }

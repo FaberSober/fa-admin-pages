@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Badge, notification, Popover } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
-import UserLayoutContext from '../../user/context/UserLayoutContext'
-import useBus from "use-bus";
+import UserLayoutContext from '../../user/context/UserLayoutContext';
+import useBus from 'use-bus';
 import MsgList from './MsgList';
-
 
 /**
  * 个人消息提示Badge
@@ -13,7 +12,7 @@ import MsgList from './MsgList';
  */
 export default function MsgBadgeCube() {
   const { unreadCount, refreshUnreadCount } = useContext(UserLayoutContext);
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const [api, contextHolder] = notification.useNotification();
 
   // receive plain message from websocket
@@ -27,10 +26,10 @@ export default function MsgBadgeCube() {
         showProgress: true,
         pauseOnHover: true,
       });
-      refreshUnreadCount()
+      refreshUnreadCount();
     },
     [],
-  )
+  );
 
   return (
     <>
@@ -39,7 +38,7 @@ export default function MsgBadgeCube() {
         placement="bottomRight"
         content={<MsgList onClose={() => setOpen(false)} />}
         trigger="click"
-        styles={{ body: {padding: 0} }}
+        styles={{ body: { padding: 0 } }}
         open={open}
         onOpenChange={setOpen}
       >

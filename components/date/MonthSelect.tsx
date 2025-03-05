@@ -1,6 +1,5 @@
 import React from 'react';
-import { Select, type SelectProps } from "antd";
-
+import { Select, type SelectProps } from 'antd';
 
 /**
  * @author xu.pengfei
@@ -26,5 +25,5 @@ export default function MonthSelect(props: SelectProps) {
       ]}
       {...props}
     />
-  )
+  );
 }

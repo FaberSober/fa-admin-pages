@@ -1,5 +1,5 @@
-import { createContext } from "react";
-import type { Admin } from "@features/fa-admin-pages/types";
+import { createContext } from 'react';
+import type { Admin } from '@features/fa-admin-pages/types';
 
 export interface ConfigLayoutContextProps {
   systemConfig: Admin.SystemConfigPo;
@@ -8,4 +8,4 @@ export interface ConfigLayoutContextProps {
 
 export const ConfigLayoutContext = createContext<ConfigLayoutContextProps>({} as any);
 
-export default ConfigLayoutContext
+export default ConfigLayoutContext;

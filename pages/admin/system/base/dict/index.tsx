@@ -6,8 +6,7 @@ import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import DictModal from './modal/DictModal';
-import DictOptionsEdit from "./cube/DictOptionsEdit";
-
+import DictOptionsEdit from './cube/DictOptionsEdit';
 
 /**
  * 字典管理
@@ -55,16 +54,12 @@ export default function DictManage() {
         <div className="fa-flex-column fa-full fa-m12">
           {viewRecord ? (
             <div className="fa-flex-column fa-full">
-              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12"/>
+              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12" />
 
-              <DictOptionsEdit
-                dict={viewRecord}
-                onChange={v => setViewRecord(v)}
-                onRefresh={refreshData}
-              />
+              <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />
             </div>
           ) : (
-            <Empty description="请先选择字典分组"/>
+            <Empty description="请先选择字典分组" />
           )}
         </div>
       </Allotment>

@@ -1,33 +1,32 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FaFlexRestLayout, FaHref, FaUtils} from "@fa/ui";
+import React, { useEffect, useRef, useState } from 'react';
+import { FaFlexRestLayout, FaHref, FaUtils } from '@fa/ui';
 // import MonacoEditor from "react-monaco-editor";
-import {useSize, useUpdate} from "ahooks";
-import type { Generator } from "@features/fa-admin-pages/types";
-import {Button, Form, Input, Modal, Space, Tree} from "antd";
-import {CopyOutlined} from "@ant-design/icons";
-import {useLocalStorage} from "react-use";
-import type {DataNode, DirectoryTreeProps} from "antd/es/tree";
-import {camelCase, get, isNil, trim} from "lodash";
-import {generatorApi} from "@features/fa-admin-pages/services";
-import CodeCopyToModal from '../modal/CodeCopyToModal'
-
+import { useSize, useUpdate } from 'ahooks';
+import type { Generator } from '@features/fa-admin-pages/types';
+import { Button, Form, Input, Modal, Space, Tree } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
+import { useLocalStorage } from 'react-use';
+import type { DataNode, DirectoryTreeProps } from 'antd/es/tree';
+import { camelCase, get, isNil, trim } from 'lodash';
+import { generatorApi } from '@features/fa-admin-pages/services';
+import CodeCopyToModal from '../modal/CodeCopyToModal';
 
 export interface GeneratorCodePreviewProps {
-  tableNames: string[]
+  tableNames: string[];
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/3/9 13:59
  */
-export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewProps) {
+export default function GeneratorCodePreview({ tableNames }: GeneratorCodePreviewProps) {
   const domRef = useRef<any | null>();
   const size = useSize(domRef);
 
   const [form] = Form.useForm();
   const update = useUpdate();
-  const [codeGen, setCodeGen] = useState<Generator.CodeGenRetVo>()
-  const [selItem, setSelItem] = useState<any>()
+  const [codeGen, setCodeGen] = useState<Generator.CodeGenRetVo>();
+  const [selItem, setSelItem] = useState<any>();
   const [configCache, setConfigCache] = useLocalStorage<any>('generator.configCache', {
     packageName: 'com.faber.api',
     tablePrefix: 'base_',
@@ -42,16 +41,16 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
   const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
     if (keys.length !== 1) return;
 
-    const item:any = info.selectedNodes[0];
-    console.log('item', item)
+    const item: any = info.selectedNodes[0];
+    console.log('item', item);
 
     if (isNil(item.type)) return;
-    setSelItem(item)
-  }
+    setSelItem(item);
+  };
 
   useEffect(() => {
-    fetchPreview()
-  }, [selItem])
+    fetchPreview();
+  }, [selItem]);
 
   function getBasicParams(): any {
     const fieldsValue = form.getFieldsValue();
@@ -64,20 +63,22 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
       email: get(fieldsValue, 'email', ''),
       javaCopyPath: get(fieldsValue, 'javaCopyPath', ''),
       rnCopyPath: get(fieldsValue, 'rnCopyPath', ''),
-    }
+    };
   }
 
   function fetchPreview() {
     if (selItem === undefined) return;
     const fieldsValue = form.getFieldsValue();
-    setConfigCache(fieldsValue)
-    generatorApi.preview({
-      ...getBasicParams(),
-      tableName: selItem.tableName,
-      type: selItem.type,
-    }).then(res => {
-      setCodeGen(res.data)
-    })
+    setConfigCache(fieldsValue);
+    generatorApi
+      .preview({
+        ...getBasicParams(),
+        tableName: selItem.tableName,
+        type: selItem.type,
+      })
+      .then((res) => {
+        setCodeGen(res.data);
+      });
   }
 
   function handleCopyJava() {
@@ -89,10 +90,10 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           ...getBasicParams(),
           tableNames,
           types: ['java.entity', 'java.mapper', 'java.biz', 'java.controller', 'xml.mapper'],
-        }
-        generatorApi.copyBatch(params).then(res => FaUtils.showResponse(res, '复制'))
-      }
-    })
+        };
+        generatorApi.copyBatch(params).then((res) => FaUtils.showResponse(res, '复制'));
+      },
+    });
   }
 
   function handleCopyAll() {
@@ -103,10 +104,10 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         const params = {
           ...getBasicParams(),
           tableNames,
-        }
-        generatorApi.copyAll(params).then(res => FaUtils.showResponse(res, '复制'))
-      }
-    })
+        };
+        generatorApi.copyAll(params).then((res) => FaUtils.showResponse(res, '复制'));
+      },
+    });
   }
 
   function handleCopyOne() {
@@ -120,31 +121,31 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
           ...getBasicParams(),
           tableName: selItem.tableName,
           type: selItem.type,
-        }
-        generatorApi.copyOne(params).then(res => FaUtils.showResponse(res, '复制'))
-      }
-    })
+        };
+        generatorApi.copyOne(params).then((res) => FaUtils.showResponse(res, '复制'));
+      },
+    });
   }
 
-  function handleCopyOneToPath(path:string) {
+  function handleCopyOneToPath(path: string) {
     if (selItem === undefined) return;
     const params = {
       ...getBasicParams(),
       tableName: selItem.tableName,
       type: selItem.type,
       path,
-    }
-    generatorApi.copyOneToPath(params).then(res => FaUtils.showResponse(res, '复制'))
+    };
+    generatorApi.copyOneToPath(params).then((res) => FaUtils.showResponse(res, '复制'));
   }
 
-  function tableNameToJava(tableName:string) {
+  function tableNameToJava(tableName: string) {
     const name = tableNameToCaml(tableName);
-    return name.substr(0, 1).toUpperCase() + name.substr(1)
+    return name.substr(0, 1).toUpperCase() + name.substr(1);
   }
 
-  function tableNameToCaml(tableName:string) {
+  function tableNameToCaml(tableName: string) {
     const tablePrefix = form.getFieldValue('tablePrefix');
-    return camelCase(tableName.replace(trim(tablePrefix), ''))
+    return camelCase(tableName.replace(trim(tablePrefix), ''));
   }
 
   const treeData: DataNode[] = [
@@ -159,7 +160,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'entity',
               key: 'entity',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}.java`,
                 key: `${tableNameToJava(i)}.java`,
                 isLeaf: true,
@@ -170,7 +171,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'mapper',
               key: 'mapper',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}Mapper.java`,
                 key: `${tableNameToJava(i)}Mapper.java`,
                 isLeaf: true,
@@ -181,7 +182,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'biz',
               key: 'biz',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}Biz.java`,
                 key: `${tableNameToJava(i)}Biz.java`,
                 isLeaf: true,
@@ -192,7 +193,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'rest',
               key: 'rest',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}Controller.java`,
                 key: `${tableNameToJava(i)}Controller.java`,
                 isLeaf: true,
@@ -200,12 +201,12 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
                 tableName: i,
               })),
             },
-          ]
+          ],
         },
         {
           title: 'mapperxml',
           key: 'mapperxml',
-          children: tableNames.map(i => ({
+          children: tableNames.map((i) => ({
             title: `${tableNameToJava(i)}Mapper.xml`,
             key: `${tableNameToJava(i)}Mapper.xml`,
             isLeaf: true,
@@ -222,7 +223,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         {
           title: 'props',
           key: 'props',
-          children: tableNames.map(i => ({
+          children: tableNames.map((i) => ({
             title: `${tableNameToCaml(i)}.ts`,
             key: `${i}.rn.props`,
             isLeaf: true,
@@ -233,7 +234,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         {
           title: 'services',
           key: 'service',
-          children: tableNames.map(i => ({
+          children: tableNames.map((i) => ({
             title: `${tableNameToCaml(i)}.ts`,
             key: `${i}.rn.service`,
             isLeaf: true,
@@ -248,7 +249,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'cube',
               key: 'cube',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}View.tsx`,
                 key: `${i}.rn.view`,
                 isLeaf: true,
@@ -259,7 +260,7 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
             {
               title: 'modal',
               key: 'modal',
-              children: tableNames.map(i => ({
+              children: tableNames.map((i) => ({
                 title: `${tableNameToJava(i)}Modal.tsx`,
                 key: `${i}.rn.modal`,
                 isLeaf: true,
@@ -267,14 +268,14 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
                 tableName: i,
               })),
             },
-            ...tableNames.map(i => ({
+            ...tableNames.map((i) => ({
               title: `${tableNameToJava(i)}List.tsx`,
               key: `${i}.rn.list`,
               isLeaf: true,
               type: 'rn.list',
               tableName: i,
             })),
-          ]
+          ],
         },
       ],
     },
@@ -282,24 +283,20 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
 
   return (
     <div className="fa-full-content-p12 fa-flex-row">
-      <div className="fa-flex-column" style={{width: 550, marginRight: 12}}>
+      <div className="fa-flex-column" style={{ width: 550, marginRight: 12 }}>
         <FaFlexRestLayout>
-          <Tree.DirectoryTree
-            defaultExpandAll
-            onSelect={onSelect}
-            treeData={treeData}
-          />
+          <Tree.DirectoryTree defaultExpandAll onSelect={onSelect} treeData={treeData} />
         </FaFlexRestLayout>
 
         <Form
           form={form}
           initialValues={configCache}
-          onFieldsChange={(cv:any) => {
+          onFieldsChange={(cv: any) => {
             if (cv.tablePrefix) {
-              update()
-              fetchPreview()
+              update();
+              fetchPreview();
             }
-            setConfigCache(form.getFieldsValue())
+            setConfigCache(form.getFieldsValue());
           }}
         >
           <Form.Item name="packageName" label="包名" rules={[{ required: true }]}>
@@ -329,12 +326,26 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         </Form>
       </div>
 
-      <FaFlexRestLayout style={{display: 'flex', flexDirection: 'column'}}>
+      <FaFlexRestLayout style={{ display: 'flex', flexDirection: 'column' }}>
         <Space className="fa-mb12">
-          <FaHref onClick={() => {FaUtils.copyToClipboard(selItem?.title)}} icon={<CopyOutlined/>} text={selItem && selItem.title} />
-          <Button onClick={handleCopyAll} icon={<CopyOutlined />}>复制全部文件</Button>
-          <Button onClick={handleCopyJava} icon={<CopyOutlined />}>复制Java文件</Button>
-          {selItem && <Button onClick={handleCopyOne} icon={<CopyOutlined />}>复制当前文件</Button>}
+          <FaHref
+            onClick={() => {
+              FaUtils.copyToClipboard(selItem?.title);
+            }}
+            icon={<CopyOutlined />}
+            text={selItem && selItem.title}
+          />
+          <Button onClick={handleCopyAll} icon={<CopyOutlined />}>
+            复制全部文件
+          </Button>
+          <Button onClick={handleCopyJava} icon={<CopyOutlined />}>
+            复制Java文件
+          </Button>
+          {selItem && (
+            <Button onClick={handleCopyOne} icon={<CopyOutlined />}>
+              复制当前文件
+            </Button>
+          )}
           {selItem && (
             <CodeCopyToModal onSubmit={(path) => handleCopyOneToPath(path)}>
               <Button icon={<CopyOutlined />}>复制当前文件到...</Button>
@@ -343,12 +354,12 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         </Space>
 
         <FaFlexRestLayout>
-          <div ref={domRef} style={{height: '100%'}}>
+          <div ref={domRef} style={{ height: '100%' }}>
             {size && size.height && codeGen && (
               <Input.TextArea
-                autoSize={{minRows:1, maxRows: 25}}
+                autoSize={{ minRows: 1, maxRows: 25 }}
                 value={codeGen && codeGen.code}
-                onChange={e => setCodeGen({ ...codeGen, code: e.target.value })}
+                onChange={(e) => setCodeGen({ ...codeGen, code: e.target.value })}
               />
               // <MonacoEditor
               //   height={size.height}
@@ -367,5 +378,5 @@ export default function GeneratorCodePreview({tableNames}: GeneratorCodePreviewP
         </FaFlexRestLayout>
       </FaFlexRestLayout>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
-import {get} from 'lodash';
-import {DownloadOutlined, SearchOutlined} from '@ant-design/icons';
-import {Badge, Button, Drawer, Form, Input, Space} from 'antd';
+import React, { useEffect } from 'react';
+import { get } from 'lodash';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Badge, Button, Drawer, Form, Input, Space } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -12,16 +12,16 @@ import {
   useDelete,
   useExport,
   useTableQueryParams,
-  useViewItem
+  useViewItem,
 } from '@fa/ui';
-import {type Admin, FaEnums} from '@/types';
-import {userApi} from '@features/fa-admin-pages/services';
+import { type Admin, FaEnums } from '@/types';
+import { userApi } from '@features/fa-admin-pages/services';
 import UserModal from '../modal/UserModal';
-import UsersChangeDeptModal from "./modal/UsersChangeDeptModal";
-import UsersChangeRoleModal from "./modal/UsersChangeRoleModal";
-import UsersChangePwdModal from "./modal/UsersChangePwdModal";
-import UserView from "./cube/UserView";
-import UserStatusCol from "./cube/UserStatusCol";
+import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
+import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
+import UsersChangePwdModal from './modal/UsersChangePwdModal';
+import UserView from './cube/UserView';
+import UserStatusCol from './cube/UserStatusCol';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 
 const serviceName = '';
@@ -34,19 +34,31 @@ interface IProps {
 export default function UserList({ departmentId }: IProps) {
   const [form] = Form.useForm();
 
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, setList, dicts, paginationProps } =
-    useTableQueryParams<Admin.UserWeb>(
-      userApi.page,
-      { extraParams: { departmentIdSuper: departmentId }, sorter: { field: 'crtTime', order: 'descend' } },
-      serviceName,
-    );
+  const {
+    queryParams,
+    setFormValues,
+    handleTableChange,
+    setSceneId,
+    setConditionList,
+    setExtraParams,
+    fetchPageList,
+    loading,
+    list,
+    setList,
+    dicts,
+    paginationProps,
+  } = useTableQueryParams<Admin.UserWeb>(
+    userApi.page,
+    { extraParams: { departmentIdSuper: departmentId }, sorter: { field: 'crtTime', order: 'descend' } },
+    serviceName,
+  );
 
   const [exporting, fetchExportExcel] = useExport(userApi.exportExcel, {
     ...queryParams,
     extraParams: { departmentIdSuper: departmentId },
   });
   const [handleDelete] = useDelete<string>(userApi.remove, fetchPageList, serviceName);
-  const {show, hide, open, item} = useViewItem<Admin.User>() // 查看记录
+  const { show, hide, open, item } = useViewItem<Admin.User>(); // 查看记录
 
   useEffect(() => setExtraParams({ departmentIdSuper: departmentId }), [departmentId]);
 
@@ -71,13 +83,13 @@ export default function UserList({ departmentId }: IProps) {
         render: (_, record) => {
           switch (record.workStatus) {
             case FaEnums.UserWorkStatusEnum.ON_JOB:
-              return <Badge status="success" text='在职'/>
+              return <Badge status="success" text="在职" />;
             case FaEnums.UserWorkStatusEnum.ASK_LEAVE:
-              return <Badge status="warning" text='请假'/>
+              return <Badge status="warning" text="请假" />;
             case FaEnums.UserWorkStatusEnum.DEPART:
-              return <Badge status="error" text='离职'/>
+              return <Badge status="error" text="离职" />;
             default:
-              return null
+              return null;
           }
         },
       },
@@ -87,10 +99,10 @@ export default function UserList({ departmentId }: IProps) {
           <UserStatusCol
             item={r}
             onChange={() => {
-              setList(list.map(i => i.id === r.id ? {...i, status: !i.status } : i))
+              setList(list.map((i) => (i.id === r.id ? { ...i, status: !i.status } : i)));
             }}
           />
-        )
+        ),
       },
       BaseTableUtils.genDictSorterColumn('性别', 'sex', 100, sorter, dicts, 'common_sex'),
       BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 165, sorter),
@@ -131,14 +143,18 @@ export default function UserList({ departmentId }: IProps) {
               <Input placeholder="请输入员工姓名" allowClear />
             </Form.Item>
             <Form.Item name="workStatus" label="工作状态">
-              <DictEnumApiSelector enumName='UserWorkStatusEnum' />
+              <DictEnumApiSelector enumName="UserWorkStatusEnum" />
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <UserModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>
@@ -158,18 +174,18 @@ export default function UserList({ departmentId }: IProps) {
         showBatchBelBtn={false}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
-        renderCheckBtns={rowKeys => (
+        renderCheckBtns={(rowKeys) => (
           <Space>
             <UsersChangeDeptModal userIds={rowKeys} fetchFinish={fetchPageList} />
             <UsersChangeRoleModal userIds={rowKeys} fetchFinish={fetchPageList} />
-            <UsersChangePwdModal  userIds={rowKeys} fetchFinish={fetchPageList} />
+            <UsersChangePwdModal userIds={rowKeys} fetchFinish={fetchPageList} />
           </Space>
         )}
-        onRow={r => ({ onDoubleClick: () => show(r) })}
+        onRow={(r) => ({ onDoubleClick: () => show(r) })}
       />
 
       <Drawer title="查看详情" open={open} onClose={hide} width={1000} styles={{ body: { position: 'relative' } }}>
-        {open && item && <UserView item={item} /> }
+        {open && item && <UserView item={item} />}
       </Drawer>
     </div>
   );

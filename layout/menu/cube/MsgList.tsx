@@ -3,10 +3,9 @@ import { fileSaveApi, msgApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import { Avatar, List } from 'antd';
 import { get } from 'lodash';
-import { ApiEffectLayoutContext } from "@fa/ui";
-import UserLayoutContext from '../../user/context/UserLayoutContext'
-import MenuLayoutContext from "../context/MenuLayoutContext";
-
+import { ApiEffectLayoutContext } from '@fa/ui';
+import UserLayoutContext from '../../user/context/UserLayoutContext';
+import MenuLayoutContext from '../context/MenuLayoutContext';
 
 interface MsgListProps {
   onClose?: () => void;
@@ -18,7 +17,7 @@ interface MsgListProps {
  * @constructor
  */
 export default function MsgList({ onClose }: MsgListProps) {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext)
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
 
   const { unreadCount, refreshUnreadCount } = useContext(UserLayoutContext);
   const { addTab } = useContext(MenuLayoutContext);
@@ -48,8 +47,8 @@ export default function MsgList({ onClose }: MsgListProps) {
       key: 'msg',
       path: '/admin/system/account/msg',
       name: '消息中心',
-    })
-    if (onClose) onClose()
+    });
+    if (onClose) onClose();
   }
 
   const bottomLink: CSSProperties = {
@@ -60,7 +59,7 @@ export default function MsgList({ onClose }: MsgListProps) {
     borderTop: '1px solid #eee',
   };
 
-  const loading = loadingEffect[msgApi.getUrl('pageMine')]
+  const loading = loadingEffect[msgApi.getUrl('pageMine')];
   return (
     <div style={{ width: 400, maxHeight: 400, overflowY: 'auto', padding: '0 12px' }}>
       <List

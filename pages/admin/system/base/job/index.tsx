@@ -1,9 +1,9 @@
 import React from 'react';
-import {DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined,} from '@ant-design/icons';
-import {Badge, Button, Form, Input, Popconfirm, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams} from '@fa/ui';
-import type {Admin} from '@/types';
-import {jobApi} from '@features/fa-admin-pages/services';
+import { DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Badge, Button, Form, Input, Popconfirm, Space } from 'antd';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import type { Admin } from '@/types';
+import { jobApi } from '@features/fa-admin-pages/services';
 import JobModal from './modal/JobModal';
 import JobLogDrawer from './jobLog/JobLogDrawer';
 
@@ -66,11 +66,7 @@ export default function JobList() {
         dataIndex: 'opr',
         render: (_: string, record: Admin.Job) => (
           <Space>
-            <Popconfirm
-              title="确定立即执行一次该任务"
-              onConfirm={() => handleRunOneTime(record.id)}
-              getPopupContainer={() => document.body}
-            >
+            <Popconfirm title="确定立即执行一次该任务" onConfirm={() => handleRunOneTime(record.id)} getPopupContainer={() => document.body}>
               <FaHref icon={<ThunderboltOutlined />} text="执行" />
             </Popconfirm>
             <Popconfirm
@@ -78,15 +74,9 @@ export default function JobList() {
               onConfirm={() => handleJobStatus(record)}
               getPopupContainer={() => document.body}
             >
-              {!record.status ? (
-                <FaHref icon={<PlayCircleOutlined />} text="启动" />
-              ) : (
-                <FaHref icon={<PauseCircleOutlined />} text="停止" />
-              )}
+              {!record.status ? <FaHref icon={<PlayCircleOutlined />} text="启动" /> : <FaHref icon={<PauseCircleOutlined />} text="停止" />}
             </Popconfirm>
-            {!record.status && (
-              <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
-            )}
+            {!record.status && <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />}
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
@@ -109,10 +99,14 @@ export default function JobList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <JobModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>

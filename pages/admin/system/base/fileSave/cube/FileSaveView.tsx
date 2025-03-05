@@ -1,9 +1,8 @@
 import React from 'react';
 import type { Admin } from '@/types';
-import { Descriptions, Divider } from "antd";
-import { FaUtils } from "@fa/ui";
-import { fileSaveApi } from "@features/fa-admin-pages/services";
-
+import { Descriptions, Divider } from 'antd';
+import { FaUtils } from '@fa/ui';
+import { fileSaveApi } from '@features/fa-admin-pages/services';
 
 export interface FileSaveViewProps {
   item: Admin.FileSave;
@@ -15,15 +14,17 @@ export interface FileSaveViewProps {
  */
 export default function FileSaveView({ item }: FileSaveViewProps) {
   function handleCopy() {
-    FaUtils.copyToClipboard(window.location.host + fileSaveApi.genLocalGetFile(item.id))
+    FaUtils.copyToClipboard(window.location.host + fileSaveApi.genLocalGetFile(item.id));
   }
 
   return (
     <Descriptions column={1} bordered>
       <Descriptions.Item label="URL">
-          <a href={fileSaveApi.genLocalGetFile(item.id)} target="_blank" rel="noreferrer">打开链接</a>
-          <Divider type="vertical" />
-          <a onClick={handleCopy}>复制链接</a>
+        <a href={fileSaveApi.genLocalGetFile(item.id)} target="_blank" rel="noreferrer">
+          打开链接
+        </a>
+        <Divider type="vertical" />
+        <a onClick={handleCopy}>复制链接</a>
       </Descriptions.Item>
       <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
       <Descriptions.Item label="文件存储地址">{item.url}</Descriptions.Item>
@@ -48,5 +49,5 @@ export default function FileSaveView({ item }: FileSaveViewProps) {
       <Descriptions.Item label="创建用户">{item.crtName}</Descriptions.Item>
       <Descriptions.Item label="创建IP">{item.crtHost}</Descriptions.Item>
     </Descriptions>
-  )
+  );
 }

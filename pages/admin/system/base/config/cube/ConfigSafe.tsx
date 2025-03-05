@@ -5,7 +5,6 @@ import { SaveOutlined } from '@ant-design/icons';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 
-
 /**
  * @author xu.pengfei
  * @date 2022/12/11 22:48
@@ -66,24 +65,24 @@ export default function ConfigSafe() {
             </Form.Item>
           </Col>
           <Col md={8}>
-            <Form.Item name="safeTokenExpireHour" label="token有效时长" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+            <Form.Item name="safeTokenExpireHour" label="token有效时长" rules={[{ required: true }, { validator: validateSafePasswordLen }]}>
               <InputNumber step={1} min={-1} max={7200} addonAfter="小时" />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={12}>
           <Col md={8}>
-            <Form.Item name="safePasswordType" label="密码类型" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+            <Form.Item name="safePasswordType" label="密码类型" rules={[{ required: true }, { validator: validateSafePasswordLen }]}>
               <DictEnumApiSelector enumName="ConfigSysSafePasswordTypeEnum" />
             </Form.Item>
           </Col>
           <Col md={8}>
-            <Form.Item name="safePasswordLenMin" label="密码最小长度" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+            <Form.Item name="safePasswordLenMin" label="密码最小长度" rules={[{ required: true }, { validator: validateSafePasswordLen }]}>
               <InputNumber min={1} max={30} />
             </Form.Item>
           </Col>
           <Col md={8}>
-            <Form.Item name="safePasswordLenMax" label="密码最大长度" rules={[{ required: true }, {validator: validateSafePasswordLen}]}>
+            <Form.Item name="safePasswordLenMax" label="密码最大长度" rules={[{ required: true }, { validator: validateSafePasswordLen }]}>
               <InputNumber min={1} max={30} />
             </Form.Item>
           </Col>

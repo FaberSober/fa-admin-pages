@@ -1,5 +1,5 @@
-import type { Admin, Rbac } from "@features/fa-admin-pages/types";
-import { createContext } from "react";
+import type { Admin, Rbac } from '@features/fa-admin-pages/types';
+import { createContext } from 'react';
 
 export interface UserLayoutContextProps {
   user: Admin.User;
@@ -12,4 +12,4 @@ export interface UserLayoutContextProps {
 
 export const UserLayoutContext = createContext<UserLayoutContextProps>({} as any);
 
-export default UserLayoutContext
+export default UserLayoutContext;

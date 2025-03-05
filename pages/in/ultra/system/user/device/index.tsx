@@ -6,34 +6,27 @@ import { userDeviceApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import UserDeviceModal from './modal/UserDeviceModal';
 import CommonExcelUploadModal from '@features/fa-admin-pages/components/excel/CommonExcelUploadModal';
-import UserSearchSelect from "@features/fa-admin-pages/components/helper/UserSearchSelect";
+import UserSearchSelect from '@features/fa-admin-pages/components/helper/UserSearchSelect';
 
 const serviceName = '';
 const biz = 'base_user_device';
 
-
-function ItemEnable({ item, onChange }: {item: Admin.UserDevice, onChange: (i: Admin.UserDevice) => void}) {
-  const [loading, setLoading] = useState(false)
+function ItemEnable({ item, onChange }: { item: Admin.UserDevice; onChange: (i: Admin.UserDevice) => void }) {
+  const [loading, setLoading] = useState(false);
 
   function handleEnableUpdate(enable: boolean) {
-    setLoading(true)
-    api.update(item.id, { ...item, enable }).then(_res => {
-      setLoading(false)
-      onChange(item)
-    }).catch(() => setLoading(false))
+    setLoading(true);
+    api
+      .update(item.id, { ...item, enable })
+      .then((_res) => {
+        setLoading(false);
+        onChange(item);
+      })
+      .catch(() => setLoading(false));
   }
 
-  return (
-    <Switch
-      checkedChildren="允许"
-      unCheckedChildren="禁止"
-      checked={item.enable}
-      onChange={e => handleEnableUpdate(e)}
-      loading={loading}
-    />
-  )
+  return <Switch checkedChildren="允许" unCheckedChildren="禁止" checked={item.enable} onChange={(e) => handleEnableUpdate(e)} loading={loading} />;
 }
-
 
 /**
  * BASE-用户设备表格查询
@@ -42,10 +35,10 @@ export default function UserDeviceList() {
   const [form] = Form.useForm();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, setList, paginationProps } =
-    useTableQueryParams<Admin.UserDevice>(api.page, {}, serviceName)
+    useTableQueryParams<Admin.UserDevice>(api.page, {}, serviceName);
 
-  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
-  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
+  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName);
+  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
 
   /** 生成表格字段List */
   function genColumns() {
@@ -68,10 +61,10 @@ export default function UserDeviceList() {
           <ItemEnable
             item={r}
             onChange={() => {
-              setList(list.map(i => i.id === r.id ? {...i, enable: !i.enable } : i))
+              setList(list.map((i) => (i.id === r.id ? { ...i, enable: !i.enable } : i)));
             }}
           />
-        )
+        ),
       },
       BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 170, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
@@ -104,10 +97,14 @@ export default function UserDeviceList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <UserDeviceModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
               <CommonExcelUploadModal fetchFinish={fetchPageList} apiDownloadTplExcel={api.exportTplExcel} apiImportExcel={api.importExcel}>
                 <Button icon={<UploadOutlined />}>上传</Button>
               </CommonExcelUploadModal>

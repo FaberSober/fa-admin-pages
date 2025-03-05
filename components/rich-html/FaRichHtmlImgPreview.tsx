@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { isNil } from "lodash";
-import { Image } from "antd";
-import { FaUtils } from "@fa/ui";
-
+import { isNil } from 'lodash';
+import { Image } from 'antd';
+import { FaUtils } from '@fa/ui';
 
 interface Img {
   id: string;
@@ -19,36 +18,35 @@ export interface FaRichHtmlImgPreviewProps {
  * @date 2023/7/17 15:28
  */
 export default function FaRichHtmlImgPreview({ domId }: FaRichHtmlImgPreviewProps) {
-
-  const [images, setImages] = useState<Img[]>([])
-  const [index, setIndex] = useState(0)
-  const [visible, setVisible] = useState(false)
+  const [images, setImages] = useState<Img[]>([]);
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const dom = document.getElementById(domId);
     if (isNil(dom)) return;
 
-    const imgs:HTMLImageElement[] = Array.from(dom!.querySelectorAll("img"))
+    const imgs: HTMLImageElement[] = Array.from(dom!.querySelectorAll('img'));
 
     const arr = imgs.map((img, i) => {
       const id = FaUtils.generateId();
-      img.setAttribute("id", id)
+      img.setAttribute('id', id);
       img.onclick = () => {
         // console.log('img', img, i)
-        setIndex(i)
-        setVisible(true)
-      }
+        setIndex(i);
+        setVisible(true);
+      };
       return {
         id,
         src: img.src,
-      }
-    })
+      };
+    });
     // console.log('arr', arr)
-    setImages(arr)
-  }, [domId])
+    setImages(arr);
+  }, [domId]);
 
   return (
-    <div style={{position: 'fixed', right: -100, bottom: -100, width: 1, height: 1, overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', right: -100, bottom: -100, width: 1, height: 1, overflow: 'hidden' }}>
       <Image.PreviewGroup
         preview={{
           visible: visible,
@@ -57,8 +55,10 @@ export default function FaRichHtmlImgPreview({ domId }: FaRichHtmlImgPreviewProp
           onVisibleChange: (v) => setVisible(v),
         }}
       >
-        {images.map(i => (<Image key={i.id} width={200} src={i.src} />))}
+        {images.map((i) => (
+          <Image key={i.id} width={200} src={i.src} />
+        ))}
       </Image.PreviewGroup>
     </div>
-  )
+  );
 }

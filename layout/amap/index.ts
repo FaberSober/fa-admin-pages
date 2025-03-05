@@ -1,1 +1,1 @@
-export { default as AMapLayout } from './AMapLayout'
+export { default as AMapLayout } from './AMapLayout';

@@ -1,16 +1,16 @@
-import React, { useContext, useState} from 'react';
-import {ConfigProvider, theme} from 'antd';
+import React, { useContext, useState } from 'react';
+import { ConfigProvider, theme } from 'antd';
 
 // antd国际化配置
 import zhCN from 'antd/es/locale/zh_CN';
 import enUS from 'antd/es/locale/en_US';
 
 // i18n国际化
-import {IntlProvider} from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import zhCNMessage from '@/lang/zh_CN';
 import enCNMessage from '@/lang/en_US';
-import {SmileOutlined} from '@ant-design/icons';
-import {type Fa, ThemeLayoutContext} from '@fa/ui';
+import { SmileOutlined } from '@ant-design/icons';
+import { type Fa, ThemeLayoutContext } from '@fa/ui';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
@@ -42,7 +42,6 @@ function handleMessages(lang: string) {
   }
 }
 
-
 // 全局表单提示校验
 const validateMessages = {
   // eslint-disable-next-line no-template-curly-in-string
@@ -51,18 +50,17 @@ const validateMessages = {
 
 // 自定义Empty组件内容
 const customizeRenderEmpty = () => (
-  <div style={{textAlign: 'center'}}>
-    <SmileOutlined style={{fontSize: 20}}/>
+  <div style={{ textAlign: 'center' }}>
+    <SmileOutlined style={{ fontSize: 20 }} />
     <div>暂无数据</div>
   </div>
 );
 
-
 /**
  * 国际化组件
  */
-export default function LangLayout({children}: Fa.BaseChildProps) {
-  const {colorPrimary, themeDark} = useContext(ThemeLayoutContext)
+export default function LangLayout({ children }: Fa.BaseChildProps) {
+  const { colorPrimary, themeDark } = useContext(ThemeLayoutContext);
   const [locale, setLocale] = useState('zh_CN');
 
   return (
@@ -74,7 +72,7 @@ export default function LangLayout({children}: Fa.BaseChildProps) {
     >
       <ConfigProvider
         locale={handleAntdMessages(locale)}
-        form={{validateMessages}}
+        form={{ validateMessages }}
         renderEmpty={customizeRenderEmpty}
         theme={{
           algorithm: themeDark ? theme.darkAlgorithm : theme.defaultAlgorithm,

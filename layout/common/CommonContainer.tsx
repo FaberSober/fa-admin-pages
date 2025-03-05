@@ -1,10 +1,9 @@
-import React, {Suspense} from 'react';
-import {Outlet} from "react-router-dom";
-import {ApiEffectLayout, PageLoading, ThemeLayout} from "@fa/ui";
-import {SITE_INFO} from "@/configs";
-import LangLayout from "../lang/LangLayout";
-import ConfigLayout from "../config/ConfigLayout";
-
+import React, { Suspense } from 'react';
+import { Outlet } from 'react-router-dom';
+import { ApiEffectLayout, PageLoading, ThemeLayout } from '@fa/ui';
+import { SITE_INFO } from '@/configs';
+import LangLayout from '../lang/LangLayout';
+import ConfigLayout from '../config/ConfigLayout';
 
 /**
  * 通用的包裹组件，基本上所有的页面都需要这些容器包裹
@@ -24,5 +23,5 @@ export default function CommonContainer() {
         </ApiEffectLayout>
       </LangLayout>
     </ThemeLayout>
-  )
+  );
 }

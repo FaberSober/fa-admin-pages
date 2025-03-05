@@ -1,10 +1,9 @@
-import React, {type CSSProperties, useContext, useEffect, useRef, useState} from 'react';
-import {v4 as uuidv4} from 'uuid'
+import React, { type CSSProperties, useContext, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import * as echarts from 'echarts';
-import type {ECharts} from 'echarts';
-import {useSize} from "ahooks";
-import {ThemeLayoutContext} from "@fa/ui";
-
+import type { ECharts } from 'echarts';
+import { useSize } from 'ahooks';
+import { ThemeLayoutContext } from '@fa/ui';
 
 export interface EchartsGaugeProps {
   min: number;
@@ -19,12 +18,12 @@ export interface EchartsGaugeProps {
  * @author xu.pengfei
  * @date 2023/6/7 11:22
  */
-export default function EchartsGauge({min, max, value, unit, restOption, style}: EchartsGaugeProps) {
-  const {themeDark} = useContext(ThemeLayoutContext)
+export default function EchartsGauge({ min, max, value, unit, restOption, style }: EchartsGaugeProps) {
+  const { themeDark } = useContext(ThemeLayoutContext);
 
-  const chartRef = useRef<ECharts>()
-  const [id] = useState(uuidv4())
-  const [ready, setReady] = useState(false)
+  const chartRef = useRef<ECharts>();
+  const [id] = useState(uuidv4());
+  const [ready, setReady] = useState(false);
 
   const domRef = useRef<any | null>();
   const size = useSize(domRef);
@@ -34,13 +33,13 @@ export default function EchartsGauge({min, max, value, unit, restOption, style}:
     if (!ready) return;
 
     chartRef.current!.resize();
-  }, [size])
+  }, [size]);
 
   useEffect(() => {
     if (chartRef.current) chartRef.current.dispose();
 
     // 基于准备好的dom，初始化echarts实例
-    const theme = themeDark ? 'dark' : 'light'
+    const theme = themeDark ? 'dark' : 'light';
     // @ts-ignore
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
@@ -57,46 +56,46 @@ export default function EchartsGauge({min, max, value, unit, restOption, style}:
           max: max,
           splitNumber: 10,
           itemStyle: {
-            color: '#FFAB91'
+            color: '#FFAB91',
           },
           progress: {
             show: true,
-            width: 20
+            width: 20,
           },
           pointer: {
-            show: false
+            show: false,
           },
           axisLine: {
             lineStyle: {
-              width: 20
-            }
+              width: 20,
+            },
           },
           axisTick: {
             distance: -35,
             splitNumber: 5,
             lineStyle: {
               width: 1,
-              color: '#999'
-            }
+              color: '#999',
+            },
           },
           splitLine: {
             distance: -42,
             length: 14,
             lineStyle: {
               width: 2,
-              color: '#999'
-            }
+              color: '#999',
+            },
           },
           axisLabel: {
             distance: -20,
             color: '#999',
-            fontSize: 16
+            fontSize: 16,
           },
           anchor: {
-            show: false
+            show: false,
           },
           title: {
-            show: false
+            show: false,
           },
           detail: {
             valueAnimation: true,
@@ -107,13 +106,13 @@ export default function EchartsGauge({min, max, value, unit, restOption, style}:
             fontSize: 40,
             fontWeight: 'bolder',
             formatter: `{value} ${unit}`,
-            color: 'inherit'
+            color: 'inherit',
           },
           data: [
             {
-              value: value
-            }
-          ]
+              value: value,
+            },
+          ],
         },
         {
           type: 'gauge',
@@ -123,41 +122,41 @@ export default function EchartsGauge({min, max, value, unit, restOption, style}:
           min: min,
           max: max,
           itemStyle: {
-            color: '#FD7347'
+            color: '#FD7347',
           },
           progress: {
             show: true,
-            width: 6
+            width: 6,
           },
           pointer: {
-            show: false
+            show: false,
           },
           axisLine: {
-            show: false
+            show: false,
           },
           axisTick: {
-            show: false
+            show: false,
           },
           splitLine: {
-            show: false
+            show: false,
           },
           axisLabel: {
-            show: false
+            show: false,
           },
           detail: {
-            show: false
+            show: false,
           },
           data: [
             {
-              value: value
-            }
-          ]
-        }
+              value: value,
+            },
+          ],
+        },
       ],
-      ...restOption
+      ...restOption,
     });
-    setReady(true)
-  }, [themeDark])
+    setReady(true);
+  }, [themeDark]);
 
   useEffect(() => {
     if (!ready) return;
@@ -168,24 +167,24 @@ export default function EchartsGauge({min, max, value, unit, restOption, style}:
         {
           data: [
             {
-              value
-            }
-          ]
+              value,
+            },
+          ],
         },
         {
           data: [
             {
-              value
-            }
-          ]
-        }
-      ]
-    })
-  }, [value])
+              value,
+            },
+          ],
+        },
+      ],
+    });
+  }, [value]);
 
   return (
     <div ref={domRef} style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
       <div id={id} style={{ height: '100%', width: '100%' }} />
     </div>
-  )
+  );
 }

@@ -7,5 +7,5 @@ import React from 'react';
 export default function AdminIframe() {
   return (
     <iframe src={window.FaIframeUrl} sandbox="allow-scripts" className="fa-full-content" style={{ width: '100%', height: '100%', border: 'none', margin: 0 }} />
-  )
+  );
 }

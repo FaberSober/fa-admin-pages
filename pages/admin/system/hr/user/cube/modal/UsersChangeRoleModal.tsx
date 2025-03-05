@@ -4,7 +4,6 @@ import { ApiEffectLayoutContext, DragModal, type DragModalProps, FaUtils } from 
 import { userApi } from '@features/fa-admin-pages/services';
 import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 
-
 interface UsersChangeRoleModalProps extends DragModalProps {
   userIds: string[];
   fetchFinish?: () => void;
@@ -20,7 +19,7 @@ export default function UsersChangeRoleModal({ children, userIds, fetchFinish, .
 
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
-    userApi.updateBatchRole({userIds, roleIds: fieldsValue.roleIds}).then((res) => {
+    userApi.updateBatchRole({ userIds, roleIds: fieldsValue.roleIds }).then((res) => {
       FaUtils.showResponse(res, '批量更新角色');
       setOpen(false);
       if (fetchFinish) fetchFinish();
@@ -31,19 +30,13 @@ export default function UsersChangeRoleModal({ children, userIds, fetchFinish, .
     setOpen(true);
   }
 
-  const loading = loadingEffect[userApi.getUrl('updateBatchRole')]
+  const loading = loadingEffect[userApi.getUrl('updateBatchRole')];
   return (
     <span>
-      <span onClick={() => showModal()}><Button>修改角色</Button></span>
-      <DragModal
-        title="批量修改角色"
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <span onClick={() => showModal()}>
+        <Button>修改角色</Button>
+      </span>
+      <DragModal title="批量修改角色" open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="roleIds" label="角色" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <RbacRoleSelect mode="multiple" />

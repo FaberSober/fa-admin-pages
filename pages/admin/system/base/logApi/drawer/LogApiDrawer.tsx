@@ -3,7 +3,7 @@ import { Descriptions, Drawer, type DrawerProps } from 'antd';
 import type { Admin } from '@/types';
 // import ReactJson from 'react-json-view';
 import { FaUtils, FaClickCopyLink } from '@fa/ui';
-import { each } from "lodash";
+import { each } from 'lodash';
 
 export interface GateLogDrawerProps extends DrawerProps {
   record: Admin.LogApi;
@@ -16,11 +16,11 @@ export interface GateLogDrawerProps extends DrawerProps {
 export default function LogApiDrawer({ children, record, ...props }: GateLogDrawerProps) {
   const [open, setOpen] = useState(false);
 
-  function decode(url:string) {
+  function decode(url: string) {
     try {
       return decodeURIComponent(url);
-    } catch (e:any) {
-      console.error(e.message, 'url=', url)
+    } catch (e: any) {
+      console.error(e.message, 'url=', url);
     }
     return url;
   }
@@ -92,21 +92,21 @@ export default function LogApiDrawer({ children, record, ...props }: GateLogDraw
   );
 }
 
-function JsonView({json}: any) {
-  const arr:any[] = []
+function JsonView({ json }: any) {
+  const arr: any[] = [];
   each(json, (v, k) => {
-    arr.push({ k, v })
-  })
+    arr.push({ k, v });
+  });
   return (
     <table className="fa-table">
       <tbody>
-      {arr.map(i => (
-        <tr key={i.k}>
-          <td style={{ width: 130 }}>{i.k}</td>
-          <td>{i.v}</td>
-        </tr>
-      ))}
+        {arr.map((i) => (
+          <tr key={i.k}>
+            <td style={{ width: 130 }}>{i.k}</td>
+            <td>{i.v}</td>
+          </tr>
+        ))}
       </tbody>
     </table>
-  )
+  );
 }

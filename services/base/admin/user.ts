@@ -1,6 +1,6 @@
-import {GATE_APP} from '@/configs';
-import {BaseApi, type Fa} from '@fa/ui';
-import type {Admin} from '@/types';
+import { GATE_APP } from '@/configs';
+import { BaseApi, type Fa } from '@fa/ui';
+import type { Admin } from '@/types';
 
 const serviceModule = 'user';
 
@@ -25,7 +25,6 @@ export interface UserForgetResetPwdVo {
 }
 
 class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
-
   /** 获取用户信息 */
   getLoginUser = (): Promise<Fa.Ret<Admin.User>> => this.get('getLoginUser');
 
@@ -33,13 +32,13 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   pageOut = (params: UserWebQuery): Promise<Fa.Ret<Fa.Page<Admin.UserWeb>>> => this.post(`pageOut`, params);
 
   /** 批量更新部门 */
-  updateBatchDept = (params: { userIds: string[], departmentId: string }): Promise<Fa.Ret> => this.post('updateInfoBatch', params);
+  updateBatchDept = (params: { userIds: string[]; departmentId: string }): Promise<Fa.Ret> => this.post('updateInfoBatch', params);
 
   /** 批量更新角色 */
-  updateBatchRole = (params: { userIds: string[], roleIds: string[] }): Promise<Fa.Ret> => this.post('updateBatchRole', params);
+  updateBatchRole = (params: { userIds: string[]; roleIds: string[] }): Promise<Fa.Ret> => this.post('updateBatchRole', params);
 
   /** 批量更新密码 */
-  updateBatchPwd = (params: { userIds: string[], newPwd: string, passwordCheck: string }): Promise<Fa.Ret> => this.post('updateBatchPwd', params);
+  updateBatchPwd = (params: { userIds: string[]; newPwd: string; passwordCheck: string }): Promise<Fa.Ret> => this.post('updateBatchPwd', params);
 
   /** ------------------------------------------ 个人账户 操作接口 ------------------------------------------ */
 
@@ -52,7 +51,7 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   /** ------------------------------------------ biz 操作接口 ------------------------------------------ */
 
   /** 不鉴权计数 */
-  jumpCount = (params: {username?:string,tel?:string}): Promise<Fa.Ret<number>> => this.post('jumpCount', params);
+  jumpCount = (params: { username?: string; tel?: string }): Promise<Fa.Ret<number>> => this.post('jumpCount', params);
 
   /** 注册 */
   registry = (params: UserRegistryVo): Promise<Fa.Ret<boolean>> => this.post('registry', params);
@@ -62,7 +61,6 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 更新 */
   updateSimpleById = (id: string, params: any): Promise<Fa.Ret> => this.post('updateSimpleById', { id, ...params });
-
 }
 
 export default new User(GATE_APP.admin, serviceModule);

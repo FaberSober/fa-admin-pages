@@ -1,9 +1,8 @@
-import React, {useContext} from 'react';
-import {Link} from 'react-router-dom';
-import {SITE_INFO} from '@/configs';
-import {fileSaveApi} from '@features/fa-admin-pages/services';
-import {ConfigLayoutContext} from "../../config/context/ConfigLayoutContext";
-
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { SITE_INFO } from '@/configs';
+import { fileSaveApi } from '@features/fa-admin-pages/services';
+import { ConfigLayoutContext } from '../../config/context/ConfigLayoutContext';
 
 /**
  * @author xu.pengfei

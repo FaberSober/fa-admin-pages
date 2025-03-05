@@ -1,27 +1,27 @@
-import React, {type CSSProperties, type HTMLAttributes, useEffect, useState} from 'react';
-import {useScroll} from "ahooks";
-import './FaToc.scss'
-import { isNil } from "lodash";
+import React, { type CSSProperties, type HTMLAttributes, useEffect, useState } from 'react';
+import { useScroll } from 'ahooks';
+import './FaToc.scss';
+import { isNil } from 'lodash';
 
 /**
  * @returns 随机生产长size位的字母[a-z]
  */
 export function generateId(size = 8) {
-  let str = "";
+  let str = '';
   for (let i = 0; i < size; i++) {
     const code = Math.floor(Math.random() * 26);
-    str += String.fromCharCode("a".charCodeAt(0) + code);
+    str += String.fromCharCode('a'.charCodeAt(0) + code);
   }
   return str;
 }
 
-function extractLevel(heading:Element) {
+function extractLevel(heading: Element) {
   if (heading.tagName.length !== 2 || heading.tagName[0].toLowerCase() !== 'h') {
     // throw new Error(`encountered invalid heading tagName ${heading.tagName}`)
     return 1;
   }
 
-  return Number(heading.tagName.substring(1))
+  return Number(heading.tagName.substring(1));
 }
 
 export interface FaTocProps extends HTMLAttributes<any> {
@@ -46,8 +46,8 @@ let TOP_GAP = 109; // 距离顶部的高度默认距离
  * @author xu.pengfei
  * @date 2023/7/3 15:53
  */
-export default function FaToc({parentDomId, domId, onClickToc, style, ...props}: FaTocProps) {
-  const [calElements, setCalElements] = useState<CalElement[]>([])
+export default function FaToc({ parentDomId, domId, onClickToc, style, ...props }: FaTocProps) {
+  const [calElements, setCalElements] = useState<CalElement[]>([]);
 
   const scroll = useScroll(document.getElementById(parentDomId));
   // console.log('scroll', scroll)
@@ -56,16 +56,16 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
     const dom = document.getElementById(domId);
     if (isNil(dom)) return;
 
-    const headings:HTMLElement[] = Array.from(dom!.querySelectorAll("h1,h2,h3,h4,h5,h6"))
+    const headings: HTMLElement[] = Array.from(dom!.querySelectorAll('h1,h2,h3,h4,h5,h6'));
 
-    const calElements:CalElement[] = headings.map((v, i) => {
+    const calElements: CalElement[] = headings.map((v, i) => {
       let bottom = 9999999;
       if (i < headings.length - 1) {
-        const nextEle = headings[i + 1]
+        const nextEle = headings[i + 1];
         bottom = nextEle.offsetTop;
       }
       const id = generateId();
-      v.setAttribute("id", id)
+      v.setAttribute('id', id);
 
       const level = extractLevel(v); // 识别h1、h2的后缀数字
       return {
@@ -74,35 +74,35 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
         top: v.offsetTop,
         bottom,
         level,
-      }
-    })
+      };
+    });
     // console.log('calElements', calElements)
-    setCalElements(calElements)
+    setCalElements(calElements);
 
     if (calElements && calElements[0]) {
       TOP_GAP = calElements[0].top;
     }
-  }, [domId])
+  }, [domId]);
 
   function handleClickTocLink(toc: CalElement) {
-    const parentDom = document.getElementById(parentDomId)
+    const parentDom = document.getElementById(parentDomId);
     if (parentDom) {
-      parentDom.scrollTo(0, toc.top)
+      parentDom.scrollTo(0, toc.top);
     }
     const originBg = toc.element.style.backgroundColor;
-    toc.element.style.transition = 'var(--fa-transition)'
-    toc.element.style.backgroundColor = 'var(--primary-color)'
+    toc.element.style.transition = 'var(--fa-transition)';
+    toc.element.style.backgroundColor = 'var(--primary-color)';
     setTimeout(() => {
       toc.element.style.backgroundColor = originBg;
-    }, 1000)
+    }, 1000);
 
     if (onClickToc) {
-      onClickToc(toc)
+      onClickToc(toc);
     }
   }
 
   return (
-    <div style={{...style}} className="fa-toc fa-scroll-auto-y" {...props}>
+    <div style={{ ...style }} className="fa-toc fa-scroll-auto-y" {...props}>
       {/*{loopToc(array, 0)}*/}
       {/* 使用计算后的flatTreeList生成列表 */}
       {calElements.map((toc, index) => {
@@ -122,16 +122,16 @@ export default function FaToc({parentDomId, domId, onClickToc, style, ...props}:
         return (
           <div
             key={toc.id}
-            className={sel ? "fa-toc-item-sel" : "fa-toc-item"}
-            style={{paddingLeft: toc.level * 12 + 6}}
+            className={sel ? 'fa-toc-item-sel' : 'fa-toc-item'}
+            style={{ paddingLeft: toc.level * 12 + 6 }}
             fa-toc-id={toc.id}
             onClick={() => handleClickTocLink(toc)}
           >
             <span>{toc.element.innerText}</span>
             {sel && <div className="fa-toc-item-slider" />}
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

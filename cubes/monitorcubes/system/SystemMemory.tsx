@@ -1,12 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {useInterval} from "ahooks";
-import {FaUtils} from "@fa/ui";
-import type { Admin } from "@features/fa-admin-pages/types";
-import { systemApi } from "@features/fa-admin-pages/services";
-import EchartsGaugeStep from "@features/fa-admin-pages/components/echarts/EchartsGaugeStep";
+import React, { useEffect, useState } from 'react';
+import { useInterval } from 'ahooks';
+import { FaUtils } from '@fa/ui';
+import type { Admin } from '@features/fa-admin-pages/types';
+import { systemApi } from '@features/fa-admin-pages/services';
+import EchartsGaugeStep from '@features/fa-admin-pages/components/echarts/EchartsGaugeStep';
 
-
-export type SystemMemoryProps = {}
+export type SystemMemoryProps = {};
 
 export function SystemMemory() {
   const [data, setData] = useState<Admin.ServerInfo>();
@@ -21,12 +20,12 @@ export function SystemMemory() {
     systemApi.server().then((res) => setData(res.data));
   }
 
-  let value:any = 0;
-  let totalStr:any = '';
-  let usedStr:any = '';
+  let value: any = 0;
+  let totalStr: any = '';
+  let usedStr: any = '';
   if (data && data.memory && data.memory.total > 0) {
     const used = data.memory.total - data.memory.available;
-    value = (used / data.memory.total * 100).toFixed(0);
+    value = ((used / data.memory.total) * 100).toFixed(0);
 
     usedStr = FaUtils.sizeToHuman(used);
     totalStr = FaUtils.sizeToHuman(data.memory.total);
@@ -46,10 +45,10 @@ export function SystemMemory() {
   );
 }
 
-SystemMemory.displayName = "SystemMemory"; // 必须与方法名称一致
-SystemMemory.title = "内存";
-SystemMemory.description = "内存运行状态指标图";
+SystemMemory.displayName = 'SystemMemory'; // 必须与方法名称一致
+SystemMemory.title = '内存';
+SystemMemory.description = '内存运行状态指标图';
 SystemMemory.showTitle = true; // 是否展示Card的Title
-SystemMemory.permission = ""; // 需要的权限
+SystemMemory.permission = ''; // 需要的权限
 SystemMemory.w = 4; // 宽度-max=16
 SystemMemory.h = 12; // 高度

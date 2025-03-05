@@ -4,15 +4,14 @@ import { Button, Form, Select } from 'antd';
 import type { Admin } from '@/types';
 import { configSysApi } from '@features/fa-admin-pages/services';
 import { SaveOutlined } from '@ant-design/icons';
-import { FaFormColSpace } from "@features/fa-admin-pages/components";
-
+import { FaFormColSpace } from '@features/fa-admin-pages/components';
 
 /**
  * @author xu.pengfei
  * @date 2022/12/29 15:40
  */
 export default function ConfigStorageBase() {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext);
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
   const [configSys, setConfigSys] = useState<Admin.ConfigSys>();
 
@@ -30,7 +29,7 @@ export default function ConfigStorageBase() {
 
     const params = {
       id: configSys.id,
-      data: {...configSys.data, ...v},
+      data: { ...configSys.data, ...v },
     };
     configSysApi.update(configSys.id, params).then((res) => FaUtils.showResponse(res, '更新配置'));
   }
@@ -45,8 +44,8 @@ export default function ConfigStorageBase() {
   const loading = loadingEffect[configSysApi.getUrl('update')];
   return (
     <div className="fa-p12">
-      <Form form={form} onFinish={onFinish} layout="horizontal" style={{width: 700}} labelCol={{span: 4}}>
-        <Form.Item name="storeActive" label="使用存储平台" rules={[{required: true}]}>
+      <Form form={form} onFinish={onFinish} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
+        <Form.Item name="storeActive" label="使用存储平台" rules={[{ required: true }]}>
           <Select
             options={[
               { label: '本地存储', value: 'local-plus' },
@@ -57,7 +56,7 @@ export default function ConfigStorageBase() {
         </Form.Item>
 
         <FaFormColSpace offset={4}>
-          <Button htmlType="submit" icon={<SaveOutlined/>} type="primary" loading={loading}>
+          <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
             保存
           </Button>
           <Button onClick={handleReset}>重置</Button>

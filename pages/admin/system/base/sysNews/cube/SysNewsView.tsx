@@ -1,9 +1,8 @@
 import React from 'react';
 import type { Admin } from '@/types';
-import { Descriptions, Image } from "antd";
-import { fileSaveApi } from "@features/fa-admin-pages/services";
-import FaRichHtmlView from "@features/fa-admin-pages/components/rich-html/FaRichHtmlView";
-
+import { Descriptions, Image } from 'antd';
+import { fileSaveApi } from '@features/fa-admin-pages/services';
+import FaRichHtmlView from '@features/fa-admin-pages/components/rich-html/FaRichHtmlView';
 
 export interface SysNewsViewProps {
   item: Admin.SysNews;
@@ -12,7 +11,7 @@ export interface SysNewsViewProps {
 /**
  * BASE-系统-新闻实体详情查看
  */
-export default function SysNewsView({item}: SysNewsViewProps) {
+export default function SysNewsView({ item }: SysNewsViewProps) {
   return (
     <Descriptions column={1} bordered labelStyle={{ width: 80 }}>
       <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
@@ -39,5 +38,5 @@ export default function SysNewsView({item}: SysNewsViewProps) {
       <Descriptions.Item label="更新用户">{item.updName}</Descriptions.Item>
       <Descriptions.Item label="更新IP">{item.updHost}</Descriptions.Item>
     </Descriptions>
-  )
+  );
 }

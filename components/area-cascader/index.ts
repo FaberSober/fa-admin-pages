@@ -1,4 +1,4 @@
-import AreaCascader, {type AreaCascaderProps} from "./AreaCascader";
+import AreaCascader, { type AreaCascaderProps } from './AreaCascader';
 
-export {AreaCascader}
-export type {AreaCascaderProps}
+export { AreaCascader };
+export type { AreaCascaderProps };

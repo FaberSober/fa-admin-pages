@@ -1,9 +1,9 @@
 import React from 'react';
-import {DownloadOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined,} from '@ant-design/icons';
-import {Button, Form, Input, Space} from 'antd';
-import {AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams,} from '@fa/ui';
-import type {Rbac} from '@/types';
-import {rbacRoleApi} from '@features/fa-admin-pages/services';
+import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space } from 'antd';
+import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import type { Rbac } from '@/types';
+import { rbacRoleApi } from '@features/fa-admin-pages/services';
 import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
 import RbacUserRoleList from './list/RbacUserRoleList';
@@ -63,10 +63,14 @@ export default function RbacRoleList() {
             </Form.Item>
 
             <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
               <RbacRoleModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
             </Space>
           </Form>
         </div>

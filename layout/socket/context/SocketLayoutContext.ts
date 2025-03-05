@@ -10,4 +10,4 @@ const SocketLayoutContext = createContext<SocketLayoutContextProps>({
   sendSocketMsg: () => {},
 });
 
-export default SocketLayoutContext
+export default SocketLayoutContext;

@@ -11,7 +11,7 @@ export interface RbacMenuCascaderProps extends Omit<BaseCascaderProps<Rbac.RbacM
  * @author xu.pengfei
  * @date 2020/12/25
  */
-export default function RbacMenuCascader({scope, ...props}: RbacMenuCascaderProps) {
+export default function RbacMenuCascader({ scope, ...props }: RbacMenuCascaderProps) {
   return (
     <BaseCascader
       showRoot={false}

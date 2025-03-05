@@ -1,7 +1,6 @@
 // import { Fa } from '@fa/ui';
 
 namespace Generator {
-
   // ------------------------------------------------- VO -------------------------------------------------
   /** 表结构 */
   export interface TableVo {
@@ -37,7 +36,6 @@ namespace Generator {
     javaCopyPath: string;
   }
 
-
   // ------------------------------------------------- VO-Query -------------------------------------------------
   export interface TableQueryVo {
     name?: string;
@@ -46,7 +44,6 @@ namespace Generator {
   export interface CodeGenRetVo extends CodeGenReqVo {
     code: string;
   }
-
 }
 
 export default Generator;

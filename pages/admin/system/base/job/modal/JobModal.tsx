@@ -1,10 +1,10 @@
-import React, {useContext, useState} from 'react';
-import {find, get} from 'lodash';
-import {Button, Form, Input, Select} from 'antd';
-import {ApiEffectLayoutContext, type CommonModalProps, CronModal, DragModal, FaHref, FaUtils} from '@fa/ui';
-import type {Admin} from '@/types';
-import {jobApi} from '@features/fa-admin-pages/services';
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
+import React, { useContext, useState } from 'react';
+import { find, get } from 'lodash';
+import { Button, Form, Input, Select } from 'antd';
+import { ApiEffectLayoutContext, type CommonModalProps, CronModal, DragModal, FaHref, FaUtils } from '@fa/ui';
+import type { Admin } from '@/types';
+import { jobApi } from '@features/fa-admin-pages/services';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 const serviceName = '';
 
@@ -68,18 +68,14 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
     <span>
       <span onClick={showModal}>
         {children}
-        {addBtn && <Button icon={<PlusOutlined />} type="primary">新增</Button>}
+        {addBtn && (
+          <Button icon={<PlusOutlined />} type="primary">
+            新增
+          </Button>
+        )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
       </span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form
           form={form}
           onFinish={onFinish}

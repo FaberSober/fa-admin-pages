@@ -1,18 +1,17 @@
-import React, {type CSSProperties, useContext, useEffect, useRef, useState} from 'react';
-import {v4 as uuidv4} from 'uuid'
+import React, { type CSSProperties, useContext, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import * as echarts from 'echarts';
-import type {ECharts, PieSeriesOption} from 'echarts';
-import {type Fa, ThemeLayoutContext} from '@fa/ui'
-import {useSize} from "ahooks";
-
+import type { ECharts, PieSeriesOption } from 'echarts';
+import { type Fa, ThemeLayoutContext } from '@fa/ui';
+import { useSize } from 'ahooks';
 
 export interface EchartsPieProps {
-  title?: string,
-  subTitle?: string,
+  title?: string;
+  subTitle?: string;
   data: Fa.ChartArrayData[];
-  dataTitle?: string,
+  dataTitle?: string;
   style?: CSSProperties;
-  pieSeriesOption?: PieSeriesOption,
+  pieSeriesOption?: PieSeriesOption;
   options?: any;
 }
 
@@ -20,12 +19,12 @@ export interface EchartsPieProps {
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsPie({title, subTitle, data, dataTitle, style, pieSeriesOption, options}: EchartsPieProps) {
-  const {themeDark} = useContext(ThemeLayoutContext)
+export default function EchartsPie({ title, subTitle, data, dataTitle, style, pieSeriesOption, options }: EchartsPieProps) {
+  const { themeDark } = useContext(ThemeLayoutContext);
 
-  const chartRef = useRef<ECharts>()
-  const [id] = useState(uuidv4())
-  const [ready, setReady] = useState(false)
+  const chartRef = useRef<ECharts>();
+  const [id] = useState(uuidv4());
+  const [ready, setReady] = useState(false);
 
   const domRef = useRef<any | null>();
   const size = useSize(domRef);
@@ -35,13 +34,13 @@ export default function EchartsPie({title, subTitle, data, dataTitle, style, pie
     if (!ready) return;
 
     chartRef.current!.resize();
-  }, [size])
+  }, [size]);
 
   useEffect(() => {
     if (chartRef.current) chartRef.current.dispose();
 
     // 基于准备好的dom，初始化echarts实例
-    const theme = themeDark ? 'dark' : 'light'
+    const theme = themeDark ? 'dark' : 'light';
     // @ts-ignore
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
@@ -51,14 +50,14 @@ export default function EchartsPie({title, subTitle, data, dataTitle, style, pie
       title: {
         text: title,
         subtext: subTitle,
-        left: 'center'
+        left: 'center',
       },
       tooltip: {
-        trigger: 'item'
+        trigger: 'item',
       },
       legend: {
         orient: 'vertical',
-        left: 'left'
+        left: 'left',
       },
       series: [
         {
@@ -77,30 +76,28 @@ export default function EchartsPie({title, subTitle, data, dataTitle, style, pie
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
           },
           ...pieSeriesOption,
-        }
+        },
       ],
       ...options,
     });
-    setReady(true)
-  }, [themeDark])
+    setReady(true);
+  }, [themeDark]);
 
   useEffect(() => {
     if (!ready) return;
 
     chartRef.current!.setOption({
-      series: [
-        { data }
-      ]
-    })
-  }, [data])
+      series: [{ data }],
+    });
+  }, [data]);
 
   return (
     <div ref={domRef} style={{ position: 'relative', height: '100%', width: '100%', ...style }}>
       <div id={id} style={{ height: '100%', width: '100%' }} />
     </div>
-  )
+  );
 }

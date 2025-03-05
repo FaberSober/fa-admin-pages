@@ -1,7 +1,18 @@
 import React, { useEffect } from 'react';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, BizUserSelect, clearForm, type FaberTable, FaUtils, type SelectedUser, useDelete, useTableQueryParams, } from '@fa/ui';
+import {
+  AuthDelBtn,
+  BaseBizTable,
+  BaseTableUtils,
+  BizUserSelect,
+  clearForm,
+  type FaberTable,
+  FaUtils,
+  type SelectedUser,
+  useDelete,
+  useTableQueryParams,
+} from '@fa/ui';
 import type { Rbac } from '@/types';
 import { rbacUserRoleApi as api } from '@features/fa-admin-pages/services';
 
@@ -38,7 +49,8 @@ export default function RbacUserRoleList({ rbacRole }: RbacUserRoleListProps) {
         FaUtils.showResponse(res, '添加用户角色');
         callback();
         fetchPageList();
-      }).catch(() => error());
+      })
+      .catch(() => error());
   }
 
   /** 生成表格字段List */

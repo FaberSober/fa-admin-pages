@@ -1,1 +1,1 @@
-export { default as VantaLayout } from './VantaLayout'
+export { default as VantaLayout } from './VantaLayout';

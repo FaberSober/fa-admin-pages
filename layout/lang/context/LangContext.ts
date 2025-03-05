@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 export interface LangContextProps {
   locale: string;
@@ -12,4 +12,4 @@ const LangContext = createContext<LangContextProps>({
   },
 });
 
-export default LangContext
+export default LangContext;

@@ -76,15 +76,7 @@ export default function DepartmentModal({ children, parentId, title, record, fet
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal
-        title={title}
-        open={open}
-        onOk={() => form.submit()}
-        confirmLoading={loading}
-        onCancel={() => setOpen(false)}
-        width={700}
-        {...props}
-      >
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="parentId" label="上级部门" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <DepartmentCascade showRoot />
