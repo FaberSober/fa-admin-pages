@@ -1,6 +1,6 @@
 import React from 'react';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Input, Modal, Space } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -31,6 +31,19 @@ export default function LogApiList() {
   const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
   const [_, deleteByQuery] = useDeleteByQuery(api.removeByQuery, queryParams, fetchPageList);
   const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
+
+  function handleDeleteAll() {
+    Modal.confirm({
+      title: '清空日志',
+      content: '清空日志后不可恢复，是否确认清空？',
+      okText: '清空',
+      okButtonProps: {danger: true},
+      onOk: () => api.deleteAll().then(res => {
+        FaUtils.showResponse(res, '清空日志');
+        fetchPageList();
+      }),
+    })
+  }
 
   /** 生成表格字段List */
   function genColumns() {
@@ -130,6 +143,9 @@ export default function LogApiList() {
         onConditionChange={(cL) => setConditionList(cL)}
         showDeleteByQuery
         onDeleteByQuery={deleteByQuery}
+        renderQueryAll={() => (
+          <Button type="primary" danger onClick={handleDeleteAll}>清空日志</Button>
+        )}
       />
     </div>
   );
