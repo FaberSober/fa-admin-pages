@@ -94,12 +94,12 @@ export default function Menu() {
               <div style={{ flex: 1 }} onClick={() => FaUtils.copyToClipboard(item.name)}>{item.name}</div>
               <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
               <div style={{ width: 100 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.id)}>{item.sourceData.id}</div>
-              <div className="fa-plr6">
+              <div className="fa-plr12">
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && <Tag color="#2db7f5">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && <Tag color="#87d068">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
               </div>
-              <div className="fa-plr6">
+              <div className="fa-plr12">
                 <Switch
                   checkedChildren="启用"
                   unCheckedChildren="禁用"
@@ -115,7 +115,7 @@ export default function Menu() {
                   }}
                 />
               </div>
-              <div style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>
+              <div className="fa-plr12" style={{ width: 400 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}>
                 {item.sourceData.linkUrl}
               </div>
               <Space>
