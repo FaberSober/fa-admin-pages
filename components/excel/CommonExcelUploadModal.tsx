@@ -1,6 +1,7 @@
 import React, { type ReactNode, useState } from 'react';
-import { DragModal, type DragModalProps, FaUtils, type Fa, UploadFileLocal } from '@fa/ui';
+import { DragModal, type DragModalProps, FaUtils, type Fa, UploadFileLocal, BaseDrawer } from '@fa/ui';
 import { Col, Form, Row } from 'antd';
+import { FileBizList } from "@features/fa-admin-pages/components";
 
 export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
@@ -12,6 +13,8 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   tips?: string | ReactNode;
   showTemplateDownload?: boolean;
   accept?: string;
+  /** 导入业务类型，有值的话展示导入关联的导入历史记录 */
+  type?: string;
 }
 
 /**
@@ -31,6 +34,7 @@ export default function CommonExcelUploadModal({
   tips,
   showTemplateDownload = true,
   accept,
+  type,
   ...props
 }: CommonExcelUploadModalProps) {
   const [form] = Form.useForm();
@@ -96,6 +100,16 @@ export default function CommonExcelUploadModal({
             <Row className="fa-mb12">
               <Col offset={4} md={20}>
                 {tips}
+              </Col>
+            </Row>
+          )}
+
+          {type && (
+            <Row className="fa-mb12">
+              <Col offset={4} md={20}>
+                <BaseDrawer triggerDom={<a>导入历史记录</a>} title="导入历史记录">
+                  <FileBizList mainBizId="" bizId="" type={type} />
+                </BaseDrawer>
               </Col>
             </Row>
           )}

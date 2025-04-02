@@ -12,13 +12,15 @@ export interface FileBizListProps {
   bizId: string;
   /** 业务类型 */
   type: string;
+  /** 展示上传按钮 */
+  showUpload?: boolean;
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/2/26 19:42
  */
-export default function FileBizList({ mainBizId, bizId, type }: FileBizListProps) {
+export default function FileBizList({ mainBizId, bizId, type, showUpload }: FileBizListProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
 
   const [array, setArray] = useState<Admin.FileBiz[]>([]);
@@ -48,11 +50,13 @@ export default function FileBizList({ mainBizId, bizId, type }: FileBizListProps
   return (
     <div>
       <Space className="fa-mb12">
-        <UploadFileModal onSubmit={handleAddFiles}>
-          <Button icon={<UploadOutlined />} type="primary">
-            上传附件
-          </Button>
-        </UploadFileModal>
+        {showUpload && (
+          <UploadFileModal onSubmit={handleAddFiles}>
+            <Button icon={<UploadOutlined />} type="primary">
+              上传附件
+            </Button>
+          </UploadFileModal>
+        )}
         <Button onClick={refreshList} loading={loading}>
           刷新
         </Button>
