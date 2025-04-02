@@ -7,11 +7,11 @@ import type { Admin } from '@features/fa-admin-pages/types';
 
 export interface FileBizListProps {
   /** 主业务ID */
-  mainBizId: string;
+  mainBizId?: string;
   /** 业务ID */
-  bizId: string;
+  bizId?: string;
   /** 业务类型 */
-  type: string;
+  type?: string;
   /** 展示上传按钮 */
   showUpload?: boolean;
 }
