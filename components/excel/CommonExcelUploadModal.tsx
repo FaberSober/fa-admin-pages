@@ -47,6 +47,7 @@ export default function CommonExcelUploadModal({
     const params = {
       ...fieldsValue,
       ...extraParams,
+      buzzType: type,
     };
 
     setLoading(true);

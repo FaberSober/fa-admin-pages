@@ -56,7 +56,7 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
 
   return (
     <FaFileViewModal fileId={file.id}>
-      <span>{file.originalFilename}</span>
+      <span className="fa-cursor-pointer fa-text-link">{file.originalFilename}</span>
     </FaFileViewModal>
   );
 }

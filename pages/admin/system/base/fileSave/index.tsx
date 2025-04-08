@@ -33,7 +33,10 @@ export default function FileSaveList() {
         ...BaseTableUtils.genSimpleSorterColumn('原始文件名', 'originalFilename', undefined, sorter),
         render: (_, r) => <FileSaveIcon file={r} width={25} />,
       },
-      BaseTableUtils.genSimpleSorterColumn('文件存储地址', 'url', undefined, sorter),
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('文件存储地址', 'url', undefined, sorter),
+        render: (v) => <a target="_blank" href={v}>{v}</a>
+      },
       {
         ...BaseTableUtils.genSimpleSorterColumn('文件大小', 'size', 100, sorter),
         render: (v) => FaUtils.sizeToHuman(v),

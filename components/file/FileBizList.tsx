@@ -69,7 +69,7 @@ export default function FileBizList({ mainBizId, bizId, type, showUpload }: File
             dataIndex: 'fileName',
             title: '附件名称',
             render: (_, r) => (
-              <a href={fileSaveApi.genLocalGetFile(r.fileId)} target="_blank" rel="noreferrer">
+              <a href={fileSaveApi.genLocalGetFile(r.fileId)} target="_blank" rel="noreferrer" className="fa-text-link fa-text">
                 {r.fileName}
               </a>
             ),
