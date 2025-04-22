@@ -4,7 +4,7 @@ import { useInterval, useSize } from "ahooks";
 
 export interface FaScrollListProps<T> {
   list: T[];
-  renderItem: (item: T) => ReactNode;
+  renderItem: (item: T, index: number) => ReactNode;
   key?: string;
   num?: number;
   interval?: number;
@@ -92,7 +92,7 @@ export default function FaScrollList<T>({ list, renderItem, key = 'id', num = 10
             }}
           >
             <div className="fa-relative fa-full">
-              {renderItem(v)}
+              {renderItem(v, i)}
             </div>
           </div>
         )
