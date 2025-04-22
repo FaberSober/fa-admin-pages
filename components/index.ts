@@ -15,6 +15,7 @@ export * from './modal';
 export * from './pdf';
 export * from './rich-html';
 export * from './route';
+export * from './scroll';
 export * from './socket';
 export * from './toc-extract';
 export * from './utils';
