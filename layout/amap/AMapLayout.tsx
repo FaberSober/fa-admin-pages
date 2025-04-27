@@ -19,7 +19,7 @@ export default function AMapLayout({ children }: Fa.BaseChildProps) {
 
   console.log('online mode 在线模式加载高德地图API');
   return (
-    <APILoader version="2.0.5" akey={VITE_APP_AMAP_KEY}>
+    <APILoader version="2.0" akey={VITE_APP_AMAP_KEY}>
       {children}
     </APILoader>
   );
