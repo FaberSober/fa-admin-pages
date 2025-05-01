@@ -76,7 +76,7 @@ export default function StudentList() {
         refreshList={() => fetchPageList()}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
-        showBatchBelBtn={false}
+        showBatchDelBtn={false}
         renderCheckBtns={(rowKeys) => (
           <Space>
             <BaseDrawer

@@ -133,7 +133,7 @@ export default function MsgList() {
         batchDelete={(ids) => msgApi.removeBatchByIds(ids)}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
-        showBatchBelBtn={false}
+        showBatchDelBtn={false}
         showComplexQuery={false}
         renderCheckBtns={(rowKeys) => (
           <Space>

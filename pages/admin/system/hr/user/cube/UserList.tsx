@@ -171,7 +171,7 @@ export default function UserList({ departmentId }: IProps) {
         refreshList={() => fetchPageList()}
         batchDelete={(ids) => userApi.removeBatchByIds(ids)}
         showComplexQuery={false}
-        showBatchBelBtn={false}
+        showBatchDelBtn={false}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
         renderCheckBtns={(rowKeys) => (
