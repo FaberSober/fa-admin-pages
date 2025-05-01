@@ -2,6 +2,7 @@ import React, { type ReactNode, useState } from 'react';
 import { DragModal, type DragModalProps, FaUtils, type Fa, UploadFileLocal, BaseDrawer } from '@fa/ui';
 import { Col, Form, Row } from 'antd';
 import { FileBizList } from "@features/fa-admin-pages/components";
+import WebSocketPlainTextCube from "../socket/WebSocketPlainTextCube";
 
 export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
@@ -12,6 +13,8 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   extraParams?: Record<any, any>;
   tips?: string | ReactNode;
   showTemplateDownload?: boolean;
+  /** 展示ws导入过程文本信息 */
+  showMsg?: boolean;
   accept?: string;
   /** 导入业务类型，有值的话展示导入关联的导入历史记录 */
   type?: string;
@@ -33,6 +36,7 @@ export default function CommonExcelUploadModal({
   extraParams,
   tips,
   showTemplateDownload = true,
+  showMsg = true,
   accept,
   type,
   ...props
@@ -113,6 +117,12 @@ export default function CommonExcelUploadModal({
                 </BaseDrawer>
               </Col>
             </Row>
+          )}
+
+          {showMsg && (
+            <div className="fa-mb12">
+              <WebSocketPlainTextCube />
+            </div>
           )}
         </Form>
       </DragModal>
