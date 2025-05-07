@@ -6,6 +6,6 @@ import React from 'react';
  */
 export default function FallbackComponent() {
   return (
-    <div>异常情况，请联系管理员进行处理。</div>
+    <div>异常情况，请联系管理员进行处理。可以尝试刷新页面。<a onClick={() => window.location.reload(true)}>点此刷新</a></div>
   )
 }
