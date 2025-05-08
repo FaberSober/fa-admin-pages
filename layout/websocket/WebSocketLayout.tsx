@@ -42,12 +42,20 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
       connect();
     }
     // send heartbeat
-    sendMessage('ping');
+    sendMsg('ping');
   }, 10000);
+
+  function sendMsg(msg: string) {
+    try {
+      sendMessage(msg);
+    } catch (e) {
+      console.log('sendMessage error', e)
+    }
+  }
 
   const contextValue: WebSocketLayoutContextProps = {
     readyState,
-    sendMessage: (msg: Record<any, any>) => sendMessage(JSON.stringify(msg)),
+    sendMessage: (msg: Record<any, any>) => sendMsg(JSON.stringify(msg)),
     latestMessage,
     latestMessageObj,
     messageHistory: messageHistory.current,
