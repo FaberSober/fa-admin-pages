@@ -30,7 +30,7 @@ export default function FileBizList({ mainBizId, bizId, type, showUpload }: File
   }, [mainBizId, bizId, type]);
 
   function refreshList() {
-    fileBizApi.list({ query: { mainBizId, bizId, type } }).then((res) => {
+    fileBizApi.list({ query: { mainBizId, bizId, type }, sorter: 'id DESC' }).then((res) => {
       setArray(res.data);
     });
   }
