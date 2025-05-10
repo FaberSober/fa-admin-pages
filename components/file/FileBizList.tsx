@@ -74,8 +74,8 @@ export default function FileBizList({ mainBizId, bizId, type, showUpload }: File
               </a>
             ),
           },
-          { dataIndex: 'crtTime', title: '创建时间' },
-          { dataIndex: 'crtName', title: '创建用户' },
+          { dataIndex: 'crtTime', title: '创建时间', width: 170 },
+          { dataIndex: 'crtName', title: '创建用户', width: 100 },
           {
             title: '操作',
             dataIndex: 'menu',
