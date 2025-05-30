@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Segmented } from 'antd';
 import ConfigSystem from './cube/ConfigSystem';
 import ConfigSafe from './cube/ConfigSafe';
+import ConfigLog from './cube/ConfigLog';
 import ConfigStorage from './cube/storage/ConfigStorage';
-import { DatabaseOutlined, SafetyCertificateOutlined, SettingOutlined } from '@ant-design/icons';
+import { DatabaseOutlined, OrderedListOutlined, SafetyCertificateOutlined, SettingOutlined } from '@ant-design/icons';
 
 /**
  * 系统配置
@@ -34,6 +35,11 @@ export default function Config() {
             value: 'file',
             icon: <DatabaseOutlined />,
           },
+          {
+            label: '日志配置',
+            value: 'log',
+            icon: <OrderedListOutlined />,
+          },
         ]}
       />
 
@@ -41,6 +47,7 @@ export default function Config() {
         {tab === 'system' && <ConfigSystem />}
         {tab === 'safe' && <ConfigSafe />}
         {tab === 'file' && <ConfigStorage />}
+        {tab === 'log' && <ConfigLog />}
       </div>
     </div>
   );
