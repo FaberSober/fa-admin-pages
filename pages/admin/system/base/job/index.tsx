@@ -1,11 +1,23 @@
 import React from 'react';
 import { DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Badge, Button, Form, Input, Popconfirm, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaHref, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import {
+  AuthDelBtn,
+  BaseBizTable,
+  BaseDrawer,
+  BaseTableUtils,
+  clearForm,
+  type FaberTable,
+  FaHref,
+  FaUtils,
+  useDelete,
+  useExport,
+  useTableQueryParams
+} from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobModal from './modal/JobModal';
-import JobLogDrawer from './jobLog/JobLogDrawer';
+import JobLogList from "@features/fa-admin-pages/pages/admin/system/base/job/jobLog/JobLogList";
 
 const serviceName = '定时任务';
 const biz = 'base_job';
@@ -47,9 +59,9 @@ export default function JobList() {
       {
         ...BaseTableUtils.genSimpleSorterColumn('任务名称', 'jobName', 240, sorter),
         render: (val, record) => (
-          <JobLogDrawer jobId={record.id}>
-            <a>{val}</a>
-          </JobLogDrawer>
+          <BaseDrawer triggerDom={<a>{val}</a>}>
+            <JobLogList jobId={record.id} />
+          </BaseDrawer>
         ),
       },
       BaseTableUtils.genSimpleSorterColumn('cron表达式', 'cron', 120, sorter),

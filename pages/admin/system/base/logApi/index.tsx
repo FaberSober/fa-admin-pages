@@ -4,6 +4,7 @@ import { Button, Form, Input, Modal, Space } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
+  BaseDrawer,
   BaseTableUtils,
   clearForm,
   DictEnumApiSelector,
@@ -17,7 +18,7 @@ import {
 } from '@fa/ui';
 import type { Admin } from '@/types';
 import { logApiApi as api } from '@features/fa-admin-pages/services';
-import LogApiDrawer from './drawer/LogApiDrawer';
+import LogApiView from '@features/fa-admin-pages/pages/admin/system/base/logApi/cube/LogApiView';
 
 const serviceName = '请求日志';
 const biz = 'base_log_api';
@@ -83,9 +84,9 @@ export default function LogApiList() {
         dataIndex: 'menu',
         render: (_, record) => (
           <Space>
-            <LogApiDrawer record={record}>
-              <FaHref icon={<EyeOutlined />} text="查看" />
-            </LogApiDrawer>
+            <BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="查看" />}>
+              <LogApiView record={record} />
+            </BaseDrawer>
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
