@@ -4,8 +4,8 @@ import { fileSaveApi } from '@features/fa-admin-pages/services';
 
 export interface FileImgViewProps {
   fileId: string;
-  width?: number;
-  height?: number;
+  width?: number | string | undefined;
+  height?: number | string | undefined;
   style?: CSSProperties;
 }
 

@@ -1,7 +1,19 @@
 import React from 'react';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Drawer, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaUtils, useDelete, useExport, useTableQueryParams, useViewItem } from '@fa/ui';
+import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space } from 'antd';
+import {
+  AuthDelBtn,
+  BaseBizTable,
+  BaseDrawer,
+  BaseTableUtils,
+  clearForm,
+  type FaberTable,
+  FaHref,
+  FaUtils,
+  useDelete,
+  useExport,
+  useTableQueryParams
+} from '@fa/ui';
 import { fileSaveApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
 import FileSaveModal from './modal/FileSaveModal';
@@ -22,7 +34,6 @@ export default function FileSaveList() {
 
   const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
-  const { show, hide, open, item } = useViewItem<Admin.FileSave>();
 
   /** 生成表格字段List */
   function genColumns() {
@@ -63,10 +74,13 @@ export default function FileSaveList() {
         render: (_, r) => (
           <Space>
             {/*<FileSaveModal editBtn title={`编辑${serviceName}信息`} record={r} fetchFinish={fetchPageList} />*/}
+            <BaseDrawer triggerDom={<FaHref text="查看" icon={<EyeOutlined />} />} width={1000}>
+              <FileSaveView item={r} />
+            </BaseDrawer>
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
           </Space>
         ),
-        width: 70,
+        width: 120,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
@@ -116,12 +130,7 @@ export default function FileSaveList() {
         batchDelete={(ids) => api.removeBatchByIds(ids)}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
-        onRow={(r) => ({ onDoubleClick: () => show(r) })}
       />
-
-      <Drawer title="查看详情" open={open} onClose={hide} width={1000} styles={{ body: { position: 'relative' } }}>
-        {open && item && <FileSaveView item={item} />}
-      </Drawer>
     </div>
   );
 }
