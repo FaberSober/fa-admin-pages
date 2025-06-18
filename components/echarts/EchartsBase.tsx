@@ -8,13 +8,14 @@ import { ThemeLayoutContext } from '@fa/ui';
 export interface EchartsBaseProps {
   option?: EChartsOption;
   style?: CSSProperties;
+  dark?: boolean; // 是否暗色主题
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsBase({ option, style }: EchartsBaseProps) {
+export default function EchartsBase({ option, style, dark }: EchartsBaseProps) {
   const { themeDark } = useContext(ThemeLayoutContext);
 
   const chartRef = useRef<ECharts>();
@@ -35,7 +36,10 @@ export default function EchartsBase({ option, style }: EchartsBaseProps) {
     if (chartRef.current) chartRef.current.dispose();
 
     // 基于准备好的dom，初始化echarts实例
-    const theme = themeDark ? 'dark' : 'light';
+    let theme = themeDark ? 'dark' : 'light';
+    if (dark) {
+      theme = 'dark';
+    }
     // @ts-ignore
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
