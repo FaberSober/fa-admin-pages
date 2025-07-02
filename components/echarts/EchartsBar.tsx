@@ -15,13 +15,14 @@ export interface EchartsBarProps {
   style?: CSSProperties;
   barSeriesOption?: BarSeriesOption;
   options?: EChartsOption;
+  dark?: boolean; // 是否暗色主题
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/2/2 09:52
  */
-export default function EchartsBar({ title, subTitle, data, dataTitle, unit, barWidth = 30, style, barSeriesOption, options }: EchartsBarProps) {
+export default function EchartsBar({ title, subTitle, data, dataTitle, unit, barWidth = 30, style, barSeriesOption, options, dark }: EchartsBarProps) {
   const { themeDark } = useContext(ThemeLayoutContext);
 
   const chartRef = useRef<ECharts>();
@@ -42,7 +43,10 @@ export default function EchartsBar({ title, subTitle, data, dataTitle, unit, bar
     if (chartRef.current) chartRef.current.dispose();
 
     // 基于准备好的dom，初始化echarts实例
-    const theme = themeDark ? 'dark' : 'light';
+    let theme = themeDark ? 'dark' : 'light';
+    if (dark) {
+      theme = 'dark';
+    }
     chartRef.current = echarts.init(document.getElementById(id), theme);
 
     chartRef.current.setOption({
