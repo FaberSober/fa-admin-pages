@@ -185,6 +185,26 @@ namespace Admin {
     deleted?: boolean;
   }
 
+  /** BASE-字典值 */
+  export interface DictData extends Fa.BaseDelEntity {
+    /** ID */
+    id: number;
+    /** 上级节点 */
+    parentId: number;
+    /** 字典分类ID */
+    dictId: number;
+    /** 排序ID */
+    sortId: number;
+    /** 字典键 */
+    label: string;
+    /** 字典值 */
+    value: string;
+    /** 是否默认值（0否 1是） */
+    isDefault: boolean;
+    /** 描述 */
+    description: string;
+  }
+
   // -------------------------------------------- 系统-告警信息 --------------------------------------------
   /** BASE-告警信息 */
   export interface Alert extends Fa.BaseDelEntity {
