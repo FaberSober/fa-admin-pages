@@ -1,4 +1,5 @@
 export type { default as Admin } from './base/Admin';
+export { default as AdminEnums } from './base/AdminEnums';
 export type { default as Rbac } from './base/Rbac';
 export type { default as Generator } from './base/Generator';
 

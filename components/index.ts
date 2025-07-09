@@ -10,6 +10,7 @@ export * from './grid';
 export * from './helper';
 export * from './icons';
 export * from './image';
+export * from './loading';
 export * from './map';
 export * from './modal';
 export * from './pdf';
