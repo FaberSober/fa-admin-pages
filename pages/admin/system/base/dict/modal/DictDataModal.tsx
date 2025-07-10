@@ -2,15 +2,21 @@ import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
 import { Button, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { DragModal, FaHref, ApiEffectLayoutContext, FaUtils, CommonModalProps, BaseBoolRadio } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils, Fa } from '@fa/ui';
 import { dictDataApi as api } from '@/services';
 import { Admin } from '@/types';
+import DictDataCascade from "../helper/DictDataCascade";
 
+
+interface DictDataModalProps extends CommonModalProps<Admin.DictData> {
+  dictId: number;
+  type: 'list'|'tree'
+}
 
 /**
  * BASE-字典值实体新增、编辑弹框
  */
-export default function DictDataModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.DictData>) {
+export default function DictDataModal({ children, title, record, fetchFinish, addBtn, editBtn, dictId, type, ...props }: DictDataModalProps) {
   const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [form] = Form.useForm();
 
@@ -38,6 +44,7 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
   function onFinish(fieldsValue: any) {
     const values = {
       ...fieldsValue,
+      dictId,
       // birthday: FaUtils.getDateStr000(fieldsValue.birthday),
     };
     if (record) {
@@ -49,12 +56,11 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
 
   function getInitialValues() {
     return {
-      parentId: get(record, 'parentId'),
-      dictId: get(record, 'dictId'),
+      parentId: get(record, 'parentId', Fa.Constant.TREE_SUPER_ROOT_ID),
       sortId: get(record, 'sortId'),
       label: get(record, 'label'),
       value: get(record, 'value'),
-      isDefault: get(record, 'isDefault'),
+      isDefault: get(record, 'isDefault', false),
       description: get(record, 'description'),
       // birthday: FaUtils.getInitialKeyTimeValue(record, 'birthday'),
     }
@@ -83,12 +89,11 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
         {...props}
       >
         <Form form={form} onFinish={onFinish} {...FaUtils.formItemFullLayout}>
-          <Form.Item name="dictId" label="字典分类ID" rules={[{ required: true }]}>
-            <Input placeholder="请输入字典分类ID" />
-          </Form.Item>
-          <Form.Item name="parentId" label="上级节点" rules={[{ required: false }]}>
-            <Input placeholder="请输入上级节点" />
-          </Form.Item>
+          {type === 'tree' && (
+            <Form.Item name="parentId" label="上级节点" rules={[{ required: false }]}>
+              <DictDataCascade dictId={dictId} placeholder="请输入上级节点" />
+            </Form.Item>
+          )}
           <Form.Item name="label" label="字典键" rules={[{ required: true }]}>
             <Input placeholder="请输入字典键" />
           </Form.Item>

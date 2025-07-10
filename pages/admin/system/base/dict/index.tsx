@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Button, Empty, Input, Segmented } from 'antd';
-import { ApiEffectLayoutContext, BaseTree, Fa, FaLabel } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseTree, Fa, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
@@ -10,6 +10,8 @@ import { DatabaseOutlined, OrderedListOutlined, SafetyCertificateOutlined, Setti
 import { Admin, AdminEnums } from "@features/fa-admin-pages/types";
 import { dispatch } from 'use-bus'
 import { FaLoading } from "@features/fa-admin-pages/components";
+import DictDataOptions from "./cube/DictDataOptions";
+import DictDataTree from "./cube/DictDataTree";
 
 /**
  * 字典管理
@@ -107,21 +109,23 @@ export default function DictManage() {
                 <FaLoading loading={loading} text="修改中..." className="fa-ml8" />
               </div>
 
-              {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
-              {viewRecord.type === AdminEnums.DictTypeEnum.TEXT && (
-                <div>
-                  <div className="fa-flex-row-center fa-mb12">
-                    <div style={{width: 100}} className="fa-text-right">字典值：</div>
-                    <Input style={{width: 300}} value={viewRecord.value} onChange={e => setViewRecord({...viewRecord, value: e.target.value})}/>
+              <FaFlexRestLayout>
+                {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
+                {viewRecord.type === AdminEnums.DictTypeEnum.TEXT && (
+                  <div>
+                    <div className="fa-flex-row-center fa-mb12">
+                      <div style={{width: 100}} className="fa-text-right">字典值：</div>
+                      <Input style={{width: 300}} value={viewRecord.value} onChange={e => setViewRecord({...viewRecord, value: e.target.value})}/>
+                    </div>
+                    <div className="fa-flex-row-center">
+                      <div style={{width: 100}}></div>
+                      <Button type="primary" onClick={() => handleUpdate()} loading={loading}>提交</Button>
+                    </div>
                   </div>
-                  <div className="fa-flex-row-center">
-                    <div style={{width: 100}}></div>
-                    <Button type="primary" onClick={() => handleUpdate()} loading={loading}>提交</Button>
-                  </div>
-                </div>
-              )}
-              {viewRecord.type === AdminEnums.DictTypeEnum.LINK_OPTIONS && <div>LINK_OPTIONS</div>}
-              {viewRecord.type === AdminEnums.DictTypeEnum.LINK_TREE && <div>LINK_TREE</div>}
+                )}
+                {viewRecord.type === AdminEnums.DictTypeEnum.LINK_OPTIONS && <DictDataOptions dictId={viewRecord.id} />}
+                {viewRecord.type === AdminEnums.DictTypeEnum.LINK_TREE && <DictDataTree dictId={viewRecord.id} />}
+              </FaFlexRestLayout>
             </div>
           ) : (
             <Empty description="请先选择字典分组"/>
