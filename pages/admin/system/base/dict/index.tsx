@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Empty, Segmented } from 'antd';
+import { Button, Empty, Input, Segmented } from 'antd';
 import { ApiEffectLayoutContext, BaseTree, Fa, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
@@ -44,6 +44,14 @@ export default function DictManage() {
     })
   }
 
+  function handleUpdate() {
+    if (viewRecord === undefined) return;
+    dictApi.update(viewRecord.id, viewRecord).then(res => {
+      dispatch({ type: Fa.Constant.TREE_REFRESH_BUS_KEY })
+      setViewRecord(res.data)
+    })
+  }
+
   const loading = loadingEffect[dictApi.getUrl('update')]
   return (
     <div className="fa-full-content">
@@ -68,7 +76,7 @@ export default function DictManage() {
             <div className="fa-flex-column fa-full">
               <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12" />
 
-              <div className="fa-flex-row-center">
+              <div className="fa-flex-row-center fa-mb12">
                 <Segmented
                   value={viewRecord.type}
                   onChange={(v: any) => handleChangeDictType(viewRecord, v)}
@@ -99,10 +107,24 @@ export default function DictManage() {
                 <FaLoading loading={loading} text="修改中..." className="fa-ml8" />
               </div>
 
-              <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />
+              {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
+              {viewRecord.type === AdminEnums.DictTypeEnum.TEXT && (
+                <div>
+                  <div className="fa-flex-row-center fa-mb12">
+                    <div style={{width: 100}} className="fa-text-right">字典值：</div>
+                    <Input style={{width: 300}} value={viewRecord.value} onChange={e => setViewRecord({...viewRecord, value: e.target.value})}/>
+                  </div>
+                  <div className="fa-flex-row-center">
+                    <div style={{width: 100}}></div>
+                    <Button type="primary" onClick={() => handleUpdate()} loading={loading}>提交</Button>
+                  </div>
+                </div>
+              )}
+              {viewRecord.type === AdminEnums.DictTypeEnum.LINK_OPTIONS && <div>LINK_OPTIONS</div>}
+              {viewRecord.type === AdminEnums.DictTypeEnum.LINK_TREE && <div>LINK_TREE</div>}
             </div>
           ) : (
-            <Empty description="请先选择字典分组" />
+            <Empty description="请先选择字典分组"/>
           )}
         </div>
       </Allotment>

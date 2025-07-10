@@ -175,6 +175,8 @@ namespace Admin {
     description: string;
     /** options */
     options: Option[];
+    /** 字典值 */
+    value: string;
   }
 
   export interface Option {
