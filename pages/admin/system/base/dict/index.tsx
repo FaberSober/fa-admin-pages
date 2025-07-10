@@ -1,15 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { Button, Empty, Input, Segmented } from 'antd';
+import { Button, Empty, Input } from 'antd';
 import { ApiEffectLayoutContext, BaseTree, Fa, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import DictModal from './modal/DictModal';
 import DictOptionsEdit from './cube/DictOptionsEdit';
-import { DatabaseOutlined, OrderedListOutlined, SafetyCertificateOutlined, SettingOutlined } from "@ant-design/icons";
 import { Admin, AdminEnums } from "@features/fa-admin-pages/types";
 import { dispatch } from 'use-bus'
-import { FaLoading } from "@features/fa-admin-pages/components";
 import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
 
@@ -39,19 +37,21 @@ export default function DictManage() {
     dictApi.getById(viewRecord.id).then((res) => setViewRecord(res.data));
   }
 
-  function handleChangeDictType(r: Admin.Dict, v: AdminEnums.DictTypeEnum) {
-    dictApi.update(r.id, { ...r, type: v }).then(res => {
-      dispatch({ type: Fa.Constant.TREE_REFRESH_BUS_KEY })
-      setViewRecord(res.data)
-    })
-  }
-
   function handleUpdate() {
     if (viewRecord === undefined) return;
     dictApi.update(viewRecord.id, viewRecord).then(res => {
       dispatch({ type: Fa.Constant.TREE_REFRESH_BUS_KEY })
       setViewRecord(res.data)
     })
+  }
+
+  const breadcrumbs = []
+  if (viewRecord) {
+    breadcrumbs.push({ title: viewRecord.name })
+    breadcrumbs.push({ title: viewRecord.code })
+    if (viewRecord.description) {
+      breadcrumbs.push({ title: viewRecord.description })
+    }
   }
 
   const loading = loadingEffect[dictApi.getUrl('update')]
@@ -69,6 +69,11 @@ export default function DictManage() {
             serviceName="字典分组"
             ServiceModal={DictModal}
             serviceApi={dictApi}
+            onAfterEditItem={r => {
+              if (viewRecord && r.id === viewRecord.id) {
+                setViewRecord({ ...r })
+              }
+            }}
           />
         </Allotment.Pane>
 
@@ -76,38 +81,7 @@ export default function DictManage() {
         <div className="fa-flex-column fa-full fa-p12">
           {viewRecord ? (
             <div className="fa-flex-column fa-full">
-              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code} / ${viewRecord?.description || ''}`} className="fa-mb12" />
-
-              <div className="fa-flex-row-center fa-mb12">
-                <Segmented
-                  value={viewRecord.type}
-                  onChange={(v: any) => handleChangeDictType(viewRecord, v)}
-                  options={[
-                    {
-                      label: '选择列表',
-                      value: AdminEnums.DictTypeEnum.OPTIONS,
-                      icon: <SettingOutlined />,
-                    },
-                    {
-                      label: '字符串',
-                      value: AdminEnums.DictTypeEnum.TEXT,
-                      icon: <SafetyCertificateOutlined />,
-                    },
-                    {
-                      label: '关联列表',
-                      value: AdminEnums.DictTypeEnum.LINK_OPTIONS,
-                      icon: <DatabaseOutlined />,
-                    },
-                    {
-                      label: '关联树',
-                      value: AdminEnums.DictTypeEnum.LINK_TREE,
-                      icon: <OrderedListOutlined />,
-                    },
-                  ]}
-                />
-
-                <FaLoading loading={loading} text="修改中..." className="fa-ml8" />
-              </div>
+              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`} className="fa-mb12" />
 
               <FaFlexRestLayout>
                 {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}

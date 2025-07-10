@@ -9,7 +9,7 @@ import DictCascade from '../helper/DictCascade';
 const serviceName = '字典分类';
 
 interface IProps extends DragModalProps {
-  fetchFinish?: () => void;
+  fetchFinish?: (r: Admin.Dict) => void;
   parentId?: number;
   title?: string;
   record?: Admin.Dict;
@@ -29,7 +29,7 @@ export default function DictModal({ children, fetchFinish, parentId, title, reco
     dictApi.save(params).then((res) => {
       FaUtils.showResponse(res, `新增${serviceName}`);
       setOpen(false);
-      if (fetchFinish) fetchFinish();
+      if (fetchFinish) fetchFinish(res.data);
     });
   }
 
@@ -38,7 +38,7 @@ export default function DictModal({ children, fetchFinish, parentId, title, reco
     dictApi.update(params.id, params).then((res) => {
       FaUtils.showResponse(res, `更新${serviceName}`);
       setOpen(false);
-      if (fetchFinish) fetchFinish();
+      if (fetchFinish) fetchFinish(res.data);
     });
   }
 
