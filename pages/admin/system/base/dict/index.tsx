@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Button, Empty, Input } from 'antd';
+import { Button, Input } from 'antd';
 import { ApiEffectLayoutContext, BaseTree, Fa, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
@@ -10,6 +10,7 @@ import { Admin, AdminEnums } from "@features/fa-admin-pages/types";
 import { dispatch } from 'use-bus'
 import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
+import DictDataList from "./cube/DictDataList";
 
 /**
  * 字典管理
@@ -56,31 +57,35 @@ export default function DictManage() {
 
   const loading = loadingEffect[dictApi.getUrl('update')]
   return (
-    <div className="fa-full-content">
+    <div className="fa-full-content-p12">
       <Allotment defaultSizes={[100, 500]}>
         {/* 左侧面板 */}
         <Allotment.Pane minSize={200} maxSize={400}>
-          <BaseTree
-            // showRoot
-            showOprBtn
-            onSelect={onTreeSelect}
-            onAfterDelItem={onAfterDelItem}
-            // 自定义配置
-            serviceName="字典分组"
-            ServiceModal={DictModal}
-            serviceApi={dictApi}
-            onAfterEditItem={r => {
-              if (viewRecord && r.id === viewRecord.id) {
-                setViewRecord({ ...r })
-              }
-            }}
-          />
+          <div className="fa-full fa-relative">
+            <div style={{ position: 'absolute', left: 0, top: 0, right: 6, bottom: 0 }}>
+              <BaseTree
+                // showRoot
+                showOprBtn
+                onSelect={onTreeSelect}
+                onAfterDelItem={onAfterDelItem}
+                // 自定义配置
+                serviceName="字典分组"
+                ServiceModal={DictModal}
+                serviceApi={dictApi}
+                onAfterEditItem={r => {
+                  if (viewRecord && r.id === viewRecord.id) {
+                    setViewRecord({ ...r })
+                  }
+                }}
+              />
+            </div>
+          </div>
         </Allotment.Pane>
 
         {/* 右侧面板 */}
-        <div className="fa-flex-column fa-full fa-p12">
+        <div className="fa-flex-column fa-full fa-absolute fa-bg-white" style={{ left: 6 }}>
           {viewRecord ? (
-            <div className="fa-flex-column fa-full">
+            <div className="fa-flex-column fa-full fa-p12">
               <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`} className="fa-mb12" />
 
               <FaFlexRestLayout>
@@ -102,7 +107,7 @@ export default function DictManage() {
               </FaFlexRestLayout>
             </div>
           ) : (
-            <Empty description="请先选择字典分组"/>
+            <DictDataList />
           )}
         </div>
       </Allotment>
