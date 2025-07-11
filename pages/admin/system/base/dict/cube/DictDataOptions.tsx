@@ -63,19 +63,19 @@ export default function DictDataOptions({ dictId }: DictDataOptionsProps) {
   return (
     <FaFlexRestLayout className="fa-bg-white">
       <div className="fa-flex-row-center fa-bg-grey">
-        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           字典名称
         </div>
-        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           字典值
         </div>
-        <div className="fa-p12 fa-border-b fa-border-r" style={{ width: 100 }}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ width: 100 }}>
           是否默认
         </div>
-        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           描述
         </div>
-        <div className="fa-p12 fa-border-b " style={{ width: 80 }}>
+        <div className="fa-dict-data-title fa-border-b " style={{ width: 80 }}>
           操作
         </div>
       </div>

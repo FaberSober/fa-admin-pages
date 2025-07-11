@@ -11,6 +11,8 @@ import { dispatch } from 'use-bus'
 import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
 import DictDataList from "./cube/DictDataList";
+import './index.scss';
+
 
 /**
  * 字典管理

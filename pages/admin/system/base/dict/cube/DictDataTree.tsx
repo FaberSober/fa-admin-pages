@@ -1,111 +1,124 @@
-import React, { useEffect } from 'react';
-import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
-import { CommonExcelUploadModal } from "@/components";
-import { dictDataApi as api } from '@/services';
-import { Admin } from '@/types';
+import React, { useContext, useEffect, useState } from 'react';
+import { Button, Space } from 'antd';
+import { EditOutlined, PlusOutlined, SisternodeOutlined } from '@ant-design/icons';
+import { useCounter } from 'react-use';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, type Fa, FaFlexRestLayout, FaHref, useDelete } from '@fa/ui';
+import { dictDataApi } from '@features/fa-admin-pages/services';
+import { Admin } from "@features/fa-admin-pages/types";
 import DictDataModal from '../modal/DictDataModal';
-import DictDataIsDefaultSwitch from "./DictDataIsDefaultSwitch";
 
-const serviceName = '字典值';
-const biz = 'base_dict_data';
 
 interface DictDataTreeProps {
   dictId: number;
 }
 
-/**
- * BASE-字典值表格查询
- */
-export default function DictDataTree({dictId}: DictDataTreeProps) {
-  const [form] = Form.useForm();
-
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<Admin.DictData>(api.page, { extraParams: {dictId} }, serviceName)
-
-  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
-  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
-  const [_, deleteByQuery] = useDeleteByQuery(api.removeByQuery, queryParams, fetchPageList);
+export default function DictDataTree({ dictId }: DictDataTreeProps) {
+  const { loadingEffect } = useContext(ApiEffectLayoutContext);
+  const [edit, setEdit] = useState<Fa.TreeNode<Admin.DictData, number>>();
+  const [open, setOpen] = useState(false);
+  const [current, { inc }] = useCounter(0);
 
   useEffect(() => {
-    setExtraParams({dictId})
-  }, [dictId])
+    refreshData();
+  }, []);
 
-  /** 生成表格字段List */
-  function genColumns() {
-    const { sorter } = queryParams;
-    return [
-      BaseTableUtils.genIdColumn('ID', 'id', 70, sorter),
-      // BaseTableUtils.genSimpleSorterColumn('上级节点', 'parentId', 100, sorter),
-      {
-        ...BaseTableUtils.genSimpleSorterColumn('字典分类', 'dictId', 200, sorter),
-        render: (_, r) => r.dictName,
-      },
-      BaseTableUtils.genSimpleSorterColumn('字典键', 'label', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('字典值', 'value', 100, sorter),
-      {
-        ...BaseTableUtils.genBoolSorterColumn('默认值', 'isDefault', 100, sorter),
-        render: (_, r) => <DictDataIsDefaultSwitch item={r} onChange={fetchPageList} />,
-      },
-      BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter),
-      BaseTableUtils.genSimpleSorterColumn('排序', 'sortId', 100, sorter),
-      ...BaseTableUtils.genCtrColumns(sorter),
-      ...BaseTableUtils.genUpdateColumns(sorter),
-      {
-        title: '操作',
-        dataIndex: 'menu',
-        render: (_, r) => (
-          <Space>
-            <DictDataModal dictId={r.dictId} type='tree' editBtn title={`编辑${serviceName}信息`} record={r} fetchFinish={fetchPageList} />
-            <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
-          </Space>
-        ),
-        width: 120,
-        fixed: 'right',
-        tcRequired: true,
-        tcType: 'menu',
-      },
-    ] as FaberTable.ColumnsProp<Admin.DictData>[];
+  function refreshData() {
+    setOpen(false);
+    inc();
   }
 
-  return (
-    <div className="fa-full-content fa-flex-column fa-bg-white">
-      <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: 8 }}>
-        <div className="fa-h3">{serviceName}</div>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form form={form} layout="inline" onFinish={setFormValues}>
-            <Form.Item name="_search" label="搜索">
-              <Input placeholder="请输入搜索内容" allowClear />
-            </Form.Item>
+  const [handleDelete] = useDelete<number>(dictDataApi.remove, refreshData, '菜单');
 
-            <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
-              <Button onClick={() => clearForm(form)}>重置</Button>
-              <DictDataModal dictId={dictId} type='tree' addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
-              <CommonExcelUploadModal fetchFinish={fetchPageList} apiDownloadTplExcel={api.exportTplExcel} apiImportExcel={api.importExcel}>
-                <Button icon={<UploadOutlined />}>上传</Button>
-              </CommonExcelUploadModal>
-            </Space>
-          </Form>
+  function showEditModal(item: Fa.TreeNode<Admin.DictData, number>) {
+    setEdit(item);
+    setOpen(true);
+  }
+
+  const loadingTree = loadingEffect[dictDataApi.getUrl('allTree')];
+  return (
+    <div className="fa-full-content fa-flex-column fa-menu-div">
+      <Space className="fa-mb12">
+        <Button onClick={refreshData} loading={loadingTree}>
+          刷新
+        </Button>
+        <DictDataModal title="新增字典" dictId={dictId} type="tree" fetchFinish={refreshData}>
+          <Button type="primary" icon={<PlusOutlined/>} loading={loadingTree}>
+            新增字典
+          </Button>
+        </DictDataModal>
+        <Button>导出</Button>
+        <Button>导入</Button>
+      </Space>
+
+      <div className="fa-flex-row-center fa-bg-grey">
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
+          字典名称
+        </div>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
+          字典值
+        </div>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{width: 100}}>
+          是否默认
+        </div>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
+          描述
+        </div>
+        <div className="fa-dict-data-title fa-border-b " style={{width: 220}}>
+          操作
         </div>
       </div>
 
-      <BaseBizTable
-        rowKey="id"
-        biz={biz}
-        columns={genColumns()}
-        pagination={paginationProps}
-        loading={loading}
-        dataSource={list}
-        onChange={handleTableChange}
-        refreshList={() => fetchPageList()}
-        batchDelete={(ids) => api.removeBatchByIds(ids)}
-        onSceneChange={(v) => setSceneId(v)}
-        onConditionChange={(cL) => setConditionList(cL)}
-        showDeleteByQuery
-        onDeleteByQuery={deleteByQuery}
+      <FaFlexRestLayout>
+        <BaseTree
+          // showRoot
+          showOprBtn
+          // onSelect={(keys) => console.log('onSelect', keys)}
+          onAfterDelItem={() => {
+          }}
+          // 自定义配置
+          serviceName="Tree"
+          serviceApi={{
+            ...dictDataApi,
+            allTree: () => dictDataApi.getTree({query: {dictId}}),
+          }}
+          bodyStyle={{width: '100%', height: '100%'}}
+          showTips={false}
+          showTopBtn={false}
+          // @ts-ignore
+          titleRender={(item: Fa.TreeNode<Admin.DictData, number> & { updating: boolean }) => (
+            <div className="fa-menu-item">
+              <div style={{flex: 1}}>{item.sourceData.label}</div>
+              <div style={{flex: 1}}>
+                {item.sourceData.value}
+              </div>
+              <div className="fa-plr12" style={{width: 100}}>
+              </div>
+              <div className="fa-plr12" style={{flex: 1}}>
+                {item.sourceData.description}
+              </div>
+              <Space>
+                <DictDataModal title="新增菜单" dictId={item.sourceData.dictId} type="tree" parentId={item.sourceData.id} fetchFinish={refreshData}>
+                  <FaHref icon={<SisternodeOutlined/>} text="新增子节点"/>
+                </DictDataModal>
+                <FaHref icon={<EditOutlined/>} text="编辑" onClick={() => showEditModal(item)}/>
+                <AuthDelBtn handleDelete={() => handleDelete(item.id)}/>
+              </Space>
+            </div>
+          )}
+          showLine={false}
+          draggable
+          extraEffectArgs={[current]}
+        />
+      </FaFlexRestLayout>
+
+      <DictDataModal
+        dictId={dictId}
+        type="tree"
+        title="编辑菜单"
+        record={edit?.sourceData}
+        fetchFinish={refreshData}
+        open={open}
+        onCancel={() => setOpen(false)}
       />
     </div>
   );

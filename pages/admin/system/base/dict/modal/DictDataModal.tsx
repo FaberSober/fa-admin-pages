@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
-import { Button, Form, Input, InputNumber } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils, Fa } from '@fa/ui';
 import { dictDataApi as api } from '@/services';
@@ -10,13 +10,14 @@ import DictDataCascade from "../helper/DictDataCascade";
 
 interface DictDataModalProps extends CommonModalProps<Admin.DictData> {
   dictId: number;
+  parentId?: number;
   type: 'list'|'tree'
 }
 
 /**
  * BASE-字典值实体新增、编辑弹框
  */
-export default function DictDataModal({ children, title, record, fetchFinish, addBtn, editBtn, dictId, type, ...props }: DictDataModalProps) {
+export default function DictDataModal({ children, title, record, fetchFinish, addBtn, editBtn, dictId, parentId, type, ...props }: DictDataModalProps) {
   const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [form] = Form.useForm();
 
@@ -56,7 +57,7 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
 
   function getInitialValues() {
     return {
-      parentId: get(record, 'parentId', Fa.Constant.TREE_SUPER_ROOT_ID),
+      parentId: get(record, 'parentId', parentId || Fa.Constant.TREE_SUPER_ROOT_ID),
       sortId: get(record, 'sortId'),
       label: get(record, 'label'),
       value: get(record, 'value'),
@@ -103,9 +104,9 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
           <Form.Item name="isDefault" label="是否默认值" rules={[{ required: true }]}>
             <BaseBoolRadio />
           </Form.Item>
-          <Form.Item name="sortId" label="排序" rules={[{ required: true }]}>
-            <InputNumber min={1} max={999999} placeholder="请输入排序" />
-          </Form.Item>
+          {/*<Form.Item name="sortId" label="排序" rules={[{ required: true }]}>*/}
+          {/*  <InputNumber min={1} max={999999} placeholder="请输入排序" />*/}
+          {/*</Form.Item>*/}
           <Form.Item name="description" label="描述" rules={[{ required: false }]}>
             <Input.TextArea autoSize placeholder="请输入描述" />
           </Form.Item>
