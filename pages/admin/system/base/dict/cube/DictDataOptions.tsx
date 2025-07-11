@@ -1,112 +1,94 @@
-import React, { useEffect } from 'react';
-import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
-import { CommonExcelUploadModal } from "@/components";
-import { dictDataApi as api } from '@/services';
-import { Admin } from '@/types';
-import DictDataModal from '../modal/DictDataModal';
-import DictDataIsDefaultSwitch from "./DictDataIsDefaultSwitch";
+import React, { useEffect, useState } from 'react';
+import { Admin } from "@features/fa-admin-pages/types";
+import { dictDataApi } from "@features/fa-admin-pages/services";
+import { Fa, FaFlexRestLayout, FaSortList, FaUtils } from "@fa/ui";
+import DictDataForm from "./DictDataForm";
 
-const serviceName = '字典值';
-const biz = 'base_dict_data';
 
-interface DictDataOptionsProps {
+export interface DictDataOptionsProps {
   dictId: number;
 }
 
 /**
- * BASE-字典值表格查询
+ * @author xu.pengfei
+ * @date 2025/7/11 14:49
  */
-export default function DictDataOptions({dictId}: DictDataOptionsProps) {
-  const [form] = Form.useForm();
-
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<Admin.DictData>(api.page, { extraParams: {dictId} }, serviceName)
-
-  const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName)
-  const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams)
-  const [_, deleteByQuery] = useDeleteByQuery(api.removeByQuery, queryParams, fetchPageList);
+export default function DictDataOptions({ dictId }: DictDataOptionsProps) {
+  const [array, setArray] = useState<Admin.DictData[]>([])
 
   useEffect(() => {
-    setExtraParams({dictId})
+    fetchData()
   }, [dictId])
 
-  /** 生成表格字段List */
-  function genColumns() {
-    const { sorter } = queryParams;
-    return [
-      BaseTableUtils.genIdColumn('ID', 'id', 70, sorter),
-      // BaseTableUtils.genSimpleSorterColumn('上级节点', 'parentId', 100, sorter),
-      {
-        ...BaseTableUtils.genSimpleSorterColumn('字典分类', 'dictId', 200, sorter),
-        render: (_, r) => r.dictName,
-      },
-      BaseTableUtils.genSimpleSorterColumn('字典键', 'label', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('字典值', 'value', 100, sorter),
-      {
-        ...BaseTableUtils.genBoolSorterColumn('默认值', 'isDefault', 100, sorter),
-        render: (_, r) => <DictDataIsDefaultSwitch item={r} onChange={fetchPageList} />,
-      },
-      BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter),
-      BaseTableUtils.genSimpleSorterColumn('排序', 'sortId', 100, sorter),
-      ...BaseTableUtils.genCtrColumns(sorter),
-      ...BaseTableUtils.genUpdateColumns(sorter),
-      {
-        title: '操作',
-        dataIndex: 'menu',
-        render: (_, r) => (
-          <Space>
-            <DictDataModal dictId={r.dictId} type='list' editBtn title={`编辑${serviceName}信息`} record={r} fetchFinish={fetchPageList} />
-            <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
-          </Space>
-        ),
-        width: 120,
-        fixed: 'right',
-        tcRequired: true,
-        tcType: 'menu',
-      },
-    ] as FaberTable.ColumnsProp<Admin.DictData>[];
+  function fetchData() {
+    dictDataApi.list({ query: {dictId}, sorter: 'sort_id ASC' }).then((res) => {
+      setArray(res.data);
+    });
+  }
+
+  function handleChangeList(list: Admin.DictData[]) {
+    console.log('change', list)
+    setArray(list)
+    const changeList: Fa.TreePosChangeVo[] = []
+    list.forEach((item, index) => {
+      if (item.sortId !== index) {
+        changeList.push({ key: item.id, pid: item.parentId, index })
+      }
+    })
+    dictDataApi.changePos(changeList)
+  }
+
+  function handleAdd(v: Admin.DictData) {
+    dictDataApi.save({...v, dictId}).then((res) => {
+      FaUtils.showResponse(res, '新增字典');
+      fetchData()
+    });
+  }
+
+  function handleEdit(v: Admin.DictData) {
+    console.log('edit', v)
+    dictDataApi.update(v.id, v).then((res) => {
+      FaUtils.showResponse(res, '更新字典');
+      fetchData()
+    });
+  }
+
+  function handleDel(v: Admin.DictData) {
+    dictDataApi.remove(v.id).then((res) => {
+      FaUtils.showResponse(res, '删除字典');
+      fetchData()
+    });
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-bg-white">
-      <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: 8 }}>
-        <div className="fa-h3">{serviceName}</div>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form form={form} layout="inline" onFinish={setFormValues}>
-            <Form.Item name="_search" label="搜索">
-              <Input placeholder="请输入搜索内容" allowClear />
-            </Form.Item>
-
-            <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
-              <Button onClick={() => clearForm(form)}>重置</Button>
-              <DictDataModal dictId={dictId} type='list' addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
-              <CommonExcelUploadModal fetchFinish={fetchPageList} apiDownloadTplExcel={api.exportTplExcel} apiImportExcel={api.importExcel}>
-                <Button icon={<UploadOutlined />}>上传</Button>
-              </CommonExcelUploadModal>
-            </Space>
-          </Form>
+    <FaFlexRestLayout className="fa-bg-white">
+      <div className="fa-flex-row-center fa-bg-grey">
+        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+          字典名称
+        </div>
+        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+          字典值
+        </div>
+        <div className="fa-p12 fa-border-b fa-border-r" style={{ width: 100 }}>
+          是否默认
+        </div>
+        <div className="fa-p12 fa-border-b fa-border-r" style={{ flex: 1 }}>
+          描述
+        </div>
+        <div className="fa-p12 fa-border-b " style={{ width: 80 }}>
+          操作
         </div>
       </div>
-
-      <BaseBizTable
-        rowKey="id"
-        biz={biz}
-        columns={genColumns()}
-        pagination={paginationProps}
-        loading={loading}
-        dataSource={list}
-        onChange={handleTableChange}
-        refreshList={() => fetchPageList()}
-        batchDelete={(ids) => api.removeBatchByIds(ids)}
-        onSceneChange={(v) => setSceneId(v)}
-        onConditionChange={(cL) => setConditionList(cL)}
-        showDeleteByQuery
-        onDeleteByQuery={deleteByQuery}
+      <FaSortList
+        list={array}
+        renderItem={(i) => <DictDataForm dict={i} onChange={handleEdit} onDelete={handleDel} />}
+        itemStyle={{ borderBottom: '1px solid var(--fa-border-color)', position: 'relative', cursor: 'default' }}
+        onSortEnd={(l) => handleChangeList(l)}
+        vertical
+        handle
+        handleStyle={{ position: 'absolute', right: 10, top: 7 }}
       />
-    </div>
-  );
+      <DictDataForm onChange={handleAdd} />
+    </FaFlexRestLayout>
+  )
 }

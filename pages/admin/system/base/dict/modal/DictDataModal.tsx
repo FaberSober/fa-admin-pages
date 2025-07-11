@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { get } from 'lodash';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, InputNumber } from 'antd';
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, BaseBoolRadio, CommonModalProps, DragModal, FaHref, FaUtils, Fa } from '@fa/ui';
 import { dictDataApi as api } from '@/services';
@@ -102,6 +102,9 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
           </Form.Item>
           <Form.Item name="isDefault" label="是否默认值" rules={[{ required: true }]}>
             <BaseBoolRadio />
+          </Form.Item>
+          <Form.Item name="sortId" label="排序" rules={[{ required: true }]}>
+            <InputNumber min={1} max={999999} placeholder="请输入排序" />
           </Form.Item>
           <Form.Item name="description" label="描述" rules={[{ required: false }]}>
             <Input.TextArea autoSize placeholder="请输入描述" />

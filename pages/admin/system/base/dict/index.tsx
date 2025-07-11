@@ -58,9 +58,9 @@ export default function DictManage() {
   const loading = loadingEffect[dictApi.getUrl('update')]
   return (
     <div className="fa-full-content-p12">
-      <Allotment defaultSizes={[100, 500]}>
+      <Allotment>
         {/* 左侧面板 */}
-        <Allotment.Pane minSize={200} maxSize={400}>
+        <Allotment.Pane minSize={200} preferredSize={240} maxSize={400}>
           <div className="fa-full fa-relative">
             <div style={{ position: 'absolute', left: 0, top: 0, right: 6, bottom: 0 }}>
               <BaseTree
