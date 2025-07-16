@@ -27,6 +27,7 @@ export default function AlertList() {
   const [handleDelete] = useDelete<number>(api.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
 
+  //统计默认值
   const [statistic, setStatistic] = useState({
     total: 0,
     processed: 0,

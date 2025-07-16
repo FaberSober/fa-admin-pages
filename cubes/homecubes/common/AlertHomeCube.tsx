@@ -9,7 +9,7 @@ import { Badge, Tooltip } from 'antd';
 // 配置常量
 const CONFIG = {
   CAROUSEL_INTERVAL: 1500,  // 轮播间隔(ms)
-  DATA_REFRESH_INTERVAL: 3600000, // 数据刷新间隔(ms) - 1小时
+  DATA_REFRESH_INTERVAL: 3600000, // 刷新间隔(ms) - 1小时
   ANIMATION_DURATION: 300   // 动画时长(ms)
 };
 
