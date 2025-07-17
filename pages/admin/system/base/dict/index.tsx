@@ -64,7 +64,7 @@ export default function DictManage() {
         {/* 左侧面板 */}
         <Allotment.Pane minSize={200} preferredSize={240} maxSize={400}>
           <div className="fa-full fa-relative">
-            <div style={{ position: 'absolute', left: 0, top: 0, right: 6, bottom: 0 }}>
+            <div style={{ position: 'absolute', left: 0, top: 0, right: 6, bottom: 0 }} className="fa-card fa-p0 fa-box-shadow">
               <BaseTree
                 // showRoot
                 showOprBtn
@@ -85,7 +85,7 @@ export default function DictManage() {
         </Allotment.Pane>
 
         {/* 右侧面板 */}
-        <div className="fa-flex-column fa-full fa-absolute fa-bg-white" style={{ left: 6 }}>
+        <div className="fa-flex-column fa-full fa-absolute fa-bg-white fa-card fa-p0 fa-box-shadow" style={{ left: 6 }}>
           {viewRecord ? (
             <div className="fa-flex-column fa-full fa-p12">
               <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`} className="fa-mb12" />

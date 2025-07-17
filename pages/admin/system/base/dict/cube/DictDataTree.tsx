@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Button, Space } from 'antd';
 import { EditOutlined, PlusOutlined, SisternodeOutlined } from '@ant-design/icons';
 import { useCounter } from 'react-use';
@@ -14,8 +14,6 @@ interface DictDataTreeProps {
 
 export default function DictDataTree({ dictId }: DictDataTreeProps) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const [edit, setEdit] = useState<Fa.TreeNode<Admin.DictData, number>>();
-  const [open, setOpen] = useState(false);
   const [current, { inc }] = useCounter(0);
 
   useEffect(() => {
@@ -23,16 +21,10 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
   }, []);
 
   function refreshData() {
-    setOpen(false);
     inc();
   }
 
   const [handleDelete] = useDelete<number>(dictDataApi.remove, refreshData, '菜单');
-
-  function showEditModal(item: Fa.TreeNode<Admin.DictData, number>) {
-    setEdit(item);
-    setOpen(true);
-  }
 
   const loadingTree = loadingEffect[dictDataApi.getUrl('allTree')];
   return (
@@ -54,13 +46,13 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
         <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
           字典名称
         </div>
-        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{width: 200}}>
           字典值
         </div>
-        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{width: 100}}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r fa-text-center" style={{width: 80}}>
           是否默认
         </div>
-        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{flex: 1}}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{width: 200}}>
           描述
         </div>
         <div className="fa-dict-data-title fa-border-b " style={{width: 220}}>
@@ -86,21 +78,30 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
           showTopBtn={false}
           // @ts-ignore
           titleRender={(item: Fa.TreeNode<Admin.DictData, number> & { updating: boolean }) => (
-            <div className="fa-menu-item">
+            <div className="fa-menu-item" style={{marginRight: -8}}>
               <div style={{flex: 1}}>{item.sourceData.label}</div>
-              <div style={{flex: 1}}>
+              <div style={{width: 200}}>
                 {item.sourceData.value}
               </div>
-              <div className="fa-plr12" style={{width: 100}}>
+              <div className="fa-dict-data-title" style={{width: 80}}>
+                {item.sourceData.isDefault && <div className="fa-text-center">✅</div>}
               </div>
-              <div className="fa-plr12" style={{flex: 1}}>
+              <div className="fa-dict-data-title" style={{width: 200}}>
                 {item.sourceData.description}
               </div>
-              <Space>
+              <Space style={{width: 220}}>
                 <DictDataModal title="新增菜单" dictId={item.sourceData.dictId} type="tree" parentId={item.sourceData.id} fetchFinish={refreshData}>
                   <FaHref icon={<SisternodeOutlined/>} text="新增子节点"/>
                 </DictDataModal>
-                <FaHref icon={<EditOutlined/>} text="编辑" onClick={() => showEditModal(item)}/>
+                <DictDataModal
+                  dictId={dictId}
+                  type="tree"
+                  title="编辑菜单"
+                  record={item.sourceData}
+                  fetchFinish={refreshData}
+                >
+                  <FaHref icon={<EditOutlined/>} text="编辑"/>
+                </DictDataModal>
                 <AuthDelBtn handleDelete={() => handleDelete(item.id)}/>
               </Space>
             </div>
@@ -110,16 +111,6 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
           extraEffectArgs={[current]}
         />
       </FaFlexRestLayout>
-
-      <DictDataModal
-        dictId={dictId}
-        type="tree"
-        title="编辑菜单"
-        record={edit?.sourceData}
-        fetchFinish={refreshData}
-        open={open}
-        onCancel={() => setOpen(false)}
-      />
     </div>
   );
 }
