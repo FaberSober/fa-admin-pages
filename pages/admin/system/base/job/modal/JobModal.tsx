@@ -59,7 +59,7 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
 
   function showModal() {
     setOpen(true);
-    jobApi.getAllJobs().then((res) => setJobs(res.data.map((i) => ({ ...i, name: i.label, label: `${i.label}_${i.value}` }))));
+    jobApi.getIdleJobs().then((res) => setJobs(res.data.map((i) => ({ ...i, name: i.label, label: `${i.label}_${i.value}` }))));
     form.setFieldsValue(getInitialValues());
   }
 
