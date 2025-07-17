@@ -90,7 +90,13 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
           }}
         >
           <Form.Item name="clazzPath" label="任务执行方法" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Select options={jobs} />
+            <Select
+              options={jobs}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
           </Form.Item>
           <Form.Item name="jobName" label="任务名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input />
