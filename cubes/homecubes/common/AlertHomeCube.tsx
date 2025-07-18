@@ -23,7 +23,7 @@ export function AlertHomeCube() {
     <div className="fa-full-content">
       <FaScrollList
         list={allAlerts}
-        renderItem={(item, index) => {
+        renderItem={(item, index, seq) => {
           return (
             <AlertModal
               key={item.id}
@@ -34,18 +34,22 @@ export function AlertHomeCube() {
               <div
                 className="fa-flex-row-center fa-full fa-border-b fa-link-grey fa-pr12"
                 style={{
-                  backgroundColor: index === 1 ? '#fff8f8' : 'transparent',
+                  backgroundColor: index === 0 ? '#fff8f8' : 'transparent',
                 }}
               >
                 <div
                   className="fa-transition"
                   style={{
-                    backgroundColor: index === 1 ? '#ff4d4f' : 'transparent',
+                    backgroundColor: index === 0 ? '#ff4d4f' : 'transparent',
                     width: 3,
                     height: '100%',
                     marginRight: 6,
                   }}
                 />
+
+                <div className="fa-flex-center fa-border fa-mr8" style={{ width: 20, height: 20, borderRadius: 10}}>
+                  <span style={{fontSize: '12px', lineHeight: '12px'}}>{seq + 1}</span>
+                </div>
 
                 <div style={{width: 120, fontWeight: 500}}>
                   <Tooltip title={item.type}>

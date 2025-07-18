@@ -45,8 +45,8 @@ export default function AlertList() {
       BaseTableUtils.genBoolSorterColumn('是否处理', 'deal', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('负责人', 'dutyStaff', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('处理人', 'dealStaff', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('处理时间', 'dealTime', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('处理描述', 'dealDesc', 100, sorter),
+      BaseTableUtils.genSimpleSorterColumn('处理时间', 'dealTime', 150, sorter),
+      BaseTableUtils.genSimpleSorterColumn('处理描述', 'dealDesc', 300, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
       ...BaseTableUtils.genUpdateColumns(sorter),
       {
