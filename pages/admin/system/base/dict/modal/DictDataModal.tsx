@@ -62,6 +62,7 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
       label: get(record, 'label'),
       value: get(record, 'value'),
       isDefault: get(record, 'isDefault', false),
+      valid: get(record, 'valid', true),
       description: get(record, 'description'),
       // birthday: FaUtils.getInitialKeyTimeValue(record, 'birthday'),
     }
@@ -102,6 +103,9 @@ export default function DictDataModal({ children, title, record, fetchFinish, ad
             <Input placeholder="请输入字典值" />
           </Form.Item>
           <Form.Item name="isDefault" label="是否默认值" rules={[{ required: true }]}>
+            <BaseBoolRadio />
+          </Form.Item>
+          <Form.Item name="valid" label="是否生效" rules={[{ required: true }]}>
             <BaseBoolRadio />
           </Form.Item>
           {/*<Form.Item name="sortId" label="排序" rules={[{ required: true }]}>*/}

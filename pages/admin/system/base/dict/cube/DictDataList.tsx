@@ -7,6 +7,7 @@ import { dictDataApi as api } from '@/services';
 import { Admin } from '@/types';
 import DictDataModal from '../modal/DictDataModal';
 import DictDataIsDefaultSwitch from "./DictDataIsDefaultSwitch";
+import DictDataValidSwitch from "./DictDataValidSwitch";
 
 const serviceName = '字典值';
 const biz = 'base_dict_data';
@@ -39,6 +40,12 @@ export default function DictDataList() {
       {
         ...BaseTableUtils.genBoolSorterColumn('默认值', 'isDefault', 100, sorter),
         render: (_, r) => <DictDataIsDefaultSwitch item={r} onChange={fetchPageList} />,
+        align: 'center',
+      },
+      {
+        ...BaseTableUtils.genBoolSorterColumn('生效', 'valid', 100, sorter),
+        render: (_, r) => <DictDataValidSwitch item={r} onChange={fetchPageList} />,
+        align: 'center',
       },
       BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter),
       BaseTableUtils.genSimpleSorterColumn('排序', 'sortId', 100, sorter),

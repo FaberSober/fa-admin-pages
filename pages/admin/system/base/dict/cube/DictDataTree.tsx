@@ -7,6 +7,8 @@ import { dictDataApi as api, dictDataApi } from '@features/fa-admin-pages/servic
 import { Admin } from "@features/fa-admin-pages/types";
 import DictDataModal from '../modal/DictDataModal';
 import { CommonExcelUploadModal } from "@features/fa-admin-pages/components";
+import DictDataIsDefaultSwitch from "@features/fa-admin-pages/pages/admin/system/base/dict/cube/DictDataIsDefaultSwitch";
+import DictDataValidSwitch from "@features/fa-admin-pages/pages/admin/system/base/dict/cube/DictDataValidSwitch";
 
 
 interface DictDataTreeProps {
@@ -61,6 +63,9 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
         <div className="fa-dict-data-title fa-border-b fa-border-r fa-text-center" style={{width: 80}}>
           是否默认
         </div>
+        <div className="fa-dict-data-title fa-border-b fa-border-r fa-text-center" style={{width: 80}}>
+          是否生效
+        </div>
         <div className="fa-dict-data-title fa-border-b fa-border-r" style={{width: 200}}>
           描述
         </div>
@@ -92,8 +97,11 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
               <div style={{width: 200}}>
                 {item.sourceData.value}
               </div>
-              <div className="fa-dict-data-title" style={{width: 80}}>
-                {item.sourceData.isDefault && <div className="fa-text-center">✅</div>}
+              <div className="fa-dict-data-title fa-text-center" style={{width: 80}}>
+                <DictDataIsDefaultSwitch item={item.sourceData} onChange={refreshData} />
+              </div>
+              <div className="fa-dict-data-title fa-text-center" style={{width: 80}}>
+                <DictDataValidSwitch item={item.sourceData} onChange={refreshData} />
               </div>
               <div className="fa-dict-data-title" style={{width: 200}}>
                 {item.sourceData.description}

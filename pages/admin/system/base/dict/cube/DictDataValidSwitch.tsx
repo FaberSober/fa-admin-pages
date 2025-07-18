@@ -3,7 +3,7 @@ import { Checkbox, Spin } from 'antd';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { dictDataApi as api } from '@features/fa-admin-pages/services';
 
-export interface DictDataIsDefaultSwitchProps {
+export interface DictDataValidSwitchProps {
   item: Admin.DictData;
   onChange: (i: Admin.DictData) => void;
 }
@@ -12,20 +12,21 @@ export interface DictDataIsDefaultSwitchProps {
  * @author xu.pengfei
  * @date 2024/1/17 16:03
  */
-export default function DictDataIsDefaultSwitch({ item, onChange }: DictDataIsDefaultSwitchProps) {
+export default function DictDataValidSwitch({ item, onChange }: DictDataValidSwitchProps) {
   const [loading, setLoading] = useState(false);
 
-  function handleEnableUpdate() {
+  function handleUpdate() {
     setLoading(true);
-    api.toggleDefaultById(item.id).then((_res) => {
+    const valid = !item.valid
+    api.update(item.id, { ...item, valid }).then((_res) => {
       setLoading(false);
-      onChange({ ...item, isDefault: !item.isDefault });
+      onChange({ ...item, valid });
     }).catch(() => setLoading(false));
   }
 
   return (
     <Spin spinning={loading || false} size="small">
-      <Checkbox checked={item.isDefault} onChange={() => handleEnableUpdate()} />
+      <Checkbox checked={item.valid} onChange={() => handleUpdate()} />
     </Spin>
   );
 }

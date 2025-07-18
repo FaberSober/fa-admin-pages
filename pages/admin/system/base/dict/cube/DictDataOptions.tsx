@@ -91,8 +91,11 @@ export default function DictDataOptions({ dictId }: DictDataOptionsProps) {
         <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           字典值
         </div>
-        <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ width: 100 }}>
+        <div className="fa-dict-data-title fa-border-b fa-border-r fa-text-center" style={{ width: 100 }}>
           是否默认
+        </div>
+        <div className="fa-dict-data-title fa-border-b fa-border-r fa-text-center" style={{ width: 100 }}>
+          是否生效
         </div>
         <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           描述

@@ -52,6 +52,7 @@ export default function DictDataForm({dict, onChange, onDelete}: DictDataFormPro
       layout="inline"
       className="fa-flex-row fa-full-w fa-form-m0 fa-item"
       labelCol={{style: {display: 'none'}}}
+      initialValues={{ valid: true }}
     >
       <div className="fa-p6" style={{flex: 1}}>
         <Form.Item name="label" label="字典名称" rules={[{required: true}]}>
@@ -65,6 +66,11 @@ export default function DictDataForm({dict, onChange, onDelete}: DictDataFormPro
       </div>
       <div className="fa-p6" style={{width: 100}}>
         <Form.Item name="isDefault" label="是否默认" valuePropName="checked" className="fa-flex-center">
+          <Checkbox onChange={() => isEdit && form.submit()}/>
+        </Form.Item>
+      </div>
+      <div className="fa-p6" style={{width: 100}}>
+        <Form.Item name="valid" label="是否生效" valuePropName="checked" className="fa-flex-center">
           <Checkbox onChange={() => isEdit && form.submit()}/>
         </Form.Item>
       </div>

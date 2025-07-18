@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Button, Input, Tooltip } from 'antd';
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { ApiEffectLayoutContext, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
@@ -12,7 +13,6 @@ import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
 import DictDataList from "./cube/DictDataList";
 import './index.scss';
-import { InfoCircleOutlined } from "@ant-design/icons";
 
 
 /**
