@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { Button, Input, Tooltip } from 'antd';
-import { ApiEffectLayoutContext, BaseTree, Fa, FaFlexRestLayout, FaLabel } from '@fa/ui';
+import { ApiEffectLayoutContext, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import DictModal from './modal/DictModal';
 import DictOptionsEdit from './cube/DictOptionsEdit';
-import { Admin, AdminEnums } from "@features/fa-admin-pages/types";
+import { Admin } from "@features/fa-admin-pages/types";
 import { dispatch } from 'use-bus'
 import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
@@ -59,10 +59,10 @@ export default function DictManage() {
   }
 
   const TYPE_TIPS = {
-    [AdminEnums.DictTypeEnum.LINK_OPTIONS]: '关联列表：dict表关联dict_data表，以列表形式存储',
-    [AdminEnums.DictTypeEnum.LINK_TREE]: '关联树：dict表关联dict_data表，以树形式存储',
-    [AdminEnums.DictTypeEnum.TEXT]: '字符串：dict表直接存储字典字符串',
-    [AdminEnums.DictTypeEnum.OPTIONS]: '选择列表：dict表直接存储列表项为json数组，不关联dict_data表',
+    [FaEnums.DictTypeEnum.LINK_OPTIONS]: '关联列表：dict表关联dict_data表，以列表形式存储',
+    [FaEnums.DictTypeEnum.LINK_TREE]: '关联树：dict表关联dict_data表，以树形式存储',
+    [FaEnums.DictTypeEnum.TEXT]: '字符串：dict表直接存储字典字符串',
+    [FaEnums.DictTypeEnum.OPTIONS]: '选择列表：dict表直接存储列表项为json数组，不关联dict_data表',
   }
 
   const loading = loadingEffect[dictApi.getUrl('update')]
@@ -104,7 +104,7 @@ export default function DictManage() {
                       <Tooltip
                         title={TYPE_TIPS[viewRecord.type]}
                       >
-                        <span>{AdminEnums.DictTypeEnumMap[viewRecord.type]}</span>
+                        <span>{FaEnums.DictTypeEnumMap[viewRecord.type]}</span>
                         <InfoCircleOutlined className="fa-mr8" />
                       </Tooltip>
                       {<div>{viewRecord.name}</div>}
@@ -117,8 +117,8 @@ export default function DictManage() {
               </div>
 
               <FaFlexRestLayout>
-                {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
-                {viewRecord.type === AdminEnums.DictTypeEnum.TEXT && (
+                {viewRecord.type === FaEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
+                {viewRecord.type === FaEnums.DictTypeEnum.TEXT && (
                   <div>
                     <div className="fa-flex-row-center fa-mb12">
                       <div style={{width: 100}} className="fa-text-right">字典值：</div>
@@ -130,8 +130,8 @@ export default function DictManage() {
                     </div>
                   </div>
                 )}
-                {viewRecord.type === AdminEnums.DictTypeEnum.LINK_OPTIONS && <DictDataOptions dictId={viewRecord.id} />}
-                {viewRecord.type === AdminEnums.DictTypeEnum.LINK_TREE && <DictDataTree dictId={viewRecord.id} />}
+                {viewRecord.type === FaEnums.DictTypeEnum.LINK_OPTIONS && <DictDataOptions dictId={viewRecord.id} />}
+                {viewRecord.type === FaEnums.DictTypeEnum.LINK_TREE && <DictDataTree dictId={viewRecord.id} />}
               </FaFlexRestLayout>
             </div>
           ) : (

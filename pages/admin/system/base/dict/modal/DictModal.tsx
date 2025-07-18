@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { Form, Input } from 'antd';
 import { ApiEffectLayoutContext, DictEnumApiSelector, DragModal, type DragModalProps, FaUtils } from '@fa/ui';
-import { type Admin, AdminEnums } from '@/types';
+import { type Admin, FaEnums } from '@/types';
 import { dictApi } from '@features/fa-admin-pages/services';
 import DictCascade from '../helper/DictCascade';
 
@@ -59,7 +59,7 @@ export default function DictModal({ children, fetchFinish, parentId, title, reco
       code: get(record, 'code'),
       name: get(record, 'name'),
       parentId: get(record, 'parentId', parentId),
-      type: get(record, 'type', AdminEnums.DictTypeEnum.LINK_OPTIONS),
+      type: get(record, 'type', FaEnums.DictTypeEnum.LINK_OPTIONS),
       description: get(record, 'description'),
     };
   }

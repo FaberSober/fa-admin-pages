@@ -1,5 +1,4 @@
 import type { ConditionQuery, Fa, FaEnums } from '@fa/ui';
-import AdminEnums from "./AdminEnums";
 
 namespace Admin {
   // -------------------------------------------- 系统-配置表 --------------------------------------------
@@ -168,7 +167,7 @@ namespace Admin {
     /** 上级节点 */
     parentId: number;
     /** 数值类型 */
-    type: AdminEnums.DictTypeEnum;
+    type: FaEnums.DictTypeEnum;
     /** 排序ID */
     sortId: number;
     /** 描述 */
