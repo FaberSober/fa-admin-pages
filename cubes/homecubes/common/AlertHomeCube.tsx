@@ -30,8 +30,6 @@ export function AlertHomeCube() {
     // 确保组件已挂载，避免内存泄漏
     if (!isMounted.current) return;
 
-    console.log('执行API请求:', new Date().toISOString()); // 调试日志
-
     try {
       const res = await alertApi.list({
         query: { deal: false },
@@ -204,13 +202,22 @@ export function AlertHomeCube() {
             >
               <div
                 ref={index === 0 ? firstItemRef : null}
-                className="fa-flex-row-center fa-link-grey fa-p8 fa-border-b"
+                className="fa-flex-row-center fa-link-grey fa-border-b"
                 style={{
                   backgroundColor: index === scrollPosition ? '#fff8f8' : 'transparent',
-                  borderLeft: index === scrollPosition ? '3px solid #ff4d4f' : 'none',
-                  minHeight: '40px'
+                  minHeight: '40px',
+                  paddingRight: 6,
                 }}
               >
+                <div
+                  className="fa-transition"
+                  style={{
+                    backgroundColor: index === scrollPosition ? '#ff4d4f' : 'transparent',
+                    width: 3,
+                    height: 40,
+                    marginRight: 6,
+                  }}
+                />
                 <div style={{ width: 120, fontWeight: 500 }}>
                   <Tooltip title={item.type}>
                     <span className="ellipsis">{item.type}</span>
@@ -228,8 +235,8 @@ export function AlertHomeCube() {
                   </div>
                 </div>
 
-                <div style={{ width: 150, textAlign: 'right' }}>
-                  <Badge status="processing" text={item.crtTime || ''} />
+                <div style={{ width: 160, textAlign: 'right' }}>
+                  <Badge status="processing" text={<span className="fa-text-same-width-only" style={{ fontSize: '12px' }}>{item.crtTime || ''}</span>} />
                 </div>
               </div>
             </AlertModal>
