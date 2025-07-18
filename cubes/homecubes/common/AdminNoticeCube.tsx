@@ -43,7 +43,8 @@ export function AdminNoticeCube() {
 }
 
 AdminNoticeCube.displayName = 'AdminNoticeCube'; // 必须与方法名称一致
-AdminNoticeCube.title = () => <TitleClickTab title="公告" url="/admin/system/base/notice" />;
+AdminNoticeCube.title = "公告";
+AdminNoticeCube.titleRender = () => <TitleClickTab title="公告" url="/admin/system/base/notice" />;
 AdminNoticeCube.description = '展示系统公告信息';
 AdminNoticeCube.showTitle = true; // 是否展示Card的Title
 AdminNoticeCube.permission = ''; // 需要的权限-对应RbacMenu.linkUrl

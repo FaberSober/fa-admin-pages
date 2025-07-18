@@ -79,7 +79,8 @@ export function AlertHomeCube() {
 }
 
 AlertHomeCube.displayName = 'AlertHomeCube';
-AlertHomeCube.title = () => <TitleClickTab title="预警信息" url="/admin/system/base/alert" />;
+AlertHomeCube.title = "预警信息";
+AlertHomeCube.titleRender = () => <TitleClickTab title="预警信息" url="/admin/system/base/alert" />;
 AlertHomeCube.description = '展示系统中未处理的预警信息（每1.5秒向上滚动一条）';
 AlertHomeCube.showTitle = true;
 AlertHomeCube.permission = '';
