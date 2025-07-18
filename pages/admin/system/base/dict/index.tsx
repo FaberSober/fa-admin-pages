@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Tooltip } from 'antd';
 import { ApiEffectLayoutContext, BaseTree, Fa, FaFlexRestLayout, FaLabel } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Allotment } from 'allotment';
@@ -12,6 +12,7 @@ import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
 import DictDataList from "./cube/DictDataList";
 import './index.scss';
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 
 /**
@@ -57,6 +58,13 @@ export default function DictManage() {
     }
   }
 
+  const TYPE_TIPS = {
+    [AdminEnums.DictTypeEnum.LINK_OPTIONS]: '关联列表：dict表关联dict_data表，以列表形式存储',
+    [AdminEnums.DictTypeEnum.LINK_TREE]: '关联树：dict表关联dict_data表，以树形式存储',
+    [AdminEnums.DictTypeEnum.TEXT]: '字符串：dict表直接存储字典字符串',
+    [AdminEnums.DictTypeEnum.OPTIONS]: '选择列表：dict表直接存储列表项为json数组，不关联dict_data表',
+  }
+
   const loading = loadingEffect[dictApi.getUrl('update')]
   return (
     <div className="fa-full-content-p12">
@@ -88,7 +96,25 @@ export default function DictManage() {
         <div className="fa-flex-column fa-full fa-absolute fa-bg-white fa-card fa-p0 fa-box-shadow" style={{ left: 6 }}>
           {viewRecord ? (
             <div className="fa-flex-column fa-full fa-p12">
-              <FaLabel title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`} className="fa-mb12" />
+              <div className="fa-flex-row-center">
+                <FaLabel
+                  // title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`}
+                  title={(
+                    <div className="fa-flex-row-center">
+                      <Tooltip
+                        title={TYPE_TIPS[viewRecord.type]}
+                      >
+                        <span>{AdminEnums.DictTypeEnumMap[viewRecord.type]}</span>
+                        <InfoCircleOutlined className="fa-mr8" />
+                      </Tooltip>
+                      {<div>{viewRecord.name}</div>}
+                      {<div> / {viewRecord.code}</div>}
+                      {viewRecord.description && <div> / {viewRecord.description}</div>}
+                    </div>
+                  )}
+                  className="fa-mb12"
+                />
+              </div>
 
               <FaFlexRestLayout>
                 {viewRecord.type === AdminEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}

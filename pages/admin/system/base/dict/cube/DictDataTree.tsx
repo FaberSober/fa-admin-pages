@@ -1,11 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import { Button, Space } from 'antd';
-import { EditOutlined, PlusOutlined, SisternodeOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, PlusOutlined, SisternodeOutlined, UploadOutlined } from '@ant-design/icons';
 import { useCounter } from 'react-use';
-import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, type Fa, FaFlexRestLayout, FaHref, useDelete } from '@fa/ui';
-import { dictDataApi } from '@features/fa-admin-pages/services';
+import { ApiEffectLayoutContext, AuthDelBtn, BaseTree, type Fa, FaFlexRestLayout, FaHref, useDelete, useExportBase } from '@fa/ui';
+import { dictDataApi as api, dictDataApi } from '@features/fa-admin-pages/services';
 import { Admin } from "@features/fa-admin-pages/types";
 import DictDataModal from '../modal/DictDataModal';
+import { CommonExcelUploadModal } from "@features/fa-admin-pages/components";
 
 
 interface DictDataTreeProps {
@@ -25,6 +26,7 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
   }
 
   const [handleDelete] = useDelete<number>(dictDataApi.remove, refreshData, '菜单');
+  const [exporting, fetchExportExcel] = useExportBase(api.exportExcel, { query: { dictId } })
 
   const loadingTree = loadingEffect[dictDataApi.getUrl('allTree')];
   return (
@@ -38,8 +40,15 @@ export default function DictDataTree({ dictId }: DictDataTreeProps) {
             新增字典
           </Button>
         </DictDataModal>
-        <Button>导出</Button>
-        <Button>导入</Button>
+        <Button icon={<DownloadOutlined />} onClick={fetchExportExcel} loading={exporting}>导出</Button>
+        <CommonExcelUploadModal
+          fetchFinish={refreshData}
+          apiDownloadTplExcel={api.exportTplExcel}
+          apiImportExcel={api.importExcel}
+          type={`base_dict_data-${dictId}`}
+        >
+          <Button icon={<UploadOutlined />}>上传</Button>
+        </CommonExcelUploadModal>
       </Space>
 
       <div className="fa-flex-row-center fa-bg-grey">

@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Admin } from "@features/fa-admin-pages/types";
+import React, { useContext, useEffect, useState } from 'react';
+import { Button, Space } from "antd";
+import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
+import { ApiEffectLayoutContext, Fa, FaFlexRestLayout, FaSortList, FaUtils, useExportBase } from "@fa/ui";
+import { CommonExcelUploadModal } from "@features/fa-admin-pages/components";
 import { dictDataApi } from "@features/fa-admin-pages/services";
-import { Fa, FaFlexRestLayout, FaSortList, FaUtils } from "@fa/ui";
+import { Admin } from "@features/fa-admin-pages/types";
 import DictDataForm from "./DictDataForm";
 
 
@@ -14,7 +17,10 @@ export interface DictDataOptionsProps {
  * @date 2025/7/11 14:49
  */
 export default function DictDataOptions({ dictId }: DictDataOptionsProps) {
+  const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [array, setArray] = useState<Admin.DictData[]>([])
+
+  const [exporting, fetchExportExcel] = useExportBase(dictDataApi.exportExcel, { query: { dictId } })
 
   useEffect(() => {
     fetchData()
@@ -60,8 +66,24 @@ export default function DictDataOptions({ dictId }: DictDataOptionsProps) {
     });
   }
 
+  const loading = loadingEffect[dictDataApi.getUrl('list')]
   return (
     <FaFlexRestLayout className="fa-bg-white">
+      <Space className="fa-mb12">
+        <Button onClick={fetchData} loading={loading}>
+          刷新
+        </Button>
+        <Button icon={<DownloadOutlined />} onClick={fetchExportExcel} loading={exporting}>导出</Button>
+        <CommonExcelUploadModal
+          fetchFinish={loading}
+          apiDownloadTplExcel={dictDataApi.exportTplExcel}
+          apiImportExcel={dictDataApi.importExcel}
+          type={`base_dict_data-${dictId}`}
+        >
+          <Button icon={<UploadOutlined />}>上传</Button>
+        </CommonExcelUploadModal>
+      </Space>
+
       <div className="fa-flex-row-center fa-bg-grey">
         <div className="fa-dict-data-title fa-border-b fa-border-r" style={{ flex: 1 }}>
           字典名称
