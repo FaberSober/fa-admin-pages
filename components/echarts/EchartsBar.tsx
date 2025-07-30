@@ -71,7 +71,7 @@ export default function EchartsBar({ title, subTitle, data, dataTitle, unit, bar
       },
       legend: {
         orient: 'vertical',
-        left: 'left',
+        top: 24,
       },
       xAxis: {
         data: data.map((i) => i.name),
