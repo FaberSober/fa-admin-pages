@@ -102,7 +102,7 @@ export default function EchartsBar({ title, subTitle, data, dataTitle, unit, bar
       ...options,
     });
     setReady(true);
-  }, [themeDark]);
+  }, [themeDark, options]);
 
   useEffect(() => {
     if (!ready) return;
