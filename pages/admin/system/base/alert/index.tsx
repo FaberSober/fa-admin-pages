@@ -72,74 +72,29 @@ export default function AlertList() {
       <AlertStatistic />
 
       {/* 查询表单区域 */}
-      <div style={{
-        padding: '16px',
-        paddingTop: 0,
-        borderBottom: '1px solid #f0f0f0',
-        background: '#fff'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-        }}>
-          <Form
-            form={form}
-            layout="inline"
-            onFinish={setFormValues}
-            style={{ display: 'flex', alignItems: 'center' }}
-          >
-            <Form.Item
-              name="content"
-              label="告警内容："
-              labelCol={{ span: 7 }}
-              wrapperCol={{ span: 20 }}
-              style={{ marginRight: '14px' }}
-            >
-              <Input placeholder="请输入告警内容" allowClear style={{ width: 180 }} />
-            </Form.Item>
+      <div style={{ padding: '0 12px 12px 12px', display: 'flex', justifyContent: 'flex-end' }}>
+        <Form form={form} layout="inline" onFinish={setFormValues}>
+          <Form.Item name="content" label="告警内容">
+            <Input placeholder="请输入告警内容" allowClear />
+          </Form.Item>
+          <Form.Item name="type" label="告警类型">
+            <DictDataSelector dictLabel="alert.type" placeholder="请选择告警类型" allowClear />
+          </Form.Item>
+          <Form.Item name="deal" label="是否处理">
+            <BaseBoolSelector placeholder="请选择处理状态" allowClear />
+          </Form.Item>
 
-            <Form.Item
-              name="type"
-              label="告警类型："
-              labelCol={{ span: 7 }}
-              wrapperCol={{ span: 20 }}
-              style={{ marginRight: '14px' }}
-            >
-              <DictDataSelector dictLabel="alert.type" placeholder="请选择告警类型" style={{ width: 160 }} />
-            </Form.Item>
-
-            <Form.Item
-              name="deal"
-              label="是否处理："
-              labelCol={{ span: 7 }}
-              wrapperCol={{ span: 18 }}
-              style={{ marginRight: '12px' }}
-            >
-              <BaseBoolSelector placeholder="请选择处理状态" />
-            </Form.Item>
-
-            <Space>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                icon={<SearchOutlined />}
-              >
-                查询
-              </Button>
-              <Button onClick={() => clearForm(form)}>重置</Button>
-              <AlertModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
-              <Button
-                type="primary"
-                loading={exporting}
-                icon={<DownloadOutlined />}
-                onClick={fetchExportExcel}
-              >
-                导出
-              </Button>
-            </Space>
-          </Form>
-        </div>
+          <Space>
+            <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+              查询
+            </Button>
+            <Button onClick={() => clearForm(form)}>重置</Button>
+            <AlertModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+              导出
+            </Button>
+          </Space>
+        </Form>
       </div>
 
       <BaseBizTable
