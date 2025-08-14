@@ -2,7 +2,7 @@ import React, { type CSSProperties, useContext, useEffect, useRef, useState } fr
 import { v4 as uuidv4 } from 'uuid';
 import * as echarts from 'echarts';
 import type { ECharts, BarSeriesOption, EChartsOption } from 'echarts';
-import { type Fa, ThemeLayoutContext } from '@fa/ui';
+import { type Fa, ThemeLayoutContext, FaUtils } from '@fa/ui';
 import { useSize } from 'ahooks';
 
 export interface EchartsBarProps {
@@ -87,7 +87,7 @@ export default function EchartsBar({ title, subTitle, data, dataTitle, unit, bar
           barWidth,
           tooltip: {
             //鼠标移入图上数值显示格式
-            valueFormatter: (value: any) => value + (unit ? ` ${unit}` : ''),
+            valueFormatter: (value: any) => FaUtils.tryToFixedNum(value, 1) + (unit ? ` ${unit}` : ''),
           },
           ...barSeriesOption,
         },
