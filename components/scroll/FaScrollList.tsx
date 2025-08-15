@@ -81,7 +81,6 @@ export default function FaScrollList<T>({ list, renderItem, key = 'id', num = 10
     updateIndex(arrayIndex + 1)
   }
 
-  console.log('arrayShow', arrayShow)
   return (
     <div
       ref={domRef}
