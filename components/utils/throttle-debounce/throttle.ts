@@ -21,7 +21,7 @@
  *
  * @returns {Function} A new, throttled, function.
  */
-export default function (delay:any, callback:any, options:any) {
+export default function (delay:any, callback:any, options?:any) {
 	const {
 		noTrailing = false,
 		noLeading = false,
