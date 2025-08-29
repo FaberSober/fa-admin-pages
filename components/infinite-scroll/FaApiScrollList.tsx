@@ -34,7 +34,7 @@ export interface FaApiScrollListProps<T> {
  * @date 2025-08-28 21:39:55
  */
 function FaApiScrollListComponent<T>(
-  { apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = 'id DESC' }: FaApiScrollListProps<T>,
+  { apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = '' }: FaApiScrollListProps<T>,
   ref: React.Ref<FaApiScrollListRef>
 ) {
   const [form] = Form.useForm();
@@ -101,7 +101,7 @@ function FaApiScrollListComponent<T>(
   return (
     <div className='fa-flex-column fa-full'>
       <Form form={form} onFinish={onFinish}>
-        <div className='fa-mb12 fa-mt12 fa-flex-row-center' style={{gap: 12}}>
+        <div className='fa-mb12 fa-flex-row-center' style={{gap: 12}}>
           <div className='fa-flex-1'>
             <Form.Item name={searchKey} noStyle style={{width: 'auto'}}>
               <Input.Search loading={loading} onSearch={() => form.submit()} allowClear />
@@ -110,7 +110,16 @@ function FaApiScrollListComponent<T>(
           <Popover
             placement='rightTop'
             title='高级筛选'
-            content={renderFilterFormItems ? renderFilterFormItems() : undefined}
+            content={(
+              <div className="fa-form-mb12">
+                {renderFilterFormItems && renderFilterFormItems()}
+                <div className='fa-flex-row-end' style={{gap: 12}}>
+                  <Button onClick={() => form.resetFields()} size='small'>重置</Button>
+                  <Button onClick={() => form.submit()} size='small' type='primary'>搜索</Button>
+                </div>
+              </div>
+            )}
+            trigger='click'
           >
             <Button icon={<FilterOutlined />} />
           </Popover>
