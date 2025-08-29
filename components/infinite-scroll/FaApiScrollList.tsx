@@ -8,13 +8,15 @@ export interface FaApiScrollListProps<T> {
   /** page分页获取接口 */
   apiPage: (params: Fa.BasePageProps) => Promise<Fa.Ret<Fa.Page<T>>>,
   /** 列表项渲染组件 */
-  renderItem: (item: T) => React.ReactNode;
+  renderItem: (item: T, index: number) => React.ReactNode;
   /** 最外层div样式 */
   style?: CSSProperties;
   /** 搜索Input的FormName */
   searchKey?: string;
   /** 高级检索的Form表单 */
   renderFilterFormItems?: () => React.ReactNode;
+  /** 排序sorter */
+  sorter?: string;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface FaApiScrollListProps<T> {
  * @author xu.pengfei
  * @date 2025-08-28 21:39:55
  */
-export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems }: FaApiScrollListProps<T>) {
+export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = 'id DESC' }: FaApiScrollListProps<T>) {
   const [form] = Form.useForm();
 
   const id = useId();
@@ -44,7 +46,7 @@ export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchK
       search: _search,
       current: pageOut ? pageOut : page,
       pageSize: 20,
-      sorter: 'id DESC'
+      sorter,
     }).then(res => {
       if (pageOut && pageOut === 1) {
         setData(res.data.rows)
@@ -68,7 +70,7 @@ export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchK
   const defaultStyle: CSSProperties = {
     height: '100%',
     overflow: 'auto',
-    padding: '0 12px',
+    // padding: '0 12px',
     // border: '1px solid rgba(140, 140, 140, 0.35)',
   }
 
@@ -104,11 +106,7 @@ export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchK
             endMessage={<Divider plain>数据加载完成～</Divider>}
             scrollableTarget={id}
           >
-            {data.map((item, index) => (
-              <div key={index}>
-                {renderItem(item)}
-              </div>
-            ))}
+            {data.map((item, index) => (renderItem(item, index)))}
           </InfiniteScroll>
         </div>
       </FaFlexRestLayout>
