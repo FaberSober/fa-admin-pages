@@ -1,8 +1,15 @@
-import React, { CSSProperties, useEffect, useId, useState } from 'react';
+import React, { CSSProperties, forwardRef, useEffect, useId, useImperativeHandle, useState } from 'react';
 import { Button, Divider, Form, Input, Popover, Skeleton } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { Fa, FaFlexRestLayout } from '@fa/ui';
 import InfiniteScroll from './InfiniteScroll';
+
+export interface FaApiScrollListRef {
+  /** 加载更多数据的方法 */
+  loadMoreData: (query?: any, pageOut?: number) => void;
+  /** 刷新列表数据的方法 */
+  refresh: () => void;
+}
 
 export interface FaApiScrollListProps<T> {
   /** page分页获取接口 */
@@ -26,7 +33,10 @@ export interface FaApiScrollListProps<T> {
  * @author xu.pengfei
  * @date 2025-08-28 21:39:55
  */
-export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = 'id DESC' }: FaApiScrollListProps<T>) {
+function FaApiScrollListComponent<T>(
+  { apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = 'id DESC' }: FaApiScrollListProps<T>,
+  ref: React.Ref<FaApiScrollListRef>
+) {
   const [form] = Form.useForm();
 
   const id = useId();
@@ -58,6 +68,20 @@ export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchK
       setLoading(false);
     }).catch(() => setLoading(false));
   }
+
+  /**
+   * 刷新列表数据
+   * 触发表单提交，重新加载第一页数据
+   */
+  function refresh() {
+    form.submit();
+  }
+
+  // 暴露方法给父组件
+  useImperativeHandle(ref, () => ({
+    loadMoreData,
+    refresh
+  }), [data, page, loading]);
 
   useEffect(() => {
     loadMoreData({}, 1);
@@ -113,3 +137,10 @@ export default function FaApiScrollList<T>({ apiPage, renderItem, style, searchK
     </div>
   );
 }
+
+// 使用React.forwardRef包装组件以支持泛型
+const FaApiScrollList = React.forwardRef(FaApiScrollListComponent) as <T>(
+  props: FaApiScrollListProps<T> & { ref?: React.Ref<FaApiScrollListRef> }
+) => React.ReactElement;
+
+export default FaApiScrollList;
