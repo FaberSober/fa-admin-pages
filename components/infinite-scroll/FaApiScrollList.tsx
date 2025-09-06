@@ -24,6 +24,8 @@ export interface FaApiScrollListProps<T> {
   renderFilterFormItems?: () => React.ReactNode;
   /** 排序sorter */
   sorter?: string;
+  /** form style */
+  formStyle?: CSSProperties;
 }
 
 /**
@@ -34,7 +36,7 @@ export interface FaApiScrollListProps<T> {
  * @date 2025-08-28 21:39:55
  */
 function FaApiScrollListComponent<T>(
-  { apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = '' }: FaApiScrollListProps<T>,
+  { apiPage, renderItem, style, searchKey = '_search', renderFilterFormItems, sorter = '', formStyle }: FaApiScrollListProps<T>,
   ref: React.Ref<FaApiScrollListRef>
 ) {
   const [form] = Form.useForm();
@@ -100,7 +102,7 @@ function FaApiScrollListComponent<T>(
 
   return (
     <div className='fa-flex-column fa-full'>
-      <Form form={form} onFinish={onFinish}>
+      <Form form={form} onFinish={onFinish} className='fa-border-b' style={{ ...formStyle }}>
         <div className='fa-mb12 fa-flex-row-center' style={{gap: 12}}>
           <div className='fa-flex-1'>
             <Form.Item name={searchKey} noStyle style={{width: 'auto'}}>

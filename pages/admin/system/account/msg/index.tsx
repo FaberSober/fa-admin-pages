@@ -7,6 +7,7 @@ import {
   BaseBoolSelector,
   BaseTableUtils,
   clearForm,
+  DictEnumApiSelector,
   type FaberTable,
   FaHref,
   FaUtils,
@@ -24,7 +25,7 @@ export default function MsgList() {
   const { user, refreshUnreadCount } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
 
-  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
+  const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, dicts, paginationProps } =
     useTableQueryParams<Admin.Msg>(msgApi.page, { extraParams: { toUserId: user.id }, sorter: { field: 'crtTime', order: 'descend' } }, serviceName);
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function MsgList() {
     const { sorter } = queryParams;
     return [
       // BaseTableUtils.genSimpleSorterColumn('ID', 'id', 70, sorter, false),
+      BaseTableUtils.genEnumSorterColumn('消息类型', 'type', 100, sorter, dicts),
       {
         ...BaseTableUtils.genSimpleSorterColumn('消息内容', 'content', undefined, sorter),
         render: (val, record) => (
@@ -104,6 +106,9 @@ export default function MsgList() {
         <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
+            <Form.Item name="type" label="消息类型">
+              <DictEnumApiSelector enumName='MsgTypeEnum' placeholder="请选择消息类型" allowClear />
+            </Form.Item>
             <Form.Item name="content" label="消息内容">
               <Input placeholder="请输入消息内容" allowClear />
             </Form.Item>
