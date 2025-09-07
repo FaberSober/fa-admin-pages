@@ -22,4 +22,5 @@ export * from './scroll';
 export * from './socket';
 export * from './toc-extract';
 export * from './utils';
+export * from './user';
 export * from './video';
