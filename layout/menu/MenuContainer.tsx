@@ -11,10 +11,11 @@ import WebSocketLayout from '../websocket/WebSocketLayout';
 
 
 interface MenuContainerProps {
+  renderHeaderExtra?: () => React.ReactNode;
   extra?: () => React.ReactNode;
 }
 
-export default function MenuContainer({ extra }: MenuContainerProps) {
+export default function MenuContainer({ renderHeaderExtra, extra }: MenuContainerProps) {
   return (
     <ThemeLayout colorPrimary={SITE_INFO.PRIMARY_COLOR} initThemeDark={SITE_INFO.THEME === 'dark'}>
       <LangLayout>
@@ -23,7 +24,7 @@ export default function MenuContainer({ extra }: MenuContainerProps) {
             <UserLayout>
               <WebSocketLayout>
                 <AMapLayout>
-                  <MenuLayout>
+                  <MenuLayout renderHeaderExtra={renderHeaderExtra}>
                     <Suspense fallback={<PageLoading />}>
                       <Outlet />
                       {extra && extra()}

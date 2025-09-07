@@ -14,12 +14,17 @@ import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import './MenuLayout.scss';
 import { SITE_INFO } from '@/configs';
 
+
+export interface MenuLayoutProps extends Fa.BaseChildProps {
+  renderHeaderExtra?: () => React.ReactNode;
+}
+
 /**
  * 厂字形菜单布局
  * @author xu.pengfei
  * @date 2022/9/22 22:23
  */
-export default function MenuLayout({ children }: Fa.BaseChildProps) {
+export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { systemConfig } = useContext(ConfigLayoutContext);
@@ -258,6 +263,7 @@ export default function MenuLayout({ children }: Fa.BaseChildProps) {
           <Layout.Header className="fa-menu-header">
             <Logo />
             <MenuAppHorizontal />
+            {renderHeaderExtra && renderHeaderExtra()}
             {/*<LangToggle />*/}
             <WxMiniApp />
             <HelpCube />
