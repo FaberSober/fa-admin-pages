@@ -122,7 +122,7 @@ export default function UserAvatar() {
       getPopupContainer={() => document.body}
       // overlayInnerStyle={{ padding: 0 }}
     >
-      <div className="fa-menu-normal-cube fa-link-grey fa-flex-center fa-pl12 fa-pr12">
+      <div className="fa-menu-normal-cube fa-link-primary fa-flex-center fa-pl12 fa-pr12">
         <Avatar size="small" src={<img src={fileSaveApi.genLocalGetFilePreview(user.img)} alt={user.name} />} />
         <span style={{ marginLeft: 12 }}>{user?.name}</span>
       </div>

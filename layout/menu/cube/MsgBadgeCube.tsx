@@ -38,7 +38,7 @@ export default function MsgBadgeCube() {
         title="系统消息"
         triggerDom={(
           <Tooltip title="系统消息">
-            <div className="fa-link-grey fa-flex-center" style={{ width: 44 }}>
+            <div className="fa-link-primary fa-flex-center" style={{ width: 44 }}>
               <a className="fa-menu-normal-cube">
                 <Badge size="small" count={unreadCount}>
                   <BellOutlined className="fa-menu-normal-cube" style={{ margin: '0 4px' }} />
