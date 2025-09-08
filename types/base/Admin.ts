@@ -329,6 +329,11 @@ namespace Admin {
     workStatus: FaEnums.UserWorkStatusEnum;
     /** 最后在线时间 */
     lastOnlineTime: string;
+    // ------------- show cols -------------
+    /** 部门名称  */
+    departmentName: string;
+    /** 职位名称  */
+    postName: string;
   }
 
   export interface UserWeb extends User {
