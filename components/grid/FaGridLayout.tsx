@@ -6,7 +6,7 @@ const ReactGridLayout = WidthProvider(RGL);
 
 export interface FaGridLayoutProps extends ReactGridLayoutProps {
   layout: Layout[];
-  renderItem: (item: Layout) => ReactNode;
+  renderItem: (item: Layout, index: number) => ReactNode;
   itemDivStyle?: CSSProperties;
 }
 
@@ -17,9 +17,9 @@ export interface FaGridLayoutProps extends ReactGridLayoutProps {
 export function FaGridLayout({ layout, renderItem, itemDivStyle, ...props }: FaGridLayoutProps) {
   return (
     <ReactGridLayout layout={layout} {...props}>
-      {layout.map((i) => (
-        <div key={i.i} style={{ ...itemDivStyle }}>
-          {renderItem(i)}
+      {layout.map((item, index) => (
+        <div key={item.i} style={{ ...itemDivStyle }}>
+          {renderItem(item, index)}
         </div>
       ))}
     </ReactGridLayout>

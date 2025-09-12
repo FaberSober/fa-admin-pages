@@ -47,7 +47,7 @@ export function useAllLayout(cubes: any): { allLayout: Layout[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: any, layout: Layout[], addId: string) {
+export function calAddLayout(cubes: any, layout: Layout[], addId: string|number) {
   const Component = (cubes as any)[addId];
 
   let x = 0;
@@ -78,6 +78,7 @@ export function calAddLayout(cubes: any, layout: Layout[], addId: string) {
   return [
     ...layout,
     {
+      id: FaUtils.uuid(),
       i: Component.displayName,
       w: Component.w,
       h: Component.h,
@@ -131,7 +132,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
    * 添加item到布局中
    * @param id
    */
-  function handleAdd(id: string) {
+  function handleAdd(id: string|number) {
     const newLayout = calAddLayout(cubes, layout, id);
     setLayout(newLayout);
   }
