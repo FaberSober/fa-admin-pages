@@ -89,11 +89,11 @@ export function parseAllLayout(cubes: CubeItem[]) {
   return allLayout;
 }
 
-export function useAllLayout(cubes: CubeItem[]): { allLayout: Widget[] } {
+export function useAllLayout(cubes: CubeItem[]): { allLayout: Layout[] } {
   const { menuList } = useContext(MenuLayoutContext);
   const permissions = menuList.map((i) => i.linkUrl);
 
-  const allLayout: Widget[] = [];
+  const allLayout: Layout[] = [];
   each(cubes, (k) => {
     if (!FaUtils.hasPermission(permissions, k.permission)) {
       return;
@@ -175,6 +175,17 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     });
   }, []);
 
+  function updateConfig(widgets: Widget[]) {
+    const params = {
+      biz,
+      type,
+      data: { widgets },
+    };
+    configApi.save(params).then((res) => {
+      setConfig(res.data);
+    });
+  }
+
   function onLayoutChange(layout: Layout[]) {
     console.log('onLayoutChange', layout)
     if (loading) return;
@@ -182,18 +193,12 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
       const newLayout = find(layout, (l: Layout) => l.i === w.id) as Layout
       return { ...w, layout: newLayout }
     })
-    const params = {
-      biz,
-      type,
-      data: { widgets: newWidgets },
-    };
-    if (config) {
-      configApi.update(config.id, { id: config.id, ...params });
-    } else {
-      configApi.save(params).then((res) => {
-        setConfig(res.data);
-      });
-    }
+    updateConfig(newWidgets);
+    setWidgets(newWidgets);
+  }
+
+  function handleWidgetChange(newWidgets: Widget[]) {
+    updateConfig(newWidgets);
     setWidgets(newWidgets);
   }
 
@@ -216,7 +221,11 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
   }
 
   function handleDel(id: string) {
-    setWidgets(widgets.filter((i) => i.id !== id));
+    setWidgets(prev => {
+      const newWidgets = prev.filter((i) => i.id !== id)
+      updateConfig(newWidgets)
+      return newWidgets
+    });
   }
 
   function handleSaveCurAsDefault() {
@@ -256,6 +265,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     setWidgets,
     loading,
     onLayoutChange,
+    handleWidgetChange,
     handleAdd,
     handleDel,
     handleSaveCurAsDefault,

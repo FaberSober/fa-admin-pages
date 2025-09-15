@@ -16,7 +16,12 @@ export interface FaGridLayoutProps extends ReactGridLayoutProps {
  */
 export function FaGridLayout({ layout, renderItem, itemDivStyle, ...props }: FaGridLayoutProps) {
   return (
-    <ReactGridLayout layout={layout} containerPadding={[0, 0]} {...props}>
+    <ReactGridLayout
+      layout={layout}
+      containerPadding={[0, 0]}
+      draggableCancel=".no-drag"   // 这类元素不会触发拖拽
+      {...props}
+    >
       {layout.map((item, index) => (
         <div key={item.i} style={{ ...itemDivStyle }}>
           {renderItem(item, index)}
