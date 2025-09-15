@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import type { Layout } from 'react-grid-layout';
-import { each } from 'lodash';
+import { each, find } from 'lodash';
 import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
 import { configApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
@@ -27,6 +27,51 @@ export interface CubeItem {
 }
 
 /**
+ * react-grid-layout 的 layout[i] 必须唯一，而业务里 同一种 widget 可以被展示多次（比如同一个图表组件实例化多个）。
+🔑 解决方案思路
+1. widget 定义（模板） 和 widget 实例 区分开。
+  - 模板：描述一种组件类型（chart/table/map…）。
+  - 实例：用户拖到 dashboard 上的一个具体 widget，带唯一 ID。
+2. 生成唯一 i
+  - 每个 widget 实例必须有唯一 ID，比如用 UUID 或者 递增计数器。
+  - 这个 ID 作为 layout.i，并且绑定到业务数据上。
+3. 存储时
+  - 存储 {id, type, config, layout}。
+  - 下次加载时直接还原。
+
+📦 保存到后端的数据结构
+```json
+[
+  {
+    "id": "4c29c73f-3d2d-4f08-8a18-94c93c2a4d12",
+    "type": "chart",
+    "title": "温度曲线",
+    "layout": { "i": "4c29c73f-3d2d-4f08-8a18-94c93c2a4d12", "x": 0, "y": 0, "w": 4, "h": 3 }
+  },
+  {
+    "id": "8d82f530-2b13-4a10-882e-47b207eecf75",
+    "type": "chart",
+    "title": "温度曲线",
+    "layout": { "i": "8d82f530-2b13-4a10-882e-47b207eecf75", "x": 4, "y": 0, "w": 4, "h": 3 }
+  },
+  {
+    "id": "3b2d4d10-2d01-42cc-9a71-4e6d3efb8a6e",
+    "type": "table",
+    "title": "设备表",
+    "layout": { "i": "3b2d4d10-2d01-42cc-9a71-4e6d3efb8a6e", "x": 8, "y": 0, "w": 4, "h": 3 }
+  }
+]
+```
+ */
+export interface Widget {
+  id: string;       // 实例唯一 ID
+  displayName: string;     // widget 类型
+  title: string;
+  config?: any;
+  layout: Layout;
+}
+
+/**
  * 解析homecubes类似组件输出全部布局配置
  * @param cubes
  */
@@ -44,11 +89,11 @@ export function parseAllLayout(cubes: CubeItem[]) {
   return allLayout;
 }
 
-export function useAllLayout(cubes: CubeItem[]): { allLayout: Layout[] } {
+export function useAllLayout(cubes: CubeItem[]): { allLayout: Widget[] } {
   const { menuList } = useContext(MenuLayoutContext);
   const permissions = menuList.map((i) => i.linkUrl);
 
-  const allLayout: Layout[] = [];
+  const allLayout: Widget[] = [];
   each(cubes, (k) => {
     if (!FaUtils.hasPermission(permissions, k.permission)) {
       return;
@@ -66,8 +111,8 @@ export function useAllLayout(cubes: CubeItem[]): { allLayout: Layout[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: CubeItem[], layout: Layout[], addId: string|number) {
-  const Component = (cubes as any)[addId];
+export function calAddLayout(cubes: CubeItem[], layout: Layout[], displayName: string): Layout {
+  const Component = find(cubes, c => c.displayName === displayName) as CubeItem;
 
   let x = 0;
   let y = 0;
@@ -94,48 +139,53 @@ export function calAddLayout(cubes: CubeItem[], layout: Layout[], addId: string|
     y = l.y;
   });
 
-  return [
-    ...layout,
-    {
-      id: FaUtils.uuid(),
-      i: Component.displayName,
-      w: Component.w,
-      h: Component.h,
-      x: x,
-      y: y,
-    },
-  ];
+  return {
+    i: FaUtils.uuid(),
+    w: Component.w,
+    h: Component.h,
+    x: x,
+    y: y,
+  };
 }
 
-export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: Layout[]) {
+export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultWidget: Widget[]) {
   const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const loading = loadingEffect[configApi.getUrl('save')] || loadingEffect[configApi.getUrl('update')];
 
-  const [config, setConfig] = useState<Admin.Config<Layout[]>>();
-  const [layout, setLayout] = useState<Layout[]>([]);
+  const [config, setConfig] = useState<Admin.Config<Widget[]>>();
+  const [widgets, setWidgets] = useState<Widget[]>([]);
+
+  const layout = useMemo(() => {
+    return widgets.map(i => i.layout)
+  }, [widgets])
 
   useEffect(() => {
     configApi.getOne(biz, type).then((res) => {
       if (res.data) {
-        setLayout(res.data.data);
+        setWidgets(res.data.data.widgets || []);
         setConfig(res.data);
       } else {
         // 未找到，去查找全局是否有配置
         configApi.getOneGlobal(biz, type).then((res1) => {
           setConfig(undefined);
-          setLayout(res1.data?.data || defaultLayout);
+          const dw = res1.data?.data.widgets || defaultWidget
+          setWidgets(dw);
         });
       }
     });
   }, []);
 
   function onLayoutChange(layout: Layout[]) {
-    // console.log('onLayoutChange', layout)
+    console.log('onLayoutChange', layout)
     if (loading) return;
+    const newWidgets = widgets.map(w => {
+      const newLayout = find(layout, (l: Layout) => l.i === w.id) as Layout
+      return { ...w, layout: newLayout }
+    })
     const params = {
       biz,
       type,
-      data: layout,
+      data: { widgets: newWidgets },
     };
     if (config) {
       configApi.update(config.id, { id: config.id, ...params });
@@ -144,20 +194,29 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
         setConfig(res.data);
       });
     }
-    setLayout(layout);
+    setWidgets(newWidgets);
   }
 
   /**
    * 添加item到布局中
    * @param id
    */
-  function handleAdd(id: string|number) {
-    const newLayout = calAddLayout(cubes, layout, id);
-    setLayout(newLayout);
+  function handleAdd(displayName: string) {
+    const Component = find(cubes, c => c.displayName === displayName) as CubeItem;
+    const newLayout = calAddLayout(cubes, layout, displayName);
+    const newWidget = {
+      id: newLayout.i,
+      displayName: Component.displayName,
+      title: Component.title,
+      layout: newLayout,
+      config: {},
+    }
+    console.log('newWidget', newWidget)
+    setWidgets(prev => ([ ...prev, newWidget ]));
   }
 
   function handleDel(id: string) {
-    setLayout(layout.filter((i) => i.i !== id));
+    setWidgets(widgets.filter((i) => i.id !== id));
   }
 
   function handleSaveCurAsDefault() {
@@ -168,7 +227,9 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
         const params = {
           biz,
           type,
-          data: layout,
+          data: {
+            widgets
+          },
         };
         return configApi.saveGlobal(params).then((res) => FaUtils.showResponse(res, '保存当前为默认配置'));
       },
@@ -191,7 +252,8 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
   return {
     config,
     layout,
-    setLayout,
+    widgets,
+    setWidgets,
     loading,
     onLayoutChange,
     handleAdd,
