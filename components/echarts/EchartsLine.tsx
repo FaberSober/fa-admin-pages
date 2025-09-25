@@ -92,7 +92,10 @@ export default function EchartsLine({ title, subTitle, dataX, dataY, unit, style
         },
         tooltip: {
           //鼠标移入图上数值显示格式
-          valueFormatter: (value: any) => value + (unit ? ` ${unit}` : ''),
+          valueFormatter: (value: any) => {
+            const formattedValue = typeof value === 'number' ? value.toFixed(1) : value;
+            return formattedValue + (unit ? ` ${unit}` : '');
+          },
         },
         ...lineSeriesOption,
       })),
