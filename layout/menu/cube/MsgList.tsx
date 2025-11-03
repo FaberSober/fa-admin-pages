@@ -28,7 +28,7 @@ export default function MsgList({ onClose }: MsgListProps) {
 
   useEffect(() => {
     scrollListRef.current?.refresh();
-  }, [unreadCount]);
+  }, [unreadCount, tab]);
 
   function handleReadOne(item: Admin.Msg) {
     // 根据消息类型确定打开页面
@@ -69,6 +69,12 @@ export default function MsgList({ onClose }: MsgListProps) {
     if (closeDrawer) closeDrawer();
   }
 
+  function getMsgType() {
+    if (tab === '1') return 1;
+    if (tab === '2') return 2;
+    return "";
+  }
+
   return (
     <div className='fa-full-content fa-flex-column'>
       <div className='fa-p12 fa-flex-row-center'>
@@ -93,7 +99,7 @@ export default function MsgList({ onClose }: MsgListProps) {
       <FaFlexRestLayout>
         <FaApiScrollList
           ref={scrollListRef}
-          apiPage={(params) => msgApi.pageMine({ ...params, query: { isRead: false }, sorter: 'id DESC' })}
+          apiPage={(params) => msgApi.pageMine({ ...params, query: { isRead: false, type: getMsgType() }, sorter: 'id DESC' })}
           renderItem={(item: Admin.Msg) => (
             <div key={item.id} className='fa-border-b fa-p12 fa-flex-row-center fa-hover'>
               <Avatar size="small" src={fileSaveApi.genLocalGetFilePreview(get(item, 'fromUser.img')!)} />
