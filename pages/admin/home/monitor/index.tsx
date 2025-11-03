@@ -29,7 +29,7 @@ export default function Monitor() {
 
   const inIds: string[] = layout.map((i) => i.i);
   return (
-    <div className="fa-full-content">
+    <div className="fa-full-content-p12">
       <FaGridLayout
         layout={layout}
         renderItem={(i) => {
