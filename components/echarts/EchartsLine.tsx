@@ -58,6 +58,7 @@ export default function EchartsLine({ title, subTitle, dataX, dataY, unit, style
         text: title,
         subtext: subTitle,
         left: 'center',
+        top: 0,
       },
       grid: {
         left: '3%',
