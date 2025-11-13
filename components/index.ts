@@ -19,6 +19,7 @@ export * from './pdf';
 export * from './rich-html';
 export * from './route';
 export * from './scroll';
+export * from './search';
 export * from './socket';
 export * from './toc-extract';
 export * from './utils';
