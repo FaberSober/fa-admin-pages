@@ -17,7 +17,7 @@ export interface SearchGridProps<Values = any> extends FormProps<Values> {
  * @author xu.pengfei
  * @date 2025-11-13 10:19:01
  */
-export default function SearchGrid({ children, btns, defaultCount = 3, minItemWidth = 240, ...props }: SearchGridProps) {
+export default function SearchGrid({ children, btns, defaultCount = 3, minItemWidth = 240, style, className, ...props }: SearchGridProps) {
   const [expand, setExpand] = useState(false);
 
   // 将 children 转换为数组，方便 slice
@@ -27,7 +27,7 @@ export default function SearchGrid({ children, btns, defaultCount = 3, minItemWi
   const visibleChildren = expand ? childArray : childArray.slice(0, defaultCount);
 
   return (
-    <Form className='fa-search-grid fa-form-m0' style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${minItemWidth}px, 1fr))` }} labelCol={{ span: 8 }} {...props}>
+    <Form className={`fa-search-grid fa-form-m0 ${className || ''}`} style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${minItemWidth}px, 1fr))`, ...style }} labelCol={{ span: 8 }} {...props}>
       {visibleChildren}
 
       <div
