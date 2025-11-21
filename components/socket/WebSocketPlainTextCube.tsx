@@ -1,23 +1,31 @@
 import React, { type CSSProperties, useState } from 'react';
 import useBus from 'use-bus';
 import { FaUtils } from '@fa/ui';
+import { isNil } from 'lodash';
 
 export interface WebSocketPlainTextCubeProps {
   style?: CSSProperties;
   className?: string;
+  channel?: string;
 }
 
 /**
  * @author xu.pengfei
  * @date 2024/11/22 11:13
  */
-export default function WebSocketPlainTextCube({ style, className }: WebSocketPlainTextCubeProps) {
+export default function WebSocketPlainTextCube({ style, className, channel }: WebSocketPlainTextCubeProps) {
   const [array, setArray] = useState<{ data: string, timestamp: number }[]>([]);
 
   useBus(
     ['@@ws/RECEIVE/PLAIN_TEXT'],
-    ({ payload, timestamp }) => {
-      setArray([...array, { data: payload, timestamp }]);
+    ({ channel: ca, payload, timestamp }) => {
+      if (isNil(channel)) {
+        setArray([...array, { data: payload, timestamp }]);
+      } else {
+        if (channel === ca) {
+          setArray([...array, { data: payload, timestamp }]);
+        }
+      }
       FaUtils.scrollToBottomById('WebSocketPlainTextCube', 100);
     },
     [array],

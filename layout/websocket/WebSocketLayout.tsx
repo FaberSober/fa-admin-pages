@@ -24,9 +24,9 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
     try {
       const ret = FaUtils.tryParseJson(latestMessage?.data, {});
       setLatestMessageObj(ret);
-      const { type, code, msg, data, timestamp } = ret;
+      const { type, channel, code, msg, data, timestamp } = ret;
       // send msg throw bus event
-      dispatch({ type: `@@ws/RECEIVE/${type}`, payload: data, code, msg, timestamp });
+      dispatch({ type: `@@ws/RECEIVE/${type}`, payload: data, channel, code, msg, timestamp });
     } catch (e) {
       console.error(e);
     }
