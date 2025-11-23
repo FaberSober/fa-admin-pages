@@ -64,7 +64,7 @@ export default function EchartsLine({ title, subTitle, dataX, dataY, unit, style
         left: '3%',
         right: '4%',
         bottom: '3%',
-        top: '17%',
+        top: '3%',
         containLabel: true,
       },
       // toolbox: FaUtils.EchartsToolbox,
@@ -76,7 +76,7 @@ export default function EchartsLine({ title, subTitle, dataX, dataY, unit, style
       },
       legend: {
         data: dataY.map((i) => i.name),
-        top: 24,
+        top: 0,
       },
       xAxis: {
         type: 'category',
