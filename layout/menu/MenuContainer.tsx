@@ -8,6 +8,7 @@ import UserLayout from '../user/UserLayout';
 import MenuLayout from './MenuLayout';
 import AMapLayout from '../amap/AMapLayout';
 import WebSocketLayout from '../websocket/WebSocketLayout';
+import { WebSocketProvider } from '../websocket';
 
 
 interface MenuContainerProps {
@@ -23,14 +24,16 @@ export default function MenuContainer({ renderHeaderExtra, extra }: MenuContaine
           <ConfigLayout>
             <UserLayout>
               <WebSocketLayout>
-                <AMapLayout>
-                  <MenuLayout renderHeaderExtra={renderHeaderExtra}>
-                    <Suspense fallback={<PageLoading />}>
-                      <Outlet />
-                      {extra && extra()}
-                    </Suspense>
-                  </MenuLayout>
-                </AMapLayout>
+                <WebSocketProvider>
+                  <AMapLayout>
+                    <MenuLayout renderHeaderExtra={renderHeaderExtra}>
+                      <Suspense fallback={<PageLoading />}>
+                        <Outlet />
+                        {extra && extra()}
+                      </Suspense>
+                    </MenuLayout>
+                  </AMapLayout>
+                </WebSocketProvider>
               </WebSocketLayout>
             </UserLayout>
           </ConfigLayout>

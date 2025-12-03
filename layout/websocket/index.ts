@@ -3,3 +3,8 @@ import WebSocketLayoutContext, { type WebSocketLayoutContextProps } from './cont
 
 export { WebSocketLayout, WebSocketLayoutContext };
 export type { WebSocketLayoutContextProps };
+
+import { useWsStore } from './stores/useWsStore';
+export { useWsStore }
+export { default as WebSocketProvider } from './WebSocketProvider'
+export * from './wsUtils';

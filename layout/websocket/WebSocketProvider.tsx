@@ -1,68 +1,74 @@
-// components/WebSocketProvider.tsx（原来 WebSocketLayout 的进化版）
-import { useEffect, useRef } from 'react';
-import { useWebSocket } from 'ahooks';
-import { useWsStore } from './stores/useWsStore';
-import { FaUtils, getToken } from '@fa/ui';
+// WebSocketBridge.tsx (新增文件)
+import React, { useEffect } from 'react';
+import { useInterval, useWebSocket } from 'ahooks';
+import { ReadyState } from 'ahooks/lib/useWebSocket';
+import { Fa, FaUtils, getToken } from '@fa/ui';
 import { dispatch } from 'use-bus';
+import { useWsStore } from './stores/useWsStore';
 
-let hasInited = false;
+/**
+ * 负责调用所有 Hooks，并将 Hooks 的方法和状态结果同步到 Zustand Store 中。
+ */
+export default function WebSocketBridge({ children }: Fa.BaseChildProps) {
+    // 1. 获取 Zustand 的设置方法
+    const setHandlers = useWsStore(state => state.setHandlers);
 
-export default function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const messageHistory = useRef<any[]>([]);
-  const set = useWsStore.setState;
-  const update = useWsStore.getState()._update; // 私有更新方法
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const url = `${wsProtocol}://${window.location.host}/api/websocket/base/${getToken()}`;
+    // 2. 在组件顶级作用域调用 Hooks (这是合法的)
+    const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(
+        wsProtocol + '://' + window.location.host + `/api/websocket/base/${getToken()}`,
+        {
+            manual: true,
+            // 实时更新 Zustand 中的 readyState
+            onOpen: () => useWsStore.setState({ readyState: ReadyState.Open }),
+            onClose: () => useWsStore.setState({ readyState: ReadyState.Closed }),
+            // ... 其他 Ahooks 配置
+        }
+    );
 
-  const { readyState, sendMessage, latestMessage, disconnect, connect } = useWebSocket(url, {
-    // 关键：只在全局初始化一次，防止重复创建
-    manual: hasInited,
-    onOpen: () => hasInited = true,
-  });
+    // 3. 将 Hooks 提供的实际操作方法注入到 Zustand Store
+    useEffect(() => {
+        setHandlers({ sendMessage, connect, disconnect });
+        // 首次挂载时尝试连接（如果你希望自动连接）
+        connect();
+    }, [sendMessage, connect, disconnect, setHandlers]);
 
-  // 暴露实例给 store 使用
-  useEffect(() => {
-    (globalThis as any)._ws_instance = { sendMessage, connect, disconnect };
-  }, [sendMessage, connect, disconnect]);
+    // 4. 监听消息变化和解析逻辑 (Hooks 监听)
+    useEffect(() => {
+        if (!latestMessage?.data) return;
 
-  // 同步状态到 zustand
-  useEffect(() => {
-    update({ readyState });
-  }, [readyState]);
+        try {
+            const ret = FaUtils.tryParseJson(latestMessage.data, {});
 
-  useEffect(() => {
-    if (!latestMessage) return;
+            // 更新 Zustand Store 中的状态
+            useWsStore.setState(state => ({ // 使用静态方法来避免触发本组件渲染
+                latestMessageObj: ret,
+                messageHistory: state.messageHistory.concat(latestMessage),
+            }));
 
-    try {
-      const obj = FaUtils.tryParseJson(latestMessage.data, {});
-      update({
-        latestMessage,
-        latestMessageObj: obj,
-        messageHistory: [...messageHistory.current, latestMessage],
-      });
+            // 保持通过 use-bus 分发事件的逻辑
+            const { type, channel, code, msg, data, timestamp } = ret;
+            dispatch({ type: `@@ws/RECEIVE/${type}`, payload: data, channel, code, msg, timestamp });
 
-      const { type, channel, code, msg, data, timestamp } = obj;
-      dispatch({ type: `@@ws/RECEIVE/${type}`, payload: data, channel, code, msg, timestamp });
+        } catch (e) {
+            console.error(e);
+        }
+    }, [latestMessage]);
 
-      // 派发全局事件，供 subscribe 使用
-      window.dispatchEvent(new CustomEvent('ws-message', { detail: latestMessage }));
-    } catch (e) {
-      console.error('ws parse error', e);
-    }
-  }, [latestMessage]);
-
-  // 心跳 + 重连
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (readyState === ReadyState.Closed) connect();
-      if (readyState === ReadyState.Open) sendMessage('ping');
+    // 5. 心跳和重连逻辑 (Hooks 监听)
+    useInterval(() => {
+        if (readyState === ReadyState.Closed) {
+            connect();
+        }
+        // 发送心跳包
+        try {
+            sendMessage('ping');
+        } catch (e) {
+            console.log('Heartbeat error: ', e);
+        }
     }, 10000);
-    return () => clearInterval(timer);
-  }, [readyState, sendMessage, connect]);
 
-  // 组件卸载时断开（可选）
-  // useEffect(() => () => disconnect(), []);
-
-  return <>{children}</>;
+    // Bridge 组件不需要渲染任何 UI
+    return (<>{children}</>);
 }

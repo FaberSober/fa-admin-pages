@@ -1,62 +1,44 @@
-// stores/useWsStore.ts
+// useWsStore.ts (修正版)
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
 import { ReadyState } from 'ahooks/lib/useWebSocket';
-import { dispatch } from 'use-bus';
-import { FaUtils, getToken } from '@fa/ui';
 
-interface WsState {
+// 1. 定义状态和方法结构
+interface WebSocketState {
+  // 保持状态，但移除所有 Hooks 调用及其依赖
   readyState: ReadyState;
-  latestMessage?: WebSocketEventMap['message'];
-  latestMessageObj?: any;
+  latestMessageObj: any;
   messageHistory: any[];
-  sendMessage: (msg: any) => void;
-  // 手动控制连接（可选）
+
+  // 保持方法结构，但需要一个外部函数来设置实际的发送逻辑
+  sendMessage: (msg: Record<any, any>) => void;
   connect: () => void;
   disconnect: () => void;
-  // 只订阅某种 type 的消息（超级实用）
-  subscribe: (type: string, callback: (data: any) => void) => () => void;
+
+  // 新增：用于 Bridge 组件设置方法的函数
+  setHandlers: (handlers: {
+      sendMessage: (msg: string) => void,
+      connect: () => void,
+      disconnect: () => void
+  }) => void;
 }
 
-export const useWsStore = create<WsState>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        readyState: ReadyState.Connecting,
-        latestMessage: undefined,
-        latestMessageObj: undefined,
-        messageHistory: [],
+// 2. 定义 Store
+export const useWsStore = create<WebSocketState>((set, get) => ({
+    readyState: ReadyState.Closed,
+    latestMessageObj: undefined,
+    messageHistory: [],
 
-        sendMessage: (msg: any) => {
-          const ws = (globalThis as any)._ws_instance;
-          if (ws && get().readyState === ReadyState.Open) {
-            ws.send(typeof msg === 'string' ? msg : JSON.stringify(msg));
-          }
-        },
+    // 默认空操作，等待 Bridge 组件设置
+    sendMessage: () => console.warn('WebSocket not initialized. Call connect() first.'),
+    connect: () => console.warn('WebSocket not initialized.'),
+    disconnect: () => console.warn('WebSocket not initialized.'),
 
-        connect: () => (globalThis as any)._ws_instance?.connect?.(),
-        disconnect: () => (globalThis as any)._ws_instance?.disconnect?.(),
+    // 接收 Bridge 组件注入的实际方法
+    setHandlers: (handlers) => set({
+        sendMessage: (msg) => handlers.sendMessage(JSON.stringify(msg)),
+        connect: handlers.connect,
+        disconnect: handlers.disconnect
+    }),
 
-        // 内部更新方法，由 WebSocketProvider 调用
-        _update: (updates: Partial<WsState>) => set(updates),
-
-        // 订阅特定 type 的消息（类似 event bus，但性能完美）
-        subscribe: (type: string, callback: (data: any) => void) => {
-          const listener = (e: any) => {
-            const msg = FaUtils.tryParseJson(e.data, {});
-            if (msg.type === type) {
-              callback(msg.data);
-            }
-          };
-          window.addEventListener('ws-message', listener as any);
-          return () => window.removeEventListener('ws-message', listener as any);
-        },
-      }),
-      {
-        name: 'ws-storage',
-        partialize: (state) => ({ messageHistory: state.messageHistory.slice(-100) }), // 只存最近100条
-      }
-    ),
-    { name: 'WebSocket Store' }
-  )
-);
+    // 其他状态初始化
+}));
