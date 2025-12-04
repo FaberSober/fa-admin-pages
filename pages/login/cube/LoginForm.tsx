@@ -3,7 +3,7 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Captcha, LoginMode, setLoginMode, setToken, useApiLoading, useQs } from '@fa/ui';
 import { ConfigLayoutContext } from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { authApi } from '@features/fa-admin-pages/services';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { useContext, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -53,7 +53,10 @@ export default function LoginForm() {
       </Form.Item>
       {systemConfig.safeCaptchaOn && (
         <Form.Item name="captcha" label="验证码" required={false} rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
-          <Input size="large" prefix={<FieldNumberOutlined />} placeholder="请输入验证码" addonAfter={<Captcha onCodeChange={(c) => setCode(c)} />} />
+          <Space.Compact style={{width: '100%'}}>
+            <Input size="large" prefix={<FieldNumberOutlined />} placeholder="请输入验证码" />
+            <Captcha onCodeChange={(c) => setCode(c)} />
+          </Space.Compact>
         </Form.Item>
       )}
 
