@@ -1,11 +1,11 @@
+import type { Admin } from '@/types';
+import { FaUtils, useApiLoading } from '@fa/ui';
+import MenuLayoutContext from '@features/fa-admin-pages/layout/menu/context/MenuLayoutContext';
+import { configApi } from '@features/fa-admin-pages/services';
+import { Modal } from 'antd';
+import { each } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
 import type { Layout } from 'react-grid-layout';
-import { each } from 'lodash';
-import { ApiEffectLayoutContext, FaUtils } from '@fa/ui';
-import { configApi } from '@features/fa-admin-pages/services';
-import type { Admin } from '@/types';
-import { Modal } from 'antd';
-import MenuLayoutContext from '@features/fa-admin-pages/layout/menu/context/MenuLayoutContext';
 
 /**
  * HelloBanner.displayName = 'HelloBanner'; // 必须与方法名称一致
@@ -108,8 +108,7 @@ export function calAddLayout(cubes: CubeItem[], layout: Layout[], addId: string|
 }
 
 export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: Layout[]) {
-  const { loadingEffect } = useContext(ApiEffectLayoutContext);
-  const loading = loadingEffect[configApi.getUrl('save')] || loadingEffect[configApi.getUrl('update')];
+  const loading = useApiLoading([ configApi.getUrl('save'), configApi.getUrl('update')]);
 
   const [config, setConfig] = useState<Admin.Config<Layout[]>>();
   const [layout, setLayout] = useState<Layout[]>([]);

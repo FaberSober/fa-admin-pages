@@ -1,8 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import type { Admin } from '@/types';
 import { CheckOutlined, SearchOutlined } from '@ant-design/icons';
-import { Badge, Button, Form, Input, Modal, Space } from 'antd';
 import {
-  ApiEffectLayoutContext,
   BaseBizTable,
   BaseBoolSelector,
   BaseTableUtils,
@@ -11,17 +9,18 @@ import {
   type FaberTable,
   FaHref,
   FaUtils,
-  useTableQueryParams,
+  useApiLoading,
+  useTableQueryParams
 } from '@fa/ui';
-import type { Admin } from '@/types';
-import { msgApi } from '@features/fa-admin-pages/services';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
+import { msgApi } from '@features/fa-admin-pages/services';
+import { Badge, Button, Form, Input, Modal, Space } from 'antd';
+import { useContext, useEffect } from 'react';
 
 const serviceName = '消息';
 const biz = 'base_msg';
 
 export default function MsgList() {
-  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const { user, refreshUnreadCount } = useContext(UserLayoutContext);
   const [form] = Form.useForm();
 
@@ -99,7 +98,7 @@ export default function MsgList() {
     ] as FaberTable.ColumnsProp<Admin.Msg>[];
   }
 
-  const batchReading = loadingEffect[msgApi.getUrl('batchRead')];
+  const batchReading = useApiLoading([msgApi.getUrl('batchRead')]);
   return (
     <div className="fa-full-content fa-flex-column fa-bg-white">
       <div className="fa-flex-row-center fa-p8">

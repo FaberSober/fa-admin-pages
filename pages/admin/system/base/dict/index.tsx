@@ -1,16 +1,16 @@
-import React, { useContext, useState } from 'react';
-import { Button, Input, Splitter, Tooltip } from 'antd';
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { ApiEffectLayoutContext, BaseTree, Fa, FaEnums, FaFlexRestLayout, FaLabel } from '@fa/ui';
+import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaLabel, useApiLoading } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
-import DictModal from './modal/DictModal';
-import DictOptionsEdit from './cube/DictOptionsEdit';
 import { Admin } from "@features/fa-admin-pages/types";
-import { dispatch } from 'use-bus'
+import { Button, Input, Splitter, Tooltip } from 'antd';
+import { useState } from 'react';
+import { dispatch } from 'use-bus';
+import DictDataList from "./cube/DictDataList";
 import DictDataOptions from "./cube/DictDataOptions";
 import DictDataTree from "./cube/DictDataTree";
-import DictDataList from "./cube/DictDataList";
+import DictOptionsEdit from './cube/DictOptionsEdit';
 import './index.scss';
+import DictModal from './modal/DictModal';
 
 
 /**
@@ -19,7 +19,6 @@ import './index.scss';
  * @date 2020/12/25
  */
 export default function DictManage() {
-  const {loadingEffect} = useContext(ApiEffectLayoutContext)
   const [viewRecord, setViewRecord] = useState<Admin.Dict>();
 
   function onTreeSelect(keys: any[]) {
@@ -63,7 +62,7 @@ export default function DictManage() {
     [FaEnums.DictTypeEnum.OPTIONS]: '选择列表：dict表直接存储列表项为json数组，不关联dict_data表',
   }
 
-  const loading = loadingEffect[dictApi.getUrl('update')]
+  const loading = useApiLoading([dictApi.getUrl('update')])
   return (
     <div className="fa-full-content">
       <Splitter>

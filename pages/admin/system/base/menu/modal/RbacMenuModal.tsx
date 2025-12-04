@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { get } from 'lodash';
-import { Form, Input, Select } from 'antd';
-import { ApiEffectLayoutContext, BaseBoolRadio, type CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils } from '@fa/ui';
 import type { Rbac } from '@/types';
-import { rbacMenuApi } from '@features/fa-admin-pages/services';
-import RbacMenuCascader from '../helper/RbacMenuCascader';
+import { BaseBoolRadio, type CommonModalProps, DictEnumApiRadio, DragModal, FaEnums, FaUtils, useApiLoading } from '@fa/ui';
 import IconSelect from '@features/fa-admin-pages/components/icons/IconSelect';
 import RouteCascader from '@features/fa-admin-pages/components/route/RouteCascader';
+import { rbacMenuApi as api } from '@features/fa-admin-pages/services';
+import { Form, Input, Select } from 'antd';
+import { get } from 'lodash';
+import { useEffect, useState } from 'react';
+import RbacMenuCascader from '../helper/RbacMenuCascader';
 
 const serviceName = '菜单';
 
@@ -19,7 +19,6 @@ interface RbacMenuModalProps extends CommonModalProps<Rbac.RbacMenu> {
  * BASE-权限表实体新增、编辑弹框
  */
 export default function RbacMenuModal({ children, title, record, scope, parentId, fetchFinish, ...props }: RbacMenuModalProps) {
-  const { loadingEffect } = useContext(ApiEffectLayoutContext);
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -32,7 +31,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
 
   /** 新增Item */
   function invokeInsertTask(params: any) {
-    rbacMenuApi.save(params).then((res) => {
+    api.save(params).then((res) => {
       FaUtils.showResponse(res, `新增${serviceName}`);
       setOpen(false);
       if (fetchFinish) fetchFinish();
@@ -41,7 +40,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
 
   /** 更新Item */
   function invokeUpdateTask(params: any) {
-    rbacMenuApi.update(params.id, params).then((res) => {
+    api.update(params.id, params).then((res) => {
       FaUtils.showResponse(res, `更新${serviceName}`);
       setOpen(false);
       if (fetchFinish) fetchFinish();
@@ -85,7 +84,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
     form.setFieldsValue(getInitialValues());
   }, [record]);
 
-  const loading = loadingEffect[rbacMenuApi.getUrl('save')] || loadingEffect[rbacMenuApi.getUrl('update')];
+  const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
   return (
     <span>
       <span onClick={showModal}>{children}</span>
