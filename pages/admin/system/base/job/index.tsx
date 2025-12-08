@@ -8,7 +8,6 @@ import {
   BaseTableUtils,
   clearForm,
   type FaberTable,
-  FaHref,
   FaUtils,
   useDelete,
   useExport,
@@ -78,15 +77,14 @@ export default function JobList() {
         dataIndex: 'opr',
         render: (_: string, record: Admin.Job) => (
           <Space>
-            <Popconfirm title="确定立即执行一次该任务" onConfirm={() => handleRunOneTime(record.id)} getPopupContainer={() => document.body}>
-              <FaHref icon={<ThunderboltOutlined />} text="执行" />
+            <Popconfirm title="确定立即执行一次该任务" onConfirm={() => handleRunOneTime(record.id)}>
+              <a><ThunderboltOutlined />执行</a>
             </Popconfirm>
             <Popconfirm
               title={!record.status ? '确定启动任务?' : '确定停止任务?'}
               onConfirm={() => handleJobStatus(record)}
-              getPopupContainer={() => document.body}
             >
-              {!record.status ? <FaHref icon={<PlayCircleOutlined />} text="启动" /> : <FaHref icon={<PauseCircleOutlined />} text="停止" />}
+              {!record.status ? <a><PlayCircleOutlined />启动</a> : <a><PauseCircleOutlined />停止</a>}
             </Popconfirm>
             {!record.status && <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />}
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
