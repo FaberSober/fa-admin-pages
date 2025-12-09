@@ -1,5 +1,6 @@
 import { FaCipher } from '@fa/ui';
-import { ConfigLayoutContext, UserLayoutContext } from '@features/fa-admin-pages/layout';
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { Empty } from 'antd';
 import { CSSProperties, useContext } from 'react';
 
