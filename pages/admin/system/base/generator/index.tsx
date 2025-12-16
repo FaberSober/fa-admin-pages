@@ -86,7 +86,7 @@ export default function StudentList() {
                 </Button>
               }
               title="预览代码"
-              width={document.body.clientWidth - 44}
+              size={document.body.clientWidth - 44}
             >
               <GeneratorCodePreview tableNames={rowKeys} />
             </BaseDrawer>
