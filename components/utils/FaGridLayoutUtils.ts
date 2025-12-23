@@ -5,7 +5,7 @@ import { configApi } from '@features/fa-admin-pages/services';
 import { Modal } from 'antd';
 import { each } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
-import type { Layout } from 'react-grid-layout';
+import type { LayoutItem } from 'react-grid-layout';
 
 /**
  * HelloBanner.displayName = 'HelloBanner'; // 必须与方法名称一致
@@ -31,7 +31,7 @@ export interface CubeItem {
  * @param cubes
  */
 export function parseAllLayout(cubes: CubeItem[]) {
-  const allLayout: Layout[] = [];
+  const allLayout: LayoutItem[] = [];
   each(cubes, (k) => {
     allLayout.push({
       i: k.displayName,
@@ -44,11 +44,11 @@ export function parseAllLayout(cubes: CubeItem[]) {
   return allLayout;
 }
 
-export function useAllLayout(cubes: CubeItem[]): { allLayout: Layout[] } {
+export function useAllLayout(cubes: CubeItem[]): { allLayout: LayoutItem[] } {
   const { menuList } = useContext(MenuLayoutContext);
   const permissions = menuList.map((i) => i.linkUrl);
 
-  const allLayout: Layout[] = [];
+  const allLayout: LayoutItem[] = [];
   each(cubes, (k) => {
     if (!FaUtils.hasPermission(permissions, k.permission)) {
       return;
@@ -66,7 +66,7 @@ export function useAllLayout(cubes: CubeItem[]): { allLayout: Layout[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: CubeItem[], layout: Layout[], addId: string|number) {
+export function calAddLayout(cubes: CubeItem[], layout: LayoutItem[], addId: string|number) {
   const Component = (cubes as any)[addId];
 
   let x = 0;
@@ -107,11 +107,11 @@ export function calAddLayout(cubes: CubeItem[], layout: Layout[], addId: string|
   ];
 }
 
-export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: Layout[]) {
+export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: LayoutItem[]) {
   const loading = useApiLoading([ configApi.getUrl('save'), configApi.getUrl('update')]);
 
-  const [config, setConfig] = useState<Admin.Config<Layout[]>>();
-  const [layout, setLayout] = useState<Layout[]>([]);
+  const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
+  const [layout, setLayout] = useState<LayoutItem[]>([]);
 
   useEffect(() => {
     configApi.getOne(biz, type).then((res) => {
@@ -128,7 +128,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     });
   }, []);
 
-  function onLayoutChange(layout: Layout[]) {
+  function onLayoutChange(layout: LayoutItem[]) {
     // console.log('onLayoutChange', layout)
     if (loading) return;
     const params = {

@@ -24,7 +24,7 @@ export default function Monitor() {
     [],
   );
 
-  const { allLayout } = FaGridLayoutUtils.useAllLayout(cubes);
+  const { allLayout } = FaGridLayoutUtils.useAllLayout(cubes as any);
   const [editing, setEditing] = useState(false);
 
   const inIds: string[] = layout.map((i) => i.i);
