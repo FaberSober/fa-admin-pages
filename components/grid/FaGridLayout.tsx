@@ -1,17 +1,18 @@
 import React, { type CSSProperties, type ReactNode } from 'react';
-import { type LayoutItem, type GridLayoutProps, ReactGridLayout, useContainerWidth, verticalCompactor } from 'react-grid-layout';
+import { type LayoutItem, type GridLayoutProps, ReactGridLayout, useContainerWidth, verticalCompactor, Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 
-export interface FaGridLayoutProps extends GridLayoutProps {
-  layout: LayoutItem[];
+export interface FaGridLayoutProps extends Omit<GridLayoutProps, 'children' | 'layout' | 'width'> {
+  layout: Layout;
   renderItem: (item: LayoutItem, index: number) => ReactNode;
   itemDivStyle?: CSSProperties;
   isDraggable?: boolean;
   isResizable?: boolean;
   rowHeight?: number;
   cols?: number;
+  width?: number;
 }
 
 /**

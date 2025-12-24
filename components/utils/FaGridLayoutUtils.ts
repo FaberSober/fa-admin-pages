@@ -5,7 +5,7 @@ import { configApi } from '@features/fa-admin-pages/services';
 import { Modal } from 'antd';
 import { each } from 'lodash';
 import { useContext, useEffect, useState } from 'react';
-import type { LayoutItem } from 'react-grid-layout';
+import type { Layout, LayoutItem } from 'react-grid-layout';
 
 /**
  * HelloBanner.displayName = 'HelloBanner'; // 必须与方法名称一致
@@ -66,7 +66,7 @@ export function useAllLayout(cubes: CubeItem[]): { allLayout: LayoutItem[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: CubeItem[], layout: LayoutItem[], addId: string|number) {
+export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|number) {
   const Component = (cubes as any)[addId];
 
   let x = 0;
@@ -111,7 +111,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
   const loading = useApiLoading([ configApi.getUrl('save'), configApi.getUrl('update')]);
 
   const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
-  const [layout, setLayout] = useState<LayoutItem[]>([]);
+  const [layout, setLayout] = useState<Layout>([]);
 
   useEffect(() => {
     configApi.getOne(biz, type).then((res) => {
@@ -128,7 +128,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
     });
   }, []);
 
-  function onLayoutChange(layout: LayoutItem[]) {
+  function onLayoutChange(layout: Layout) {
     // console.log('onLayoutChange', layout)
     if (loading) return;
     const params = {
