@@ -13,17 +13,18 @@ export interface FaGridLayoutProps extends Omit<GridLayoutProps, 'children' | 'l
   rowHeight?: number;
   cols?: number;
   width?: number;
+  containerStyle?: CSSProperties;
 }
 
 /**
  * @author xu.pengfei
  * @date 2023/1/8 20:42
  */
-export function FaGridLayout({ layout, renderItem, itemDivStyle, width: outWidth, gridConfig, isDraggable, isResizable, dragConfig, resizeConfig, rowHeight = 20, cols = 24, ...props }: FaGridLayoutProps) {
+export function FaGridLayout({ layout, renderItem, itemDivStyle, width: outWidth, gridConfig, isDraggable, isResizable, dragConfig, resizeConfig, rowHeight = 20, cols = 24, containerStyle, ...props }: FaGridLayoutProps) {
   const { width, containerRef, mounted } = useContainerWidth();
 
   return (
-    <div ref={containerRef as any}>
+    <div ref={containerRef as any} style={containerStyle}>
       {mounted && (
         <ReactGridLayout
           width={width}
