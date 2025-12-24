@@ -61,7 +61,8 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
         title="角色权限设置"
         open={open}
         onClose={() => setOpen(false)}
-        width={700}
+        defaultSize={600}
+        resizable
         extra={
           <Button size="small" type="primary" onClick={handleSave} loading={loading}>
             更新
