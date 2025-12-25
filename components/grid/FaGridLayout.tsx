@@ -37,14 +37,14 @@ export function FaGridLayout({ layout, renderItem, itemDivStyle, width: outWidth
             ...gridConfig,
           }}
           dragConfig={{
-            enabled: isDraggable !== false,             // 是否启用拖拽（默认 true）
+            enabled: isDraggable ?? true,             // 是否启用拖拽（默认 true）
             // handle: '.drag-handle',    // 只允许匹配该 CSS 选择器的元素触发拖拽（等同旧版 draggableHandle）
             cancel: '.no-drag',        // 匹配该 CSS 选择器的元素及其子元素不会触发拖拽（等同旧版 draggableCancel）
             // bounded: true,          // 可选：限制拖拽边界在容器内
             ...dragConfig,
           }}
           resizeConfig={{
-            enabled: isResizable !== false,          // 是否启用调整大小（默认 true）
+            enabled: isResizable ?? true,          // 是否启用调整大小（默认 true）
             // handles: ['se'],      // 可选：调整大小的控制点位置，默认四角和边中点都有
             // minWidth: 10,        // 可选：调整大小的最小宽度
             // minHeight: 10,       // 可选：调整大小的最小高度
