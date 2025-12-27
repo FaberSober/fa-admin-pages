@@ -38,7 +38,7 @@ export default function IconSelect({ value, onChange }: IconSelectProps) {
           )}
         </div>
       </span>
-      <Drawer title="选择图标" open={open} onClose={() => setOpen(false)} width={940} styles={{ body: { display: 'flex', flexDirection: 'column' } }}>
+      <Drawer title="选择图标" open={open} onClose={() => setOpen(false)} defaultSize={940} resizable styles={{ body: { display: 'flex', flexDirection: 'column' } }}>
         <Input value={search} placeholder="搜索图标" onChange={(e) => setSearch(e.target.value)} />
         <FaFlexRestLayout>
           <FaIconSelect search={search} onChange={handleChange} />
