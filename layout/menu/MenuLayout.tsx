@@ -46,6 +46,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
 
   const [hasPermission] = useRoutePermission(menuList);
+  // const hasPermission = true;
 
   const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
