@@ -42,9 +42,9 @@ export default function AccountBase() {
     });
   }
 
-  if (userDetail === undefined) return <PageLoading />;
-
   const loading = useApiLoading([userApi.getUrl('updateMine')]);
+
+  if (userDetail === undefined) return <PageLoading />;
   return (
     <Card title="基本信息">
       <div>
