@@ -56,7 +56,7 @@ export default function Monitor() {
       <Space style={{ position: 'absolute', top: 12, right: 12 }}>
         {loading && <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />}
 
-        <BaseDrawer title="添加组件" triggerDom={<Button shape="circle" icon={<PlusOutlined />} size="small" />} bodyStyle={{ padding: 0 }}>
+        <BaseDrawer title="添加组件" triggerDom={<Button shape="circle" icon={<PlusOutlined />} size="small" />} styles={{ body: { padding: 0 } }}>
           <Space className="fa-p12">
             <Button onClick={() => onLayoutChange([])}>清空</Button>
             <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>

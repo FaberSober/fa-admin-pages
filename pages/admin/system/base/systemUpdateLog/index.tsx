@@ -40,7 +40,7 @@ export default function SystemUpdateLogList() {
         dataIndex: 'menu',
         render: (_, r) => (
           <Space>
-            <BaseDrawer triggerDom={<FaHrefView />} width={1000}>
+            <BaseDrawer triggerDom={<FaHrefView />} size={1000}>
               <SystemUpdateLogView record={r} />
             </BaseDrawer>
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />

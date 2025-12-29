@@ -74,7 +74,7 @@ export default function FileSaveList() {
         render: (_, r) => (
           <Space>
             {/*<FileSaveModal editBtn title={`编辑${serviceName}信息`} record={r} fetchFinish={fetchPageList} />*/}
-            <BaseDrawer triggerDom={<FaHref text="查看" icon={<EyeOutlined />} />} width={1000}>
+            <BaseDrawer triggerDom={<FaHref text="查看" icon={<EyeOutlined />} />} size={1000}>
               <FileSaveView item={r} />
             </BaseDrawer>
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
