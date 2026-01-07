@@ -373,9 +373,10 @@ export default function GeneratorCodePreview({ tableNames }: GeneratorCodePrevie
           <div ref={domRef} style={{ height: '100%' }}>
             {size && size.height && codeGen && (
               <Input.TextArea
-                autoSize={{ minRows: 1, maxRows: 25 }}
+                // autoSize={{ minRows: 1 }}
                 value={codeGen && codeGen.code}
                 onChange={(e) => setCodeGen({ ...codeGen, code: e.target.value })}
+                style={{ height: '100%' }}
               />
               // <MonacoEditor
               //   height={size.height}
