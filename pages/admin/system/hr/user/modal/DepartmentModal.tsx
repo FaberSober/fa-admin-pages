@@ -6,7 +6,7 @@ import { Form, Input } from 'antd';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 
-const serviceName = '';
+const serviceName = '部门';
 
 interface DepartmentModalProps extends CommonModalProps<Admin.Department> {
   parentId?: number;
