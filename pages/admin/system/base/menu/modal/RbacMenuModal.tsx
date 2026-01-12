@@ -7,6 +7,7 @@ import { Form, Input, Select } from 'antd';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import RbacMenuCascader from '../helper/RbacMenuCascader';
+import RbacFlowMenuSelect from '../helper/RbacFlowMenuSelect';
 
 const serviceName = '菜单';
 
@@ -139,7 +140,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
             {linkType === FaEnums.RbacLinkTypeEnum.INNER && <RouteCascader />}
             {linkType === FaEnums.RbacLinkTypeEnum.OUT && <Input placeholder="请输入完整的外部链接地址，如：https://www.example.com/page" />}
             {linkType === FaEnums.RbacLinkTypeEnum.PATH && <Input placeholder="请输入自定义路径，如：/custom/path" />}
-            {linkType === FaEnums.RbacLinkTypeEnum.FA_FORM && <Input placeholder="请输入自定义表单的标识，如：form-12345" />}
+            {linkType === FaEnums.RbacLinkTypeEnum.FA_FORM && <RbacFlowMenuSelect />}
           </Form.Item>
 
           <Form.Item name="icon" label="图标标识" rules={[{ required: false }]}>
