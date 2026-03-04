@@ -13,7 +13,7 @@ HelloBanner.title = '欢迎';
 HelloBanner.description = '欢迎组件';
 HelloBanner.showTitle = false; // 是否展示Card的Title
 HelloBanner.permission = ''; // 需要的权限-对应RbacMenu.linkUrl
-HelloBanner.w = 16; // 宽度-网格-max=16
+HelloBanner.w = 24; // 宽度-网格-max=24
 HelloBanner.h = 3; // 高度-每个单位20px
  */
 export interface CubeItem {
@@ -82,7 +82,7 @@ export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|nu
       y = l.y;
     }
 
-    if (tryX + Component.w > 16) {
+    if (tryX + Component.w > 24) {
       // 本行已经摆放不下了，需要摆放到下一行
       x = 0;
       y = l.y + l.h; // y的下一行位置

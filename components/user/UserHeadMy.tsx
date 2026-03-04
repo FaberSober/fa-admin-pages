@@ -1,4 +1,4 @@
-import { UserLayoutContext } from '@/layout';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import { Avatar } from 'antd';
 import React, { useContext } from 'react';

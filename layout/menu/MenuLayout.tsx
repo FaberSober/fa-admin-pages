@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Empty, Layout } from 'antd';
+import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -13,6 +13,7 @@ import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } fro
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import './MenuLayout.scss';
 import { SITE_INFO } from '@/configs';
+import MenuCollapse from './cube/MenuCollapse';
 
 
 export interface MenuLayoutProps extends Fa.BaseChildProps {
@@ -44,9 +45,12 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
+  const [tabReloadKeys, setTabReloadKeys] = useState<Record<string, number>>({}); // 每个tab的reload版本号
+
+  const [breadcrumbs, setBreadcrumbs] = useState<{title:string}[]>([])
+
 
   const [hasPermission] = useRoutePermission(menuList);
-  // const hasPermission = true;
 
   const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
@@ -82,46 +86,16 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     });
   }, []);
 
-  useEffect(() => {
-    // syncOpenMenuById(menuSelMenuId, menuFullTree);
-  }, [collapse]);
 
   function transMenuToTabItem(menu: Rbac.RbacMenu): OpenTabsItem {
     return {
       key: menu.id,
       path: menu.linkUrl,
       name: menu.name,
+      icon: menu.icon,
       closeable: true,
     };
   }
-
-  // function justSyncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[]) {
-  //   if (openMenuId === undefined) return;
-  //
-  //   const menuArr = flatTreeList(tree);
-  //   const menu = find(menuArr, (i) => i.id === openMenuId) as Rbac.RbacMenu;
-  //   if (menu === undefined) return;
-  //
-  //   // 设置选中的menuId，
-  //   setMenuSelMenuId(openMenuId);
-  //   const menuPath = findTreePath(tree, (menu) => menu.sourceData.id === openMenuId);
-  //   const [id0, ...restIds] = menuPath;
-  //
-  //   // 顶部模块同步打开位置
-  //   const blocks = tree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);
-  //   const blockFind = find(blocks, (i) => i.id === id0.id);
-  //   if (blockFind) {
-  //     setMenuSelAppId(blockFind.id);
-  //     setMenuTree(blockFind.children || []);
-  //   } else {
-  //     setMenuTree([]);
-  //   }
-  //
-  //   // sider同步打开位置
-  //   const menuIds = restIds.map((i) => i.id);
-  //   setMenuSelPath(menuIds);
-  //   setOpenSideMenuKeys(collapse ? [] : menuIds);
-  // }
 
   /**
    * 同步打开的菜单到页面布局
@@ -166,6 +140,9 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     // sider同步打开位置
     const menuIds = restIds.map((i) => i.id);
     setMenuSelPath(menuIds);
+    console.log(menuPath);
+    setBreadcrumbs(menuPath.map(m=>({title:m.name})))
+
     setOpenSideMenuKeys(collapse ? [] : menuIds);
 
     // 加入已经打开的tabs
@@ -201,7 +178,6 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       syncOpenMenuById(id, menuFullTree);
     },
     setMenuSelPath: (key: string) => {
-      // console.log('setMenuSelPath')
       syncOpenMenuById(key, menuFullTree);
     },
     setMenuSelAppId: (id) => {
@@ -225,17 +201,15 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     setOpenTabs,
     addTab: (tab1: OpenTabsItem) => {
       const newTab: OpenTabsItem = { ...tab1, linkMenuId: menuSelMenuId };
-      // console.log('add tab', newTab)
       const tabFind = find(openTabs, (i) => i.key === newTab.key); // 查找已打开的tab
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree);
       } else {
-        setOpenTabs([...openTabs, newTab]);
+        // 使用函数式更新避免 stale closure 捕获旧 openTabs
+        setOpenTabs((prev) => [...prev, newTab]);
         setCurTab(newTab);
         navigateTab(newTab);
-        setTimeout(() => {
-          syncOpenMenuById(newTab.key, menuFullTree);
-        }, 100);
+        syncOpenMenuById(newTab.key, menuFullTree);
       }
       // cache tab info
       setFaTabCache({ ...faTabCache, [newTab.path]: newTab });
@@ -248,6 +222,13 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       // console.log('selTab')
       syncOpenMenuById(tabKey, menuFullTree);
     },
+    reloadKey: tabReloadKeys[curTab?.key ?? ''] ?? 0,
+    reloadTab: (tabKey: string) => {
+      setTabReloadKeys((prev) => ({
+        ...prev,
+        [tabKey]: (prev[tabKey] ?? 0) + 1,
+      }));
+    },
   };
 
   const faUiContextValue: FaUiContextProps = {
@@ -258,11 +239,14 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   return (
     <MenuLayoutContext.Provider value={contextValue}>
       <FaUiContext.Provider value={faUiContextValue}>
-        <Layout style={{ height: '100vh', width: '100vw' }}>
+        <div style={{ height: '100vh', width: '100vw' }} className="fa-full fa-flex-column">
           <Helmet title={`${curTab ? curTab.name + ' | ' : ''}${systemConfig.title}`} />
 
-          <Layout.Header className="fa-menu-header">
+          <div className="fa-menu-header fa-border-b">
             <Logo />
+            <MenuCollapse />
+            <div style={{ flex: 1 }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <MenuAppHorizontal />
             {renderHeaderExtra && renderHeaderExtra()}
             {/*<LangToggle />*/}
@@ -270,21 +254,22 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
             <HelpCube />
             <MsgBadgeCube />
             <UserAvatar />
-          </Layout.Header>
+            </div>
+          </div>
 
-          <Layout style={{ flexDirection: 'row' }} className="fa-main-layout">
+          <FaFlexRestLayout style={{ display: 'flex', flexDirection: 'row' }}>
             <SideMenu />
 
-            <Layout style={{ width }} className="fa-main-layout-right">
-              <div className="fa-full fa-flex-column">
+            <FaFlexRestLayout >
+              <div className="fa-full fa-flex-column fa-relative">
                 {showTabs && <OpenTabs />}
                 <FaFlexRestLayout>
-                  <div className="fa-main">{hasPermission ? children : <Empty description="页面丢失了" />}</div>
+                  <div className="fa-full fa-main">{hasPermission ? <React.Fragment key={tabReloadKeys[curTab?.key ?? ''] ?? 0}>{children}</React.Fragment> : <Empty description="页面丢失了" />}</div>
                 </FaFlexRestLayout>
               </div>
-            </Layout>
-          </Layout>
-        </Layout>
+            </FaFlexRestLayout>
+          </FaFlexRestLayout>
+        </div>
       </FaUiContext.Provider>
     </MenuLayoutContext.Provider>
   );

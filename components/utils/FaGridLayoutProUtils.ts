@@ -13,7 +13,7 @@ HelloBanner.title = '欢迎';
 HelloBanner.description = '欢迎组件';
 HelloBanner.showTitle = false; // 是否展示Card的Title
 HelloBanner.permission = ''; // 需要的权限-对应RbacMenu.linkUrl
-HelloBanner.w = 16; // 宽度-网格-max=16
+HelloBanner.w = 24; // 宽度-网格-max=24
 HelloBanner.h = 3; // 高度-每个单位20px
  */
 export interface CubeItem {
