@@ -91,7 +91,7 @@ export default function MsgList({ onClose }: MsgListProps) {
         </div>
         <Space size={0}>
           <a onClick={handleReadAll}>全部已读</a>
-          <Divider type='vertical' />
+          <Divider orientation='vertical' />
           <a onClick={handleOpenMsgTag}>查看更多</a>
         </Space>
       </div>

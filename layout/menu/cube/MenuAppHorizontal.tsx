@@ -4,6 +4,7 @@ import { FaEnums, ThemeLayoutContext } from '@fa/ui';
 import { FaIcon } from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../../config/context/ConfigLayoutContext';
+import './MenuAppHorizontal.scss'
 
 /**
  * 顶部水平的菜单
