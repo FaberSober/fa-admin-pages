@@ -14,10 +14,16 @@ import { Popover } from 'antd';
  * @date 2022/9/23
  */
 export default function OpenTabs() {
-  const { openTabs, curTab, selTab } = useContext(MenuLayoutContext);
+  const { openTabs, curTab, selTab, reloadTab } = useContext(MenuLayoutContext);
   const tabsRef = useRef<HTMLDivElement>(null);
   const [contextTabKey, setContextTabKey] = React.useState<string>('');
   const { remove } = useTabOperations();
+
+  function reloadCurTab() {
+    if (curTab?.key) {
+      reloadTab(curTab.key);
+    }
+  }
 
   function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
     if (tabsRef.current) {
@@ -83,7 +89,7 @@ export default function OpenTabs() {
           <AppstoreOutlined />
         </div>
       </Popover>
-      <div className='fa-menu-tab-right-btn'>
+      <div className='fa-menu-tab-right-btn' onClick={reloadCurTab}>
         <ReloadOutlined />
       </div>
       {/* TODO 需要修改为网页内全屏，即隐藏header、menu */}

@@ -130,7 +130,7 @@ export default function UserAvatar() {
     <Popover
       placement="bottom"
       content={<UserPopoverContent />}
-      trigger="click"
+      // trigger="click"
       getPopupContainer={() => document.body}
       styles={{
         container: {

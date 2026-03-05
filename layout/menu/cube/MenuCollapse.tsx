@@ -14,7 +14,7 @@ export default function MenuCollapse({}: MenuCollapseProps) {
   const { collapse, setCollapse } = useContext(MenuLayoutContext);
 
   return (
-    <div>
+    <div className='fa-flex-center'>
       {collapse ? (
         <Button type="text" icon={<MenuUnfoldOutlined />} onClick={() => setCollapse(false)} />
       ) : (

@@ -245,15 +245,16 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
           <div className="fa-menu-header fa-border-b">
             <Logo />
             <MenuCollapse />
-            <div style={{ flex: 1 }} />
+            <div style={{ flex: 1 }}>
+              <MenuAppHorizontal />
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <MenuAppHorizontal />
-            {renderHeaderExtra && renderHeaderExtra()}
-            {/*<LangToggle />*/}
-            <WxMiniApp />
-            <HelpCube />
-            <MsgBadgeCube />
-            <UserAvatar />
+              {renderHeaderExtra && renderHeaderExtra()}
+              {/*<LangToggle />*/}
+              <WxMiniApp />
+              <HelpCube />
+              <MsgBadgeCube />
+              <UserAvatar />
             </div>
           </div>
 
