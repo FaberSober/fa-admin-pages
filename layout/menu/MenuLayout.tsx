@@ -14,6 +14,7 @@ import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import './MenuLayout.scss';
 import { SITE_INFO } from '@/configs';
 import MenuCollapse from './cube/MenuCollapse';
+import MenuRefresh from './cube/MenuRefresh';
 
 
 export interface MenuLayoutProps extends Fa.BaseChildProps {
@@ -244,8 +245,11 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
 
           <div className="fa-menu-header fa-border-b">
             <Logo />
-            <MenuCollapse />
-            <div style={{ flex: 1 }}>
+            <div className='fa-flex-row fa-gap6'>
+              <MenuCollapse />
+              <MenuRefresh />
+            </div>
+            <div style={{ flex: 1, marginLeft: 6 }}>
               <MenuAppHorizontal />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

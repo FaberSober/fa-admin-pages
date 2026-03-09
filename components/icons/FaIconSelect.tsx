@@ -3,8 +3,12 @@ import { trim } from 'lodash';
 import { Icon } from '@iconify/react';
 import mdiIcons from '@iconify-json/mdi/icons.json';
 
+// 合并 icons（有完整 body）和 aliases（别名，如 settings-outline -> cog-outline）
 // @ts-ignore
-const ICON_LIST: string[] = Object.keys(mdiIcons.icons);
+const ICON_LIST: string[] = [
+  ...Object.keys(mdiIcons.icons),
+  ...Object.keys((mdiIcons as any).aliases ?? {}),
+].sort();
 
 export interface FaIconSelectProps {
   search?: string;

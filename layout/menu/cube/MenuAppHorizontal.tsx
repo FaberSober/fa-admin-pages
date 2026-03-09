@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import { Menu } from 'antd';
-import { FaEnums, ThemeLayoutContext } from '@fa/ui';
+import { FaEnums } from '@fa/ui';
+import clsx from 'clsx';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../../config/context/ConfigLayoutContext';
 import './MenuAppHorizontal.scss'
@@ -12,7 +12,6 @@ import { FaIconPro } from '@/components';
  * @date 2022/9/23
  */
 export default function MenuAppHorizontal() {
-  const { themeDark } = useContext(ThemeLayoutContext);
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { menuFullTree, menuSelAppId, setMenuSelAppId } = useContext(MenuLayoutContext);
 
@@ -23,28 +22,29 @@ export default function MenuAppHorizontal() {
     } else {
       document.body.removeAttribute('fa-menu-theme');
     }
-  }, []);
+  }, [systemConfig.topMenuBarStyle]);
 
   const blocks = menuFullTree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);
-  const items = blocks.map((i) => ({
-    key: i.id,
-    label: i.name,
-    icon: i.sourceData.icon ? (
-      <div className="fa-flex-column-center" style={{ width: 20 }}>
-        <FaIconPro icon={i.sourceData.icon} />
-      </div>
-    ) : null,
-  }));
 
   return (
-    <Menu
-      className="fa-menu-top"
-      mode="horizontal"
-      theme={themeDark ? 'dark' : 'light'}
-      items={items}
-      selectedKeys={menuSelAppId ? [menuSelAppId] : []}
-      onSelect={({ key }) => setMenuSelAppId(key)}
-      style={{ flex: 1 }}
-    />
+    <div className="fa-menu-top-container">
+      {blocks.map(bl => {
+        const isActive = bl.id === menuSelAppId;
+        return (
+          <div
+            key={bl.id}
+            className={clsx('fa-menu-top-item', isActive && 'fa-menu-top-item-active')}
+            onClick={() => setMenuSelAppId(bl.id)}
+          >
+            {bl.sourceData.icon && (
+              <span className="fa-menu-top-item-icon">
+                <FaIconPro icon={bl.sourceData.icon} />
+              </span>
+            )}
+            <span className="fa-menu-top-item-text">{bl.name}</span>
+          </div>
+        )
+      })}
+    </div>
   );
 }

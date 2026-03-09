@@ -1,52 +1,83 @@
-.menu-app-horizontal {
+.fa-menu-top-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
   height: 100%;
-  gap: 6px;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
-  &__item {
+.fa-menu-top-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  color: var(--fa-text-color);
+  font-size: 14px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+
+  .fa-menu-top-item-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: var(--fa-text-color);
+    margin-right: 6px;
     font-size: 16px;
-    transition: all 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-    &:hover {
-      background-color: #F4F4F5;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    
+    .fa-menu-top-item-icon {
+      transform: scale(1.15);
+    }
+  }
+
+  &-active {
+    background-color: var(--primary-color) !important;
+    color: #FFF !important;
+    font-weight: 500;
+
+    .fa-menu-top-item-icon {
+      color: #FFF !important;
     }
 
-    &--active {
-      background-color: #e2e2e2;
-
-      &:hover {
-        background-color: #F4F4F5;
-      }
+    &:hover {
+      background-color: var(--primary-color) !important;
+      opacity: 0.9;
     }
   }
 }
 
-// 顶部菜单条样式-color 主题
-[fa-menu-theme=color] .menu-app-horizontal {
-  .menu-app-horizontal__item {
-    color: #fff;
+[fa-menu-theme=color] {
+  .fa-menu-top-item {
+    color: rgba(255, 255, 255, 0.85);
 
     &:hover {
       background-color: var(--primary-color-dark300);
-      color: #fff;
+      color: #FFF;
     }
 
-    &--active {
-      background-color: #fff;
-      color: var(--primary-color);
+    &-active {
+      background-color: #FFF !important;
+      color: var(--primary-color) !important;
+
+      .fa-menu-top-item-icon {
+        color: var(--primary-color) !important;
+      }
 
       &:hover {
-        background-color: var(--primary-color-light300);
-        color: #fff;
+        background-color: var(--primary-color-light300) !important;
+        color: #FFF !important;
       }
     }
   }

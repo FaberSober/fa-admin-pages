@@ -1,8 +1,8 @@
 import { FaIcon } from '@fa/icons';
-import { Icon } from '@iconify/react';
+import { Icon, IconProps } from '@iconify/react';
 import React from 'react';
 
-export interface FaIconProProps {
+export interface FaIconProProps extends IconProps {
   icon: string;
 }
 
@@ -12,7 +12,7 @@ export interface FaIconProProps {
  */
 export default function FaIconPro({ icon, ...props }: FaIconProProps) {
   if (icon.startsWith('mdi:')) {
-    return <Icon icon={icon} fontSize='18px' {...props} />
+    return <Icon icon={icon} fontSize='18px' className='' {...props} />
   }
   return (
     <FaIcon icon={icon} {...props} />
