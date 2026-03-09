@@ -5,9 +5,9 @@ import { FaFullscreenBtn } from '@fa/ui';
 import MenuLayoutContext, { type OpenTabsItem } from '../context/MenuLayoutContext';
 import './OpenTabs.scss';
 import { AppstoreOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons';
-import { FaIcon } from '@fa/icons';
 import OpenTabsMenu, { useTabOperations } from './OpenTabsMenu';
 import { Popover } from 'antd';
+import { FaIconPro } from '@/components';
 
 /**
  * @author xu.pengfei
@@ -57,7 +57,7 @@ export default function OpenTabs() {
               >
                 <div className='fa-tab-menu-item-bg'></div>
                 <div className="fa-tab-menu-item-main" onContextMenu={(e) => handleContextMenu(e, item)}>
-                  {item.icon ? <FaIcon className='fa-tab-menu-item-icon' icon={item.icon as string} /> : null}
+                  {item.icon ? <FaIconPro className='fa-tab-menu-item-icon' icon={item.icon as string} fontSize={16} /> : null}
 
                   <span>{item.name}</span>
 

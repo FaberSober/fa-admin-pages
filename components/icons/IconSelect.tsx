@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Drawer, Input, Popover, Space } from 'antd';
-import { FaFlexRestLayout } from '@fa/ui';
-import { FaIcon, FaIconSelect } from '@fa/icons';
 import { AppstoreOutlined } from '@ant-design/icons';
+import { Button, Input, Popover, Space } from 'antd';
+import { useState } from 'react';
+import FaIconPro from './FaIconPro';
+import FaIconSelect from './FaIconSelect';
 
 export interface IconSelectProps {
-  value?: any;
+  value?: string;
   onChange?: (v: string | undefined) => void;
 }
 
@@ -47,7 +47,7 @@ export default function IconSelect({ value, onChange }: IconSelectProps) {
               onOpenChange={setOpen}
             >
               <Button
-                icon={value ? <FaIcon icon={value} /> : <AppstoreOutlined />}
+                icon={value ? <FaIconPro icon={value} /> : <AppstoreOutlined />}
               />
             </Popover>
           </Space.Compact>

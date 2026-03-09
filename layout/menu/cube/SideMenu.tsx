@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { Menu } from 'antd';
 import { isNil } from 'lodash';
 import { type Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
-import { FaIcon } from '@fa/icons';
 import type { Rbac } from '@/types';
 import MenuLayoutContext from '../context/MenuLayoutContext';
+import { FaIconPro } from '@/components';
 
 /**
  * @author xu.pengfei
@@ -23,7 +23,7 @@ export default function SideMenu() {
       children: loop(i.children),
       icon: i.sourceData.icon ? (
         <div className="fa-flex-column-center" style={{ width: 14, display: 'inline-block' }}>
-          <FaIcon icon={i.sourceData.icon} />
+          <FaIconPro icon={i.sourceData.icon} />
         </div>
       ) : null,
     }));

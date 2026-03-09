@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react';
 import { Menu } from 'antd';
 import { FaEnums, ThemeLayoutContext } from '@fa/ui';
-import { FaIcon } from '@fa/icons';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../../config/context/ConfigLayoutContext';
 import './MenuAppHorizontal.scss'
+import { FaIconPro } from '@/components';
 
 /**
  * 顶部水平的菜单
@@ -31,7 +31,7 @@ export default function MenuAppHorizontal() {
     label: i.name,
     icon: i.sourceData.icon ? (
       <div className="fa-flex-column-center" style={{ width: 20 }}>
-        <FaIcon icon={i.sourceData.icon} />
+        <FaIconPro icon={i.sourceData.icon} />
       </div>
     ) : null,
   }));

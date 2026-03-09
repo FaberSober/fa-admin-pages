@@ -80,6 +80,9 @@
   .ant-menu-item {
     color: var(--fa-text-color) !important;
     padding-right: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 
   .ant-menu-item-selected {

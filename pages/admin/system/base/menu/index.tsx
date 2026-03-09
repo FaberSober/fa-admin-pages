@@ -1,6 +1,6 @@
+import { FaIconPro } from '@/components';
 import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
-import { FaIcon } from '@fa/icons';
 import { AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import { Button, Segmented, Space, Switch, Tag } from 'antd';
@@ -83,7 +83,7 @@ export default function Menu() {
           titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
             <div className="fa-menu-item">
               <div style={{ flex: 1 }} onClick={() => FaUtils.copyToClipboard(item.name)}>{item.name}</div>
-              <div style={{ width: 30 }}>{item.sourceData.icon ? <FaIcon icon={item.sourceData.icon} /> : null}</div>
+              <div style={{ width: 30 }} className='fa-flex-center'>{item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : null}</div>
               <div style={{ width: 100 }} onClick={() => FaUtils.copyToClipboard(item.sourceData.id)}>{item.sourceData.id}</div>
               <div className="fa-plr12">
                 {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && <Tag color="#f50">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>}
