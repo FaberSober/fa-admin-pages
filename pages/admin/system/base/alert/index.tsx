@@ -73,7 +73,7 @@ export default function AlertList() {
 
       {/* 查询表单区域 */}
       <div className='fa-bg-white fa-flex-column fa-flex-1'>
-        <div style={{ padding: '0 12px 12px 12px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ padding: 12, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
             <Form.Item name="content" label="告警内容">
               <Input placeholder="请输入告警内容" allowClear />
