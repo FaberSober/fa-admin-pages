@@ -99,7 +99,7 @@ export default function LogApiList() {
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-bg-white">
+    <div className="fa-full-content-p12 fa-flex-column fa-bg-white">
       <SearchGrid
         form={form}
         onFinish={setFormValues}

@@ -58,7 +58,7 @@ export default function JobList() {
       {
         ...BaseTableUtils.genSimpleSorterColumn('任务名称', 'jobName', 240, sorter),
         render: (val, record) => (
-          <BaseDrawer triggerDom={<a>{val}</a>}>
+          <BaseDrawer triggerDom={<a>{val}</a>} size={1000}>
             <JobLogList jobId={record.id} />
           </BaseDrawer>
         ),
@@ -99,7 +99,7 @@ export default function JobList() {
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-bg-white">
+    <div className="fa-full-content-p12 fa-flex-column fa-bg-white">
       <div className="fa-flex-row-center fa-p8">
         <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>

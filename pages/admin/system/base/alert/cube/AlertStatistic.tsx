@@ -68,8 +68,8 @@ export default function AlertStatistic() {
   ];
 
   return (
-    <div className="fa-p12">
-      <Row gutter={[24, 0]} justify="center">
+    <div className="">
+      <Row gutter={[12, 0]} justify="center">
         {statisticCards.map((item, index) => (
           <Col xs={24} sm={12} md={6} key={index} style={{padding: '0 12px'}}>
             <Card style={{borderRadius: 10}} hoverable className="fa-box-shadow">
