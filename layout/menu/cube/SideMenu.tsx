@@ -5,6 +5,7 @@ import { type Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
 import type { Rbac } from '@/types';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import { FaIconPro } from '@/components';
+import './SideMenu.scss'
 
 /**
  * @author xu.pengfei
@@ -22,7 +23,7 @@ export default function SideMenu() {
       label: i.name,
       children: loop(i.children),
       icon: i.sourceData.icon ? (
-        <div className="fa-flex-column-center" style={{ width: 14, display: 'inline-block' }}>
+        <div className="fa-flex-column-center" style={{ }}>
           <FaIconPro icon={i.sourceData.icon} />
         </div>
       ) : null,
