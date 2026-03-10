@@ -4,7 +4,7 @@ import { isNil } from 'lodash';
 import { type Fa, FaEnums, SiderLayout, treeUtils } from '@fa/ui';
 import type { Rbac } from '@/types';
 import MenuLayoutContext from '../context/MenuLayoutContext';
-import { FaIconPro } from '@/components';
+import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import './SideMenu.scss'
 
 /**

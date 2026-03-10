@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../../config/context/ConfigLayoutContext';
 import './MenuAppHorizontal.scss'
-import { FaIconPro } from '@/components';
+import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 
 /**
  * 顶部水平的菜单

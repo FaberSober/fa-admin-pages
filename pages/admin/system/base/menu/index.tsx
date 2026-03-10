@@ -1,4 +1,4 @@
-import { FaIconPro } from '@/components';
+import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
 import { AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useApiLoading, useDelete } from '@fa/ui';
