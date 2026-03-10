@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { FaEnums, ThemeLayoutContext } from '@fa/ui';
 import type { Rbac } from '@/types';
@@ -107,8 +108,8 @@ export default function MenuSearch() {
         </span>
       </div>
 
-      {/* 搜索弹窗遮罩 */}
-      {open && (
+      {/* 搜索弹窗遮罩 - Portal 挂载到 body，脱离父级 stacking context */}
+      {open && createPortal(
         <div className="menu-search-mask" onClick={handleClose}>
           <div className="menu-search-modal" onClick={(e) => e.stopPropagation()}>
             {/* 搜索框 */}
@@ -186,7 +187,7 @@ export default function MenuSearch() {
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }
