@@ -15,6 +15,7 @@ import './MenuLayout.scss';
 import { SITE_INFO } from '@/configs';
 import MenuCollapse from './cube/MenuCollapse';
 import MenuRefresh from './cube/MenuRefresh';
+import MenuSearch from './cube/MenuSearch';
 
 
 export interface MenuLayoutProps extends Fa.BaseChildProps {
@@ -253,6 +254,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
               <MenuAppHorizontal />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <MenuSearch />
               {renderHeaderExtra && renderHeaderExtra()}
               {/*<LangToggle />*/}
               <WxMiniApp />
