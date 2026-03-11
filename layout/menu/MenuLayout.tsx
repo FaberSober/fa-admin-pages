@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { rbacUserRoleApi } from '@features/fa-admin-pages/services';
 import useRoutePermission from '../../hooks/useRoutePermission';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
+import UserLayoutContext from '../user/context/UserLayoutContext';
 import './MenuLayout.scss';
 import { SITE_INFO } from '@/configs';
 import MenuCollapse from './cube/MenuCollapse';
@@ -31,6 +32,10 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const navigate = useNavigate();
   const location = useLocation();
   const { systemConfig } = useContext(ConfigLayoutContext);
+  const { user } = useContext(UserLayoutContext);
+
+  // 以用户id为维度的 localStorage key，保证多账户隔离
+  const openTabsCacheKey = useMemo(() => `fa-open-tabs-${user?.id || 'guest'}`, [user?.id]);
 
   // 将tree平铺的menu list
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);
@@ -45,7 +50,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [collapse, setCollapse] = useLocalStorage<boolean>('MenuLayout.collapse', false); // 是否折叠左侧菜单
   const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS || true); // 是否展示标签栏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
-  const [openTabs, setOpenTabs] = useState<OpenTabsItem[]>([]); // 受控-打开的标签页数组
+  const [openTabs, setOpenTabs] = useLocalStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-打开的标签页数组（localStorage缓存，按用户id隔离）
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
   const [tabReloadKeys, setTabReloadKeys] = useState<Record<string, number>>({}); // 每个tab的reload版本号
 
@@ -73,9 +78,9 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
           // console.log('faTabCache', faTabCache)
           const cacheTabItem = faTabCache[location.pathname];
           if (!isNil(cacheTabItem)) {
-            const itemFind = find(openTabs, (i) => i.key === cacheTabItem.key);
+            const itemFind = find(openTabs || [], (i) => i.key === cacheTabItem.key);
             if (isNil(itemFind)) {
-              setOpenTabs([...openTabs, cacheTabItem]);
+              setOpenTabs([...(openTabs || []), cacheTabItem]);
             }
             setCurTab(cacheTabItem);
             navigateTab(cacheTabItem);
@@ -112,7 +117,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     const menu = find(menuArr, (i) => i.id === openMenuId) as Rbac.RbacMenu;
     if (menu === undefined) {
       // 未找到对应的菜单，说明不是菜单页，是新开的自定义tab，无需同步菜单
-      const tabItem = find(openTabs, (i) => i.key === openMenuId);
+      const tabItem = find(openTabs || [], (i) => i.key === openMenuId);
       setCurTab(tabItem);
       if (tabItem) {
         navigateTab(tabItem);
@@ -148,10 +153,10 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     setOpenSideMenuKeys(collapse ? [] : menuIds);
 
     // 加入已经打开的tabs
-    const tab = find(openTabs, (i) => i.key === menu.id);
+    const tab = find(openTabs || [], (i) => i.key === menu.id);
     if (isNil(tab)) {
       const tabItem = transMenuToTabItem(menu);
-      setOpenTabs([...openTabs, tabItem]);
+      setOpenTabs([...(openTabs || []), tabItem]);
       setCurTab(tabItem);
     } else {
       setCurTab(tab);
@@ -194,7 +199,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     setOpenSideMenuKeys,
     showTabs,
     setShowTabs,
-    openTabs,
+    openTabs: openTabs || [],
     curTab,
     setCurTab: (tab: OpenTabsItem | undefined) => {
       // console.log('setCurTab')
@@ -203,12 +208,12 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     setOpenTabs,
     addTab: (tab1: OpenTabsItem) => {
       const newTab: OpenTabsItem = { ...tab1, linkMenuId: menuSelMenuId };
-      const tabFind = find(openTabs, (i) => i.key === newTab.key); // 查找已打开的tab
+      const tabFind = find(openTabs || [], (i) => i.key === newTab.key); // 查找已打开的tab
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree);
       } else {
         // 使用函数式更新避免 stale closure 捕获旧 openTabs
-        setOpenTabs((prev) => [...prev, newTab]);
+        setOpenTabs((prev) => [...(prev || []), newTab]);
         setCurTab(newTab);
         navigateTab(newTab);
         syncOpenMenuById(newTab.key, menuFullTree);
@@ -218,7 +223,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     },
     removeTab: (tabKey: string) => {
       // console.log('close tab', tabKey)
-      setOpenTabs(openTabs.filter((i) => i.key !== tabKey));
+      setOpenTabs((openTabs || []).filter((i) => i.key !== tabKey));
     },
     selTab: (tabKey: string) => {
       // console.log('selTab')
