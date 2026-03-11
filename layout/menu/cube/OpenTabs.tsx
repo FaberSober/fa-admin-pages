@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Menu, useContextMenu } from 'react-contexify';
 import 'react-contexify/ReactContexify.css';
 import { FaFullscreenBtn } from '@fa/ui';
@@ -18,6 +18,15 @@ export default function OpenTabs() {
   const tabsRef = useRef<HTMLDivElement>(null);
   const [contextTabKey, setContextTabKey] = React.useState<string>('');
   const { remove } = useTabOperations();
+
+  // 切换 tab 时，丝滑滚动使当前激活的标签进入视野
+  useEffect(() => {
+    if (!curTab?.key || !tabsRef.current) return;
+    const activeEl = tabsRef.current.querySelector<HTMLDivElement>('.fa-tab-menu-item.active');
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+  }, [curTab?.key]);
 
   function reloadCurTab() {
     if (curTab?.key) {
@@ -42,7 +51,7 @@ export default function OpenTabs() {
     show({ event, props });
   }
 
-  console.log('openTabs', openTabs, 'curTab', curTab)
+  // console.log('openTabs', openTabs, 'curTab', curTab)
   return (
     <div className="fa-menu-open-tabs fa-border-b">
       <div ref={tabsRef} className='fa-flex-1 fa-full-h fa-menu-top' style={{paddingTop: 3}} onWheel={handleWheel}>
