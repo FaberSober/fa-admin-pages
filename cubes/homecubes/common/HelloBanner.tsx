@@ -31,7 +31,7 @@ export function HelloBanner() {
       <div className="fa-admin-hello-banner__left">
         <Avatar
           className="fa-admin-hello-banner__avatar"
-          size={46}
+          size={66}
           src={<img src={fileSaveApi.genLocalGetFilePreview(user.img)} alt={user.name} />}
         >
           {user.name?.charAt(0)}

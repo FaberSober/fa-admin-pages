@@ -229,3 +229,12 @@
     margin: 4px 0;
   }
 }
+
+[data-theme=dark] {
+  .fa-tab-menu-item {
+    &.active {
+      background-color: #2a2d2f;
+      color: #fff;
+    }
+  }
+}
