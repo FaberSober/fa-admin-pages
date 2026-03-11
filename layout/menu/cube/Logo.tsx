@@ -16,7 +16,10 @@ export default function Logo() {
     <Link 
       to={SITE_INFO.HOME_LINK} 
       className="fa-menu-logo"
-      style={{ width: collapse ? 44 : 200 }}
+      style={{ 
+        // width: collapse ? 44 : undefined,
+        // minWidth: collapse ? 44 : 200,
+      }}
     >
       <img src={fileSaveApi.genLocalGetFile(systemConfig.logo)} alt="logo" className="fa-menu-logo-img" />
       {!collapse && <span className="fa-menu-logo-title">{systemConfig.title}</span>}
