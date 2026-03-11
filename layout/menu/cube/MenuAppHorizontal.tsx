@@ -15,14 +15,14 @@ export default function MenuAppHorizontal() {
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { menuFullTree, menuSelAppId, setMenuSelAppId } = useContext(MenuLayoutContext);
 
-  useEffect(() => {
-    // 设置-顶部菜单条样式
-    if (systemConfig.topMenuBarStyle === 'color') {
-      document.body.setAttribute('fa-menu-theme', 'color');
-    } else {
-      document.body.removeAttribute('fa-menu-theme');
-    }
-  }, [systemConfig.topMenuBarStyle]);
+  // useEffect(() => {
+  //   // 设置-顶部菜单条样式
+  //   if (systemConfig.topMenuBarStyle === 'color') {
+  //     document.body.setAttribute('fa-menu-theme', 'color');
+  //   } else {
+  //     document.body.removeAttribute('fa-menu-theme');
+  //   }
+  // }, [systemConfig.topMenuBarStyle]);
 
   const blocks = menuFullTree.filter((i) => i.sourceData.level === FaEnums.RbacMenuLevelEnum.APP);
 
