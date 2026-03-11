@@ -23,7 +23,7 @@
 }
 
 .fa-user-avatar:hover {
-  background-color: #F4F4F5;
+  background-color: var(--fa-bg-color-hover);
 }
 
 .fa-user-online-badge {
@@ -32,7 +32,7 @@
   height: 12px;
   border-radius: 50%;
   background-color: #52C41A;
-  border: 2px solid #fff;
+  border: 2px solid var(--fa-bg-color);
 }
 
 .fa-user-avatar-big {

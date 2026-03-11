@@ -127,7 +127,7 @@
   background-color: var(--primary-color) !important;
 
   .ant-menu-item-selected {
-    background-color: #fff;
+    background-color: var(--fa-bg-color) !important;
     //border-radius: 0 !important;
     color: var(--primary-color) !important;
   }
@@ -209,7 +209,7 @@
   transition-timing-function: cubic-bezier(.4, 0, .2, 1);
 
   &:hover {
-    background-color: #F4F4F5;
+    background-color: var(--fa-bg-color-hover);
 
     svg {
       animation: shrink 0.3s ease-in-out;

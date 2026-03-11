@@ -35,7 +35,7 @@
   }
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: var(--fa-bg-color-hover);
     
     .fa-menu-top-item-icon {
       transform: scale(1.15);
@@ -68,7 +68,7 @@
     }
 
     &-active {
-      background-color: #FFF !important;
+      background-color: var(--fa-bg-color) !important;
       color: var(--primary-color) !important;
 
       .fa-menu-top-item-icon {

@@ -17,6 +17,8 @@ import { SITE_INFO } from '@/configs';
 import MenuCollapse from './cube/MenuCollapse';
 import MenuRefresh from './cube/MenuRefresh';
 import MenuSearch from './cube/MenuSearch';
+import FullScreenToggle from './cube/FullScreenToggle';
+import ThemeToggle from './cube/ThemeToggle';
 
 
 export interface MenuLayoutProps extends Fa.BaseChildProps {
@@ -264,6 +266,8 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
               {/*<LangToggle />*/}
               <WxMiniApp />
               <HelpCube />
+              <ThemeToggle />
+              <FullScreenToggle />
               <MsgBadgeCube />
               <UserAvatar />
             </div>

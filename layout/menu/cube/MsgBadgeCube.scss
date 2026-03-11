@@ -12,7 +12,7 @@
   position: relative;
 
   &:hover {
-    background-color: #F4F4F5;
+    background-color: var(--fa-bg-color-hover);
 
     svg {
       animation: bell-ring 1s both;

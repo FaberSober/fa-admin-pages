@@ -1,5 +1,5 @@
 .ant-tabs-card >.ant-tabs-nav .ant-tabs-tab {
-  background-color: #fff !important;
+  background-color: var(--fa-bg-color) !important;
   border-top-left-radius: 6px !important;
   border-top-right-radius: 6px !important;
   position: relative !important;
@@ -42,11 +42,7 @@
 }
 
 .fa-menu-open-tabs .ant-tabs-tab-active {
-  background: #FFF !important;
-}
-
-[data-theme=dark] .fa-menu-open-tabs .ant-tabs-tab-active {
-  background: var(--fa-bg-selected) !important;
+  background: var(--fa-bg-color) !important;
 }
 
 .fa-menu-open-tabs .ant-tabs-nav::before {
@@ -73,7 +69,7 @@
 }
 
 .fa-menu-open-tabs .ant-tabs-tab-remove:hover {
-  background: #ccc;
+  background: var(--fa-bg-color-hover);
 }
 
 .fa-open-tabs-item-title-div {
@@ -167,7 +163,7 @@
   right: 0;
   bottom: 3px;
   z-index: 0;
-  background-color: #f4f4f5;
+  background-color: var(--fa-bg-color-hover);
   border-radius: 4px;
 }
 
@@ -181,7 +177,7 @@
   border-radius: 8px;
 
   &:hover {
-    background-color: #f4f4f5;
+    background-color: var(--fa-bg-color-hover);
   }
 }
 
