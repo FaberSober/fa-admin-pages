@@ -104,7 +104,7 @@ export default function OpenTabs() {
       {/* TODO 需要修改为网页内全屏，即隐藏header、menu */}
       <FaFullscreenBtn target={document.body} style={{ width: 37, height: 37, borderRadius: 0, borderLeft: '1px solid var(--fa-border-color)' }} />
 
-      <Menu id="menu_context_tab_item" className="fa-border" style={{minWidth: 180, zIndex: 9999}}>
+      <Menu id="menu_context_tab_item" className="fa-border fa-tabs-context-menu" style={{minWidth: 180, zIndex: 9999}}>
         <OpenTabsMenu targetTabKey={contextTabKey} />
       </Menu>
     </div>
