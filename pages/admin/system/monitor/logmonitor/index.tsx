@@ -19,6 +19,7 @@ export default function LogMonitor() {
   const [isTail, setIsTail] = useState(true);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastScrollTopRef = useRef<number>(0);
 
   useEffect(() => {
     fetchTree();
@@ -33,13 +34,27 @@ export default function LogMonitor() {
     }
   };
 
-  useEffect(() => {
-    if (!isTail) return;
-    
-    // Use a small timeout to ensure DOM has updated
+  const toBottom = () => {
     const timer = setTimeout(scrollToBottom, 50);
-    return () => clearTimeout(timer);
-  }, [logs, isTail]);
+  }
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+
+    // Detect if scrolling up
+    if (scrollTop < lastScrollTopRef.current) {
+      setIsTail(false);
+    }
+
+    // Detect if scrolled to bottom (with some buffer)
+    if (scrollHeight - scrollTop - clientHeight < 10) {
+      setIsTail(true);
+    }
+
+    lastScrollTopRef.current = scrollTop;
+  };
 
   // WebSocket message handler
   useBus(
@@ -47,9 +62,12 @@ export default function LogMonitor() {
     ({ channel, payload }: any) => {
       if (channel === selectedFile) {
         setLogs((prev) => [...prev, payload]);
+        if (isTail) {
+          toBottom();
+        }
       }
     },
-    [selectedFile]
+    [selectedFile, isTail]
   );
 
   const fetchTree = async () => {
@@ -78,10 +96,12 @@ export default function LogMonitor() {
       }
 
       setSelectedFile(filePath);
+      setIsTail(true);
       setLoading(true);
       try {
         const res = await logMonitorApi.readLogFile(filePath, 200);
         setLogs(res.data);
+        toBottom()
         
         // Start new tail
         sendMessage({ type: 'log-tail', data: { action: 'start', filePath } });
@@ -99,6 +119,7 @@ export default function LogMonitor() {
 
   const handleViewAll = async () => {
     if (selectedFile) {
+      setIsTail(true);
       setLoading(true);
       try {
         // Read 10,000 lines as "all" for safety, or increase as needed
@@ -157,6 +178,7 @@ export default function LogMonitor() {
         <div
           ref={scrollRef}
           className="fa-log-monitor-container fa-full-content"
+          onScroll={handleScroll}
         >
           {logs.length > 0 ? (
             logs.map((log, index) => (
