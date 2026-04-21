@@ -657,6 +657,46 @@ namespace Admin {
     usableSpace: number;
   }
 
+  // -------------------------------------------- 系统-Redis --------------------------------------------
+  export interface RedisOverview {
+    dbSize: number;
+    redisPrefix: string;
+  }
+
+  export interface RedisKeyItem {
+    key: string;
+    type: string;
+    ttlSeconds?: number;
+    persistent: boolean;
+    size: number;
+    summary: string;
+  }
+
+  export interface RedisKeyList {
+    keyword?: string;
+    pattern: string;
+    limit: number;
+    truncated: boolean;
+    items: RedisKeyItem[];
+  }
+
+  export interface RedisKeyDetailEntry {
+    index?: number;
+    field?: string;
+    value: string;
+    score?: number;
+  }
+
+  export interface RedisKeyDetail {
+    key: string;
+    type: string;
+    ttlSeconds?: number;
+    persistent: boolean;
+    size: number;
+    valueText?: string;
+    entries?: RedisKeyDetailEntry[];
+  }
+
   /** BASE-系统-新闻 */
   export interface SysNews extends Fa.BaseDelEntity {
     /** ID */
