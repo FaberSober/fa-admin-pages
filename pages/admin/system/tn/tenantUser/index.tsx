@@ -4,7 +4,7 @@ import { Button, Form, Space } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
-  BaseBoolRadio,
+  BaseBoolSelector,
   BaseTableUtils,
   clearForm,
   type FaberTable,
@@ -59,7 +59,7 @@ export default function TenantUserList() {
 
   return (
     <div className="fa-full-content-p12 fa-flex-column fa-content">
-      <div className="fa-flex-row-center fa-p8">
+      <div className="fa-flex-row-center fa-p8 fa-search-form">
         <div className="fa-h3">{serviceName}</div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <Form form={form} layout="inline" onFinish={setFormValues}>
@@ -70,7 +70,7 @@ export default function TenantUserList() {
               <UserSearchSelect />
             </Form.Item>
             <Form.Item name="status" label="状态">
-              <BaseBoolRadio />
+              <BaseBoolSelector />
             </Form.Item>
             <Space>
               <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
