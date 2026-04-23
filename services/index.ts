@@ -25,7 +25,11 @@ export { default as systemUpdateLogApi } from './base/admin/systemUpdateLog';
 export { default as userApi } from './base/admin/user';
 export { default as userDeviceApi } from './base/admin/userDevice';
 export { default as userTokenApi } from './base/admin/userToken';
-export { default as logMonitorApi } from './admin/system/logMonitor';
+export { default as logMonitorApi } from './base/system/logMonitor';
+
+// ------------------------------------- Tenant -------------------------------------
+export { default as tenantApi } from './base/tn/tenant';
+export { default as tenantUserApi } from './base/tn/tenantUser';
 
 // ------------------------------------- Rbac -------------------------------------
 export { default as rbacMenuApi } from './base/rbac/rbacMenu';
