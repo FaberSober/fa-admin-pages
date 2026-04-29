@@ -4,7 +4,7 @@ import { BaseBoolRadio, type CommonModalProps, DragModal, FaHref, FaUtils, useAp
 import { Button, Form, Input, InputNumber } from 'antd';
 import { get } from 'lodash';
 import { tenantUserApi as api } from '@features/fa-admin-pages/services';
-import { TenantSearchSelect, UserSearchSelect } from '@features/fa-admin-pages/components/helper';
+import { AllUserSearchSelect, TenantSearchSelect } from '@features/fa-admin-pages/components/helper';
 import type { Tn } from '@/types';
 
 const serviceName = '租户用户关联';
@@ -74,7 +74,7 @@ export default function TenantUserModal({ children, title, record, fetchFinish, 
             <TenantSearchSelect />
           </Form.Item>
           <Form.Item name="userId" label="用户" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <UserSearchSelect />
+            <AllUserSearchSelect />
           </Form.Item>
           <Form.Item name="isAdmin" label="租户管理员" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />

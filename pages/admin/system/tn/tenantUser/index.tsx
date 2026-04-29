@@ -14,7 +14,7 @@ import {
 } from '@fa/ui';
 import type { Tn } from '@/types';
 import { tenantUserApi } from '@features/fa-admin-pages/services';
-import { TenantSearchSelect, UserSearchSelect } from '@features/fa-admin-pages/components/helper';
+import { AllUserSearchSelect, TenantSearchSelect } from '@features/fa-admin-pages/components/helper';
 import TenantUserModal from './modal/TenantUserModal';
 
 const serviceName = '租户用户关联';
@@ -67,7 +67,7 @@ export default function TenantUserList() {
               <TenantSearchSelect />
             </Form.Item>
             <Form.Item name="userId" label="用户">
-              <UserSearchSelect />
+              <AllUserSearchSelect />
             </Form.Item>
             <Form.Item name="status" label="状态">
               <BaseBoolSelector />
