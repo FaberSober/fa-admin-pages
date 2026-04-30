@@ -35,6 +35,10 @@ namespace Rbac {
     remarks: string;
     /** 是否启用 */
     status: boolean;
+    /** 是否全局角色 */
+    global: boolean;
+    /** 租户ID */
+    tenantId: string;
   }
 
   /** BASE-角色权限对应表 */

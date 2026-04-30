@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
+import { Button, Form, Input, Space, Tag } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import type { Rbac } from '@/types';
 import { rbacRoleApi } from '@features/fa-admin-pages/services';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import RbacRoleModal from './modal/RbacRoleModal';
 import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
 import RbacUserRoleList from './list/RbacUserRoleList';
@@ -13,6 +14,7 @@ const biz = 'base_rbac_role';
 
 export default function RbacRoleList() {
   const [form] = Form.useForm();
+  const { user, selectedTenant } = useContext(UserLayoutContext);
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Rbac.RbacRole>(rbacRoleApi.page, { sorter: { field: 'crtTime', order: 'descend' } }, serviceName);
@@ -20,12 +22,31 @@ export default function RbacRoleList() {
   const [handleDelete] = useDelete<string>(rbacRoleApi.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(rbacRoleApi.exportExcel, queryParams);
 
+  function isGlobalRole(record: Rbac.RbacRole) {
+    return record.global === true || !record.tenantId;
+  }
+
+  function canManageRole(record: Rbac.RbacRole) {
+    return user.superAdmin || (!isGlobalRole(record) && selectedTenant?.isAdmin && record.tenantId === selectedTenant.tenantId);
+  }
+
+  function canCreateRole() {
+    return user.superAdmin || selectedTenant?.isAdmin;
+  }
+
   /** 生成表格字段List */
   function genColumns() {
     const { sorter } = queryParams;
     return [
       BaseTableUtils.genSimpleSorterColumn('角色名称', 'name', 200, sorter),
       BaseTableUtils.genSimpleSorterColumn('角色描述', 'remarks', undefined, sorter),
+      {
+        title: '角色范围',
+        dataIndex: 'global',
+        render: (_, record) => (isGlobalRole(record) ? <Tag color="blue">全局角色</Tag> : <Tag color="green">租户角色</Tag>),
+        width: 100,
+      },
+      BaseTableUtils.genSimpleSorterColumn('租户ID', 'tenantId', 180, sorter),
       BaseTableUtils.genBoolSorterColumn('是否启用', 'status', 100, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
       ...BaseTableUtils.genUpdateColumns(sorter),
@@ -34,14 +55,18 @@ export default function RbacRoleList() {
         dataIndex: 'opr',
         render: (_, record) => (
           <Space>
-            <RbacRoleModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
-            <RbacRoleMenuDrawer record={record}>
-              <FaHref icon={<UnorderedListOutlined />} text="权限" />
-            </RbacRoleMenuDrawer>
-            <BaseDrawer title="角色用户列表" triggerDom={<FaHref icon={<UsergroupAddOutlined />} text="用户" />}>
-              <RbacUserRoleList rbacRole={record} />
-            </BaseDrawer>
-            <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+            {canManageRole(record) && (
+              <>
+                <RbacRoleModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
+                <RbacRoleMenuDrawer record={record}>
+                  <FaHref icon={<UnorderedListOutlined />} text="权限" />
+                </RbacRoleMenuDrawer>
+                <BaseDrawer title="角色用户列表" triggerDom={<FaHref icon={<UsergroupAddOutlined />} text="用户" />}>
+                  <RbacUserRoleList rbacRole={record} />
+                </BaseDrawer>
+                <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+              </>
+            )}
           </Space>
         ),
         width: 230,
@@ -67,7 +92,7 @@ export default function RbacRoleList() {
                 查询
               </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
-              <RbacRoleModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+              {canCreateRole() && <RbacRoleModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />}
               <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
                 导出
               </Button>

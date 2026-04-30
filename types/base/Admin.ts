@@ -329,6 +329,8 @@ namespace Admin {
     workStatus: FaEnums.UserWorkStatusEnum;
     /** 最后在线时间 */
     lastOnlineTime: string;
+    /** 是否超级管理员 */
+    superAdmin: boolean;
     // ------------- show cols -------------
     /** 部门名称  */
     departmentName: string;

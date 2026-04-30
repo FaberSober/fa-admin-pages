@@ -4,7 +4,8 @@ import { BaseBoolRadio, type CommonModalProps, DragModal, FaHref, FaUtils, useAp
 import { rbacRoleApi as api } from '@features/fa-admin-pages/services';
 import { Button, Form, Input } from 'antd';
 import { get } from 'lodash';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 
 const serviceName = '';
 
@@ -13,6 +14,7 @@ const serviceName = '';
  */
 export default function RbacRoleModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Rbac.RbacRole>) {
   const [form] = Form.useForm();
+  const { user, selectedTenant } = useContext(UserLayoutContext);
 
   const [open, setOpen] = useState(false);
 
@@ -38,6 +40,8 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
   function onFinish(fieldsValue: any) {
     const values = {
       ...fieldsValue,
+      global: user.superAdmin ? fieldsValue.global : false,
+      tenantId: user.superAdmin && fieldsValue.global ? undefined : record?.tenantId || selectedTenant?.tenantId,
       // birthday: getDateStr000(fieldsValue.birthday),
     };
     if (record) {
@@ -52,6 +56,7 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
       name: get(record, 'name'),
       remarks: get(record, 'remarks'),
       status: get(record, 'status', true),
+      global: record ? get(record, 'global') ?? !get(record, 'tenantId') : false,
     };
   }
 
@@ -83,6 +88,11 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
           <Form.Item name="status" label="是否启用" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />
           </Form.Item>
+          {user.superAdmin && (
+            <Form.Item name="global" label="是否全局角色" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+              <BaseBoolRadio />
+            </Form.Item>
+          )}
         </Form>
       </DragModal>
     </span>
