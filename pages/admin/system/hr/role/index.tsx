@@ -12,6 +12,12 @@ import RbacUserRoleList from './list/RbacUserRoleList';
 const serviceName = '';
 const biz = 'base_rbac_role';
 
+const ROLE_TYPE_OPTIONS = [
+  { value: 1, label: '全局超管', color: 'red' },
+  { value: 2, label: '全局', color: 'blue' },
+  { value: 3, label: '租户', color: 'green' },
+] as const;
+
 export default function RbacRoleList() {
   const [form] = Form.useForm();
   const { user, selectedTenant } = useContext(UserLayoutContext);
@@ -22,12 +28,17 @@ export default function RbacRoleList() {
   const [handleDelete] = useDelete<string>(rbacRoleApi.remove, fetchPageList, serviceName);
   const [exporting, fetchExportExcel] = useExport(rbacRoleApi.exportExcel, queryParams);
 
-  function isGlobalRole(record: Rbac.RbacRole) {
-    return record.global === true || !record.tenantId;
+  function getRoleType(record: Rbac.RbacRole): 1 | 2 | 3 {
+    if (record.type) return record.type;
+    if (String(record.id) === '1') return 1;
+    return record.tenantId ? 3 : 2;
   }
 
   function canManageRole(record: Rbac.RbacRole) {
-    return user.superAdmin || (!isGlobalRole(record) && selectedTenant?.isAdmin && record.tenantId === selectedTenant.tenantId);
+    const type = getRoleType(record);
+    if (user.superAdmin) return true;
+    if (type === 1 || !selectedTenant?.isAdmin) return false;
+    return type === 2 || record.tenantId === selectedTenant.tenantId;
   }
 
   function canCreateRole() {
@@ -41,10 +52,13 @@ export default function RbacRoleList() {
       BaseTableUtils.genSimpleSorterColumn('角色名称', 'name', 200, sorter),
       BaseTableUtils.genSimpleSorterColumn('角色描述', 'remarks', undefined, sorter),
       {
-        title: '角色范围',
-        dataIndex: 'global',
-        render: (_, record) => (isGlobalRole(record) ? <Tag color="blue">全局角色</Tag> : <Tag color="green">租户角色</Tag>),
-        width: 100,
+        title: '类型',
+        dataIndex: 'type',
+        render: (_, record) => {
+          const option = ROLE_TYPE_OPTIONS.find((item) => item.value === getRoleType(record));
+          return <Tag color={option?.color}>{option?.label}</Tag>;
+        },
+        width: 110,
       },
       BaseTableUtils.genSimpleSorterColumn('租户ID', 'tenantId', 180, sorter),
       BaseTableUtils.genBoolSorterColumn('是否启用', 'status', 100, sorter),
@@ -106,7 +120,7 @@ export default function RbacRoleList() {
         columns={genColumns()}
         pagination={paginationProps}
         loading={loading}
-        dataSource={list}
+        dataSource={user.superAdmin ? list : list.filter((item) => getRoleType(item) !== 1)}
         rowKey={(item) => item.id}
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}

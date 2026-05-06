@@ -2,12 +2,18 @@ import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { BaseBoolRadio, type CommonModalProps, DragModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
 import { rbacRoleApi as api } from '@features/fa-admin-pages/services';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import { get } from 'lodash';
 import { useContext, useState } from 'react';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 
 const serviceName = '';
+
+const ROLE_TYPE_OPTIONS = [
+  { value: 1, label: '全局超管' },
+  { value: 2, label: '全局' },
+  { value: 3, label: '租户' },
+];
 
 /**
  * BASE-角色表实体新增、编辑弹框
@@ -38,10 +44,11 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
 
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
+    const type = user.superAdmin ? fieldsValue.type : fieldsValue.type || 3;
     const values = {
       ...fieldsValue,
-      global: user.superAdmin ? fieldsValue.global : false,
-      tenantId: user.superAdmin && fieldsValue.global ? undefined : record?.tenantId || selectedTenant?.tenantId,
+      type,
+      tenantId: type === 3 ? record?.tenantId || selectedTenant?.tenantId : undefined,
       // birthday: getDateStr000(fieldsValue.birthday),
     };
     if (record) {
@@ -52,11 +59,12 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
   }
 
   function getInitialValues() {
+    const type = get(record, 'type') ?? (record ? (String(get(record, 'id')) === '1' ? 1 : get(record, 'tenantId') ? 3 : 2) : 3);
     return {
       name: get(record, 'name'),
       remarks: get(record, 'remarks'),
       status: get(record, 'status', true),
-      global: record ? get(record, 'global') ?? !get(record, 'tenantId') : false,
+      type,
     };
   }
 
@@ -88,11 +96,9 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
           <Form.Item name="status" label="是否启用" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <BaseBoolRadio />
           </Form.Item>
-          {user.superAdmin && (
-            <Form.Item name="global" label="是否全局角色" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-              <BaseBoolRadio />
-            </Form.Item>
-          )}
+          <Form.Item name="type" label="类型" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <Select options={user.superAdmin ? ROLE_TYPE_OPTIONS : ROLE_TYPE_OPTIONS.filter((item) => item.value !== 1)} />
+          </Form.Item>
         </Form>
       </DragModal>
     </span>
