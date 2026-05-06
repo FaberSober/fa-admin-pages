@@ -39,6 +39,8 @@ namespace Rbac {
     type: 1 | 2 | 3;
     /** 租户ID */
     tenantId: string;
+    /** 租户名称 */
+    tenantName: string;
   }
 
   /** BASE-角色权限对应表 */

@@ -60,7 +60,10 @@ export default function RbacRoleList() {
         },
         width: 110,
       },
-      BaseTableUtils.genSimpleSorterColumn('租户ID', 'tenantId', 180, sorter),
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('租户名称', 'tenantId', 180, sorter),
+        render: (_, record) => record.tenantName || record.tenantId || '-',
+      },
       BaseTableUtils.genBoolSorterColumn('是否启用', 'status', 100, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
       ...BaseTableUtils.genUpdateColumns(sorter),
