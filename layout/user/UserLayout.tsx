@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Modal } from 'antd';
 import type { Admin, Rbac, Tn } from '@/types';
 import { clearTnTenantId, clearToken, getTnTenantId, type Fa, PageLoading, setTnTenantId } from '@fa/ui';
 import { authApi, msgApi, rbacUserRoleApi, tenantUserApi, userApi } from '@features/fa-admin-pages/services';
+import ConfigLayoutContext from '../config/context/ConfigLayoutContext';
 import UserLayoutContext, { type UserLayoutContextProps } from './context/UserLayoutContext';
 
 /**
@@ -11,6 +12,7 @@ import UserLayoutContext, { type UserLayoutContextProps } from './context/UserLa
  * @date 2022/9/21
  */
 export default function UserLayout({ children }: Fa.BaseChildProps) {
+  const { systemConfig } = useContext(ConfigLayoutContext);
   const [user, setUser] = useState<Admin.User>();
   const [roles, setRoles] = useState<Rbac.RbacRole[]>([]);
   const [tenants, setTenants] = useState<Tn.TenantUser[]>([]);
@@ -29,6 +31,13 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   }
 
   function refreshTenants() {
+    if (!systemConfig.tenantEnabled) {
+      clearTnTenantId();
+      setTenants([]);
+      setSelectedTenant(undefined);
+      return;
+    }
+
     tenantUserApi.myTenants().then((res) => {
       const list = res.data || [];
       const cachedTenantId = getTnTenantId();

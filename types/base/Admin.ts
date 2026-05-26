@@ -143,6 +143,8 @@ namespace Admin {
     kkFileViewUrl: string;
     /** [Web]是否离线环境 */
     offline: boolean;
+    /** [租户]是否开启租户 */
+    tenantEnabled: boolean;
     /** [安全]是否开启验证码 */
     safeCaptchaOn: boolean;
     /** [安全]是否开启注册 */
