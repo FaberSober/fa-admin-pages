@@ -3,6 +3,8 @@ import { DragModal, type DragModalProps, FaUtils, type Fa, UploadFileLocal, Base
 import { Col, Form, Row } from 'antd';
 import { FileBizList } from "@features/fa-admin-pages/components";
 import WebSocketPlainTextCube from "../socket/WebSocketPlainTextCube";
+import WebSocketTaskProgress from "../socket/WebSocketTaskProgress";
+import { sendMessage } from '@features/fa-admin-pages/layout/websocket';
 
 export interface CommonExcelUploadModalProps extends DragModalProps {
   fetchFinish?: () => void;
@@ -15,6 +17,10 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   showTemplateDownload?: boolean;
   /** 展示ws导入过程文本信息 */
   showMsg?: boolean;
+  /** 展示WebSocket任务进度 */
+  showProgress?: boolean;
+  /** 导入批次大小 */
+  importBatchSize?: number;
   accept?: string;
   /** 导入业务类型，有值的话展示导入关联的导入历史记录 */
   type?: string;
@@ -39,6 +45,8 @@ export default function CommonExcelUploadModal({
   tips,
   showTemplateDownload = true,
   showMsg = true,
+  showProgress = false,
+  importBatchSize = 1000,
   accept,
   type,
   formInitValues,
@@ -48,13 +56,30 @@ export default function CommonExcelUploadModal({
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [task, setTask] = useState<Fa.SocketTaskVo>();
 
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
+    const taskId = showProgress ? FaUtils.uuid() : undefined;
+    if (taskId) {
+      const nextTask = {
+        taskId,
+        name: '导入文件',
+        total: 0,
+        cur: 0,
+        error: 0,
+        startTime: new Date().toISOString(),
+      };
+      setTask(nextTask);
+      sendMessage({ type: 'WebSocketTaskDemo', data: { taskId } });
+    }
+
     const params = {
       ...fieldsValue,
       ...extraParams,
       buzzType: type,
+      taskId,
+      importBatchSize: showProgress ? importBatchSize : undefined,
     };
 
     setLoading(true);
@@ -72,6 +97,7 @@ export default function CommonExcelUploadModal({
 
   function showModal() {
     setOpen(true);
+    setTask(undefined);
     form.setFieldsValue({ fileId: undefined, ...formInitValues });
   }
 
@@ -126,6 +152,14 @@ export default function CommonExcelUploadModal({
             <div className="fa-mb12">
               <WebSocketPlainTextCube />
             </div>
+          )}
+
+          {showProgress && task && (
+            <Row className="fa-mb12">
+              <Col offset={4} md={20}>
+                <WebSocketTaskProgress task={task} onTaskChange={setTask} status={loading ? 'active' : undefined} />
+              </Col>
+            </Row>
           )}
         </Form>
       </DragModal>
