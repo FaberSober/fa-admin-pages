@@ -34,7 +34,7 @@ export default function TenantUserList() {
     return [
       BaseTableUtils.genSimpleSorterColumn('租户名称', 'tenantName', 180, sorter),
       BaseTableUtils.genSimpleSorterColumn('用户名称', 'userName', 140, sorter),
-      BaseTableUtils.genBoolSorterColumn('租户管理员', 'isAdmin', 100, sorter),
+      BaseTableUtils.genBoolSorterColumn('租户管理员', 'isAdmin', 120, sorter),
       BaseTableUtils.genBoolSorterColumn('状态', 'status', 80, sorter),
       BaseTableUtils.genSimpleSorterColumn('排序', 'sort', 80, sorter),
       BaseTableUtils.genSimpleSorterColumn('描述', 'description', 220, sorter),
