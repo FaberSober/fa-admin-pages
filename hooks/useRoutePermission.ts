@@ -22,6 +22,9 @@ export default function useRoutePermission(menuList: Rbac.RbacMenu[], openTabs: 
 
     if (index > -1) return true;
 
+    const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuList);
+    if (nearestMenu) return true;
+
     const openTab = find(openTabs, (tab) => tab.path === location.pathname || tab.path === matchRoute || tab.key === location.pathname);
     if (!openTab?.linkMenuId) return false;
 

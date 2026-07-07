@@ -9,6 +9,7 @@ import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, Us
 import type { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@features/fa-admin-pages/services';
 import useRoutePermission from '../../hooks/useRoutePermission';
+import * as FaRouteUtils from '../../components/utils/FaRouteUtils';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import UserLayoutContext from '../user/context/UserLayoutContext';
@@ -66,6 +67,14 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
   useEffect(() => {
+    const tabs = openTabs || [];
+    const uniqTabs = tabs.filter((tab, index) => tabs.findIndex((i) => i.key === tab.key) === index);
+    if (uniqTabs.length !== tabs.length) {
+      setOpenTabs(uniqTabs);
+    }
+  }, [openTabs, setOpenTabs]);
+
+  useEffect(() => {
     rbacUserRoleApi.getMyMenusTree().then((res) => {
       setMenuFullTree(res.data);
       const menuArr = flatTreeList(res.data);
@@ -77,6 +86,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
         // 找到菜单
         syncOpenMenuById(menu.id, res.data);
       } else {
+        const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuArr) as Rbac.RbacMenu | undefined;
         // 未找到菜单，解析打开的菜单
         try {
           // console.log('faTabCache', faTabCache)
@@ -86,13 +96,15 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
             if (isNil(itemFind)) {
               setOpenTabs([...(openTabs || []), cacheTabItem]);
             }
+            syncOpenMenuById(cacheTabItem.linkMenuId || nearestMenu?.id, res.data, { navigate: false, openTab: false });
             setCurTab(cacheTabItem);
             navigateTab(cacheTabItem);
-            // justSyncOpenMenuById(cacheTabItem.linkMenuId, res.data);
+            return;
           }
         } catch (e) {
           /* empty */
         }
+        syncOpenMenuById(nearestMenu?.id, res.data, { navigate: false, openTab: false });
       }
     });
   }, []);
@@ -113,7 +125,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
    * @param openMenuId
    * @param tree
    */
-  function syncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[]) {
+  function syncOpenMenuById(openMenuId: string | undefined, tree: Fa.TreeNode<Rbac.RbacMenu>[], options: { navigate?: boolean; openTab?: boolean } = {}) {
     // console.log('syncOpenMenuById', curTab)
     if (openMenuId === undefined) return;
 
@@ -123,17 +135,21 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       // 未找到对应的菜单，说明不是菜单页，是新开的自定义tab，无需同步菜单
       const tabItem = find(openTabs || [], (i) => i.key === openMenuId);
       setCurTab(tabItem);
+      syncOpenMenuById(tabItem?.linkMenuId, tree, { navigate: false, openTab: false });
       if (tabItem) {
         navigateTab(tabItem);
+      } else {
+        setMenuSelPath([]);
       }
-      setMenuSelPath([]);
       return;
     }
 
     // 设置选中的menuId，
     setMenuSelMenuId(openMenuId);
     // 打开页面
-    navigate(menu.linkUrl);
+    if (options.navigate !== false) {
+      navigate(menu.linkUrl);
+    }
 
     const menuPath = findTreePath(tree, (menu) => menu.sourceData.id === openMenuId);
     const [id0, ...restIds] = menuPath;
@@ -156,14 +172,16 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
 
     setOpenSideMenuKeys(collapse ? [] : menuIds);
 
-    // 加入已经打开的tabs
-    const tab = find(openTabs || [], (i) => i.key === menu.id);
-    if (isNil(tab)) {
-      const tabItem = transMenuToTabItem(menu);
-      setOpenTabs([...(openTabs || []), tabItem]);
-      setCurTab(tabItem);
-    } else {
-      setCurTab(tab);
+    if (options.openTab !== false) {
+      // 加入已经打开的tabs
+      const tab = find(openTabs || [], (i) => i.key === menu.id);
+      if (isNil(tab)) {
+        const tabItem = transMenuToTabItem(menu);
+        setOpenTabs([...(openTabs || []), tabItem]);
+        setCurTab(tabItem);
+      } else {
+        setCurTab(tab);
+      }
     }
   }
 
@@ -218,11 +236,13 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       if (tabFind) {
         syncOpenMenuById(tabFind.key, menuFullTree);
       } else {
-        // 使用函数式更新避免 stale closure 捕获旧 openTabs
-        setOpenTabs((prev) => [...(prev || []), newTab]);
+        setOpenTabs((prev) => {
+          const tabs = prev || [];
+          return find(tabs, (i) => i.key === newTab.key) ? tabs : [...tabs, newTab];
+        });
         setCurTab(newTab);
         navigateTab(newTab);
-        syncOpenMenuById(newTab.key, menuFullTree);
+        syncOpenMenuById(newTab.linkMenuId, menuFullTree, { navigate: false, openTab: false });
       }
       // cache tab info
       setFaTabCache({ ...faTabCache, [newTab.path]: newTab });
