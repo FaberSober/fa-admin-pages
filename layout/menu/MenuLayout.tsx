@@ -61,7 +61,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [breadcrumbs, setBreadcrumbs] = useState<{title:string}[]>([])
 
 
-  const [hasPermission] = useRoutePermission(menuList);
+  const [hasPermission] = useRoutePermission(menuList, openTabs || []);
 
   const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
