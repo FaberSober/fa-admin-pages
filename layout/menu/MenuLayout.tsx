@@ -3,7 +3,7 @@ import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useLocalStorage } from 'react-use';
+import { useLocalStorage, useSessionStorage } from 'react-use';
 import { type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps, findTreePath, flatTreeList } from '@fa/ui';
 import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from './cube';
 import type { Rbac } from '@/types';
@@ -38,7 +38,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { user } = useContext(UserLayoutContext);
 
-  // 以用户id为维度的 localStorage key，保证多账户隔离
+  // 以用户 id 为维度的会话缓存 key，保证多账户隔离；不跨浏览器会话恢复历史标签页
   const openTabsCacheKey = useMemo(() => `fa-open-tabs-${user?.id || 'guest'}`, [user?.id]);
 
   // 将tree平铺的menu list
@@ -55,7 +55,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS || true); // 是否展示标签栏
   const [menuContentFull, setMenuContentFull] = useLocalStorage<boolean>('MenuLayout.menuContentFull', false); // 是否网页内全屏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
-  const [openTabs, setOpenTabs] = useLocalStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-打开的标签页数组（localStorage缓存，按用户id隔离）
+  const [openTabs, setOpenTabs] = useSessionStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-当前浏览器会话的标签页数组
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
   const [tabReloadKeys, setTabReloadKeys] = useState<Record<string, number>>({}); // 每个tab的reload版本号
 
@@ -63,8 +63,6 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
 
 
   const [hasPermission] = useRoutePermission(menuList, openTabs || []);
-
-  const [faTabCache, setFaTabCache] = useLocalStorage<any>('fa-tab-cache', {});
 
   useEffect(() => {
     const tabs = openTabs || [];
@@ -80,6 +78,16 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       const menuArr = flatTreeList(res.data);
       setMenuList(menuArr);
 
+      // 刷新或直接进入自定义页面时，选中当前会话中与地址匹配的 Tab。
+      // 仅匹配 sessionStorage 内已打开的标签，不恢复旧 localStorage 中的历史标签。
+      const currentPathTab = find(openTabs || [], (item) => item.path === location.pathname);
+      if (currentPathTab) {
+        const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuArr) as Rbac.RbacMenu | undefined;
+        syncOpenMenuById(currentPathTab.linkMenuId || nearestMenu?.id, res.data, { navigate: false, openTab: false });
+        setCurTab(currentPathTab);
+        return;
+      }
+
       // 初始化选中的菜单
       const menu = find(menuArr, (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
       if (menu) {
@@ -87,23 +95,8 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
         syncOpenMenuById(menu.id, res.data);
       } else {
         const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuArr) as Rbac.RbacMenu | undefined;
-        // 未找到菜单，解析打开的菜单
-        try {
-          // console.log('faTabCache', faTabCache)
-          const cacheTabItem = faTabCache[location.pathname];
-          if (!isNil(cacheTabItem)) {
-            const itemFind = find(openTabs || [], (i) => i.key === cacheTabItem.key);
-            if (isNil(itemFind)) {
-              setOpenTabs([...(openTabs || []), cacheTabItem]);
-            }
-            syncOpenMenuById(cacheTabItem.linkMenuId || nearestMenu?.id, res.data, { navigate: false, openTab: false });
-            setCurTab(cacheTabItem);
-            navigateTab(cacheTabItem);
-            return;
-          }
-        } catch (e) {
-          /* empty */
-        }
+        // 未找到精确菜单时，仅同步至所属菜单。自定义 Tab 不再从 localStorage 自动恢复，
+        // 避免旧项目页、标注页在新会话中被重新打开。
         syncOpenMenuById(nearestMenu?.id, res.data, { navigate: false, openTab: false });
       }
     });
@@ -244,8 +237,6 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
         navigateTab(newTab);
         syncOpenMenuById(newTab.linkMenuId, menuFullTree, { navigate: false, openTab: false });
       }
-      // cache tab info
-      setFaTabCache({ ...faTabCache, [newTab.path]: newTab });
     },
     removeTab: (tabKey: string) => {
       // console.log('close tab', tabKey)
