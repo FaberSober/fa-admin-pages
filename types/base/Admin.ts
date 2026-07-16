@@ -691,6 +691,21 @@ namespace Admin {
     score?: number;
   }
 
+  export interface RedisStreamEntry {
+    id: string;
+    timestamp: number | string;
+    fields: Record<string, string>;
+  }
+
+  export interface RedisStreamConsumerGroup {
+    name: string;
+    consumers: number;
+    pending: number;
+    lastDeliveredId?: string;
+    entriesRead: number;
+    lag: number;
+  }
+
   export interface RedisKeyDetail {
     key: string;
     type: string;
@@ -699,6 +714,8 @@ namespace Admin {
     size: number;
     valueText?: string;
     entries?: RedisKeyDetailEntry[];
+    streamEntries?: RedisStreamEntry[];
+    consumerGroups?: RedisStreamConsumerGroup[];
   }
 
   /** BASE-系统-新闻 */

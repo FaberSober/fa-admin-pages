@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
   // background:
   //   radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 22%),
   //   linear-gradient(180deg, #f8fbff 0%, #f2f6fb 100%);
@@ -140,16 +141,24 @@
 
 .redis-monitor-detail {
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   padding-left: 6px;
 }
 
 .redis-monitor-detail-card {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .redis-monitor-detail-card .ant-card-body {
-  height: 100%;
+  flex: 1;
+  height: auto;
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .redis-monitor-group-count {
@@ -230,6 +239,42 @@
 
 .redis-monitor-inner-card .ant-card-body {
   min-height: 0;
+}
+
+.redis-monitor-stream-card {
+  min-width: 0;
+}
+
+.redis-monitor-stream-tabs,
+.redis-monitor-stream-tabs .ant-tabs-content-holder,
+.redis-monitor-stream-tabs .ant-tabs-content,
+.redis-monitor-stream-tabs .ant-tabs-tabpane {
+  min-width: 0;
+}
+
+.redis-monitor-stream-tabs .ant-tabs-nav {
+  margin: 0;
+  padding: 0 12px;
+}
+
+.redis-monitor-stream-tabs .ant-table-wrapper {
+  min-width: 0;
+}
+
+.redis-monitor-stream-id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.redis-monitor-stream-id span:first-child {
+  color: #475569;
+}
+
+.redis-monitor-stream-id span:last-child {
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 .redis-monitor-empty {

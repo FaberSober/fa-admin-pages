@@ -8,7 +8,8 @@ import {
 } from '@ant-design/icons';
 import { FaUtils } from '@fa/ui';
 import { redisApi } from '@features/fa-admin-pages/services';
-import { Button, Card, Descriptions, Empty, Input, Modal, Space, Splitter, Table, Tag, Tree, message } from 'antd';
+import { Button, Card, Descriptions, Empty, Input, Modal, Space, Splitter, Table, Tabs, Tag, Tree, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import type { DataNode } from 'antd/es/tree';
 import React, { useEffect, useState } from 'react';
 import './index.scss';
@@ -24,7 +25,13 @@ const TYPE_COLORS: Record<string, string> = {
   list: 'cyan',
   set: 'gold',
   zset: 'geekblue',
+  stream: 'lime',
 };
+
+function formatStreamTime(timestamp: number | string) {
+  const date = new Date(Number(timestamp));
+  return Number.isNaN(date.getTime()) ? '--' : date.toLocaleString('zh-CN', { hour12: false });
+}
 
 function formatTtl(ttlSeconds?: number, persistent?: boolean) {
   if (persistent || ttlSeconds === undefined) {
@@ -99,7 +106,11 @@ function buildTreeData(items: Admin.RedisKeyItem[]): RedisTreeNode[] {
       }
       return String(a.title).localeCompare(String(b.title), 'zh-CN');
     });
-    nodes.forEach((node) => node.children && sortNodes(node.children as RedisTreeNode[]));
+    nodes.forEach((node) => {
+      if (node.children) {
+        sortNodes(node.children as RedisTreeNode[]);
+      }
+    });
   }
 
   sortNodes(root);
@@ -302,6 +313,42 @@ export default function Redis() {
   ];
 
   const persistentCount = keyList.filter((item) => item.persistent).length;
+  const streamFieldNames = Array.from(
+    new Set((detail?.streamEntries || []).flatMap((entry) => Object.keys(entry.fields || {}))),
+  );
+  const streamColumns: ColumnsType<Admin.RedisStreamEntry> = [
+    {
+      title: 'Entry ID',
+      dataIndex: 'id',
+      fixed: 'left',
+      width: 190,
+      render: (id: string, record) => (
+        <div className="redis-monitor-stream-id">
+          <span>{formatStreamTime(record.timestamp)}</span>
+          <span>{id}</span>
+        </div>
+      ),
+    },
+    ...streamFieldNames.map((field) => ({
+      title: field,
+      key: field,
+      width: 180,
+      render: (_: unknown, record: Admin.RedisStreamEntry) => (
+        <div className="redis-monitor-cell" title={record.fields?.[field]}>
+          {record.fields?.[field] || '--'}
+        </div>
+      ),
+    })),
+  ];
+  const streamTableWidth = 190 + streamFieldNames.length * 180;
+  const consumerGroupColumns: ColumnsType<Admin.RedisStreamConsumerGroup> = [
+    { title: '消费组', dataIndex: 'name', fixed: 'left', width: 180 },
+    { title: '消费者', dataIndex: 'consumers', width: 100 },
+    { title: 'Pending', dataIndex: 'pending', width: 100 },
+    { title: '最后投递 ID', dataIndex: 'lastDeliveredId', width: 190, render: (value?: string) => value || '--' },
+    { title: '已读取', dataIndex: 'entriesRead', width: 100 },
+    { title: 'Lag', dataIndex: 'lag', width: 100 },
+  ];
 
   return (
     <div className="fa-full-content-p12 redis-monitor-page">
@@ -464,6 +511,44 @@ export default function Redis() {
                   {detail.type === 'string' ? (
                     <Card title="Value" size="small" className="redis-monitor-inner-card">
                       <pre className="redis-monitor-pre">{FaUtils.tryFormatJson(detail.valueText || '')}</pre>
+                    </Card>
+                  ) : detail.type === 'stream' ? (
+                    <Card size="small" className="redis-monitor-inner-card redis-monitor-stream-card" styles={{ body: { padding: 0 } }}>
+                      <Tabs
+                        className="redis-monitor-stream-tabs"
+                        items={[
+                          {
+                            key: 'data',
+                            label: `Stream 数据 (${detail.streamEntries?.length || 0}/${detail.size || 0})`,
+                            children: (
+                              <Table
+                                rowKey="id"
+                                columns={streamColumns}
+                                dataSource={detail.streamEntries || []}
+                                size="small"
+                                pagination={{ pageSize: 20, showSizeChanger: false }}
+                                scroll={{ x: Math.max(streamTableWidth, 1000) }}
+                                sticky
+                              />
+                            ),
+                          },
+                          {
+                            key: 'groups',
+                            label: `消费组 (${detail.consumerGroups?.length || 0})`,
+                            children: (
+                              <Table
+                                rowKey="name"
+                                columns={consumerGroupColumns}
+                                dataSource={detail.consumerGroups || []}
+                                size="small"
+                                pagination={false}
+                                scroll={{ x: 770 }}
+                                sticky
+                              />
+                            ),
+                          },
+                        ]}
+                      />
                     </Card>
                   ) : (
                     <Card
