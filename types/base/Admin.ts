@@ -315,6 +315,8 @@ namespace Admin {
     sex: FaEnums.SexEnum;
     /** 状态是否有效  */
     status: boolean;
+    /** 是否允许访问后台管理端 */
+    adminEnabled: boolean;
     /** 描述  */
     roleNames: string;
     /** 描述  */

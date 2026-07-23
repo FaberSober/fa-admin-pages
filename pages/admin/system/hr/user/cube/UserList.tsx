@@ -21,6 +21,7 @@ import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
 import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
 import UsersChangePwdModal from './modal/UsersChangePwdModal';
 import UserView from './cube/UserView';
+import UserAdminAccessCol from './cube/UserAdminAccessCol';
 import UserStatusCol from './cube/UserStatusCol';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import { SearchGrid } from '@/components';
@@ -100,6 +101,17 @@ export default function UserList({ departmentId, superMode = false }: IProps) {
             item={r}
             onChange={() => {
               setList(list.map((i) => (i.id === r.id ? { ...i, status: !i.status } : i)));
+            }}
+          />
+        ),
+      },
+      {
+        ...BaseTableUtils.genBoolSorterColumn('后台访问', 'adminEnabled', 100, sorter),
+        render: (_v, record) => (
+          <UserAdminAccessCol
+            item={record}
+            onChange={(updated) => {
+              setList(list.map((user) => (user.id === record.id ? updated : user)));
             }}
           />
         ),

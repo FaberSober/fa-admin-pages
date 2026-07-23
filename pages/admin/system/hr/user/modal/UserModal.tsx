@@ -69,6 +69,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
       departmentId: get(record, 'departmentId'),
       sex: get(record, 'sex'),
       status: get(record, 'status', true),
+      adminEnabled: get(record, 'adminEnabled', false),
       description: get(record, 'description'),
       post: get(record, 'post'),
       img: get(record, 'img'),
@@ -124,6 +125,9 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
           </Form.Item>
           <Form.Item name="status" label="账户有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout} valuePropName="checked">
             <Switch checkedChildren="有效" unCheckedChildren="禁止" />
+          </Form.Item>
+          <Form.Item name="adminEnabled" label="后台访问" rules={[{ required: true }]} {...FaUtils.formItemFullLayout} valuePropName="checked">
+            <Switch checkedChildren="允许" unCheckedChildren="禁止" />
           </Form.Item>
           <Form.Item name="email" label="邮箱" {...FaUtils.formItemFullLayout}>
             <Input placeholder="请输入邮箱" />

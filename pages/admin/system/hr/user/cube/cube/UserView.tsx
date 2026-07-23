@@ -23,6 +23,7 @@ export default function UserView({ item }: UserViewProps) {
       <Descriptions.Item label="地址">{item.address}</Descriptions.Item>
       <Descriptions.Item label="邮箱">{item.email}</Descriptions.Item>
       <Descriptions.Item label="状态">{item.status}</Descriptions.Item>
+      <Descriptions.Item label="后台访问">{item.adminEnabled ? '允许' : '禁止'}</Descriptions.Item>
       <Descriptions.Item label="角色名称">{item.roleNames}</Descriptions.Item>
       <Descriptions.Item label="描述">{item.description}</Descriptions.Item>
       <Descriptions.Item label="头像URL">{item.img}</Descriptions.Item>
