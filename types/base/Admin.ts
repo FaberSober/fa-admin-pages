@@ -619,7 +619,7 @@ namespace Admin {
   }
 
   /** BASE-系统版本更新日志表 */
-  export interface SystemUpdateLog extends Fa.BaseDelEntity {
+  export interface SystemUpdateLog {
     /** ID */
     id: number;
     /** 模块编码 */
@@ -627,13 +627,25 @@ namespace Admin {
     /** 模块名称 */
     name: string;
     /** 版本号 */
-    ver: string;
+    ver: number;
     /** 版本编码 */
     verNo: string;
     /** 备注信息 */
     remark: string;
     /** SQL执行内容 */
-    log: string;
+    log?: string;
+    /** 执行时间 */
+    crtTime: string;
+    /** 执行状态：1成功/9失败 */
+    status: number;
+    /** SQL资源文件名 */
+    fileName?: string;
+    /** SQL内容SHA-256 */
+    checksum?: string;
+    /** 执行耗时毫秒 */
+    durationMs?: number;
+    /** 失败堆栈 */
+    errorMsg?: string;
   }
 
   // -------------------------------------------- 系统-server info --------------------------------------------
