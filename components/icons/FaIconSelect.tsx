@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { trim } from 'lodash';
-import { Icon } from '@iconify/react';
-import mdiIcons from '@iconify-json/mdi/icons.json';
+import { addCollection, Icon } from '@iconify/react';
 
-// 合并 icons（有完整 body）和 aliases（别名，如 settings-outline -> cog-outline）
-// @ts-ignore
-const ICON_LIST: string[] = [
-  ...Object.keys(mdiIcons.icons),
-  ...Object.keys((mdiIcons as any).aliases ?? {}),
-].sort();
+type MdiIconCollection = {
+  aliases?: Record<string, unknown>;
+  icons: Record<string, unknown>;
+};
 
 export interface FaIconSelectProps {
   search?: string;
@@ -25,6 +22,22 @@ const PAGE_SIZE = 36;
  */
 export default function FaIconSelect({ value, search, onChange }: FaIconSelectProps) {
   const [page, setPage] = useState(1);
+  const [iconList, setIconList] = useState<string[]>();
+
+  useEffect(() => {
+    let active = true;
+
+    void import('@iconify-json/mdi/icons.json').then(({ default: collection }) => {
+      const mdiCollection = collection as MdiIconCollection;
+      addCollection(mdiCollection as Parameters<typeof addCollection>[0]);
+      if (!active) return;
+      setIconList([...Object.keys(mdiCollection.icons), ...Object.keys(mdiCollection.aliases ?? {})].sort());
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // 搜索词变化时重置到第一页
   useEffect(() => {
@@ -35,13 +48,15 @@ export default function FaIconSelect({ value, search, onChange }: FaIconSelectPr
     if (onChange) onChange(v);
   }
 
-  const filteredList = ICON_LIST.filter((i: string) => {
+  const filteredList = (iconList ?? []).filter((i: string) => {
     if (!search || trim(search) === '') return true;
     return i.includes(trim(search));
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredList.length / PAGE_SIZE));
   const pageList = filteredList.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  if (!iconList) return <div className="fa-p12">图标加载中...</div>;
 
   return (
     <div className="fa-flex-column">

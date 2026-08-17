@@ -34,7 +34,7 @@ export default function IconSelect({ value, onChange }: IconSelectProps) {
                   <div className='fa-p12 fa-pb0'>
                     <Input value={search} placeholder="搜索图标" onChange={(e) => setSearch(e.target.value)} />
                   </div>
-                  <FaIconSelect search={search} onChange={handleChange} />
+                  {open && <FaIconSelect search={search} onChange={handleChange} />}
                 </div>
               )}
               styles={{
