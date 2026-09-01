@@ -15,8 +15,9 @@ export interface CommonExcelUploadModalProps extends DragModalProps {
   extraParams?: Record<any, any>;
   tips?: string | ReactNode;
   showTemplateDownload?: boolean;
-  /** 展示ws导入过程文本信息 */
+  /** 展示websocket导入过程文本信息 */
   showMsg?: boolean;
+  showMsgChannel?: string;
   /** 展示WebSocket任务进度 */
   showProgress?: boolean;
   /** 导入批次大小 */
@@ -45,6 +46,7 @@ export default function CommonExcelUploadModal({
   tips,
   showTemplateDownload = true,
   showMsg = true,
+  showMsgChannel,
   showProgress = false,
   importBatchSize = 1000,
   accept,
@@ -87,10 +89,12 @@ export default function CommonExcelUploadModal({
       .then((res) => {
         setLoading(false);
         FaUtils.showResponse(res, '导入文件');
-        if (fetchFinish) {
+        if (!showProgress && fetchFinish) {
           fetchFinish();
         }
-        setOpen(false);
+        if (!showProgress) {
+          setOpen(false);
+        }
       })
       .catch(() => setLoading(false));
   }
@@ -99,6 +103,13 @@ export default function CommonExcelUploadModal({
     setOpen(true);
     setTask(undefined);
     form.setFieldsValue({ fileId: undefined, ...formInitValues });
+  }
+
+  function onTaskChange(nextTask: Fa.SocketTaskVo) {
+    setTask(nextTask);
+    if (nextTask.total > 0 && nextTask.cur >= nextTask.total) {
+      fetchFinish?.();
+    }
   }
 
   return (
@@ -150,14 +161,14 @@ export default function CommonExcelUploadModal({
 
           {showMsg && (
             <div className="fa-mb12">
-              <WebSocketPlainTextCube />
+              <WebSocketPlainTextCube channel={showMsgChannel} />
             </div>
           )}
 
           {showProgress && task && (
             <Row className="fa-mb12">
               <Col offset={4} md={20}>
-                <WebSocketTaskProgress task={task} onTaskChange={setTask} status={loading ? 'active' : undefined} />
+                <WebSocketTaskProgress task={task} onTaskChange={onTaskChange} status={loading ? 'active' : undefined} />
               </Col>
             </Row>
           )}
