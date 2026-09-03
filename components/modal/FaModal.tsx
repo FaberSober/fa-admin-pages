@@ -1,8 +1,8 @@
-import React, { ReactNode, useCallback, useState } from 'react';
-import { Button, Modal } from 'antd';
-import { ModalProps } from 'antd/es/modal';
 import { FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { FaDragItem } from '@fa/ui';
+import { Button, Modal } from 'antd';
+import { ModalProps } from 'antd/es/modal';
+import React, { ReactNode, useCallback, useState } from 'react';
 
 export interface FaModalProps extends ModalProps {
   children?: JSX.Element;
@@ -23,7 +23,7 @@ export default function FaModal({ defaultFullScreen, width, triggerDom, onCancel
 
   // 切换全屏状态的函数 <--- 关键逻辑
   const toggleFullScreen = useCallback(() => {
-    setFullScreen(prev => !prev);
+    setFullScreen((prev) => !prev);
   }, []);
 
   return (
@@ -65,27 +65,33 @@ export default function FaModal({ defaultFullScreen, width, triggerDom, onCancel
             />
           </div>
         }
-        modalRender={(modal) => fullScreen ? modal : (
-          <FaDragItem disabled={disabled} hold>
-            {modal}
-          </FaDragItem>
-        )}
+        modalRender={(modal) =>
+          fullScreen ? (
+            modal
+          ) : (
+            <FaDragItem disabled={disabled} hold>
+              {modal}
+            </FaDragItem>
+          )
+        }
         destroyOnHidden
-        maskClosable={!fullScreen} // 全屏时通常不希望点击蒙层关闭
-        keyboard={!fullScreen}     // 全屏时通常不希望按 Esc 键关闭
+        mask={{
+          closable: !fullScreen, // 全屏时通常不希望点击蒙层关闭
+        }}
+        keyboard={!fullScreen} // 全屏时通常不希望按 Esc 键关闭
         wrapClassName={fullScreen ? 'fa-full-screen-modal-wrap' : ''}
         // 全屏时可以把宽度设为 100vw，高度设为 100vh
         width={fullScreen ? '100vw' : width || 600}
         // 如果需要，设置全屏时距离顶部的距离为 0
         style={fullScreen ? { top: 0, padding: 0 } : {}}
-        // 移除 Modal 自身的 body 内边距，让内容完全铺满
+        // 移除 Modal 自身的 body 内边距，让内容完全铺满；全屏时用 flex 撑满（配合 styles.css）
         styles={{
-          body: fullScreen ? { height: 'calc(100vh - 55px - 53px)', overflow: 'auto' } : {}
+          body: fullScreen ? { flex: 1, height: 'auto', overflow: 'auto' } : {},
         }}
         open={open}
         onCancel={(e) => {
-          setOpen(false)
-          if (onCancel) onCancel(e)
+          setOpen(false);
+          if (onCancel) onCancel(e);
         }}
         {...restProps}
       />
