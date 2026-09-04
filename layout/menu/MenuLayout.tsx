@@ -8,6 +8,7 @@ import { type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps,
 import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from './cube';
 import type { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@features/fa-admin-pages/services';
+import { TabErrorBoundary } from '@features/fa-admin-pages/components/exception';
 import useRoutePermission from '../../hooks/useRoutePermission';
 import * as FaRouteUtils from '../../components/utils/FaRouteUtils';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
@@ -298,7 +299,18 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
               <div className="fa-full fa-flex-column fa-relative">
                 {showTabs && <OpenTabs />}
                 <FaFlexRestLayout>
-                  <div className="fa-full fa-main">{hasPermission ? <React.Fragment key={tabReloadKeys[curTab?.key ?? ''] ?? 0}>{children}</React.Fragment> : <Empty description="页面丢失了" />}</div>
+                  <div className="fa-full fa-main">
+                    {hasPermission ? (
+                      <TabErrorBoundary
+                        key={`${curTab?.key ?? ''}-${tabReloadKeys[curTab?.key ?? ''] ?? 0}`}
+                        onReload={() => reloadTab(curTab?.key ?? '')}
+                      >
+                        <React.Fragment key={tabReloadKeys[curTab?.key ?? ''] ?? 0}>{children}</React.Fragment>
+                      </TabErrorBoundary>
+                    ) : (
+                      <Empty description="页面丢失了" />
+                    )}
+                  </div>
                 </FaFlexRestLayout>
               </div>
             </FaFlexRestLayout>
