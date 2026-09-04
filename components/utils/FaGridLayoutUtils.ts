@@ -107,7 +107,20 @@ export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|nu
   ];
 }
 
-export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: LayoutItem[]) {
+/** 按组件声明的尺寸生成默认布局。 */
+export function createDefaultLayout(cubes: CubeItem[], ids: Array<string | number>): Layout {
+  return ids.reduce<Layout>((layout, id) => {
+    return (cubes as any)[id] ? calAddLayout(cubes, layout, id) : layout;
+  }, []);
+}
+
+export function useGridLayoutConfig(
+  cubes: any,
+  biz: string,
+  type: string,
+  defaultLayout: LayoutItem[],
+  normalizeGlobalLayout?: (layout: Layout) => Layout,
+) {
   const loading = useApiLoading([ configApi.getUrl('save'), configApi.getUrl('update')]);
 
   const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
@@ -122,7 +135,8 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
         // 未找到，去查找全局是否有配置
         configApi.getOneGlobal(biz, type).then((res1) => {
           setConfig(undefined);
-          setLayout(res1.data?.data || defaultLayout);
+          const globalLayout = res1.data?.data;
+          setLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
         });
       }
     });
