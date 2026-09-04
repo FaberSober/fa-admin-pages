@@ -647,6 +647,53 @@ namespace Admin {
     createTime: string;
   }
 
+  export type TelemetryStatEventType = 'LOGIN' | 'PAGE_VIEW' | 'ACTION' | 'BUSINESS';
+
+  export interface StatEvent {
+    id: number;
+    appId: number;
+    clientType: TelemetryClientType;
+    environment: string;
+    release: string;
+    sessionId: string;
+    userId?: string;
+    tenantId?: string;
+    eventType: TelemetryStatEventType;
+    eventCode: string;
+    module?: string;
+    bizType?: string;
+    bizId?: string;
+    result?: string;
+    duration?: number;
+    properties?: unknown;
+    context?: unknown;
+    occurTime: string;
+    createTime: string;
+  }
+
+  export interface TelemetryDashboardOverview {
+    activeUserCount: number;
+    loginUserCount: number;
+    pageViewCount: number;
+    businessEventCount: number;
+    errorCount: number;
+    affectedUserCount: number;
+  }
+
+  export interface TelemetryDashboardTrend {
+    statDate: string;
+    activeUserCount: number;
+    loginCount: number;
+    businessEventCount: number;
+    errorCount: number;
+  }
+
+  export interface TelemetryDashboardRank {
+    name: string;
+    primaryCount: number;
+    secondaryCount: number;
+  }
+
   // -------------------------------------------- 系统-实体变更日志 --------------------------------------------
   /** BASE- 实体变更日志 */
   export interface EntityLog extends Fa.BaseCrtEntity {

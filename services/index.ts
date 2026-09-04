@@ -17,6 +17,8 @@ export { default as logApiApi } from './base/admin/logApi';
 export { default as logLoginApi } from './base/admin/logLogin';
 export { default as telemetryIssueApi } from './base/telemetry/issue';
 export { default as telemetryErrorEventApi } from './base/telemetry/errorEvent';
+export { default as telemetryStatEventApi } from './base/telemetry/statEvent';
+export { default as telemetryDashboardApi } from './base/telemetry/dashboard';
 export { default as msgApi } from './base/admin/msg';
 export { default as noticeApi } from './base/admin/notice';
 export { default as redisApi } from './base/admin/redis';
