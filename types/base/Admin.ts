@@ -105,6 +105,12 @@ namespace Admin {
     safePasswordLenMax: number;
     /** [安全]token有效时长(小时) */
     safeTokenExpireHour: number;
+    /** 是否开启按月归档 */
+    logArchiveEnabled: boolean;
+    /** 归档日志保留策略 */
+    logArchiveRetentionPolicy: 'FOREVER' | 'MONTHS';
+    /** 保留归档月数 */
+    logArchiveRetentionMonths: number;
   }
 
   // -------------------------------------------- 系统配置参数 --------------------------------------------

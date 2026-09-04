@@ -18,7 +18,8 @@ import {
 import { SearchGrid } from '@features/fa-admin-pages/components';
 import LogApiView from '@features/fa-admin-pages/pages/admin/system/base/logApi/cube/LogApiView';
 import { logApiApi as api } from '@features/fa-admin-pages/services';
-import { Button, Form, Input, Modal, Space } from 'antd';
+import { Button, DatePicker, Form, Input, Modal, Space } from 'antd';
+import dayjs from 'dayjs';
 
 const serviceName = '请求日志';
 const biz = 'base_log_api';
@@ -32,6 +33,15 @@ export default function LogApiList() {
   const [handleDelete] = useDelete<string>(api.remove, fetchPageList, serviceName);
   const [_, deleteByQuery] = useDeleteByQuery(api.removeByQuery, queryParams, fetchPageList);
   const [exporting, fetchExportExcel] = useExport(api.exportExcel, queryParams);
+
+  function handleSearch(values: any) {
+    const [startTime, endTime] = values.crtTimeRange || [];
+    const nextValues = { ...values };
+    delete nextValues.crtTimeRange;
+    nextValues['crtTime#$min'] = startTime?.format('YYYY-MM-DD HH:mm:ss');
+    nextValues['crtTime#$max'] = endTime?.format('YYYY-MM-DD HH:mm:ss');
+    setFormValues(nextValues);
+  }
 
   function handleDeleteAll() {
     Modal.confirm({
@@ -102,7 +112,7 @@ export default function LogApiList() {
     <div className="fa-full-content-p12 fa-flex-column fa-content">
       <SearchGrid
         form={form}
-        onFinish={setFormValues}
+        onFinish={handleSearch}
         btns={(<>
             <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
               查询
@@ -122,6 +132,18 @@ export default function LogApiList() {
         </Form.Item>
         <Form.Item name="url" label="URL">
           <Input placeholder="请输入请求URL" allowClear />
+        </Form.Item>
+        <Form.Item name="crtTimeRange" label="请求时间">
+          <DatePicker.RangePicker
+            showTime
+            format="YYYY-MM-DD HH:mm:ss"
+            presets={[
+              { label: '今天', value: [dayjs().startOf('day'), dayjs()] },
+              { label: '最近7天', value: [dayjs().subtract(6, 'day').startOf('day'), dayjs()] },
+              { label: '本月', value: [dayjs().startOf('month'), dayjs()] },
+              { label: '上月', value: [dayjs().subtract(1, 'month').startOf('month'), dayjs().subtract(1, 'month').endOf('month')] },
+            ]}
+          />
         </Form.Item>
       </SearchGrid>
 

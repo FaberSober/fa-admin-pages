@@ -2,7 +2,7 @@ import type { Admin } from '@/types';
 import { SaveOutlined } from '@ant-design/icons';
 import { FaUtils, useApiLoading } from '@fa/ui';
 import { configSysApi } from '@features/fa-admin-pages/services';
-import { Button, Col, Form, InputNumber, Row, Select, Space } from 'antd';
+import { Button, Col, Form, InputNumber, Row, Select, Space, Switch } from 'antd';
 import { useEffect, useState } from 'react';
 
 /**
@@ -18,6 +18,9 @@ export default function ConfigLog() {
       setConfigSys(res.data);
       form.setFieldsValue({
         ...res.data.data,
+        logArchiveEnabled: res.data.data.logArchiveEnabled ?? false,
+        logArchiveRetentionPolicy: res.data.data.logArchiveRetentionPolicy ?? 'FOREVER',
+        logArchiveRetentionMonths: res.data.data.logArchiveRetentionMonths ?? 12,
       });
     });
   }, []);
@@ -40,6 +43,9 @@ export default function ConfigLog() {
   }
 
   const loading = useApiLoading([configSysApi.getUrl('update')]);
+  const archiveEnabled = Form.useWatch('logArchiveEnabled', form);
+  const retentionPolicy = Form.useWatch('logArchiveRetentionPolicy', form);
+
   return (
     <div className="fa-p12">
       <Form form={form} onFinish={onFinish} layout="vertical">
@@ -58,11 +64,36 @@ export default function ConfigLog() {
         </Row>
         <Row>
           <Col md={8}>
-            <Form.Item name="logSaveMaxNum" label="日志保存最大数量" rules={[{ required: true }]} help="-1表示不限制记录数量">
-              <InputNumber step={1} min={-1} max={100000} addonAfter="条" />
+            <Form.Item name="logArchiveEnabled" label="按月归档" valuePropName="checked" help="每月归档上一个自然月的请求日志">
+              <Switch />
             </Form.Item>
           </Col>
         </Row>
+        {archiveEnabled && (
+          <>
+            <Row>
+              <Col md={8}>
+                <Form.Item name="logArchiveRetentionPolicy" label="归档日志保留策略" rules={[{ required: true }]}>
+                  <Select
+                    options={[
+                      { label: '永久保留', value: 'FOREVER' },
+                      { label: '保留指定月数', value: 'MONTHS' },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            {retentionPolicy === 'MONTHS' && (
+              <Row>
+                <Col md={8}>
+                  <Form.Item name="logArchiveRetentionMonths" label="归档日志保留月数" rules={[{ required: true }]}>
+                    <InputNumber step={1} min={1} max={1200} addonAfter="个月" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            )}
+          </>
+        )}
 
         <Space>
           <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>
