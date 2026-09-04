@@ -85,7 +85,7 @@ export default function Menu() {
             <div className="fa-menu-item">
               <button
                 type="button"
-                style={{ flex: 1, padding: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ flex: 1, padding: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
                 onClick={() => FaUtils.copyToClipboard(item.name)}
               >
                 {item.name}
@@ -93,7 +93,7 @@ export default function Menu() {
               <div style={{ width: 30 }} className='fa-flex-center'>{item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : null}</div>
               <button
                 type="button"
-                style={{ width: 100, padding: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ width: 100, padding: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
                 onClick={() => FaUtils.copyToClipboard(item.sourceData.id)}
               >
                 {item.sourceData.id}
@@ -109,7 +109,7 @@ export default function Menu() {
               <button
                 type="button"
                 className="fa-plr12"
-                style={{ width: 400, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
+                style={{ width: 400, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
                 onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}
               >
                 {item.sourceData.linkUrl}
