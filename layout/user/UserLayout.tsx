@@ -23,11 +23,12 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
     refreshUser();
     refreshTenants();
     refreshUnreadCount();
-    rbacUserRoleApi.getMyRoles().then((res) => setRoles(res.data));
+    rbacUserRoleApi.getMyRoles().then((res) => setRoles(res.data)).catch(() => {});
   }, []);
 
   function refreshUser() {
-    userApi.getLoginUser().then((res) => setUser(res.data));
+    // 错误提示与登录失效跳转统一由 axios 拦截器处理，此处仅消除 unhandled rejection
+    userApi.getLoginUser().then((res) => setUser(res.data)).catch(() => {});
   }
 
   function refreshTenants() {
@@ -87,7 +88,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
   }
 
   function refreshUnreadCount() {
-    msgApi.countMine().then((res) => setUnreadCount(res.data.unreadCount));
+    msgApi.countMine().then((res) => setUnreadCount(res.data.unreadCount)).catch(() => {});
   }
 
   if (user === undefined) return <PageLoading />;
