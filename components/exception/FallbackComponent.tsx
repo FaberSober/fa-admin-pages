@@ -1,7 +1,7 @@
 import { Button, Result } from 'antd';
 
 /**
- * 框架级兜底组件：应用根级（Sentry.ErrorBoundary）捕获到框架自身异常时整屏展示，属于最后防线。
+ * 框架级兜底组件：应用根级 Telemetry ErrorBoundary 捕获到框架自身异常时整屏展示，属于最后防线。
  * 常规页面异常由 TabErrorBoundary 在 Tab 内容区内隔离，不会走到这里。
  */
 export default function FallbackComponent() {

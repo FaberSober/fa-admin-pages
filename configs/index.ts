@@ -13,5 +13,7 @@ export default {
     generator: '/api/base/generator',
     /** doc服务 */
     doc: '/api/base/doc',
+    /** telemetry服务 */
+    telemetry: '/api/base/telemetry',
   },
 } as Fa.ConfigApp;

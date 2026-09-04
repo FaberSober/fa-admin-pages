@@ -1,0 +1,34 @@
+import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space } from 'antd';
+import { BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useTableQueryParams } from '@fa/ui';
+import type { Admin } from '@/types';
+import { telemetryErrorEventApi as api } from '@features/fa-admin-pages/services';
+import ErrorEventView from './cube/ErrorEventView';
+
+export default function TelemetryErrorEventList() {
+  const [form] = Form.useForm();
+  const { queryParams, setFormValues, handleTableChange, fetchPageList, loading, list, paginationProps } =
+    useTableQueryParams<Admin.ClientErrorEvent>(api.page, {}, '客户端异常事件');
+  const { sorter } = queryParams;
+  const columns: FaberTable.ColumnsProp<Admin.ClientErrorEvent>[] = [
+    BaseTableUtils.genIdColumn('ID', 'id', 70, sorter),
+    BaseTableUtils.genSimpleSorterColumn('Issue ID', 'issueId', 90, sorter),
+    BaseTableUtils.genSimpleSorterColumn('异常类型', 'errorType', 140, sorter),
+    BaseTableUtils.genSimpleSorterColumn('消息', 'message', 320, sorter),
+    BaseTableUtils.genSimpleSorterColumn('环境', 'environment', 100, sorter),
+    BaseTableUtils.genSimpleSorterColumn('版本', 'release', 130, sorter),
+    BaseTableUtils.genSimpleSorterColumn('用户', 'userId', 120, sorter),
+    BaseTableUtils.genSimpleSorterColumn('发生时间', 'occurTime', 170, sorter),
+    { title: '操作', dataIndex: 'menu', width: 90, fixed: 'right', render: (_, record) => <Space><BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="详情" />}><ErrorEventView record={record} /></BaseDrawer></Space> },
+  ];
+  return <div className="fa-full-content-p12 fa-flex-column fa-content">
+    <Form form={form} layout="inline" onFinish={setFormValues} className="fa-mtb12">
+      <Form.Item name="issueId" label="Issue ID"><Input allowClear /></Form.Item>
+      <Form.Item name="environment" label="环境"><Input allowClear /></Form.Item>
+      <Form.Item name="errorType" label="异常类型"><Input allowClear /></Form.Item>
+      <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+      <Button onClick={() => clearForm(form)}>重置</Button>
+    </Form>
+    <BaseBizTable biz="base_client_error_event" rowKey="id" columns={columns} pagination={paginationProps} loading={loading} dataSource={list} onChange={handleTableChange} refreshList={fetchPageList} />
+  </div>;
+}

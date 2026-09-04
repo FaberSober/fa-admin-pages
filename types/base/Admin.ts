@@ -609,6 +609,44 @@ namespace Admin {
     addr: string;
   }
 
+  // -------------------------------------------- Telemetry --------------------------------------------
+  export type TelemetryClientType = 'WEB' | 'DESKTOP' | 'MOBILE' | 'OTHER';
+  export type TelemetryIssueStatus = 'OPEN' | 'RESOLVED' | 'IGNORED';
+
+  export interface ClientErrorIssue {
+    id: number;
+    appId: number;
+    clientType: TelemetryClientType;
+    fingerprint: string;
+    title: string;
+    errorType: string;
+    status: TelemetryIssueStatus;
+    firstSeenTime: string;
+    lastSeenTime: string;
+    eventCount: number;
+    userCount: number;
+    latestRelease: string;
+  }
+
+  export interface ClientErrorEvent {
+    id: number;
+    appId: number;
+    issueId: number;
+    clientType: TelemetryClientType;
+    environment: string;
+    release: string;
+    sessionId: string;
+    userId?: string;
+    tenantId?: string;
+    errorType: string;
+    message: string;
+    stack?: string;
+    breadcrumbs?: unknown;
+    context?: unknown;
+    occurTime: string;
+    createTime: string;
+  }
+
   // -------------------------------------------- 系统-实体变更日志 --------------------------------------------
   /** BASE- 实体变更日志 */
   export interface EntityLog extends Fa.BaseCrtEntity {

@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react';
+import { telemetry } from '@/telemetry';
 import { Button, Result } from 'antd';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
@@ -22,7 +22,7 @@ interface TabErrorBoundaryState {
  *    因按 Tab key 隔离，同一时刻只有当前 Tab 的边界实例在监听）。
  *
  * 需按 Tab 隔离使用：外层以 `tabKey-版本号` 作为 key，切换 Tab 或重新加载时边界随之重建。
- * 内层边界截获后错误不再冒泡到根级 Sentry 边界，因此需主动上报 Sentry。
+ * 内层边界截获后的渲染异常需主动交给 Telemetry 上报；全局异常由 Telemetry SDK 统一监听。
  */
 export default class TabErrorBoundary extends Component<TabErrorBoundaryProps, TabErrorBoundaryState> {
   state: TabErrorBoundaryState = {
@@ -38,7 +38,7 @@ export default class TabErrorBoundary extends Component<TabErrorBoundaryProps, T
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     this.handling = true;
-    Sentry.captureException(error);
+    telemetry.captureException(error, { react: { componentStack: info.componentStack } });
     if (import.meta.env.DEV) {
       console.error('[TabErrorBoundary] 页面渲染异常', error, info);
     }
@@ -59,7 +59,6 @@ export default class TabErrorBoundary extends Component<TabErrorBoundaryProps, T
     this.handling = true;
     const err = event.error instanceof Error ? event.error : new Error(event.message || 'Unknown error');
     this.setState({ error: err });
-    Sentry.captureException(err);
     if (import.meta.env.DEV) {
       console.error('[TabErrorBoundary] 捕获到未处理异常（useEffect/异步/事件）', err);
     }
@@ -70,7 +69,6 @@ export default class TabErrorBoundary extends Component<TabErrorBoundaryProps, T
     this.handling = true;
     const err = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
     this.setState({ error: err });
-    Sentry.captureException(err);
     if (import.meta.env.DEV) {
       console.error('[TabErrorBoundary] 捕获到未处理 Promise 拒绝', err);
     }
