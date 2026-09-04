@@ -5,6 +5,7 @@ import { clearTnTenantId, clearToken, getTnTenantId, type Fa, PageLoading, setTn
 import { authApi, msgApi, rbacUserRoleApi, tenantUserApi, userApi } from '@features/fa-admin-pages/services';
 import ConfigLayoutContext from '../config/context/ConfigLayoutContext';
 import UserLayoutContext, { type UserLayoutContextProps } from './context/UserLayoutContext';
+import { telemetry } from '@/telemetry';
 
 /**
  * 登录后的用户上下文
@@ -25,6 +26,10 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
     refreshUnreadCount();
     rbacUserRoleApi.getMyRoles().then((res) => setRoles(res.data)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (user) telemetry.identify({ userId: user.id, tenantId: selectedTenant?.tenantId });
+  }, [user, selectedTenant?.tenantId]);
 
   function refreshUser() {
     // 错误提示与登录失效跳转统一由 axios 拦截器处理，此处仅消除 unhandled rejection
@@ -80,6 +85,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
       okText: '退出',
       onOk: () =>
         authApi.logout().then((res) => {
+          telemetry.clearUser();
           clearToken();
           clearTnTenantId();
           window.location.href = res.data;
