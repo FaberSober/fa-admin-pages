@@ -3,6 +3,7 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Captcha, LoginMode, setLoginMode, setToken, useApiLoading, useQs } from '@fa/ui';
 import { ConfigLayoutContext } from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { authApi } from '@features/fa-admin-pages/services';
+import { telemetry } from '@/telemetry';
 import { Button, Checkbox, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { useContext, useState } from 'react';
@@ -17,16 +18,17 @@ export default function LoginForm() {
 
   const [code, setCode] = useState('');
 
-  function onFinish(fieldsValue: any) {
-    authApi.login(fieldsValue.username, fieldsValue.password).then((res) => {
+  async function onFinish(fieldsValue: any) {
+    try {
+      const res = await authApi.login(fieldsValue.username, fieldsValue.password);
+      telemetry.track('auth.login.success', { eventType: 'LOGIN', result: 'SUCCESS' });
       setToken(res.data.tokenValue);
       setLoginMode(LoginMode.LOCAL);
-      if (search.redirect) {
-        navigate(search.redirect);
-      } else {
-        navigate(SITE_INFO.HOME_LINK);
-      }
-    });
+      navigate(search.redirect || SITE_INFO.HOME_LINK);
+    } catch (error) {
+      telemetry.track('auth.login.failed', { eventType: 'LOGIN', result: 'FAIL' });
+      throw error;
+    }
   }
 
   function validateCaptcha(_: any, value: any) {

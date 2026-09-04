@@ -85,6 +85,7 @@ export default function UserLayout({ children }: Fa.BaseChildProps) {
       okText: '退出',
       onOk: () =>
         authApi.logout().then((res) => {
+          telemetry.track('auth.logout', { eventType: 'LOGIN', result: 'SUCCESS' });
           telemetry.clearUser();
           clearToken();
           clearTnTenantId();
