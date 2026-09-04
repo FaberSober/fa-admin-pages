@@ -21,6 +21,8 @@ export default function ConfigLog() {
         logArchiveEnabled: res.data.data.logArchiveEnabled ?? false,
         logArchiveRetentionPolicy: res.data.data.logArchiveRetentionPolicy ?? 'FOREVER',
         logArchiveRetentionMonths: res.data.data.logArchiveRetentionMonths ?? 12,
+        telemetryErrorEventRetentionDays: res.data.data.telemetryErrorEventRetentionDays ?? 180,
+        telemetryStatEventRetentionDays: res.data.data.telemetryStatEventRetentionDays ?? 180,
       });
     });
   }, []);
@@ -94,6 +96,19 @@ export default function ConfigLog() {
             )}
           </>
         )}
+
+        <Row gutter={12}>
+          <Col md={8}>
+            <Form.Item name="telemetryErrorEventRetentionDays" label="Telemetry 异常明细保留" help="到期后仅清理异常明细，Issue 聚合长期保留" rules={[{ required: true }]}>
+              <InputNumber step={1} min={1} max={3650} addonAfter="天" />
+            </Form.Item>
+          </Col>
+          <Col md={8}>
+            <Form.Item name="telemetryStatEventRetentionDays" label="Telemetry 统计明细保留" help="到期后仅清理统计明细，每日聚合长期保留" rules={[{ required: true }]}>
+              <InputNumber step={1} min={1} max={3650} addonAfter="天" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Space>
           <Button htmlType="submit" icon={<SaveOutlined />} type="primary" loading={loading}>

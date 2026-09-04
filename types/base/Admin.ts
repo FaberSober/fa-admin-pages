@@ -111,6 +111,10 @@ namespace Admin {
     logArchiveRetentionPolicy: 'FOREVER' | 'MONTHS';
     /** 保留归档月数 */
     logArchiveRetentionMonths: number;
+    /** Telemetry 异常明细保留天数 */
+    telemetryErrorEventRetentionDays: number;
+    /** Telemetry 统计明细保留天数 */
+    telemetryStatEventRetentionDays: number;
   }
 
   // -------------------------------------------- 系统配置参数 --------------------------------------------
