@@ -309,3 +309,71 @@
     padding-top: 12px;
   }
 }
+
+// ------------------------- 暗色主题适配 -------------------------
+[data-theme='dark'] {
+  .redis-monitor-toolbar {
+    background: rgba(21, 25, 33, 0.92);
+    border-color: var(--fa-border-color);
+  }
+
+  .redis-monitor-title {
+    color: var(--fa-text-color);
+  }
+
+  .redis-monitor-subtitle {
+    color: var(--fa-text-color-light100);
+  }
+
+  .redis-monitor-kpi {
+    border-color: var(--fa-border-color);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+  }
+
+  .redis-monitor-kpi-title {
+    color: var(--fa-text-color-light100);
+  }
+
+  .redis-monitor-card {
+    border-color: var(--fa-border-color);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
+  }
+
+  .redis-monitor-search-bar {
+    border-color: var(--fa-border-color);
+    background: linear-gradient(180deg, rgba(31, 31, 31, 0.9) 0%, rgba(21, 25, 33, 0.9) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .redis-monitor-group-count {
+    color: var(--fa-text-color-light100);
+  }
+
+  .redis-monitor-tree-sub {
+    color: var(--fa-text-color-light100);
+  }
+
+  .redis-monitor-pre {
+    background: rgba(15, 23, 42, 0.6);
+    color: #e2e8f0;
+    border: 1px solid var(--fa-border-color);
+  }
+
+  .redis-monitor-inner-card {
+    background: rgba(42, 45, 47, 0.5);
+    border-color: var(--fa-border-color);
+  }
+
+  .redis-monitor-stream-id span:first-child {
+    color: var(--fa-text-color-light100);
+  }
+
+  .redis-monitor-stream-id span:last-child {
+    color: var(--fa-text-color-light100);
+    opacity: 0.7;
+  }
+
+  .redis-monitor-muted {
+    color: var(--fa-text-color-light100);
+  }
+}

@@ -213,3 +213,88 @@
     font-size: 28px;
   }
 }
+
+// ------------------------- 暗色主题适配 -------------------------
+[data-theme='dark'] {
+  .server-monitor-page {
+    background:
+      radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 24%),
+      radial-gradient(circle at top right, rgba(16, 185, 129, 0.1), transparent 22%);
+  }
+
+  .server-monitor-toolbar {
+    border-color: var(--fa-border-color);
+    background: linear-gradient(135deg, rgba(21, 25, 33, 0.96), rgba(31, 31, 31, 0.96));
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  }
+
+  .server-monitor-title {
+    color: var(--fa-text-color);
+  }
+
+  .server-monitor-subtitle {
+    color: var(--fa-text-color-light100);
+  }
+
+  .server-monitor-kpi {
+    border-color: var(--fa-border-color);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  .server-monitor-kpi-foot {
+    color: var(--fa-text-color-light100);
+  }
+
+  .server-monitor-card {
+    border-color: var(--fa-border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .server-monitor-stat-row {
+    background: rgba(42, 45, 47, 0.8);
+    color: var(--fa-text-color-light100);
+  }
+
+  .server-monitor-stat-row strong {
+    color: var(--fa-text-color);
+  }
+
+  .server-monitor-inline-value {
+    color: var(--fa-text-color);
+  }
+
+  .server-monitor-info-item {
+    border-color: var(--fa-border-color);
+    background: linear-gradient(180deg, rgba(42, 45, 47, 0.7), rgba(31, 31, 31, 0.9));
+  }
+
+  .server-monitor-info-item span {
+    color: var(--fa-text-color-light100);
+  }
+
+  .server-monitor-info-item strong {
+    color: var(--fa-text-color);
+  }
+
+  .server-monitor-disk-card {
+    border-color: var(--fa-border-color);
+    background: linear-gradient(180deg, rgba(31, 31, 31, 0.9), rgba(42, 45, 47, 0.85));
+  }
+
+  .server-monitor-disk-name {
+    color: var(--fa-text-color);
+  }
+
+  .server-monitor-disk-volume {
+    color: var(--fa-text-color-light100);
+  }
+
+  .server-monitor-disk-meta {
+    color: var(--fa-text-color-light100);
+  }
+
+  // 覆盖 Progress 硬编码的浅色轨道
+  .server-monitor-page .ant-progress-inner {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+}
