@@ -1,3 +1,4 @@
+import { clientTypes, telemetryLabel } from '@features/fa-admin-pages/components/telemetry';
 import { SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Select, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, useDelete, useTableQueryParams } from '@fa/ui';
@@ -20,7 +21,7 @@ export default function TelemetryAppPage() {
       BaseTableUtils.genSimpleSorterColumn('应用名称', 'appName', 160, sorter),
       BaseTableUtils.genSimpleSorterColumn('应用编码', 'appCode', 160, sorter),
       BaseTableUtils.genSimpleSorterColumn('AppKey', 'appKey', 180, sorter),
-      BaseTableUtils.genSimpleSorterColumn('客户端类型', 'clientType', 110, sorter),
+      { ...BaseTableUtils.genSimpleSorterColumn('客户端类型', 'clientType', 110, sorter), render: (_, record) => telemetryLabel(clientTypes, record.clientType) },
       BaseTableUtils.genBoolSorterColumn('允许上报', 'enabled', 100, sorter),
       BaseTableUtils.genSimpleSorterColumn('备注', 'remark', 200, sorter),
       ...BaseTableUtils.genCtrColumns(sorter),
@@ -40,7 +41,7 @@ export default function TelemetryAppPage() {
       <Form form={form} layout="inline" onFinish={({ enabled, ...values }) => setFormValues({ ...values, enabled: enabled === undefined ? undefined : enabled === 'true' })}>
         <Form.Item name="appName" label="名称"><Input allowClear /></Form.Item>
         <Form.Item name="appKey" label="AppKey"><Input allowClear /></Form.Item>
-        <Form.Item name="clientType" label="客户端"><Select allowClear style={{ width: 120 }} options={['WEB', 'DESKTOP', 'MOBILE', 'OTHER'].map(value => ({ value, label: value }))} /></Form.Item>
+        <Form.Item name="clientType" label="客户端"><Select allowClear style={{ width: 120 }} options={clientTypes} /></Form.Item>
         <Form.Item name="enabled" label="状态"><Select allowClear style={{ width: 100 }} options={[{ value: 'true', label: '启用' }, { value: 'false', label: '停用' }]} /></Form.Item>
         <Space>
           <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
