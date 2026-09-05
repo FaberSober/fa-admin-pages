@@ -615,6 +615,15 @@ namespace Admin {
 
   // -------------------------------------------- Telemetry --------------------------------------------
   export type TelemetryClientType = 'WEB' | 'DESKTOP' | 'MOBILE' | 'OTHER';
+  export interface TelemetryApp extends Fa.BaseDelEntity {
+    id: number;
+    appKey: string;
+    appCode: string;
+    appName: string;
+    clientType: TelemetryClientType;
+    enabled: boolean;
+    remark?: string;
+  }
   export type TelemetryIssueStatus = 'OPEN' | 'RESOLVED' | 'IGNORED';
 
   export interface ClientErrorIssue {

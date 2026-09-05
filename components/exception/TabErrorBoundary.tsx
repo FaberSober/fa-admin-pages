@@ -1,4 +1,4 @@
-import { telemetry } from '@/telemetry';
+import { telemetry } from '@features/fa-admin-pages/telemetry';
 import { Button, Result } from 'antd';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 

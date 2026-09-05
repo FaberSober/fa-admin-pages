@@ -5,7 +5,7 @@ import { clearTnTenantId, clearToken, getTnTenantId, type Fa, PageLoading, setTn
 import { authApi, msgApi, rbacUserRoleApi, tenantUserApi, userApi } from '@features/fa-admin-pages/services';
 import ConfigLayoutContext from '../config/context/ConfigLayoutContext';
 import UserLayoutContext, { type UserLayoutContextProps } from './context/UserLayoutContext';
-import { telemetry } from '@/telemetry';
+import { telemetry } from '@features/fa-admin-pages/telemetry';
 
 /**
  * 登录后的用户上下文

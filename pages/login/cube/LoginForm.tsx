@@ -3,7 +3,7 @@ import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/ico
 import { Captcha, LoginMode, setLoginMode, setToken, useApiLoading, useQs } from '@fa/ui';
 import { ConfigLayoutContext } from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { authApi } from '@features/fa-admin-pages/services';
-import { telemetry } from '@/telemetry';
+import { telemetry } from '@features/fa-admin-pages/telemetry';
 import { Button, Checkbox, Form, Input, Space } from 'antd';
 import { trim } from 'lodash';
 import { useContext, useState } from 'react';
