@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Alert, App, Button, Form, Input, Select, Space, Tag } from 'antd';
-import { BaseBizTable, type Fa, type FaberTable, ShiroPermissionContainer, useApiLoading, useTableQueryParams } from '@fa/ui';
+import { Alert, Button, Form, Input, Modal, Select, Space, Tag } from 'antd';
+import { BaseBizTable, BaseTableUtils, type Fa, type FaberTable, FaUtils, ShiroPermissionContainer, useApiLoading, useTableQueryParams } from '@fa/ui';
 import dayjs from 'dayjs';
 import { onlineUserApi } from '@features/fa-admin-pages/services';
 import type { OnlineUser } from '@features/fa-admin-pages/types';
@@ -11,7 +11,6 @@ const formatTime = (value: number | null) => (value == null ? '未知（已有�
 
 export default function OnlineUserList() {
   const [form] = Form.useForm();
-  const { modal, message } = App.useApp();
   const [stats, setStats] = useState<OnlineUser.Stats>();
   const kicking = useApiLoading(onlineUserApi.getUrl('kickout'));
   const loadPage = useCallback(async (params: Fa.BasePageProps) => {
@@ -23,7 +22,7 @@ export default function OnlineUserList() {
     useTableQueryParams<OnlineUser.Session>(loadPage, {}, '在线会话');
 
   function confirmKickout(record: OnlineUser.Session, allSessions: boolean) {
-    modal.confirm({
+    Modal.confirm({
       title: allSessions ? '下线该用户全部后台会话？' : '强制下线此会话？',
       content: (
         <div>
@@ -37,35 +36,36 @@ export default function OnlineUserList() {
       okButtonProps: { danger: true },
       onOk: async () => {
         const res = await onlineUserApi.kickout(record.id, allSessions);
-        message.success(res.data > 0 ? `已下线 ${res.data} 个后台会话` : '该会话已失效，无需重复下线');
+        FaUtils.showResponse(res, '强制下线');
         fetchPageList();
       },
     });
   }
 
   function genColumns(): FaberTable.ColumnsProp<OnlineUser.Session>[] {
+    // 后端固定按最近访问时间倒序，列不启用服务端尚未支持的排序。
     return [
-      { title: '账号', dataIndex: 'username', width: 150, render: (_, record) => (
+      { ...BaseTableUtils.genSimpleSorterColumn('账号', 'username', 150, false), render: (_, record) => (
         <Space>{record.username}{record.current && <Tag color="blue">当前会话</Tag>}</Space>
       ) },
-      { title: '姓名', dataIndex: 'name', width: 110 },
-      { title: '来源', dataIndex: 'source', width: 90, render: () => '后台 Web' },
-      { title: '状态', dataIndex: 'active', width: 110, render: (value: boolean) => (
+      BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 110, false),
+      { ...BaseTableUtils.genSimpleSorterColumn('来源', 'source', 90, false), render: () => '后台 Web' },
+      { ...BaseTableUtils.genBoolSorterColumn('状态', 'active', 110, false), render: (value: boolean) => (
         <Tag color={value ? 'green' : 'default'}>{value ? '近期活跃' : '暂未活跃'}</Tag>
       ) },
-      { title: '登录时间', dataIndex: 'loginTime', width: 180, render: formatTime },
-      { title: '最近访问时间', dataIndex: 'lastAccessTime', width: 180, render: formatTime },
-      { title: '最近访问 IP', dataIndex: 'ip', width: 145, render: (value: string | null) => value || '-' },
-      { title: '最近浏览器', dataIndex: 'browser', width: 120 },
-      { title: '最近操作系统', dataIndex: 'os', width: 125 },
-      { title: '到期时间', dataIndex: 'expiresAt', width: 180, render: (value: number | null) => value == null ? '永不过期' : formatTime(value) },
+      { ...BaseTableUtils.genTimeSorterColumn('登录时间', 'loginTime', 180, false), render: formatTime },
+      { ...BaseTableUtils.genTimeSorterColumn('最近访问时间', 'lastAccessTime', 180, false), render: formatTime },
+      { ...BaseTableUtils.genSimpleSorterColumn('最近访问 IP', 'ip', 145, false), render: (value: string | null) => value || '-' },
+      { ...BaseTableUtils.genSimpleSorterColumn('最近浏览器', 'browser', 120, false), ellipsis: true, render: (value: string | null) => value || '-' },
+      { ...BaseTableUtils.genSimpleSorterColumn('最近操作系统', 'os', 125, false), ellipsis: true, render: (value: string | null) => value || '-' },
+      { ...BaseTableUtils.genTimeSorterColumn('到期时间', 'expiresAt', 180, false), render: (value: number | null) => value == null ? '永不过期' : formatTime(value) },
       { title: '操作', dataIndex: 'opr', width: 230, fixed: 'right', tcRequired: true, tcType: 'menu', render: (_, record) => (
         <ShiroPermissionContainer permission={kickPermission}>
           <Space>
-            <Button type="link" danger disabled={record.current || kicking} onClick={() => confirmKickout(record, false)}>
+            <Button size="small" type="link" danger disabled={record.current || kicking} onClick={() => confirmKickout(record, false)}>
               强制下线
             </Button>
-            <Button type="link" danger disabled={record.currentUser || kicking} onClick={() => confirmKickout(record, true)}>
+            <Button size="small" type="link" danger disabled={record.currentUser || kicking} onClick={() => confirmKickout(record, true)}>
               全部后台下线
             </Button>
           </Space>
