@@ -4,11 +4,12 @@ import {
 } from '@ant-design/icons';
 import { EchartsBar, EchartsLine } from '@features/fa-admin-pages/components';
 import { telemetryDashboardApi } from '@features/fa-admin-pages/services';
+import { ThemeLayoutContext } from '@fa/ui';
 import type { Admin, Fa } from '@/types';
 import { Button, Card, Col, Empty, Row, Segmented, Skeleton, Space } from 'antd';
 import type { BarSeriesOption, EChartsOption } from 'echarts';
 import dayjs from 'dayjs';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import './index.scss';
 
 const EMPTY_OVERVIEW: Admin.TelemetryDashboardOverview = {
@@ -43,10 +44,10 @@ const METRICS: MetricConfig[] = [
 ];
 
 const SCOPE_ITEMS = [
-  { icon: <DashboardOutlined />, color: '#1677ff', bg: 'rgba(22,119,255,0.10)', title: '今日实时指标', desc: '直接读取 Stat Event，实时统计今日活跃 / 登录 / PV / 业务与异常' },
-  { icon: <LineChartOutlined />, color: '#13c2c2', bg: 'rgba(19,194,194,0.10)', title: '历史使用趋势', desc: '按日聚合近 7 / 30 天窗口的活跃、登录、业务操作与异常' },
-  { icon: <BarChartOutlined />, color: '#fa8c16', bg: 'rgba(250,140,22,0.10)', title: '业务使用排行', desc: '统计近 30 天各模块与各功能的使用次数排行' },
-  { icon: <DatabaseOutlined />, color: '#722ed1', bg: 'rgba(114,46,209,0.10)', title: '数据留存策略', desc: '每日汇总任务保留长期聚合数据，页面以有限原始事件窗口保证计算准确性' },
+  { icon: <DashboardOutlined />, color: '#1677ff', bg: 'rgba(22,119,255,0.12)', title: '今日实时指标', desc: '直接读取 Stat Event，实时统计今日活跃 / 登录 / PV / 业务与异常' },
+  { icon: <LineChartOutlined />, color: '#13c2c2', bg: 'rgba(19,194,194,0.12)', title: '历史使用趋势', desc: '按日聚合近 7 / 30 天窗口的活跃、登录、业务操作与异常' },
+  { icon: <BarChartOutlined />, color: '#fa8c16', bg: 'rgba(250,140,22,0.12)', title: '业务使用排行', desc: '统计近 30 天各模块与各功能的使用次数排行' },
+  { icon: <DatabaseOutlined />, color: '#722ed1', bg: 'rgba(114,46,209,0.12)', title: '数据留存策略', desc: '每日汇总任务保留长期聚合数据，页面以有限原始事件窗口保证计算准确性' },
 ];
 
 /** 柱状图配色：第 1 名主色高亮，其余递减 */
@@ -55,7 +56,15 @@ const barPalette = (base: string) => (params: any) => {
   return list[Math.min(params.dataIndex, list.length - 1)];
 };
 
-const LINE_OPTIONS: EChartsOption = {
+const chartTooltip = {
+  backgroundColor: 'rgba(15,23,42,0.88)',
+  borderWidth: 0,
+  padding: [8, 12],
+  textStyle: { color: '#fff', fontSize: 12 },
+};
+
+/** 折线图配置：坐标轴 / 图例 / 网格线随明暗主题切换 */
+const buildLineOptions = (dark: boolean): EChartsOption => ({
   color: ['#1677ff', '#13c2c2', '#fa8c16', '#cf1322'],
   legend: {
     top: 0,
@@ -63,27 +72,24 @@ const LINE_OPTIONS: EChartsOption = {
     itemWidth: 16,
     itemHeight: 8,
     icon: 'roundRect',
-    textStyle: { fontSize: 12, color: '#64748b' },
+    textStyle: { fontSize: 12, color: dark ? 'rgba(255,255,255,0.65)' : '#64748b' },
   },
   grid: { left: 8, right: 12, top: 32, bottom: 4, containLabel: true },
   tooltip: {
     trigger: 'axis',
-    backgroundColor: 'rgba(15,23,42,0.88)',
-    borderWidth: 0,
-    padding: [8, 12],
-    textStyle: { color: '#fff', fontSize: 12 },
-    axisPointer: { type: 'line', lineStyle: { color: 'rgba(148,163,184,0.5)', type: 'dashed' } },
+    ...chartTooltip,
+    axisPointer: { type: 'line', lineStyle: { color: dark ? 'rgba(255,255,255,0.3)' : 'rgba(148,163,184,0.5)', type: 'dashed' } },
     valueFormatter: (value: any) => (typeof value === 'number' ? value.toLocaleString('zh-CN') : String(value ?? '-')),
   },
   xAxis: {
     boundaryGap: false,
-    axisLine: { lineStyle: { color: 'rgba(148,163,184,0.35)' } },
+    axisLine: { lineStyle: { color: dark ? 'rgba(255,255,255,0.15)' : 'rgba(148,163,184,0.35)' } },
     axisTick: { show: false },
-    axisLabel: { color: '#94a3b8', fontSize: 11 },
+    axisLabel: { color: dark ? 'rgba(255,255,255,0.55)' : '#94a3b8', fontSize: 11 },
   },
   yAxis: {
-    splitLine: { lineStyle: { color: 'rgba(148,163,184,0.16)', type: 'dashed' } },
-    axisLabel: { color: '#94a3b8', fontSize: 11 },
+    splitLine: { lineStyle: { color: dark ? 'rgba(255,255,255,0.08)' : 'rgba(148,163,184,0.16)', type: 'dashed' } },
+    axisLabel: { color: dark ? 'rgba(255,255,255,0.55)' : '#94a3b8', fontSize: 11 },
   },
   series: [
     {
@@ -110,33 +116,23 @@ const LINE_OPTIONS: EChartsOption = {
     { name: '业务操作', type: 'line', smooth: true, showSymbol: false, symbol: 'circle', symbolSize: 7, lineStyle: { width: 2 }, emphasis: { focus: 'series' } },
     { name: '异常', type: 'line', smooth: true, showSymbol: false, symbol: 'circle', symbolSize: 7, lineStyle: { width: 2, type: 'dashed' }, emphasis: { focus: 'series' } },
   ],
-};
+});
 
-const barTooltip = {
-  backgroundColor: 'rgba(15,23,42,0.88)',
-  borderWidth: 0,
-  padding: [8, 12],
-  textStyle: { color: '#fff', fontSize: 12 },
-};
-
-const MODULE_BAR_OPTIONS: EChartsOption = {
+/** 柱状图配置：坐标轴 / 网格线随明暗主题切换 */
+const buildBarOptions = (dark: boolean): EChartsOption => ({
   legend: { show: false },
   grid: { left: 8, right: 16, top: 12, bottom: 4, containLabel: true },
   xAxis: {
-    axisLine: { lineStyle: { color: 'rgba(148,163,184,0.35)' } },
+    axisLine: { lineStyle: { color: dark ? 'rgba(255,255,255,0.15)' : 'rgba(148,163,184,0.35)' } },
     axisTick: { show: false },
-    axisLabel: { color: '#94a3b8', fontSize: 11, interval: 0, formatter: (v: string) => (v.length > 12 ? `${v.slice(0, 12)}…` : v) },
+    axisLabel: { color: dark ? 'rgba(255,255,255,0.55)' : '#94a3b8', fontSize: 11, interval: 0, formatter: (v: string) => (v.length > 12 ? `${v.slice(0, 12)}…` : v) },
   },
   yAxis: {
-    splitLine: { lineStyle: { color: 'rgba(148,163,184,0.16)', type: 'dashed' } },
-    axisLabel: { color: '#94a3b8', fontSize: 11 },
+    splitLine: { lineStyle: { color: dark ? 'rgba(255,255,255,0.08)' : 'rgba(148,163,184,0.16)', type: 'dashed' } },
+    axisLabel: { color: dark ? 'rgba(255,255,255,0.55)' : '#94a3b8', fontSize: 11 },
   },
-  tooltip: { ...barTooltip, trigger: 'axis', axisPointer: { type: 'shadow' } },
-};
-
-const EVENT_BAR_OPTIONS: EChartsOption = {
-  ...MODULE_BAR_OPTIONS,
-};
+  tooltip: { ...chartTooltip, trigger: 'axis', axisPointer: { type: 'shadow' } },
+});
 
 const MODULE_BAR_SERIES: BarSeriesOption = {
   itemStyle: {
@@ -157,6 +153,7 @@ const EVENT_BAR_SERIES: BarSeriesOption = {
 };
 
 export default function TelemetryDashboard() {
+  const { themeDark } = useContext(ThemeLayoutContext);
   const [days, setDays] = useState<7 | 30>(7);
   const [overview, setOverview] = useState<Admin.TelemetryDashboardOverview>();
   const [trend, setTrend] = useState<Admin.TelemetryDashboardTrend[]>([]);
@@ -164,6 +161,9 @@ export default function TelemetryDashboard() {
   const [eventRank, setEventRank] = useState<Admin.TelemetryDashboardRank[]>([]);
   const [loading, setLoading] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<string>();
+
+  const lineOptions = useMemo(() => buildLineOptions(themeDark), [themeDark]);
+  const barOptions = useMemo(() => buildBarOptions(themeDark), [themeDark]);
 
   useEffect(() => {
     fetchData();
@@ -235,7 +235,7 @@ export default function TelemetryDashboard() {
                   { name: '业务操作', data: trend.map((item) => item.businessEventCount) },
                   { name: '异常', data: trend.map((item) => item.errorCount) },
                 ]}
-                restOption={LINE_OPTIONS}
+                restOption={lineOptions}
               />
             )}
           </Card>
@@ -271,7 +271,7 @@ export default function TelemetryDashboard() {
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无排行数据" />
               </div>
             ) : (
-              <EchartsBar data={moduleData} dataTitle="页面访问" barWidth={18} barSeriesOption={MODULE_BAR_SERIES} options={MODULE_BAR_OPTIONS} />
+              <EchartsBar data={moduleData} dataTitle="页面访问" barWidth={18} barSeriesOption={MODULE_BAR_SERIES} options={barOptions} />
             )}
           </Card>
         </Col>
@@ -284,7 +284,7 @@ export default function TelemetryDashboard() {
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无排行数据" />
               </div>
             ) : (
-              <EchartsBar data={eventData} dataTitle="使用次数" barWidth={18} barSeriesOption={EVENT_BAR_SERIES} options={EVENT_BAR_OPTIONS} />
+              <EchartsBar data={eventData} dataTitle="使用次数" barWidth={18} barSeriesOption={EVENT_BAR_SERIES} options={barOptions} />
             )}
           </Card>
         </Col>

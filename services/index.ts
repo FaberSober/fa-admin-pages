@@ -15,6 +15,7 @@ export { default as jobApi } from './base/admin/job';
 export { default as jobLogApi } from './base/admin/jobLog';
 export { default as logApiApi } from './base/admin/logApi';
 export { default as logLoginApi } from './base/admin/logLogin';
+export { default as onlineUserApi } from './base/admin/onlineUser';
 export { default as telemetryIssueApi } from './base/telemetry/issue';
 export { default as telemetryAppApi } from './base/telemetry/app';
 export { default as telemetryErrorEventApi } from './base/telemetry/errorEvent';
