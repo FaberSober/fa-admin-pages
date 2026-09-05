@@ -1,0 +1,6 @@
+/* 异常事件详情：Descriptions bordered 表格固定列宽，
+   避免展开 JSON 后表格列被内容固有宽度撑宽（antd bordered 默认 table-layout: auto） */
+.fa-json-view-descriptions.ant-descriptions.ant-descriptions-bordered .ant-descriptions-view > table {
+  width: 100%;
+  table-layout: fixed;
+}
