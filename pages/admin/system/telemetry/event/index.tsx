@@ -20,9 +20,23 @@ export default function TelemetryErrorEventList() {
     BaseTableUtils.genSimpleSorterColumn('环境', 'environment', 100, sorter),
     BaseTableUtils.genSimpleSorterColumn('版本', 'release', 130, sorter),
     BaseTableUtils.genSimpleSorterColumn('用户', 'userId', 120, sorter),
-    BaseTableUtils.genSimpleSorterColumn('Session', 'sessionId', 160, sorter),
+    BaseTableUtils.genSimpleSorterColumn('Session', 'sessionId', 260, sorter),
     BaseTableUtils.genSimpleSorterColumn('发生时间', 'occurTime', 170, sorter),
-    { title: '操作', dataIndex: 'menu', width: 90, fixed: 'right', render: (_, record) => <Space><BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="详情" />}><ErrorEventView record={record} /></BaseDrawer></Space> },
+    {
+      title: '操作',
+      dataIndex: 'menu',
+      width: 90,
+      fixed: 'right',
+      tcRequired: true,
+      tcType: 'menu',
+      render: (_, record) => (
+        <Space>
+          <BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="详情" />}>
+            <ErrorEventView record={record} />
+          </BaseDrawer>
+        </Space>
+      )
+    },
   ];
   return <div className="fa-full-content-p12 fa-flex-column fa-content">
     <Form form={form} layout="inline" onFinish={setFormValues} className="fa-mtb12">

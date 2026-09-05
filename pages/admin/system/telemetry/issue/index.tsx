@@ -46,6 +46,8 @@ export default function TelemetryIssueList() {
         dataIndex: 'menu',
         width: 220,
         fixed: 'right',
+        tcRequired: true,
+        tcType: 'menu',
         render: (_, record) => <Space>
           <BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="详情" />}><IssueView record={record} /></BaseDrawer>
           <Button size="small" onClick={() => updateStatus(record.id, 'OPEN')}>打开</Button>

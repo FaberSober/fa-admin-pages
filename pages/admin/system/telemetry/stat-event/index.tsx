@@ -19,10 +19,12 @@ export default function TelemetryStatEventList() {
     BaseTableUtils.genSimpleSorterColumn('结果', 'result', 90, sorter),
     BaseTableUtils.genSimpleSorterColumn('环境', 'environment', 90, sorter),
     BaseTableUtils.genSimpleSorterColumn('版本', 'release', 120, sorter),
-    BaseTableUtils.genSimpleSorterColumn('Session', 'sessionId', 160, sorter),
+    BaseTableUtils.genSimpleSorterColumn('Session', 'sessionId', 260, sorter),
     BaseTableUtils.genSimpleSorterColumn('发生时间', 'occurTime', 170, sorter),
     {
       title: '操作', dataIndex: 'menu', width: 90, fixed: 'right',
+      tcRequired: true,
+      tcType: 'menu',
       render: (_, record) => <BaseDrawer triggerDom={<FaHref icon={<EyeOutlined />} text="详情" />}><EventDetail record={record} /></BaseDrawer>,
     },
   ];

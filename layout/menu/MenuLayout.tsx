@@ -161,7 +161,6 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
     // sider同步打开位置
     const menuIds = restIds.map((i) => i.id);
     setMenuSelPath(menuIds);
-    console.log(menuPath);
     setBreadcrumbs(menuPath.map(m=>({title:m.name})))
 
     setOpenSideMenuKeys(collapse ? [] : menuIds);
@@ -303,7 +302,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
                     {hasPermission ? (
                       <TabErrorBoundary
                         key={`${curTab?.key ?? ''}-${tabReloadKeys[curTab?.key ?? ''] ?? 0}`}
-                        onReload={() => reloadTab(curTab?.key ?? '')}
+                        onReload={() => contextValue.reloadTab(curTab?.key ?? '')}
                       >
                         <React.Fragment key={tabReloadKeys[curTab?.key ?? ''] ?? 0}>{children}</React.Fragment>
                       </TabErrorBoundary>
