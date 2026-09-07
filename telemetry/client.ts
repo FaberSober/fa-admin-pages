@@ -2,6 +2,7 @@ import { getWebTelemetryContext } from './context';
 import { TelemetryBreadcrumbBuffer } from './breadcrumb';
 import { createTelemetrySessionId } from './session';
 import { TelemetryUserStore } from './user';
+import { getErrorFingerprint, TelemetryErrorRateLimiter } from './rate-limit';
 import type { TelemetryBasePayload, TelemetryErrorPayload, TelemetryEventPayload, TelemetryEventType, TelemetryInitOptions, TelemetryUser } from './types';
 
 /** Telemetry Phase 1 客户端基础状态；事件发送将在后续阶段接入。 */
@@ -11,6 +12,8 @@ export class TelemetryClient {
   private context?: TelemetryInitOptions['context'];
   private readonly userStore = new TelemetryUserStore();
   private readonly breadcrumbs = new TelemetryBreadcrumbBuffer();
+  /** 异常上报限流：同指纹冷却 + 全局滑动窗口上限，防止异常风暴打爆上报接口 */
+  private readonly errorRateLimiter = new TelemetryErrorRateLimiter();
   private globalHandlersInstalled = false;
 
   init(options: TelemetryInitOptions): void {
@@ -43,6 +46,9 @@ export class TelemetryClient {
   captureException(error: unknown, extraContext?: Record<string, unknown>): void {
     if (!this.isInitialized()) return;
     const normalized = normalizeError(error);
+    // 异常风暴防护：同指纹冷却 + 全局滑动窗口上限；被抑制的异常不发送、不记录 breadcrumb
+    const fingerprint = getErrorFingerprint(normalized.errorType, normalized.message, normalized.stack);
+    if (!this.errorRateLimiter.shouldSend(fingerprint)) return;
     this.breadcrumbs.add('ERROR', { errorType: normalized.errorType, message: normalized.message });
     const payload: TelemetryErrorPayload = {
       ...this.getBasePayload(),
