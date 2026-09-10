@@ -67,6 +67,10 @@ function useApps() {
   return context;
 }
 
+export function useTelemetryApps() {
+  return useApps();
+}
+
 export function TelemetryAppSelect(props: SelectProps<number>) {
   const { apps, loading, failed, reload } = useApps();
   return <Select<number> allowClear showSearch optionFilterProp="label" placeholder="全部应用" style={{ width: 240 }}

@@ -697,6 +697,7 @@ namespace Admin {
     statDate: string;
     activeUserCount: number;
     loginCount: number;
+    pageViewCount: number;
     businessEventCount: number;
     errorCount: number;
   }
@@ -705,6 +706,28 @@ namespace Admin {
     name: string;
     primaryCount: number;
     secondaryCount: number;
+  }
+
+  export interface TelemetryGlobalDashboardOverview {
+    appCount: number;
+    enabledAppCount: number;
+    activeUserCount: number;
+    pageViewCount: number;
+    businessEventCount: number;
+    errorCount: number;
+  }
+
+  export interface TelemetryGlobalDashboardAppRank {
+    appId: number;
+    appName: string;
+    appCode: string;
+    clientType: TelemetryClientType;
+    enabled: boolean;
+    activeUserCount: number;
+    pageViewCount: number;
+    businessEventCount: number;
+    errorCount: number;
+    lastReportTime?: string;
   }
 
   // -------------------------------------------- 系统-实体变更日志 --------------------------------------------

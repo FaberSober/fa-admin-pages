@@ -3,13 +3,14 @@ import {
   LineChartOutlined, LoginOutlined, ReloadOutlined, TeamOutlined, ThunderboltOutlined, UserOutlined,
 } from '@ant-design/icons';
 import { EchartsBar, EchartsLine } from '@features/fa-admin-pages/components';
+import { TelemetryAppProvider, TelemetryAppSelect, useTelemetryApps } from '@features/fa-admin-pages/components/telemetry';
 import { telemetryDashboardApi } from '@features/fa-admin-pages/services';
 import { ThemeLayoutContext } from '@fa/ui';
 import type { Admin, Fa } from '@/types';
 import { Button, Card, Col, Empty, Row, Segmented, Skeleton, Space } from 'antd';
 import type { BarSeriesOption, EChartsOption } from 'echarts';
 import dayjs from 'dayjs';
-import { type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import './index.scss';
 
 const EMPTY_OVERVIEW: Admin.TelemetryDashboardOverview = {
@@ -153,7 +154,13 @@ const EVENT_BAR_SERIES: BarSeriesOption = {
 };
 
 export default function TelemetryDashboard() {
+  return <TelemetryAppProvider><TelemetryDashboardContent /></TelemetryAppProvider>;
+}
+
+function TelemetryDashboardContent() {
+  const { apps } = useTelemetryApps();
   const { themeDark } = useContext(ThemeLayoutContext);
+  const [appId, setAppId] = useState<number>();
   const [days, setDays] = useState<7 | 30>(7);
   const [overview, setOverview] = useState<Admin.TelemetryDashboardOverview>();
   const [trend, setTrend] = useState<Admin.TelemetryDashboardTrend[]>([]);
@@ -161,31 +168,41 @@ export default function TelemetryDashboard() {
   const [eventRank, setEventRank] = useState<Admin.TelemetryDashboardRank[]>([]);
   const [loading, setLoading] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<string>();
+  const requestId = useRef(0);
 
   const lineOptions = useMemo(() => buildLineOptions(themeDark), [themeDark]);
   const barOptions = useMemo(() => buildBarOptions(themeDark), [themeDark]);
 
   useEffect(() => {
-    fetchData();
+    if (appId === undefined && apps.length > 0) {
+      setAppId((apps.find(app => app.enabled) || apps[0]).id);
+    }
+  }, [apps, appId]);
+
+  useEffect(() => {
+    if (appId !== undefined) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [days]);
+  }, [days, appId]);
 
   async function fetchData() {
+    if (appId === undefined) return;
+    const currentRequestId = ++requestId.current;
     setLoading(true);
     try {
       const [overviewRes, trendRes, moduleRes, eventRes] = await Promise.all([
-        telemetryDashboardApi.overview(),
-        telemetryDashboardApi.trend(days),
-        telemetryDashboardApi.moduleRank(),
-        telemetryDashboardApi.eventRank(),
+        telemetryDashboardApi.overview(appId),
+        telemetryDashboardApi.trend(appId, days),
+        telemetryDashboardApi.moduleRank(appId),
+        telemetryDashboardApi.eventRank(appId),
       ]);
+      if (currentRequestId !== requestId.current) return;
       setOverview(overviewRes.data);
       setTrend(trendRes.data || []);
       setModuleRank(moduleRes.data || []);
       setEventRank(eventRes.data || []);
       setUpdatedAt(dayjs().format('HH:mm:ss'));
     } finally {
-      setLoading(false);
+      if (currentRequestId === requestId.current) setLoading(false);
     }
   }
 
@@ -206,6 +223,7 @@ export default function TelemetryDashboard() {
           </div>
         </div>
         <Space wrap>
+          <TelemetryAppSelect allowClear={false} value={appId} onChange={setAppId} placeholder="请选择应用" />
           <Segmented<7 | 30> value={days} options={[{ label: '近 7 天', value: 7 }, { label: '近 30 天', value: 30 }]} onChange={setDays} />
           <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchData}>刷新</Button>
         </Space>
