@@ -457,6 +457,7 @@ namespace Admin {
     enabled: boolean;
     mode: LicenseMode;
     status: LicenseState;
+    canViewDiagnostics: boolean;
     machineId?: string | null;
     licenseId?: string | null;
     product?: string | null;
