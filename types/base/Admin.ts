@@ -438,6 +438,33 @@ namespace Admin {
     md5: string;
   }
 
+  /** 授权状态 */
+  export type LicenseMode = 'ONLINE' | 'OFFLINE';
+
+  export type LicenseState =
+    | 'ACTIVE'
+    | 'GRACE'
+    | 'BYPASSED'
+    | 'EXPIRED'
+    | 'DISABLED'
+    | 'MACHINE_MISMATCH'
+    | 'INVALID'
+    | 'TIME_ANOMALY'
+    | 'BLOCKED'
+    | 'UNCONFIGURED';
+
+  export interface LicenseStatus {
+    enabled: boolean;
+    mode: LicenseMode;
+    status: LicenseState;
+    machineId?: string | null;
+    licenseId?: string | null;
+    product?: string | null;
+    customer?: string | null;
+    issuedAt?: string | null;
+    expireAt?: string | null;
+  }
+
   /** BASE-通用业务附件表 */
   export interface FileBiz extends Fa.BaseDelEntity {
     /** ID */
