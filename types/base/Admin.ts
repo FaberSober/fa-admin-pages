@@ -466,6 +466,13 @@ namespace Admin {
     expireAt?: string | null;
   }
 
+  export interface LicenseRecoveryStatus {
+    matched: boolean;
+    uploadAllowed: boolean;
+    mode?: LicenseMode | null;
+    status?: LicenseState | null;
+  }
+
   /** BASE-通用业务附件表 */
   export interface FileBiz extends Fa.BaseDelEntity {
     /** ID */

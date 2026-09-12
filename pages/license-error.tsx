@@ -1,11 +1,10 @@
-import { CopyOutlined, ReloadOutlined } from '@ant-design/icons';
-import { FaUtils, getToken } from '@fa/ui';
+import { CopyOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { FaUtils, getToken, useApiLoading, useQs } from '@fa/ui';
 import { licenseApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
-import { Button, Card, Descriptions, Result, Space, Spin, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Descriptions, message, Result, Space, Spin, Tag, Typography, Upload } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 const STATUS_META: Record<Admin.LicenseState, { label: string; color: string }> = {
   ACTIVE: { label: '有效', color: 'success' },
@@ -42,31 +41,51 @@ function safeRedirect(value: string | null) {
 }
 
 export default function LicenseErrorPage() {
-  const [searchParams] = useSearchParams();
+  const search: any = useQs();
   const [license, setLicense] = useState<Admin.LicenseStatus>();
-  const [loading, setLoading] = useState(false);
-  const returnUrl = safeRedirect(searchParams.get('redirect'));
+  const [recovery, setRecovery] = useState<Admin.LicenseRecoveryStatus>();
+  const [recoveryFile, setRecoveryFile] = useState<File>();
+  const machineId = typeof search.machineId === 'string' ? search.machineId.trim() : '';
+  const returnUrl = safeRedirect(typeof search.redirect === 'string' ? search.redirect : null);
+  const loading = useApiLoading(licenseApi.getUrl('info'));
+  const recoveryLoading = useApiLoading(licenseApi.getUrl('recovery-info'));
+  const recoveryImporting = useApiLoading(licenseApi.getUrl('recovery-import'));
   const statusMeta = license ? STATUS_META[license.status] : undefined;
+  const recoveryStatusMeta = recovery?.status ? STATUS_META[recovery.status] : undefined;
 
   useEffect(() => {
-    if (!getToken()) return;
+    if (machineId || !getToken()) return;
 
     let mounted = true;
-    setLoading(true);
     licenseApi
       .info()
       .then((response) => {
         if (mounted) setLicense(response.data);
       })
-      .catch(() => {})
-      .finally(() => {
-        if (mounted) setLoading(false);
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [machineId]);
+
+  useEffect(() => {
+    if (!machineId) return;
+
+    let mounted = true;
+    licenseApi
+      .recoveryInfo(machineId)
+      .then((response) => {
+        if (mounted) setRecovery(response.data);
+      })
+      .catch(() => {
+        if (mounted) setRecovery(undefined);
       });
 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [machineId]);
 
   function retry() {
     window.location.replace(returnUrl);
@@ -78,6 +97,32 @@ export default function LicenseErrorPage() {
 
   function copyMachineId() {
     if (license?.machineId) FaUtils.copyToClipboard(license.machineId, 'Machine ID');
+  }
+
+  function handleBeforeRecoveryUpload(file: File) {
+    if (!file.name.toLowerCase().endsWith('.lic')) {
+      message.error('仅支持 .lic 授权文件');
+      return Upload.LIST_IGNORE;
+    }
+    if (file.size > 64 * 1024) {
+      message.error('License 文件不能超过 64 KB');
+      return Upload.LIST_IGNORE;
+    }
+    setRecoveryFile(file);
+    return false;
+  }
+
+  async function handleRecoveryImport() {
+    if (!machineId || !recoveryFile || !recovery?.uploadAllowed) return;
+    try {
+      const response = await licenseApi.recoveryImport(recoveryFile, machineId);
+      setRecovery(response.data);
+      setRecoveryFile(undefined);
+      message.success('授权恢复成功，正在重新检测');
+      window.setTimeout(() => window.location.replace(returnUrl), 500);
+    } catch {
+      // 请求拦截器负责显示后端返回的错误信息。
+    }
   }
 
   return (
@@ -109,6 +154,68 @@ export default function LicenseErrorPage() {
       />
 
       {loading && <Spin size="small" />}
+
+      {machineId && recoveryLoading && <Spin size="small" tip="正在校验恢复入口" />}
+
+      {machineId && !recoveryLoading && recovery && !recovery.matched && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ width: 'min(760px, 100%)' }}
+          message="授权恢复入口校验失败"
+          description="当前 URL 中的机器码与本服务器不匹配，暂不开放恢复操作。"
+        />
+      )}
+
+      {machineId && recovery?.matched && (
+        <Card title="应急授权恢复" style={{ width: 'min(760px, 100%)' }}>
+          <Descriptions bordered column={2} size="small" className="fa-mb12">
+            <Descriptions.Item label="机器码校验">已匹配当前服务器</Descriptions.Item>
+            <Descriptions.Item label="授权模式">{modeLabel(recovery.mode)}</Descriptions.Item>
+            <Descriptions.Item label="授权状态">
+              <Tag color={recoveryStatusMeta?.color || 'error'}>{recoveryStatusMeta?.label || display(recovery.status)}</Tag>
+            </Descriptions.Item>
+          </Descriptions>
+
+          {recovery.mode === 'ONLINE' && (
+            <Alert type="info" showIcon message="当前为在线授权模式" description="在线模式不支持上传离线 License，请配置 FA_LICENSE_KEY 后重新启动服务。" />
+          )}
+
+          {recovery.mode === 'OFFLINE' && recovery.uploadAllowed && (
+            <>
+              <Alert
+                className="fa-mb12"
+                type="warning"
+                showIcon
+                message="已开放离线授权恢复"
+                description="仅支持当前服务器的有效 .lic 授权文件，上传后会替换现有离线授权文件。"
+              />
+              <Space wrap>
+                <Upload
+                  key={recoveryFile?.name || 'recovery-license-upload'}
+                  accept=".lic"
+                  maxCount={1}
+                  showUploadList={false}
+                  disabled={recoveryImporting}
+                  beforeUpload={handleBeforeRecoveryUpload}
+                >
+                  <Button icon={<UploadOutlined />} disabled={recoveryImporting}>
+                    选择授权文件
+                  </Button>
+                </Upload>
+                <Typography.Text type="secondary">{recoveryFile ? recoveryFile.name : '尚未选择文件'}</Typography.Text>
+                <Button type="primary" loading={recoveryImporting} disabled={!recoveryFile} onClick={() => void handleRecoveryImport()}>
+                  上传并恢复
+                </Button>
+              </Space>
+            </>
+          )}
+
+          {recovery.mode === 'OFFLINE' && !recovery.uploadAllowed && (
+            <Alert type="info" showIcon message="当前不允许执行匿名恢复" description="请登录超级管理员后进行授权操作，或确认当前授权状态。" />
+          )}
+        </Card>
+      )}
 
       {license?.canViewDiagnostics && (
         <Card title="授权诊断信息" style={{ width: 'min(760px, 100%)' }}>
