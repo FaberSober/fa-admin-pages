@@ -946,6 +946,24 @@ namespace Admin {
     changedDays: BaseCalendarDay[];
   }
 
+  export interface CalendarExternalImportCalendarPreview {
+    calendarCode: string;
+    source: string;
+    sourceVersion: string;
+    preview: CalendarDayImportPreview;
+  }
+
+  export interface CalendarExternalImportPreview {
+    year: number;
+    calendars: CalendarExternalImportCalendarPreview[];
+    imports: CalendarDayImportRequest[];
+  }
+
+  export interface CalendarExternalImportPublishRequest {
+    year: number;
+    imports: CalendarDayImportRequest[];
+  }
+
   /** BASE-系统-新闻 */
   export interface SysNews extends Fa.BaseDelEntity {
     /** ID */

@@ -1,6 +1,25 @@
-import { CalendarOutlined, CheckCircleOutlined, CloudUploadOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CalendarOutlined, CheckCircleOutlined, CloudSyncOutlined, CloudUploadOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { calendarApi, calendarDayApi } from '@features/fa-admin-pages/services';
-import { Button, Card, Col, DatePicker, Empty, Form, Input, InputNumber, Modal, message, Row, Select, Space, Switch, Table, Tag, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Empty,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  message,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
@@ -16,15 +35,27 @@ const DAY_TYPE_OPTIONS: { value: Admin.CalendarDayType; label: string; open: boo
   { value: 'SPECIAL_TRADING_DAY', label: '特殊交易日', open: true },
 ];
 
+const OA_DAY_TYPES: Admin.CalendarDayType[] = ['HOLIDAY', 'MAKEUP_WORKDAY'];
+const TRADING_DAY_TYPES: Admin.CalendarDayType[] = ['EXCHANGE_CLOSED', 'SPECIAL_TRADING_DAY'];
+
 const CALENDAR_TYPE_OPTIONS = [
-  { value: 'OA', label: 'OA 工作日历' },
-  { value: 'TRADING', label: '交易日历' },
+  { value: 'OA', label: '工作日历' },
+  { value: 'TRADING', label: '业务日历' },
 ];
 
 const IMPORT_EXAMPLE = JSON.stringify(
   [
     { calendarDate: '2026-10-01', dayType: 'HOLIDAY', isOpen: false, holidayName: '国庆节', remark: '' },
     { calendarDate: '2026-10-10', dayType: 'MAKEUP_WORKDAY', isOpen: true, holidayName: '国庆节调休', remark: '' },
+  ],
+  null,
+  2,
+);
+
+const TRADING_IMPORT_EXAMPLE = JSON.stringify(
+  [
+    { calendarDate: '2026-10-01', dayType: 'EXCHANGE_CLOSED', isOpen: false, holidayName: '国庆节', remark: '' },
+    { calendarDate: '2026-10-10', dayType: 'SPECIAL_TRADING_DAY', isOpen: true, holidayName: '周末开市', remark: '' },
   ],
   null,
   2,
@@ -59,6 +90,17 @@ function getDayTypeMeta(value: Admin.CalendarDayType) {
   return DAY_TYPE_OPTIONS.find((option) => option.value === value) ?? DAY_TYPE_OPTIONS[0];
 }
 
+function getDayTypeOptions(calendar?: Admin.BaseCalendar, currentValue?: Admin.CalendarDayType) {
+  const allowedTypes =
+    calendar?.calendarType === 'OA' ? OA_DAY_TYPES : calendar?.calendarType === 'TRADING' ? TRADING_DAY_TYPES : DAY_TYPE_OPTIONS.map((option) => option.value);
+  const options = DAY_TYPE_OPTIONS.filter((option) => allowedTypes.includes(option.value));
+  if (currentValue && !options.some((option) => option.value === currentValue)) {
+    const currentOption = DAY_TYPE_OPTIONS.find((option) => option.value === currentValue);
+    if (currentOption) options.push({ ...currentOption, label: `${currentOption.label}（已有记录）` });
+  }
+  return options;
+}
+
 function formatDateTime(value?: string | null) {
   return value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '—';
 }
@@ -68,7 +110,7 @@ function isDateText(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && parsed.isValid() && parsed.format('YYYY-MM-DD') === value;
 }
 
-function getImportRequest(values: ImportFormValues, calendarCode: string): Admin.CalendarDayImportRequest {
+function getImportRequest(values: ImportFormValues, calendarCode: string, allowedOptions = DAY_TYPE_OPTIONS): Admin.CalendarDayImportRequest {
   let parsed: unknown;
   try {
     parsed = JSON.parse(values.json);
@@ -86,6 +128,7 @@ function getImportRequest(values: ImportFormValues, calendarCode: string): Admin
     const meta = DAY_TYPE_OPTIONS.find((option) => option.value === dayType);
     if (!isDateText(calendarDate)) throw new Error(`第 ${index + 1} 行日期无效`);
     if (!meta) throw new Error(`第 ${index + 1} 行日期类型无效`);
+    if (!allowedOptions.some((option) => option.value === meta.value)) throw new Error(`第 ${index + 1} 行日期类型不适用于当前日历`);
     if (typeof row.isOpen !== 'boolean' || row.isOpen !== meta.open) throw new Error(`第 ${index + 1} 行日期类型与 isOpen 不一致`);
     return {
       calendarDate,
@@ -124,13 +167,18 @@ export default function CalendarMaintenance() {
   const [previewRequest, setPreviewRequest] = useState<Admin.CalendarDayImportRequest>();
   const [previewLoading, setPreviewLoading] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
+  const [externalPreviewModalOpen, setExternalPreviewModalOpen] = useState(false);
+  const [externalPreview, setExternalPreview] = useState<Admin.CalendarExternalImportPreview>();
+  const [externalPreviewLoading, setExternalPreviewLoading] = useState(false);
+  const [externalPublishLoading, setExternalPublishLoading] = useState(false);
 
   const selectedCalendar = useMemo(() => calendars.find((item) => item.calendarCode === selectedCode), [calendars, selectedCode]);
+  const dayTypeOptions = useMemo(() => getDayTypeOptions(selectedCalendar, editingDay?.dayType), [selectedCalendar, editingDay?.dayType]);
 
   function loadCalendars() {
     setCalendarLoading(true);
     calendarApi
-      .page({ current: 1, pageSize: 100, sorter: { field: 'id', order: 'ascend' } as any })
+      .page({ current: 1, pageSize: 100, sorter: 'id ASC' })
       .then((response) => {
         const rows = response.data?.rows ?? [];
         setCalendars(rows);
@@ -187,7 +235,7 @@ export default function CalendarMaintenance() {
   function openDayModal(record?: Admin.BaseCalendarDay) {
     if (!selectedCode) return;
     setEditingDay(record);
-    const dayType = record?.dayType ?? 'WORKDAY';
+    const dayType = record?.dayType ?? (selectedCalendar?.calendarType === 'TRADING' ? 'EXCHANGE_CLOSED' : 'HOLIDAY');
     dayForm.setFieldsValue({
       calendarDate: dayjs(record?.calendarDate ?? `${year}-01-01`),
       dayType,
@@ -231,7 +279,11 @@ export default function CalendarMaintenance() {
 
   function openImportModal() {
     if (!selectedCode) return;
-    importForm.setFieldsValue({ source: 'MANUAL', sourceVersion: '', json: IMPORT_EXAMPLE });
+    importForm.setFieldsValue({
+      source: 'MANUAL',
+      sourceVersion: '',
+      json: selectedCalendar?.calendarType === 'TRADING' ? TRADING_IMPORT_EXAMPLE : IMPORT_EXAMPLE,
+    });
     setImportModalOpen(true);
   }
 
@@ -240,7 +292,7 @@ export default function CalendarMaintenance() {
     const values = await importForm.validateFields();
     let request: Admin.CalendarDayImportRequest;
     try {
-      request = getImportRequest(values, selectedCode);
+      request = getImportRequest(values, selectedCode, getDayTypeOptions(selectedCalendar));
     } catch (error) {
       message.error(error instanceof Error ? error.message : '导入内容无效');
       return;
@@ -265,13 +317,42 @@ export default function CalendarMaintenance() {
       .publish(previewRequest)
       .then((response) => {
         if (!response.data) return;
-        message.success('日历日期已发布；如影响已生成的每日概览，请手动重建对应日期');
+        message.success('日期事实已发布；如影响关联业务数据，请按需重建对应日期');
         setPreviewModalOpen(false);
         setImportModalOpen(false);
         loadDays();
       })
       .catch(() => message.error('发布日历失败'))
       .finally(() => setPublishLoading(false));
+  }
+
+  function previewExternalImport() {
+    setExternalPreviewLoading(true);
+    calendarDayApi
+      .previewExternal(year)
+      .then((response) => {
+        if (!response.data) return;
+        setExternalPreview(response.data);
+        setExternalPreviewModalOpen(true);
+      })
+      .catch(() => message.error('获取外部年度日历失败，请检查外部数据源配置'))
+      .finally(() => setExternalPreviewLoading(false));
+  }
+
+  function publishExternalImport() {
+    if (!externalPreview) return;
+    setExternalPublishLoading(true);
+    calendarDayApi
+      .publishExternal({ year: externalPreview.year, imports: externalPreview.imports })
+      .then((response) => {
+        if (!response.data) return;
+        message.success('年度日历已发布；如影响关联业务数据，请按需重建');
+        setExternalPreviewModalOpen(false);
+        setYear(externalPreview.year);
+        loadDays(selectedCode, externalPreview.year);
+      })
+      .catch(() => message.error('发布外部年度日历失败'))
+      .finally(() => setExternalPublishLoading(false));
   }
 
   const calendarColumns: ColumnsType<Admin.BaseCalendar> = [
@@ -344,16 +425,29 @@ export default function CalendarMaintenance() {
     ...(preview?.changedDays ?? []).map((item) => ({ ...item, changeType: '修改' })),
   ];
 
+  const externalPreviewColumns: ColumnsType<Admin.CalendarExternalImportCalendarPreview> = [
+    { title: '日历', dataIndex: 'calendarCode', width: 120, render: (value: string) => <Typography.Text code>{value}</Typography.Text> },
+    { title: '来源', dataIndex: 'source', width: 150, ellipsis: true },
+    { title: '版本', dataIndex: 'sourceVersion', width: 90 },
+    { title: '总记录', width: 80, render: (_, record) => record.preview.total },
+    { title: '新增', width: 70, render: (_, record) => record.preview.added },
+    { title: '修改', width: 70, render: (_, record) => record.preview.changed },
+    { title: '未变化', width: 80, render: (_, record) => record.preview.unchanged },
+  ];
+
   return (
     <div className="calendarMaintenancePage">
       <section className="calendarMaintenanceHero">
         <div>
           <Typography.Title level={2}>统一日历</Typography.Title>
           <Typography.Paragraph>
-            维护 OA 工作日与交易所开闭市事实。日历编码彼此独立，调休不会把 A 股误判为交易日；发布后可供 OA、量化和外部端共享。
+            维护各业务使用的日历定义和日期例外事实。日历编码彼此独立，未录入日期按默认规则处理；发布后可供业务模块和外部端共享。
           </Typography.Paragraph>
         </div>
         <Space wrap>
+          <Button type="primary" icon={<CloudSyncOutlined />} loading={externalPreviewLoading} onClick={previewExternalImport}>
+            同步今年日历
+          </Button>
           <Button icon={<ReloadOutlined />} loading={calendarLoading} onClick={loadCalendars}>
             刷新定义
           </Button>
@@ -368,8 +462,38 @@ export default function CalendarMaintenance() {
         type="info"
         showIcon
         message="维护提示"
-        description="日历日期采用最终事实模型，不支持删除；需要撤销时请修正为关闭日期。修改历史日期不会自动覆盖每日概览 JSON，请按需手动重建。"
+        description="日历只维护覆盖默认规则的例外日期；未录入日期由日历类型按工作日/周末规则推导。日期事实不支持删除，需要撤销时请修正为关闭日期；修改历史日期不会自动覆盖已生成的业务数据，请按需重建。"
       />
+
+      <Modal
+        title={`同步 ${externalPreview?.year ?? year} 年外部日历`}
+        open={externalPreviewModalOpen}
+        width={820}
+        confirmLoading={externalPublishLoading}
+        okText="确认发布"
+        onOk={publishExternalImport}
+        onCancel={() => setExternalPreviewModalOpen(false)}
+        destroyOnClose
+      >
+        <Alert
+          type="warning"
+          showIcon
+          message="请确认数据来源后发布"
+          description="系统将按配置的数据源生成年度日历例外日期；确认后将一次性幂等更新本次数据。"
+        />
+        <Table
+          style={{ marginTop: 16 }}
+          size="small"
+          rowKey="calendarCode"
+          columns={externalPreviewColumns}
+          dataSource={externalPreview?.calendars ?? []}
+          pagination={false}
+          scroll={{ x: 680 }}
+        />
+        <Typography.Paragraph type="secondary" style={{ marginTop: 12, marginBottom: 0 }}>
+          发布不会删除已有日期事实；若来源修正了已生成业务数据使用的日期，请按需重建对应日期。
+        </Typography.Paragraph>
+      </Modal>
 
       <Row gutter={[16, 16]} align="stretch">
         <Col xs={24} lg={9} xl={8}>
@@ -432,7 +556,7 @@ export default function CalendarMaintenance() {
                     <span>编码：{selectedCalendar.calendarCode}</span>
                     <span>时区：{selectedCalendar.timezone}</span>
                     <span>市场：{selectedCalendar.market || '—'}</span>
-                    <span>年度事实：{days.length} 条</span>
+                    <span>已维护例外：{days.length} 条</span>
                   </div>
                 )}
                 <Table
@@ -444,7 +568,7 @@ export default function CalendarMaintenance() {
                   dataSource={days}
                   loading={dayLoading}
                   pagination={{ pageSize: 15, showSizeChanger: true }}
-                  locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={`暂无 ${year} 年显式日期事实，未命中日期按周一至周五兜底`} /> }}
+                  locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={`暂无 ${year} 年例外日期，未录入日期按默认规则处理`} /> }}
                   scroll={{ x: 850 }}
                 />
               </>
@@ -463,10 +587,10 @@ export default function CalendarMaintenance() {
       >
         <Form form={calendarForm} layout="vertical">
           <Form.Item name="calendarCode" label="日历编码" rules={[{ required: true, whitespace: true, max: 32 }]}>
-            <Input disabled={Boolean(editingCalendar)} placeholder="例如 CN_OA" />
+            <Input disabled={Boolean(editingCalendar)} placeholder="例如 COMPANY_WORKDAY" />
           </Form.Item>
           <Form.Item name="name" label="名称" rules={[{ required: true, whitespace: true, max: 64 }]}>
-            <Input placeholder="例如 中国 OA 工作日历" />
+            <Input placeholder="例如公司工作日历" />
           </Form.Item>
           <Space style={{ display: 'flex' }} align="start">
             <Form.Item name="calendarType" label="类型" rules={[{ required: true }]} style={{ flex: 1 }}>
@@ -494,17 +618,18 @@ export default function CalendarMaintenance() {
         destroyOnClose
       >
         <Form form={dayForm} layout="vertical">
+          <Alert type="info" showIcon message="当前日历只维护例外日期" description="请根据需要选择日期类型；普通日期无需录入。" style={{ marginBottom: 16 }} />
           <Form.Item name="calendarDate" label="日期" rules={[{ required: true }]}>
             <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
           </Form.Item>
           <Form.Item name="dayType" label="日期类型" rules={[{ required: true }]}>
             <Select
-              options={DAY_TYPE_OPTIONS.map(({ value, label }) => ({ value, label }))}
+              options={dayTypeOptions.map(({ value, label }) => ({ value, label }))}
               onChange={(value: Admin.CalendarDayType) => dayForm.setFieldValue('isOpen', getDayTypeMeta(value).open)}
             />
           </Form.Item>
           <Form.Item name="isOpen" label="日历开放" valuePropName="checked">
-            <Switch checkedChildren="开放" unCheckedChildren="关闭" />
+            <Switch checkedChildren="开放" unCheckedChildren="关闭" disabled />
           </Form.Item>
           <Form.Item name="holidayName" label="节日/说明">
             <Input placeholder="例如 春节、国庆节调休" />
@@ -536,8 +661,8 @@ export default function CalendarMaintenance() {
         <Alert
           type="info"
           showIcon
-          message="输入日期数组 JSON"
-          description="每项必须包含 calendarDate、dayType、isOpen；日期类型与开放状态需一致。预览确认后才会发布。"
+          message="只导入例外日期数组 JSON"
+          description="请按当前日历配置选择对应的例外类型；普通日期无需导入，预览确认后才会发布。"
         />
         <Form form={importForm} layout="vertical" style={{ marginTop: 16 }}>
           <Space style={{ display: 'flex' }} align="start">
@@ -578,7 +703,7 @@ export default function CalendarMaintenance() {
                 </div>
               ))}
             </div>
-            <Typography.Paragraph type="secondary">发布后会以日历日期为业务主键幂等更新；如影响已有每日概览，请在量化页面显式重建。</Typography.Paragraph>
+            <Typography.Paragraph type="secondary">发布后会以日历日期为业务主键幂等更新；如影响已有业务数据，请按需重建。</Typography.Paragraph>
             <Table
               size="small"
               rowKey={(record) => `${record.calendarDate}-${record.changeType}`}
