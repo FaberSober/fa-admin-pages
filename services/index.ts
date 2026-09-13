@@ -2,6 +2,8 @@
 export { default as alertApi } from './base/admin/alert';
 export { default as areaApi } from './base/admin/area';
 export { default as authApi } from './base/admin/auth';
+export { default as calendarApi } from './base/admin/calendar';
+export { default as calendarDayApi } from './base/admin/calendarDay';
 export { default as configApi } from './base/admin/config';
 export { default as configSceneApi } from './base/admin/configScene';
 export { default as configSysApi } from './base/admin/configSys';

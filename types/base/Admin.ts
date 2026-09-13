@@ -894,6 +894,58 @@ namespace Admin {
     consumerGroups?: RedisStreamConsumerGroup[];
   }
 
+  // -------------------------------------------- 统一工作日/交易日历 --------------------------------------------
+  export type CalendarType = 'OA' | 'TRADING';
+
+  export type CalendarDayType = 'WORKDAY' | 'WEEKEND' | 'HOLIDAY' | 'MAKEUP_WORKDAY' | 'EXCHANGE_CLOSED' | 'SPECIAL_TRADING_DAY';
+
+  export interface BaseCalendar extends Fa.BaseDelEntity {
+    id: number;
+    calendarCode: string;
+    name: string;
+    calendarType: CalendarType;
+    market?: string;
+    timezone: string;
+    enabled: boolean;
+  }
+
+  export interface BaseCalendarDay extends Fa.BaseDelEntity {
+    id: number;
+    calendarCode: string;
+    calendarDate: string;
+    dayType: CalendarDayType;
+    isOpen: boolean;
+    holidayName?: string;
+    source?: string;
+    sourceVersion?: string;
+    remark?: string;
+  }
+
+  export interface CalendarDayImportItem {
+    calendarDate: string;
+    dayType: CalendarDayType;
+    isOpen: boolean;
+    holidayName?: string;
+    remark?: string;
+  }
+
+  export interface CalendarDayImportRequest {
+    calendarCode: string;
+    source?: string;
+    sourceVersion?: string;
+    days: CalendarDayImportItem[];
+  }
+
+  export interface CalendarDayImportPreview {
+    calendarCode: string;
+    total: number;
+    added: number;
+    changed: number;
+    unchanged: number;
+    addedDays: BaseCalendarDay[];
+    changedDays: BaseCalendarDay[];
+  }
+
   /** BASE-系统-新闻 */
   export interface SysNews extends Fa.BaseDelEntity {
     /** ID */

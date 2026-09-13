@@ -15,5 +15,7 @@ export default {
     doc: '/api/base/doc',
     /** telemetry服务 */
     telemetry: '/api/base/telemetry',
+    /** 统一工作日/交易日历服务 */
+    calendar: '/api/base',
   },
 } as Fa.ConfigApp;

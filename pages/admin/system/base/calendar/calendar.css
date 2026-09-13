@@ -1,0 +1,79 @@
+.calendarMaintenancePage {
+  min-height: 100%;
+  padding: 16px;
+  background: var(--fa-bg-color, #f5f7fa);
+}
+
+.calendarMaintenanceHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--ant-color-primary, #1677ff) 16%, transparent);
+  border-radius: 12px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--ant-color-primary, #1677ff) 11%, transparent), transparent 68%);
+}
+
+.calendarMaintenanceHero h2 {
+  margin: 0 0 6px;
+}
+
+.calendarMaintenanceHero p {
+  margin: 0;
+  color: var(--ant-color-text-secondary, #666);
+}
+
+.calendarMaintenanceCard {
+  height: 100%;
+}
+
+.calendarMaintenanceCalendarTable .ant-table-tbody > tr {
+  cursor: pointer;
+}
+
+.calendarMaintenanceCalendarTable .calendarMaintenanceSelectedRow > td {
+  background: color-mix(in srgb, var(--ant-color-primary, #1677ff) 10%, transparent);
+}
+
+.calendarMaintenanceMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  color: var(--ant-color-text-secondary, #666);
+  font-size: 12px;
+}
+
+.calendarMaintenanceImportHint {
+  margin-bottom: 12px;
+}
+
+.calendarMaintenancePreviewSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendarMaintenancePreviewMetric {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--ant-color-fill-quaternary, #fafafa);
+}
+
+.calendarMaintenancePreviewMetric strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 18px;
+}
+
+@media (max-width: 900px) {
+  .calendarMaintenanceHero {
+    flex-direction: column;
+  }
+
+  .calendarMaintenancePreviewSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
