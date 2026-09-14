@@ -5,6 +5,7 @@ import type { OpenTabsItem } from './context/MenuLayoutContext';
 
 interface TabContentCacheProps {
   activeKey: string;
+  currentPathname: string;
   currentRouteKey: string;
   currentOutlet: ReactNode;
   openTabs: OpenTabsItem[];
@@ -34,7 +35,7 @@ function IframeTabContent({ src, title }: IframeTabContentProps) {
  * currentOutlet 必须是 useOutlet() 返回的已匹配路由节点，不能传入原始 Outlet 组件，
  * 否则所有缓存面板仍会跟随当前 URL 渲染同一个页面。
  */
-export default function TabContentCache({ activeKey, currentRouteKey, currentOutlet, openTabs, reloadKeys, onReload }: TabContentCacheProps) {
+export default function TabContentCache({ activeKey, currentPathname, currentRouteKey, currentOutlet, openTabs, reloadKeys, onReload }: TabContentCacheProps) {
   const [entries, setEntries] = useState<Map<string, TabCacheEntry>>(() => new Map());
 
   const tabsByKey = useMemo(() => {
@@ -44,6 +45,9 @@ export default function TabContentCache({ activeKey, currentRouteKey, currentOut
     });
     return result;
   }, [openTabs]);
+  const activeTab = tabsByKey.get(activeKey);
+  const currentRouteBelongsToActiveTab =
+    activeTab === undefined || activeTab.type === 'iframe' || activeTab.path === currentRouteKey || activeTab.path === currentPathname;
 
   const tabKeys = useMemo(() => {
     const keys = openTabs.map((tab) => tab.key);
@@ -55,6 +59,12 @@ export default function TabContentCache({ activeKey, currentRouteKey, currentOut
 
   // 当前 URL 对应的路由出口首次渲染后，保存为当前 Tab 的缓存内容。
   useEffect(() => {
+    // 关闭当前 Tab 时，activeKey 可能已经切到下一个 Tab，但 URL 仍是旧 Tab。
+    // 此时不能把旧 Tab 的 outlet 覆盖到新 Tab 的缓存中。
+    if (activeTab?.type === 'iframe' || !currentRouteBelongsToActiveTab || currentOutlet === undefined || currentOutlet === null) {
+      return;
+    }
+
     setEntries((previous) => {
       const existing = previous.get(activeKey);
       if (existing?.routeKey === currentRouteKey) {
@@ -65,7 +75,7 @@ export default function TabContentCache({ activeKey, currentRouteKey, currentOut
       next.set(activeKey, { routeKey: currentRouteKey, outlet: currentOutlet });
       return next;
     });
-  }, [activeKey, currentOutlet, currentRouteKey]);
+  }, [activeKey, activeTab?.type, currentOutlet, currentRouteBelongsToActiveTab, currentRouteKey]);
 
   // 关闭 Tab 后移除对应的 React 节点引用，使页面生命周期正常结束并释放内存。
   useEffect(() => {
@@ -91,8 +101,7 @@ export default function TabContentCache({ activeKey, currentRouteKey, currentOut
         const tab = tabsByKey.get(tabKey);
         const isActive = tabKey === activeKey;
         const entry = entries.get(tabKey);
-        const isCurrentEntry = isActive && entry?.routeKey === currentRouteKey;
-        const outlet = isCurrentEntry ? entry?.outlet : isActive ? currentOutlet : entry?.outlet;
+        const outlet = isActive && currentRouteBelongsToActiveTab ? currentOutlet : entry?.outlet;
 
         // iframe Tab 的原始路由都是 /admin/iframe，必须按 Tab 自己的 path 隔离实例。
         const content = tab?.type === 'iframe' ? <IframeTabContent src={tab.path} title={tab.name} /> : outlet;

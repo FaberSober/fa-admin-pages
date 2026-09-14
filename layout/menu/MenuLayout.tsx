@@ -322,6 +322,7 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
                       <>
                         <TabContentCache
                           activeKey={activeTabKey}
+                          currentPathname={location.pathname}
                           currentRouteKey={currentRouteKey}
                           currentOutlet={outlet}
                           openTabs={openTabs || []}
