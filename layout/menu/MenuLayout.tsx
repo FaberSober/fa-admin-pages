@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useLocalStorage, useSessionStorage } from 'react-use';
 import { type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps, findTreePath, flatTreeList } from '@fa/ui';
 import { HelpCube, Logo, MenuAppHorizontal, MsgBadgeCube, OpenTabs, SideMenu, UserAvatar, WxMiniApp } from './cube';
 import type { Rbac } from '@/types';
 import { rbacUserRoleApi } from '@features/fa-admin-pages/services';
-import { TabErrorBoundary } from '@features/fa-admin-pages/components/exception';
 import useRoutePermission from '../../hooks/useRoutePermission';
 import * as FaRouteUtils from '../../components/utils/FaRouteUtils';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
+import TabContentCache from './TabContentCache';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import UserLayoutContext from '../user/context/UserLayoutContext';
 import './MenuLayout.scss';
@@ -24,8 +24,9 @@ import ThemeToggle from './cube/ThemeToggle';
 import TenantSelect from './cube/TenantSelect';
 
 
-export interface MenuLayoutProps extends Fa.BaseChildProps {
+export interface MenuLayoutProps {
   renderHeaderExtra?: () => React.ReactNode;
+  renderContentExtra?: () => React.ReactNode;
 }
 
 /**
@@ -33,9 +34,10 @@ export interface MenuLayoutProps extends Fa.BaseChildProps {
  * @author xu.pengfei
  * @date 2022/9/22 22:23
  */
-export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutProps) {
+export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: MenuLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const outlet = useOutlet();
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { user } = useContext(UserLayoutContext);
 
@@ -61,6 +63,23 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
   const [tabReloadKeys, setTabReloadKeys] = useState<Record<string, number>>({}); // 每个tab的reload版本号
 
   const [breadcrumbs, setBreadcrumbs] = useState<{title:string}[]>([])
+
+  const currentRouteKey = `${location.pathname}${location.search}${location.hash}`;
+  const locationTab = useMemo(() => {
+    const tabs = openTabs || [];
+    return (
+      find(tabs, (item) => item.type !== 'iframe' && item.path === currentRouteKey) ||
+      find(tabs, (item) => item.type !== 'iframe' && item.path === location.pathname)
+    );
+  }, [currentRouteKey, location.pathname, openTabs]);
+  const activeTabKey = locationTab?.key ?? curTab?.key ?? currentRouteKey;
+
+  // 浏览器前进/后退或直接通过 URL 导航时，同步 Tab 高亮状态。
+  useEffect(() => {
+    if (locationTab && locationTab.key !== curTab?.key) {
+      setCurTab(locationTab);
+    }
+  }, [curTab?.key, locationTab]);
 
 
   const [hasPermission] = useRoutePermission(menuList, openTabs || []);
@@ -246,7 +265,7 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
       // console.log('selTab')
       syncOpenMenuById(tabKey, menuFullTree);
     },
-    reloadKey: tabReloadKeys[curTab?.key ?? ''] ?? 0,
+    reloadKey: tabReloadKeys[activeTabKey] ?? 0,
     reloadTab: (tabKey: string) => {
       setTabReloadKeys((prev) => ({
         ...prev,
@@ -298,14 +317,19 @@ export default function MenuLayout({ renderHeaderExtra, children }: MenuLayoutPr
               <div className="fa-full fa-flex-column fa-relative">
                 {showTabs && <OpenTabs />}
                 <FaFlexRestLayout>
-                  <div className="fa-full fa-main">
+                  <div className="fa-full fa-main" style={{ padding: 0 }}>
                     {hasPermission ? (
-                      <TabErrorBoundary
-                        key={`${curTab?.key ?? ''}-${tabReloadKeys[curTab?.key ?? ''] ?? 0}`}
-                        onReload={() => contextValue.reloadTab(curTab?.key ?? '')}
-                      >
-                        <React.Fragment key={tabReloadKeys[curTab?.key ?? ''] ?? 0}>{children}</React.Fragment>
-                      </TabErrorBoundary>
+                      <>
+                        <TabContentCache
+                          activeKey={activeTabKey}
+                          currentRouteKey={currentRouteKey}
+                          currentOutlet={outlet}
+                          openTabs={openTabs || []}
+                          reloadKeys={tabReloadKeys}
+                          onReload={contextValue.reloadTab}
+                        />
+                        {renderContentExtra && renderContentExtra()}
+                      </>
                     ) : (
                       <Empty description="页面丢失了" />
                     )}

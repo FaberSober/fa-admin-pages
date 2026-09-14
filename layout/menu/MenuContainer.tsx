@@ -1,14 +1,12 @@
-import React, { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
-import { ApiEffectLayout, PageLoading, ThemeLayout } from '@fa/ui';
+import { ApiEffectLayout, ThemeLayout } from '@fa/ui';
+import React from 'react';
 import { SITE_INFO } from '@/configs';
-import LangLayout from '../lang/LangLayout';
-import ConfigLayout from '../config/ConfigLayout';
-import UserLayout from '../user/UserLayout';
-import MenuLayout from './MenuLayout';
 import AMapLayout from '../amap/AMapLayout';
+import ConfigLayout from '../config/ConfigLayout';
+import LangLayout from '../lang/LangLayout';
+import UserLayout from '../user/UserLayout';
 import WebSocketLayout from '../websocket/WebSocketLayout';
-
+import MenuLayout from './MenuLayout';
 
 interface MenuContainerProps {
   renderHeaderExtra?: () => React.ReactNode;
@@ -24,12 +22,7 @@ export default function MenuContainer({ renderHeaderExtra, extra }: MenuContaine
             <UserLayout>
               <WebSocketLayout>
                 <AMapLayout>
-                  <MenuLayout renderHeaderExtra={renderHeaderExtra}>
-                    <Suspense fallback={<PageLoading />}>
-                      <Outlet />
-                      {extra && extra()}
-                    </Suspense>
-                  </MenuLayout>
+                  <MenuLayout renderHeaderExtra={renderHeaderExtra} renderContentExtra={extra} />
                 </AMapLayout>
               </WebSocketLayout>
             </UserLayout>
