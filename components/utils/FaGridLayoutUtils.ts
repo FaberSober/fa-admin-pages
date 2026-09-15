@@ -1,11 +1,11 @@
-import type { Admin } from '@/types';
 import { FaUtils, useApiLoading } from '@fa/ui';
 import MenuLayoutContext from '@features/fa-admin-pages/layout/menu/context/MenuLayoutContext';
 import { configApi } from '@features/fa-admin-pages/services';
 import { Modal } from 'antd';
-import { each } from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { each, isEqual } from 'lodash';
+import { useContext, useEffect, useRef, useState } from 'react';
 import type { Layout, LayoutItem } from 'react-grid-layout';
+import type { Admin } from '@/types';
 
 /**
  * HelloBanner.displayName = 'HelloBanner'; // 必须与方法名称一致
@@ -125,39 +125,111 @@ export function useGridLayoutConfig(
 
   const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
   const [layout, setLayout] = useState<Layout>([]);
+  const configRef = useRef<Admin.Config<LayoutItem[]>>();
+  const initializingRef = useRef(true);
+  const skipInitialLayoutChangeRef = useRef(false);
+  const controlledLayoutRef = useRef<Layout | undefined>(undefined);
+  const savingRef = useRef(false);
+  const pendingLayoutRef = useRef<Layout | undefined>(undefined);
+  const failedLayoutRef = useRef<Layout | undefined>(undefined);
 
   useEffect(() => {
+    initializingRef.current = true;
+    skipInitialLayoutChangeRef.current = false;
+    controlledLayoutRef.current = undefined;
+
+    const applyInitialLayout = (nextLayout: Layout, nextConfig?: Admin.Config<LayoutItem[]>) => {
+      skipInitialLayoutChangeRef.current = nextLayout.length > 0;
+      configRef.current = nextConfig;
+      setConfig(nextConfig);
+      setLayout(nextLayout);
+      initializingRef.current = false;
+    };
+
     configApi.getOne(biz, type).then((res) => {
       if (res.data) {
-        setLayout(res.data.data);
-        setConfig(res.data);
-      } else {
-        // 未找到，去查找全局是否有配置
-        configApi.getOneGlobal(biz, type).then((res1) => {
-          setConfig(undefined);
-          const globalLayout = res1.data?.data;
-          setLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
-        });
+        applyInitialLayout(res.data.data, res.data);
+        return;
       }
+
+      // 未找到，去查找全局是否有配置
+      return configApi.getOneGlobal(biz, type).then((res1) => {
+        const globalLayout = res1.data?.data;
+        applyInitialLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+      });
+    }).catch(() => {
+      // 请求层负责错误提示；初始化失败后允许用户继续操作布局。
+      initializingRef.current = false;
     });
   }, []);
 
-  function onLayoutChange(layout: Layout) {
-    // console.log('onLayoutChange', layout)
-    if (loading) return;
+  function submitLayout(nextLayout: Layout) {
+    savingRef.current = true;
+    const currentConfig = configRef.current;
     const params = {
       biz,
       type,
-      data: layout,
+      data: nextLayout,
     };
-    if (config) {
-      configApi.update(config.id, { id: config.id, ...params });
-    } else {
-      configApi.save(params).then((res) => {
-        setConfig(res.data);
+    const request = currentConfig
+      ? configApi.update(currentConfig.id, { id: currentConfig.id, ...params })
+      : configApi.save(params);
+
+    request
+      .then((res) => {
+        if (!currentConfig && res.data) {
+          configRef.current = res.data;
+          setConfig(res.data);
+        }
+        failedLayoutRef.current = undefined;
+      })
+      .catch(() => {
+        failedLayoutRef.current = nextLayout;
+      })
+      .finally(() => {
+        savingRef.current = false;
+        const pendingLayout = pendingLayoutRef.current;
+        pendingLayoutRef.current = undefined;
+        if (pendingLayout !== undefined) {
+          submitLayout(pendingLayout);
+        }
       });
+  }
+
+  function commitLayout(nextLayout: Layout) {
+    controlledLayoutRef.current = nextLayout;
+    setLayout(nextLayout);
+    if (savingRef.current) {
+      pendingLayoutRef.current = nextLayout;
+      return;
     }
-    setLayout(layout);
+    failedLayoutRef.current = undefined;
+    submitLayout(nextLayout);
+  }
+
+  function retryLayout() {
+    const failedLayout = failedLayoutRef.current;
+    if (failedLayout === undefined || savingRef.current) return;
+
+    failedLayoutRef.current = undefined;
+    commitLayout(failedLayout);
+  }
+
+  function onLayoutChange(nextLayout: Layout) {
+    if (initializingRef.current) return;
+    if (skipInitialLayoutChangeRef.current) {
+      skipInitialLayoutChangeRef.current = false;
+      setLayout(nextLayout);
+      return;
+    }
+
+    if (controlledLayoutRef.current !== undefined) {
+      const controlledLayout = controlledLayoutRef.current;
+      controlledLayoutRef.current = undefined;
+      if (isEqual(controlledLayout, nextLayout)) return;
+    }
+
+    commitLayout(nextLayout);
   }
 
   /**
@@ -207,6 +279,7 @@ export function useGridLayoutConfig(
     setLayout,
     loading,
     onLayoutChange,
+    retryLayout,
     handleAdd,
     handleDel,
     handleSaveCurAsDefault,
