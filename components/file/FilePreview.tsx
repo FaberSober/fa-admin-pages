@@ -2,14 +2,16 @@ import { FaUtils, PageLoading } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { Empty, Image } from 'antd';
-import { type CSSProperties, lazy, Suspense, useEffect, useState } from 'react';
+import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useEffect, useState } from 'react';
 import FaFileUrlView from './FaFileUrlView';
 
 const ReactPdfView = lazy(() => import('../pdf/ReactPdfView'));
+const FileViewerDocument = lazy(() => import('./FileViewerDocument'));
 
 const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'ico', 'bmp', 'gif', 'svg', 'webp']);
 const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'ogg']);
 const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'flac', 'aac', 'm4a']);
+const OFFICE_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx']);
 const TEXT_EXTENSIONS = new Set([
   'txt',
   'log',
@@ -42,7 +44,7 @@ const TEXT_EXTENSIONS = new Set([
 
 const MAX_TEXT_FILE_SIZE = 5 * 1024 * 1024;
 
-type FilePreviewKind = 'image' | 'video' | 'audio' | 'pdf' | 'text' | 'fallback';
+type FilePreviewKind = 'image' | 'video' | 'audio' | 'pdf' | 'text' | 'office' | 'fallback';
 
 interface FilePreviewResource {
   file: Admin.FileSave;
@@ -74,6 +76,7 @@ function resolveKind(file: Admin.FileSave, ext: string): FilePreviewKind {
   if (AUDIO_EXTENSIONS.has(ext) || contentType.startsWith('audio/')) return 'audio';
   if (ext === 'pdf' || contentType.startsWith('application/pdf')) return 'pdf';
   if (TEXT_EXTENSIONS.has(ext) || contentType.startsWith('text/') || contentType.includes('json')) return 'text';
+  if (OFFICE_EXTENSIONS.has(ext)) return 'office';
   return 'fallback';
 }
 
@@ -186,6 +189,45 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
   );
 }
 
+interface FileViewerErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+interface FileViewerErrorBoundaryState {
+  hasError: boolean;
+}
+
+class FileViewerErrorBoundary extends Component<FileViewerErrorBoundaryProps, FileViewerErrorBoundaryState> {
+  state: FileViewerErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): FileViewerErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
+}
+
+function OfficeViewer({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
+  return (
+    <FileViewerErrorBoundary
+      key={resource.file.id}
+      fallback={<FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />}
+    >
+      <Suspense fallback={<PageLoading />}>
+        <FileViewerDocument
+          url={resource.absoluteFileUrl}
+          filename={resource.file.originalFilename}
+          type={resource.ext}
+          size={Number(resource.file.size) || undefined}
+        />
+      </Suspense>
+    </FileViewerErrorBoundary>
+  );
+}
+
 function FilePreviewContent({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
   if (resource.kind === 'image' || resource.kind === 'video' || resource.kind === 'audio') {
     return <NativeViewer resource={resource} />;
@@ -200,6 +242,7 @@ function FilePreviewContent({ resource, watermark }: { resource: FilePreviewReso
   }
 
   if (resource.kind === 'text') return <TextViewer resource={resource} />;
+  if (resource.kind === 'office') return <OfficeViewer resource={resource} watermark={watermark} />;
 
   return <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
 }
