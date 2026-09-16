@@ -14,7 +14,8 @@ const OnlyofficeEditor = lazy(() => import('../helper/OnlyofficeEditor'));
 const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'ico', 'bmp', 'gif', 'svg', 'webp']);
 const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'ogg']);
 const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'flac', 'aac', 'm4a']);
-const OFFICE_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx']);
+const OFFICE_VIEW_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx', 'ofd']);
+const OFFICE_EDIT_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx']);
 const TEXT_EXTENSIONS = new Set([
   'txt',
   'log',
@@ -85,7 +86,7 @@ function resolveKind(file: Admin.FileSave, ext: string): FilePreviewKind {
   if (AUDIO_EXTENSIONS.has(ext) || contentType.startsWith('audio/')) return 'audio';
   if (ext === 'pdf' || contentType.startsWith('application/pdf')) return 'pdf';
   if (TEXT_EXTENSIONS.has(ext) || contentType.startsWith('text/') || contentType.includes('json')) return 'text';
-  if (OFFICE_EXTENSIONS.has(ext)) return 'office';
+  if (OFFICE_VIEW_EXTENSIONS.has(ext)) return 'office';
   return 'fallback';
 }
 
@@ -412,7 +413,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, d
         <Empty description="文件未找到" />
       </div>
     );
-  if (mode === 'edit' && resource.kind === 'office')
+  if (mode === 'edit' && resource.kind === 'office' && OFFICE_EDIT_EXTENSIONS.has(resource.ext))
     return (
       <div className={className} style={style}>
         <OfficeEditor fileId={resource.file.id} />
