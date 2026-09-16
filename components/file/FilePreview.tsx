@@ -14,7 +14,7 @@ const OnlyofficeEditor = lazy(() => import('../helper/OnlyofficeEditor'));
 const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'ico', 'bmp', 'gif', 'svg', 'webp']);
 const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'ogg']);
 const AUDIO_EXTENSIONS = new Set(['mp3', 'wav', 'flac', 'aac', 'm4a']);
-const OFFICE_VIEW_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx', 'ofd']);
+const FILE_VIEWER_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx', 'ofd', 'pdf']);
 const OFFICE_EDIT_EXTENSIONS = new Set(['docx', 'xlsx', 'pptx']);
 const TEXT_EXTENSIONS = new Set([
   'txt',
@@ -48,7 +48,7 @@ const TEXT_EXTENSIONS = new Set([
 
 const MAX_TEXT_FILE_SIZE = 5 * 1024 * 1024;
 
-type FilePreviewKind = 'image' | 'video' | 'audio' | 'pdf' | 'text' | 'office' | 'fallback';
+type FilePreviewKind = 'image' | 'video' | 'audio' | 'text' | 'fileViewer' | 'fallback';
 
 interface FilePreviewResource {
   file: Admin.FileSave;
@@ -84,9 +84,8 @@ function resolveKind(file: Admin.FileSave, ext: string): FilePreviewKind {
   if (IMAGE_EXTENSIONS.has(ext) || contentType.startsWith('image/')) return 'image';
   if (VIDEO_EXTENSIONS.has(ext) || contentType.startsWith('video/')) return 'video';
   if (AUDIO_EXTENSIONS.has(ext) || contentType.startsWith('audio/')) return 'audio';
-  if (ext === 'pdf' || contentType.startsWith('application/pdf')) return 'pdf';
+  if (FILE_VIEWER_EXTENSIONS.has(ext) || contentType.startsWith('application/pdf')) return 'fileViewer';
   if (TEXT_EXTENSIONS.has(ext) || contentType.startsWith('text/') || contentType.includes('json')) return 'text';
-  if (OFFICE_VIEW_EXTENSIONS.has(ext)) return 'office';
   return 'fallback';
 }
 
@@ -194,7 +193,7 @@ function PreviewSurface({
   resource: FilePreviewResource;
   watermark: boolean;
 }) {
-  const showClientWatermark = watermark && resource.kind !== 'office' && resource.kind !== 'fallback';
+  const showClientWatermark = watermark && resource.kind !== 'fileViewer' && resource.kind !== 'fallback';
 
   return (
     <div className="fa-full fa-flex-column" style={{ minHeight: 0 }}>
@@ -299,12 +298,24 @@ class FileViewerErrorBoundary extends Component<FileViewerErrorBoundaryProps, Fi
   }
 }
 
-function OfficeViewer({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
+function FileViewerFallback({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
+  if (resource.ext === 'pdf') {
+    return (
+      <div className="fa-full" style={{ minHeight: 0, position: 'relative' }}>
+        <Suspense fallback={<PageLoading />}>
+          <ReactPdfView fileUrl={resource.fileUrl} />
+        </Suspense>
+        {watermark && <PreviewWatermark />}
+      </div>
+    );
+  }
+
+  return <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
+}
+
+function FileViewerViewer({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
   return (
-    <FileViewerErrorBoundary
-      key={resource.file.id}
-      fallback={<FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />}
-    >
+    <FileViewerErrorBoundary key={resource.file.id} fallback={<FileViewerFallback resource={resource} watermark={watermark} />}>
       <Suspense fallback={<PageLoading />}>
         <FileViewerDocument
           url={resource.absoluteFileUrl}
@@ -331,16 +342,10 @@ function FilePreviewContent({ resource, watermark, download }: { resource: FileP
 
   if (resource.kind === 'image' || resource.kind === 'video' || resource.kind === 'audio') {
     content = <NativeViewer resource={resource} />;
-  } else if (resource.kind === 'pdf') {
-    content = (
-      <Suspense fallback={<PageLoading />}>
-        <ReactPdfView fileUrl={resource.fileUrl} />
-      </Suspense>
-    );
   } else if (resource.kind === 'text') {
     content = <TextViewer resource={resource} />;
-  } else if (resource.kind === 'office') {
-    content = <OfficeViewer resource={resource} watermark={watermark} />;
+  } else if (resource.kind === 'fileViewer') {
+    content = <FileViewerViewer resource={resource} watermark={watermark} />;
   } else {
     content = <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
   }
@@ -413,7 +418,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, d
         <Empty description="文件未找到" />
       </div>
     );
-  if (mode === 'edit' && resource.kind === 'office' && OFFICE_EDIT_EXTENSIONS.has(resource.ext))
+  if (mode === 'edit' && resource.kind === 'fileViewer' && OFFICE_EDIT_EXTENSIONS.has(resource.ext))
     return (
       <div className={className} style={style}>
         <OfficeEditor fileId={resource.file.id} />
