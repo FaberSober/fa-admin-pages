@@ -1,9 +1,9 @@
-import React, { type CSSProperties } from 'react';
-import { Image } from 'antd';
 import { FaUtils } from '@fa/ui';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
+import { Image } from 'antd';
+import { type CSSProperties } from 'react';
 import VideoPlainModal from '../video/VideoPlainModal';
-import FaFileViewModal from './FaFileViewModal';
+import FilePreviewModal from './FilePreviewModal';
 
 export interface FileInfo {
   id: string;
@@ -54,9 +54,5 @@ export default function FileSaveIcon({ file, width = 20, style }: FileSaveIconPr
     );
   }
 
-  return (
-    <FaFileViewModal fileId={file.id}>
-      <span className="fa-cursor-pointer fa-text-link">{file.originalFilename}</span>
-    </FaFileViewModal>
-  );
+  return <FilePreviewModal fileId={file.id} trigger={<span className="fa-cursor-pointer fa-text-link">{file.originalFilename}</span>} />;
 }
