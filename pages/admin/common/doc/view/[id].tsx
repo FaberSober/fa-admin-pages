@@ -1,6 +1,6 @@
+import { FilePreviewPage } from '@features/fa-admin-pages/components';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { OnlyofficeEditor } from '@features/fa-admin-pages/components';
 
 /**
  * 在线查看office文档
@@ -10,5 +10,5 @@ import { OnlyofficeEditor } from '@features/fa-admin-pages/components';
 export default function DocView() {
   const { id } = useParams();
 
-  return <div className="fa-full-content">{id && <OnlyofficeEditor fileId={id} mode="view" />}</div>;
+  return <FilePreviewPage fileId={id ?? ''} />;
 }

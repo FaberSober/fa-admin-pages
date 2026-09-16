@@ -7,6 +7,7 @@ import FaFileUrlView from './FaFileUrlView';
 
 const ReactPdfView = lazy(() => import('../pdf/ReactPdfView'));
 const FileViewerDocument = lazy(() => import('./FileViewerDocument'));
+const OnlyofficeEditor = lazy(() => import('../helper/OnlyofficeEditor'));
 
 const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'ico', 'bmp', 'gif', 'svg', 'webp']);
 const VIDEO_EXTENSIONS = new Set(['mp4', 'webm', 'ogg']);
@@ -228,6 +229,14 @@ function OfficeViewer({ resource, watermark }: { resource: FilePreviewResource; 
   );
 }
 
+function OfficeEditor({ fileId }: { fileId: string }) {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <OnlyofficeEditor key={fileId} fileId={fileId} mode="edit" />
+    </Suspense>
+  );
+}
+
 function FilePreviewContent({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
   if (resource.kind === 'image' || resource.kind === 'video' || resource.kind === 'audio') {
     return <NativeViewer resource={resource} />;
@@ -304,6 +313,12 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, c
     return (
       <div className={className} style={style}>
         <Empty description="文件未找到" />
+      </div>
+    );
+  if (mode === 'edit' && resource.kind === 'office')
+    return (
+      <div className={className} style={style}>
+        <OfficeEditor fileId={resource.file.id} />
       </div>
     );
   if (mode === 'edit')
