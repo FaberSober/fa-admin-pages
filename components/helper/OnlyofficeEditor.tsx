@@ -2,7 +2,7 @@ import { PageLoading } from '@fa/ui';
 import { onlyofficeApi } from '@features/fa-admin-pages/services';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { Empty } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface OnlyofficeEditorProps {
   fileId: string; // fileSave表的ID
@@ -20,12 +20,13 @@ export default function OnlyofficeEditor({ fileId, mode }: OnlyofficeEditorProps
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setDocumentServerUrl(undefined);
     setConfig(undefined);
     setError(undefined);
 
     onlyofficeApi
-      .openFile(fileId, mode)
+      .openFile(fileId, mode, { signal: controller.signal, headers: { hideErrorMsg: '1' } })
       .then((res) => {
         if (!active) return;
         setDocumentServerUrl(res.data.documentApi);
@@ -37,6 +38,7 @@ export default function OnlyofficeEditor({ fileId, mode }: OnlyofficeEditorProps
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [fileId, mode]);
 

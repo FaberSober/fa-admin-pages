@@ -225,8 +225,9 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setContent(undefined);
-    setError(false);
+    setError(undefined);
     setLoading(true);
 
     if (Number(resource.file.size) > MAX_TEXT_FILE_SIZE) {
@@ -238,7 +239,7 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
     }
 
     fileSaveApi
-      .getFileStr(resource.file.id)
+      .getFileStr(resource.file.id, { signal: controller.signal, headers: { hideErrorMsg: '1' } })
       .then((res) => {
         if (!active) return;
         setContent(res.data || '');
@@ -252,6 +253,7 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [resource.file.id, resource.file.size]);
 
@@ -356,6 +358,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, d
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setResource(undefined);
     setError(undefined);
     setLoading(true);
@@ -369,7 +372,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, d
     }
 
     fileSaveApi
-      .getById(fileId)
+      .getById(fileId, { signal: controller.signal, headers: { hideErrorMsg: '1' } })
       .then((res) => {
         if (!active) return;
         if (!res.data) {
@@ -387,6 +390,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, d
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [fileId]);
 
