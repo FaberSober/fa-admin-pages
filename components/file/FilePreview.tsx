@@ -1,8 +1,10 @@
+import { DownloadOutlined } from '@ant-design/icons';
 import { FaUtils, PageLoading } from '@fa/ui';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
-import { Empty, Image } from 'antd';
-import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useEffect, useState } from 'react';
+import { Button, Empty, Image } from 'antd';
+import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useContext, useEffect, useState } from 'react';
 import FaFileUrlView from './FaFileUrlView';
 
 const ReactPdfView = lazy(() => import('../pdf/ReactPdfView'));
@@ -60,8 +62,14 @@ export interface FilePreviewProps {
   fileId: string;
   mode?: 'view' | 'edit';
   watermark?: boolean;
+  download?: boolean;
   className?: string;
   style?: CSSProperties;
+}
+
+function isPermissionError(error: unknown) {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 401 || status === 403;
 }
 
 function normalizeExtension(file: Admin.FileSave) {
@@ -133,10 +141,87 @@ function NativeViewer({ resource }: { resource: FilePreviewResource }) {
   );
 }
 
+function PreviewWatermark() {
+  const { user } = useContext(UserLayoutContext);
+  const text = `${user.name}/${user.username}`;
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        bottom: 0,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateRows: 'repeat(3, 1fr)',
+        left: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        userSelect: 'none',
+        zIndex: 1,
+      }}
+    >
+      {Array.from({ length: 9 }, (_, index) => (
+        <span
+          key={index}
+          style={{
+            alignSelf: 'center',
+            color: 'rgba(0, 0, 0, 0.16)',
+            fontSize: 14,
+            justifySelf: 'center',
+            transform: 'rotate(-28deg)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {text}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PreviewSurface({
+  children,
+  download,
+  resource,
+  watermark,
+}: {
+  children: ReactNode;
+  download: boolean;
+  resource: FilePreviewResource;
+  watermark: boolean;
+}) {
+  const showClientWatermark = watermark && resource.kind !== 'office' && resource.kind !== 'fallback';
+
+  return (
+    <div className="fa-full fa-flex-column" style={{ minHeight: 0 }}>
+      {download && (
+        <div className="fa-flex-row fa-flex-row-end" style={{ flex: '0 0 auto', padding: '0 8px' }}>
+          <Button
+            aria-label={`下载 ${resource.file.originalFilename}`}
+            icon={<DownloadOutlined />}
+            size="small"
+            type="link"
+            onClick={() => fileSaveApi.openFile(resource.file.id)}
+          >
+            下载
+          </Button>
+        </div>
+      )}
+      <div className="fa-flex-1" style={{ minHeight: 0, position: 'relative' }}>
+        {children}
+        {showClientWatermark && <PreviewWatermark />}
+      </div>
+    </div>
+  );
+}
+
 function TextViewer({ resource }: { resource: FilePreviewResource }) {
   const [content, setContent] = useState<string>();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     let active = true;
@@ -146,7 +231,7 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
 
     if (Number(resource.file.size) > MAX_TEXT_FILE_SIZE) {
       setLoading(false);
-      setError(true);
+      setError('文本文件过大或读取失败');
       return () => {
         active = false;
       };
@@ -159,9 +244,9 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
         setContent(res.data || '');
         setLoading(false);
       })
-      .catch(() => {
+      .catch((requestError) => {
         if (!active) return;
-        setError(true);
+        setError(isPermissionError(requestError) ? '无权查看该文件' : '文本文件过大或读取失败');
         setLoading(false);
       });
 
@@ -171,7 +256,7 @@ function TextViewer({ resource }: { resource: FilePreviewResource }) {
   }, [resource.file.id, resource.file.size]);
 
   if (loading) return <PageLoading />;
-  if (error) return <Empty description="文本文件过大或读取失败" />;
+  if (error) return <Empty description={error} />;
 
   return (
     <pre
@@ -223,6 +308,7 @@ function OfficeViewer({ resource, watermark }: { resource: FilePreviewResource; 
           filename={resource.file.originalFilename}
           type={resource.ext}
           size={Number(resource.file.size) || undefined}
+          watermark={watermark}
         />
       </Suspense>
     </FileViewerErrorBoundary>
@@ -237,26 +323,33 @@ function OfficeEditor({ fileId }: { fileId: string }) {
   );
 }
 
-function FilePreviewContent({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
-  if (resource.kind === 'image' || resource.kind === 'video' || resource.kind === 'audio') {
-    return <NativeViewer resource={resource} />;
-  }
+function FilePreviewContent({ resource, watermark, download }: { resource: FilePreviewResource; watermark: boolean; download: boolean }) {
+  let content: ReactNode;
 
-  if (resource.kind === 'pdf') {
-    return (
+  if (resource.kind === 'image' || resource.kind === 'video' || resource.kind === 'audio') {
+    content = <NativeViewer resource={resource} />;
+  } else if (resource.kind === 'pdf') {
+    content = (
       <Suspense fallback={<PageLoading />}>
         <ReactPdfView fileUrl={resource.fileUrl} />
       </Suspense>
     );
+  } else if (resource.kind === 'text') {
+    content = <TextViewer resource={resource} />;
+  } else if (resource.kind === 'office') {
+    content = <OfficeViewer resource={resource} watermark={watermark} />;
+  } else {
+    content = <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
   }
 
-  if (resource.kind === 'text') return <TextViewer resource={resource} />;
-  if (resource.kind === 'office') return <OfficeViewer resource={resource} watermark={watermark} />;
-
-  return <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
+  return (
+    <PreviewSurface download={download} resource={resource} watermark={watermark}>
+      {content}
+    </PreviewSurface>
+  );
 }
 
-export default function FilePreview({ fileId, mode = 'view', watermark = true, className = 'fa-full', style }: FilePreviewProps) {
+export default function FilePreview({ fileId, mode = 'view', watermark = true, download = true, className = 'fa-full', style }: FilePreviewProps) {
   const [resource, setResource] = useState<FilePreviewResource>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
@@ -286,9 +379,9 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, c
         }
         setLoading(false);
       })
-      .catch(() => {
+      .catch((requestError) => {
         if (!active) return;
-        setError('文件加载失败');
+        setError(isPermissionError(requestError) ? '无权查看该文件' : '文件加载失败');
         setLoading(false);
       });
 
@@ -330,7 +423,7 @@ export default function FilePreview({ fileId, mode = 'view', watermark = true, c
 
   return (
     <div className={className} style={style}>
-      <FilePreviewContent resource={resource} watermark={watermark} />
+      <FilePreviewContent download={download} resource={resource} watermark={watermark} />
     </div>
   );
 }

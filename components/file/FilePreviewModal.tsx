@@ -19,6 +19,7 @@ export default function FilePreviewModal({
   fileId,
   mode,
   watermark,
+  download,
   defaultOpen = false,
   open: openProp,
   onOpenChange,
@@ -64,7 +65,7 @@ export default function FilePreviewModal({
           onCancel?.(event);
         }}
       >
-        <FilePreview fileId={fileId} mode={mode} watermark={watermark} style={previewStyle} />
+        <FilePreview fileId={fileId} mode={mode} watermark={watermark} download={download} style={previewStyle} />
       </DragModal>
     </>
   );
