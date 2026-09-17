@@ -52,13 +52,11 @@ export default function RbacRoleList() {
       BaseTableUtils.genSimpleSorterColumn('角色名称', 'name', 200, sorter),
       BaseTableUtils.genSimpleSorterColumn('角色描述', 'remarks', undefined, sorter),
       {
-        title: '类型',
-        dataIndex: 'type',
+        ...BaseTableUtils.genSimpleSorterColumn('类型', 'type', 110, sorter),
         render: (_, record) => {
           const option = ROLE_TYPE_OPTIONS.find((item) => item.value === getRoleType(record));
           return <Tag color={option?.color}>{option?.label}</Tag>;
         },
-        width: 110,
       },
       {
         ...BaseTableUtils.genSimpleSorterColumn('租户名称', 'tenantId', 180, sorter),
