@@ -1,37 +1,28 @@
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, treeUtils, useApiLoading } from '@fa/ui';
+import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { tenantApi as api, rbacMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
-import { Button, DatePicker, Form, Input, InputNumber, message, Space, Spin, Tag, Tree } from 'antd';
+import { Button, DatePicker, Form, Input, InputNumber, message } from 'antd';
 import { get } from 'lodash';
-import React, { useContext, useEffect, useState } from 'react';
+import type { Key } from 'react';
+import { useContext, useState } from 'react';
 import type { Rbac, Tn } from '@/types';
 import './TenantModal.css';
+import TenantPermissionPanel from './TenantPermissionPanel';
 
 const serviceName = '租户';
-
-function getMenuKeys(tree: Fa.TreeNode<Rbac.RbacMenu>[]): React.Key[] {
-  return tree.flatMap((item) => [item.id, ...(item.children ? getMenuKeys(item.children) : [])]);
-}
 
 export default function TenantModal({ children, title, record, fetchFinish, addBtn, editBtn }: CommonModalProps<Tn.Tenant>) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [menuTree, setMenuTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
-  const [checkedMenuIds, setCheckedMenuIds] = useState<React.Key[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
-  const [expandedMenuKeys, setExpandedMenuKeys] = useState<React.Key[]>([]);
+  const [checkedMenuIds, setCheckedMenuIds] = useState<Key[]>([]);
   const { systemConfig } = useContext(ConfigLayoutContext);
-
-  useEffect(() => {
-    setCheckedKeys(treeUtils.calCheckedKey(menuTree, checkedMenuIds));
-  }, [menuTree, checkedMenuIds]);
 
   async function loadMenuTree() {
     const res = await rbacMenuApi.getTree({ query: { status: true }, sorter: 'scope ASC' });
     const tree = res.data || [];
     setMenuTree(tree);
-    setExpandedMenuKeys(getMenuKeys(tree));
   }
 
   async function loadTenantPermissions(tenantId: string) {
@@ -63,7 +54,6 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     setCheckedMenuIds([]);
     if (systemConfig.tenantEnabled) {
       setMenuTree([]);
-      setExpandedMenuKeys([]);
       void loadMenuTree();
       if (record?.id) {
         void loadTenantPermissions(record.id);
@@ -201,35 +191,9 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
                     {record ? '修改后将同步该租户管理员的权限范围' : '所选权限将作为该租户管理员的初始权限范围，创建后仍可继续调整'}
                   </div>
                 </div>
-                <Space className="tenant-permission-actions" size={4}>
-                  <Tag color="blue">已选 {checkedMenuIds.length} 项</Tag>
-                  <Button type="link" size="small" disabled={menuLoading || menuTree.length === 0} onClick={() => setExpandedMenuKeys(getMenuKeys(menuTree))}>
-                    展开全部
-                  </Button>
-                  <Button type="link" size="small" disabled={menuLoading || menuTree.length === 0} onClick={() => setExpandedMenuKeys([])}>
-                    收起全部
-                  </Button>
-                </Space>
               </div>
 
-              <div className="tenant-permission-tree fa-bg-grey">
-                <Spin spinning={menuLoading} className="tenant-permission-tree-spin">
-                  <Tree
-                    checkable
-                    blockNode
-                    showLine
-                    treeData={menuTree}
-                    fieldNames={{ title: 'name', key: 'id' }}
-                    checkedKeys={checkedKeys}
-                    expandedKeys={expandedMenuKeys}
-                    onExpand={(keys) => setExpandedMenuKeys(keys)}
-                    onCheck={(checked: any, info: any) => {
-                      setCheckedMenuIds([...(checked || []), ...(info.halfCheckedKeys || [])]);
-                    }}
-                    titleRender={(node) => <span>{node.name}</span>}
-                  />
-                </Spin>
-              </div>
+              <TenantPermissionPanel tree={menuTree} checkedMenuIds={checkedMenuIds} loading={menuLoading} onCheckedMenuIdsChange={setCheckedMenuIds} />
             </section>
           )}
         </div>

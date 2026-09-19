@@ -41,28 +41,6 @@
   margin-bottom: 16px;
 }
 
-.tenant-permission-actions {
-  flex: 0 0 auto;
-}
-
-.tenant-permission-actions .ant-btn-link {
-  padding-inline: 4px;
-}
-
-.tenant-permission-tree {
-  min-height: 220px;
-  max-height: 420px;
-  overflow: auto;
-  padding: 12px;
-  border: 1px solid var(--fa-border-color);
-  border-radius: var(--fa-border-radius);
-}
-
-.tenant-permission-tree-spin {
-  display: block;
-  min-height: 196px;
-}
-
 @media (max-width: 1000px) {
   .tenant-form-section {
     padding: 16px 12px 4px;
