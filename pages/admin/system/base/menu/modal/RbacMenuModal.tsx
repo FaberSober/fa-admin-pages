@@ -113,7 +113,7 @@ export default function RbacMenuModal({
 
       if (nextLevel === FaEnums.RbacMenuLevelEnum.BUTTON) {
         setLinkType(FaEnums.RbacLinkTypeEnum.PATH);
-        form.setFieldsValue({ linkType: FaEnums.RbacLinkTypeEnum.PATH, linkUrl: '' });
+        form.setFieldsValue({ parentId: undefined, linkType: FaEnums.RbacLinkTypeEnum.PATH, linkUrl: '' });
       } else if (previousLevel === FaEnums.RbacMenuLevelEnum.BUTTON) {
         setLinkType(FaEnums.RbacLinkTypeEnum.INNER);
         form.setFieldsValue({ linkType: FaEnums.RbacLinkTypeEnum.INNER, linkUrl: '' });
@@ -167,6 +167,7 @@ export default function RbacMenuModal({
             <Form.Item name="parentId" label="上级菜单" rules={[{ required: true }]}>
               <RbacMenuCascader
                 showRoot={false}
+                childLevel={level}
                 onChangeWithItem={(_: any, raw: Rbac.RbacMenu | undefined) => {
                   if (!isButton) {
                     form.setFieldValue('linkUrl', raw ? raw.linkUrl : '');
