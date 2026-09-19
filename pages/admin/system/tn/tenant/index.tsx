@@ -1,22 +1,12 @@
-import React from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import {
-  AuthDelBtn,
-  BaseBizTable,
-  BaseTableUtils,
-  BaseBoolSelector,
-  clearForm,
-  type FaberTable,
-  useDelete,
-  useExport,
-  useTableQueryParams,
-} from '@fa/ui';
-import type { Tn } from '@/types';
+import { AuthDelBtn, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, type FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { tenantApi } from '@features/fa-admin-pages/services';
+import { Button, Form, Input, Space } from 'antd';
+import type { Tn } from '@/types';
 import TenantModal from './modal/TenantModal';
 
 const serviceName = '租户管理';
+const entityName = '租户';
 const biz = 'tn_tenant';
 
 export default function TenantList() {
@@ -46,7 +36,7 @@ export default function TenantList() {
         dataIndex: 'opr',
         render: (_, r: Tn.Tenant) => (
           <Space>
-            <TenantModal editBtn title={`编辑${serviceName}`} record={r} fetchFinish={fetchPageList} />
+            <TenantModal editBtn title={`编辑${entityName}`} record={r} fetchFinish={fetchPageList} />
             <AuthDelBtn handleDelete={() => handleDelete(r.id)} />
           </Space>
         ),
@@ -78,7 +68,7 @@ export default function TenantList() {
                 查询
               </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
-              <TenantModal addBtn title={`新增${serviceName}`} fetchFinish={fetchPageList} />
+              <TenantModal addBtn title={`新增${entityName}`} fetchFinish={fetchPageList} />
               <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
                 导出
               </Button>
