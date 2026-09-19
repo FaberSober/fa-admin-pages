@@ -1,12 +1,18 @@
 import { type CommonModalProps, DragModal, type Fa, FaUtils, UserSearchSelect, useApiLoading } from '@fa/ui';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import { departmentApi as api } from '@features/fa-admin-pages/services';
-import { Form, Input } from 'antd';
+import { Form, Input, Select } from 'antd';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import type { Admin } from '@/types';
 
 const serviceName = '部门';
+
+const departmentTypeOptions = [
+  { label: '公司', value: 'CORP' },
+  { label: '部门', value: 'DEPT' },
+  { label: '小组', value: 'TEAM' },
+];
 
 function findTreeNode(nodes: Fa.TreeNode<Admin.Department, string>[], id: string): Fa.TreeNode<Admin.Department, string> | undefined {
   for (const node of nodes) {
@@ -109,7 +115,7 @@ export default function DepartmentModal({ children, parentId, title, record, fet
     form.setFieldsValue(getInitialValues());
   }, [props.open]);
 
-  const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
+  const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
   return (
     <span>
       <span onClick={showModal}>{children}</span>
@@ -120,6 +126,9 @@ export default function DepartmentModal({ children, parentId, title, record, fet
           </Form.Item>
           <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <Input />
+          </Form.Item>
+          <Form.Item name="type" label="类型" rules={[{ required: true, message: '请选择部门类型' }]} {...FaUtils.formItemFullLayout}>
+            <Select placeholder="请选择部门类型" options={departmentTypeOptions} />
           </Form.Item>
           <Form.Item name="managerId" label="负责人" {...FaUtils.formItemFullLayout}>
             <UserSearchSelect placeholder="请输入负责人姓名进行搜索" />

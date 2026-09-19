@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   DeleteOutlined,
   EditOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
   PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { type Fa, FaHref, FaUtils, ShiroPermissionContainer, useApiLoading, useDelete } from '@fa/ui';
+import { type Fa, FaHref, FaUtils, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
-import type { Admin } from '@/types';
-import { Button, Empty, Form, Input, Popconfirm, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import { SearchGrid } from '@/components';
+import { Button, Empty, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import type { Admin } from '@/types';
 import DepartmentModal from '../user/modal/DepartmentModal';
 import './index.scss';
 
@@ -30,6 +31,11 @@ const departmentTypeMap: Record<string, { text: string; color: string }> = {
   DEPT: { text: '部门', color: 'green' },
   TEAM: { text: '小组', color: 'orange' },
 };
+
+const departmentTypeOptions = Object.entries(departmentTypeMap).map(([value, type]) => ({
+  label: type.text,
+  value,
+}));
 
 function parseRows(nodes: Fa.TreeNode<Admin.DepartmentVo, string>[] = []): DepartmentRow[] {
   return nodes.map((node) => {
@@ -56,16 +62,64 @@ function collectKeys(rows: DepartmentRow[]): React.Key[] {
   }, []);
 }
 
+function countRows(rows: DepartmentRow[]): number {
+  return rows.reduce((count, row) => count + 1 + (row.children ? countRows(row.children) : 0), 0);
+}
+
+function hasDepartmentFilters(query: Record<string, any>): boolean {
+  return Boolean(String(query.name || '').trim() || query.type || query.managerId);
+}
+
+function matchesDepartment(row: DepartmentRow, query: Record<string, any>): boolean {
+  const name = String(query.name || '')
+    .trim()
+    .toLowerCase();
+  if (
+    name &&
+    !String(row.name || '')
+      .toLowerCase()
+      .includes(name)
+  )
+    return false;
+  if (query.type && row.type !== query.type) return false;
+  if (query.managerId && row.managerId !== query.managerId) return false;
+  return true;
+}
+
+function filterDepartmentTree(rows: DepartmentRow[], query: Record<string, any>): DepartmentRow[] {
+  if (!hasDepartmentFilters(query)) return rows;
+
+  return rows.flatMap((row) => {
+    const children = filterDepartmentTree(row.children || [], query);
+    if (!matchesDepartment(row, query) && children.length === 0) return [];
+
+    return [
+      {
+        ...row,
+        children: children.length > 0 ? children : undefined,
+        hasChildren: children.length > 0,
+      },
+    ];
+  });
+}
+
+function countMatchingRows(rows: DepartmentRow[], query: Record<string, any>): number {
+  return rows.reduce((count, row) => count + (matchesDepartment(row, query) ? 1 : 0) + countMatchingRows(row.children || [], query), 0);
+}
+
 /**
  * 部门管理
  * @author xu.pengfei
  * @date 2026-04-28 11:36:29
  */
 export default function DepartmentManage() {
-  const [form] = Form.useForm();
   const [query, setQuery] = useState<Record<string, any>>({});
-  const [treeData, setTreeData] = useState<DepartmentRow[]>([]);
+  const [sourceTreeData, setSourceTreeData] = useState<DepartmentRow[]>([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+
+  const hasFilters = hasDepartmentFilters(query);
+  const treeData = useMemo(() => filterDepartmentTree(sourceTreeData, query), [query, sourceTreeData]);
+  const matchingCount = hasFilters ? countMatchingRows(sourceTreeData, query) : countRows(sourceTreeData);
 
   const loading = useApiLoading([
     departmentApi.getUrl('getTree'),
@@ -78,24 +132,38 @@ export default function DepartmentManage() {
 
   useEffect(() => {
     fetchTreeData();
-  }, [query]);
+  }, []);
 
   function fetchTreeData() {
-    departmentApi.getTree({ query }).then((res) => {
+    departmentApi.getTree().then((res) => {
       const rows = parseRows(res.data || []);
-      setTreeData(rows);
+      setSourceTreeData(rows);
       setExpandedRowKeys(collectKeys(rows));
     });
   }
 
-  function handleSearch(values: Record<string, any>) {
-    setQuery(values);
+  function updateFilter(name: string, value: any) {
+    setQuery((currentQuery) => {
+      if (value === undefined || value === null || value === '' || value === 'all') {
+        const nextQuery = { ...currentQuery };
+        delete nextQuery[name];
+        return nextQuery;
+      }
+      return { ...currentQuery, [name]: value };
+    });
   }
 
-  function handleReset() {
-    form.resetFields();
-    setQuery({});
+  function expandAll() {
+    setExpandedRowKeys(collectKeys(treeData));
   }
+
+  function collapseAll() {
+    setExpandedRowKeys([]);
+  }
+
+  useEffect(() => {
+    setExpandedRowKeys(collectKeys(treeData));
+  }, [treeData]);
 
   function handleMove(id: string, direction: 'up' | 'down') {
     const request = direction === 'up' ? departmentApi.moveUp(id) : departmentApi.moveDown(id);
@@ -126,7 +194,8 @@ export default function DepartmentManage() {
       dataIndex: 'type',
       width: 100,
       render: (value) => {
-        const type = departmentTypeMap[value] || { text: value || '未设置', color: 'default' };
+        if (!value) return <span className="fa-department-cell-placeholder">—</span>;
+        const type = departmentTypeMap[value] || { text: value, color: 'default' };
         return <Tag color={type.color}>{type.text}</Tag>;
       },
     },
@@ -135,8 +204,8 @@ export default function DepartmentManage() {
       dataIndex: ['manager', 'name'],
       width: 140,
       render: (_, record) => {
-        const manager = record.manager?.name || record.managerId || '未设置负责人';
-        return <span title={manager}>{manager}</span>;
+        const manager = record.manager?.name || record.managerId;
+        return manager ? <span title={manager}>{manager}</span> : <span className="fa-department-cell-placeholder">—</span>;
       },
     },
     {
@@ -196,35 +265,54 @@ export default function DepartmentManage() {
 
   return (
     <div className="fa-full-content-p12 fa-flex-column fa-content fa-pl12 fa-pr12 fa-department-page">
-      <SearchGrid
-        form={form}
-        onFinish={handleSearch}
-        btns={(
-          <Space>
-            <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={handleReset}>重置</Button>
-            <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchTreeData}>
-              刷新
-            </Button>
-            <DepartmentModal title="新增部门" parentId={0} fetchFinish={fetchTreeData}>
-              <Button type="primary" icon={<PlusOutlined />}>
-                新增部门
-              </Button>
-            </DepartmentModal>
+      <div className="fa-department-toolbar">
+        <div className="fa-department-toolbar__filters">
+          <Space className="fa-department-toolbar__filter-controls" size={8} wrap>
+            <Input
+              className="fa-department-toolbar__keyword"
+              prefix={<SearchOutlined />}
+              placeholder="搜索部门名称"
+              allowClear
+              value={query.name || ''}
+              onChange={(event) => updateFilter('name', event.target.value)}
+            />
+            <Select
+              className="fa-department-toolbar__type"
+              value={query.type || 'all'}
+              options={[{ label: '全部类型', value: 'all' }, ...departmentTypeOptions]}
+              onChange={(value) => updateFilter('type', value)}
+            />
+            <div className="fa-department-toolbar__manager">
+              <UserSearchSelect
+                value={query.managerId}
+                placeholder="搜索负责人"
+                bodyStyle={{ width: '100%' }}
+                style={{ width: '100%' }}
+                onChange={(value) => updateFilter('managerId', value)}
+              />
+            </div>
+            <span className="fa-department-toolbar__summary" aria-live="polite">
+              {hasFilters ? `命中 ${matchingCount} 项` : `共 ${matchingCount} 项`}
+            </span>
           </Space>
-        )}
-        defaultCount={2}
-        className="fa-department-search fa-mb12"
-      >
-        <Form.Item name="name" label="部门名称">
-          <Input placeholder="请输入部门名称" allowClear />
-        </Form.Item>
-        <Form.Item name="managerId" label="负责人ID">
-          <Input placeholder="请输入负责人ID" allowClear />
-        </Form.Item>
-      </SearchGrid>
+        </div>
+        <Space className="fa-department-toolbar__actions">
+          <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchTreeData}>
+            刷新
+          </Button>
+          <Button icon={<MinusCircleOutlined />} disabled={loading || treeData.length === 0} onClick={collapseAll}>
+            折叠
+          </Button>
+          <Button icon={<PlusCircleOutlined />} disabled={loading || treeData.length === 0} onClick={expandAll}>
+            展开
+          </Button>
+          <DepartmentModal title="新增部门" parentId={0} fetchFinish={fetchTreeData}>
+            <Button type="primary" icon={<PlusOutlined />}>
+              新增部门
+            </Button>
+          </DepartmentModal>
+        </Space>
+      </div>
 
       <Table<DepartmentRow>
         rowKey="id"
