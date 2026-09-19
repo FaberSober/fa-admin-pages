@@ -15,7 +15,7 @@ import {
 import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
-import { Button, Dropdown, Input, Modal, Segmented, Select, Space, Tag } from 'antd';
+import { Alert, Button, Dropdown, Input, Modal, Segmented, Select, Space, Tag } from 'antd';
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
@@ -195,9 +195,10 @@ interface MenuRowActionsProps {
   scope: FaEnums.RbacMenuScopeEnum;
   onRefresh: () => void;
   onDelete: (id: string) => void;
+  descendantCount: number;
 }
 
-function MenuRowActions({ item, scope, onRefresh, onDelete }: MenuRowActionsProps) {
+function MenuRowActions({ item, scope, onRefresh, onDelete, descendantCount }: MenuRowActionsProps) {
   const [action, setAction] = useState<'add-child' | 'edit'>();
   const canAddChild = item.sourceData.level !== FaEnums.RbacMenuLevelEnum.BUTTON;
 
@@ -219,9 +220,22 @@ function MenuRowActions({ item, scope, onRefresh, onDelete }: MenuRowActionsProp
       return;
     }
     if (key === 'delete') {
+      const hasDescendants = descendantCount > 0;
       Modal.confirm({
-        title: '删除菜单',
-        content: `确认删除菜单【${item.name}】？`,
+        title: hasDescendants ? '级联删除菜单' : '删除菜单',
+        content: hasDescendants ? (
+          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+            <span>确认删除菜单【{item.name}】？</span>
+            <Alert
+              type="warning"
+              showIcon
+              message={`该菜单包含 ${descendantCount} 个下级节点`}
+              description="删除后将级联删除所有下级菜单和权限按钮，且不可恢复。"
+            />
+          </Space>
+        ) : (
+          `确认删除菜单【${item.name}】？删除后不可恢复。`
+        ),
         okText: '删除',
         okButtonProps: { danger: true },
         onOk: () => onDelete(item.id),
@@ -506,7 +520,13 @@ export default function Menu() {
                   <MenuStatusSwitch item={item.sourceData} onChange={(status) => handleStatusChange(item.id, status)} />
                 </div>
                 <div className="fa-menu-item__actions">
-                  <MenuRowActions item={item} scope={scope} onRefresh={refreshData} onDelete={handleDelete} />
+                  <MenuRowActions
+                    item={item}
+                    scope={scope}
+                    onRefresh={refreshData}
+                    onDelete={handleDelete}
+                    descendantCount={countMenuNodes(findMenuNodeById(sourceTree, item.id)?.children)}
+                  />
                 </div>
               </div>
             )}
