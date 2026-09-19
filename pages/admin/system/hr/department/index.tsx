@@ -1,15 +1,5 @@
-import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  MinusCircleOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
-import { type Fa, FaHref, FaUtils, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
+import { DeleteOutlined, EditOutlined, MinusCircleOutlined, PlusCircleOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { type Fa, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import type { TableProps } from 'antd';
 import { Button, Empty, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
@@ -121,12 +111,7 @@ export default function DepartmentManage() {
   const treeData = useMemo(() => filterDepartmentTree(sourceTreeData, query), [query, sourceTreeData]);
   const matchingCount = hasFilters ? countMatchingRows(sourceTreeData, query) : countRows(sourceTreeData);
 
-  const loading = useApiLoading([
-    departmentApi.getUrl('getTree'),
-    departmentApi.getUrl('remove'),
-    departmentApi.getUrl('moveUp'),
-    departmentApi.getUrl('moveDown'),
-  ]);
+  const loading = useApiLoading([departmentApi.getUrl('getTree'), departmentApi.getUrl('remove')]);
 
   const [handleDelete] = useDelete<string>(departmentApi.remove, fetchTreeData, serviceName);
 
@@ -164,14 +149,6 @@ export default function DepartmentManage() {
   useEffect(() => {
     setExpandedRowKeys(collectKeys(treeData));
   }, [treeData]);
-
-  function handleMove(id: string, direction: 'up' | 'down') {
-    const request = direction === 'up' ? departmentApi.moveUp(id) : departmentApi.moveDown(id);
-    request.then((res) => {
-      FaUtils.showResponse(res, direction === 'up' ? '上移部门' : '下移部门');
-      fetchTreeData();
-    });
-  }
 
   const columns: TableProps<DepartmentRow>['columns'] = [
     {
@@ -235,7 +212,7 @@ export default function DepartmentManage() {
     {
       title: '操作',
       dataIndex: 'opr',
-      width: 320,
+      width: 240,
       fixed: 'right',
       render: (_, record) => (
         <Space>
@@ -245,8 +222,6 @@ export default function DepartmentManage() {
           <DepartmentModal title="编辑部门" record={record} fetchFinish={fetchTreeData}>
             <FaHref icon={<EditOutlined />} text="编辑" />
           </DepartmentModal>
-          <FaHref icon={<ArrowUpOutlined />} text="上移" onClick={() => handleMove(record.id, 'up')} />
-          <FaHref icon={<ArrowDownOutlined />} text="下移" onClick={() => handleMove(record.id, 'down')} />
           {record.hasChildren ? (
             <ShiroPermissionContainer>
               <FaHref text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
@@ -316,7 +291,7 @@ export default function DepartmentManage() {
 
       <Table<DepartmentRow>
         rowKey="id"
-        className="fa-department-table"
+        className="fa-department-table fa-mt12"
         columns={columns}
         dataSource={treeData}
         loading={loading}

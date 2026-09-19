@@ -10,13 +10,25 @@
   --fa-menu-tag-button-background: #f6ffed;
   --fa-menu-tag-button-border: #b7eb8f;
 
+  min-width: 0;
+  overflow: auto;
+  background: var(--fa-bg-color) !important;
+  isolation: isolate;
+
   .fa-menu-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    margin-bottom: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin: -12px -12px 12px;
+    padding: 12px;
+    background-color: var(--fa-bg-color) !important;
+    border-bottom: 1px solid var(--fa-border-color);
+    box-shadow: 0 1px 0 var(--fa-border-color);
   }
 
   .fa-menu-toolbar__filters {

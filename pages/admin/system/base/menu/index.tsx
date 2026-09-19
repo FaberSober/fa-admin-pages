@@ -373,8 +373,8 @@ export default function Menu() {
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-menu-div">
-      <div className="fa-m12 fa-menu-toolbar">
+    <div className="fa-full-content-p12 fa-flex-column fa-content fa-pl12 fa-pr12 fa-menu-div">
+      <div className="fa-menu-toolbar">
         <div className="fa-menu-toolbar__filters">
           <Segmented
             value={scope}
@@ -447,7 +447,7 @@ export default function Menu() {
         </Space>
       </div>
 
-      <FaFlexRestLayout className="fa-full-content-p12 fa-card fa-p0">
+      <FaFlexRestLayout className="fa-full-content fa-card fa-p0" style={{ top: 12, bottom: 12 }}>
         <div className="fa-menu-table">
           <div className="fa-menu-table-head">
             <span>菜单名称</span>
