@@ -58,6 +58,17 @@
   padding-bottom: 2px;
 }
 
+.tenant-permission-panel__scope-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tenant-permission-panel__scope-row .tenant-permission-panel__scope-list {
+  flex: 1 1 auto;
+}
+
 .tenant-permission-panel__scope-tab,
 .tenant-permission-panel__module-tab {
   display: inline-flex;
@@ -89,6 +100,13 @@
   border-color: var(--ant-color-primary, #1677ff);
   background: var(--fa-bg-color-highlight);
   color: var(--fa-text-color-highlight);
+}
+
+[data-theme='light'] .tenant-permission-panel__scope-tab.is-active,
+[data-theme='light'] .tenant-permission-panel__module-tab.is-active {
+  border-color: var(--ant-color-primary, #1677ff);
+  background: color-mix(in srgb, var(--ant-color-primary, #1677ff) 10%, var(--fa-bg-color));
+  color: var(--ant-color-primary, #1677ff);
 }
 
 .tenant-permission-panel__scope-icon {
@@ -158,6 +176,16 @@
   overflow: auto;
   padding: 12px 14px 20px;
   background: var(--fa-bg-grey);
+}
+
+/* Keep the permission workspace on the same surface as the surrounding cards in dark mode. */
+[data-theme='dark'] .tenant-permission-panel__content,
+[data-theme='dark'] .tenant-permission-panel__module-header {
+  background: var(--fa-bg-color);
+}
+
+[data-theme='dark'] .tenant-permission-panel__page-card {
+  background: var(--fa-bg-color1);
 }
 
 .tenant-permission-panel__module-header {

@@ -2,6 +2,15 @@
   min-height: 100%;
 }
 
+.tenant-form-loading {
+  display: block;
+  min-height: 100%;
+}
+
+.tenant-form-loading > .ant-spin-container {
+  min-height: 100%;
+}
+
 .tenant-form-shell {
   width: min(100%, 1320px);
   margin: 0 auto;

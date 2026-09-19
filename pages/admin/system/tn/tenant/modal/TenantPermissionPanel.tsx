@@ -330,27 +330,30 @@ export default function TenantPermissionPanel({ tree, checkedMenuIds, loading = 
             </span>
           </div>
 
-          <div className="tenant-permission-panel__scope-list" role="tablist" aria-label="终端类型">
-            {scopeGroups.map((group) => {
-              const stats = getStats(group.modules, selectedKeys);
-              const active = group.key === activeScopeKey;
-              return (
-                <button
-                  key={group.key}
-                  type="button"
-                  className={clsx('tenant-permission-panel__scope-tab', active && 'is-active')}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setActiveScopeKey(group.key)}
-                >
-                  <span className="tenant-permission-panel__scope-icon">{group.icon}</span>
-                  <span>{group.label}</span>
-                  <span className="tenant-permission-panel__scope-count">
-                    {stats.selected}/{stats.total}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="tenant-permission-panel__scope-row">
+            <span className="tenant-permission-panel__row-label">平台</span>
+            <div className="tenant-permission-panel__scope-list" role="tablist" aria-label="终端类型">
+              {scopeGroups.map((group) => {
+                const stats = getStats(group.modules, selectedKeys);
+                const active = group.key === activeScopeKey;
+                return (
+                  <button
+                    key={group.key}
+                    type="button"
+                    className={clsx('tenant-permission-panel__scope-tab', active && 'is-active')}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setActiveScopeKey(group.key)}
+                  >
+                    <span className="tenant-permission-panel__scope-icon">{group.icon}</span>
+                    <span>{group.label}</span>
+                    <span className="tenant-permission-panel__scope-count">
+                      {stats.selected}/{stats.total}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="tenant-permission-panel__module-row">
