@@ -10,6 +10,19 @@
   --fa-menu-tag-button-background: #f6ffed;
   --fa-menu-tag-button-border: #b7eb8f;
 
+  .fa-menu-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .fa-menu-toolbar__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
   .fa-menu-table {
     display: flex;
     min-width: 0;
@@ -97,6 +110,18 @@
   --fa-menu-tag-button-color: #95de64;
   --fa-menu-tag-button-background: rgba(82, 196, 26, 0.16);
   --fa-menu-tag-button-border: rgba(149, 222, 100, 0.45);
+}
+
+@media (max-width: 860px) {
+  .fa-menu-div .fa-menu-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .fa-menu-div .fa-menu-toolbar__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 .fa-menu-item {

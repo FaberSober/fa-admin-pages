@@ -1,9 +1,18 @@
-import { EditOutlined, PlusOutlined, SafetyCertificateOutlined, SettingOutlined, SisternodeOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+  SettingOutlined,
+  SisternodeOutlined,
+} from '@ant-design/icons';
 import { AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import { Button, Segmented, Space, Tag } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
 import type { Rbac } from '@/types';
 import './index.scss';
@@ -18,6 +27,7 @@ import RbacMenuModal from './modal/RbacMenuModal';
 export default function Menu() {
   const [current, { inc }] = useCounter(0);
   const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
+  const treeRef = useRef<{ collapseAll: () => void; expandAll: () => void }>(null);
 
   useEffect(() => {
     refreshData();
@@ -32,10 +42,32 @@ export default function Menu() {
   const loadingTree = useApiLoading([rbacMenuApi.getUrl('allTree')]);
   return (
     <div className="fa-full-content fa-flex-column fa-menu-div">
-      <div className="fa-m12 fa-flex-column" style={{ marginBottom: 0 }}>
-        <Space style={{ marginBottom: 12 }}>
-          <Button onClick={refreshData} loading={loadingTree}>
+      <div className="fa-m12 fa-menu-toolbar">
+        <Segmented
+          value={scope}
+          onChange={(value) => setScope(value as FaEnums.RbacMenuScopeEnum)}
+          options={[
+            {
+              label: '网页',
+              value: FaEnums.RbacMenuScopeEnum.WEB,
+              icon: <SettingOutlined />,
+            },
+            {
+              label: 'APP',
+              value: FaEnums.RbacMenuScopeEnum.APP,
+              icon: <SafetyCertificateOutlined />,
+            },
+          ]}
+        />
+        <Space className="fa-menu-toolbar__actions">
+          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree}>
             刷新
+          </Button>
+          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree}>
+            折叠
+          </Button>
+          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree}>
+            展开
           </Button>
           <RbacMenuModal title="新增菜单" scope={scope} fetchFinish={refreshData}>
             <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
@@ -43,25 +75,6 @@ export default function Menu() {
             </Button>
           </RbacMenuModal>
         </Space>
-
-        <div>
-          <Segmented
-            value={scope}
-            onChange={(v: any) => setScope(v)}
-            options={[
-              {
-                label: '网页',
-                value: FaEnums.RbacMenuScopeEnum.WEB,
-                icon: <SettingOutlined />,
-              },
-              {
-                label: 'APP',
-                value: FaEnums.RbacMenuScopeEnum.APP,
-                icon: <SafetyCertificateOutlined />,
-              },
-            ]}
-          />
-        </div>
       </div>
 
       <FaFlexRestLayout className="fa-full-content-p12 fa-card fa-p0">
@@ -76,6 +89,7 @@ export default function Menu() {
             <span>操作</span>
           </div>
           <BaseTree
+            ref={treeRef}
             className="fa-menu-tree"
             // showRoot
             showOprBtn
