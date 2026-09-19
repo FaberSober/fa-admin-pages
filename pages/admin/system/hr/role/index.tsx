@@ -122,6 +122,13 @@ export default function RbacRoleList() {
         pagination={paginationProps}
         loading={loading}
         dataSource={user.superAdmin ? list : list.filter((item) => getRoleType(item) !== 1)}
+        rowSelection={
+          user.superAdmin
+            ? undefined
+            : {
+                getCheckboxProps: (record) => ({ disabled: !canManageRole(record) }),
+              }
+        }
         rowKey={(item) => item.id}
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}
