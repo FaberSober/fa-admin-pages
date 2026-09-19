@@ -1,11 +1,11 @@
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { type CommonModalProps, DictEnumApiRadio, DictEnumApiSelector, DragModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
+import { type CommonModalProps, DictEnumApiRadio, DictEnumApiSelector, Fa, FaFullContentModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { userApi as api, rbacUserRoleApi } from '@features/fa-admin-pages/services';
-import { Button, Form, Input, Switch } from 'antd';
+import { Button, Form, Input, message, Switch } from 'antd';
 import { get } from 'lodash';
 import { useContext, useState } from 'react';
 import useBus from 'use-bus';
@@ -20,53 +20,11 @@ interface UserModalProps extends CommonModalProps<Admin.User> {
 /**
  * 用户实体新增、编辑弹框
  */
-export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, defaultDepartmentId, ...props }: UserModalProps) {
+export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, defaultDepartmentId }: UserModalProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { user, selectedTenant } = useContext(UserLayoutContext);
-
-  useBus(
-    ['@@UserModal/SHOW_ADD'],
-    ({ payload }) => {
-      if (record === undefined) {
-        form.resetFields();
-        form.setFieldsValue(getInitialValues(payload.departmentId));
-        setOpen(true);
-      }
-    },
-    [record],
-  );
-
-  /** 新增Item */
-  function invokeInsertTask(params: any) {
-    api.save(params).then((res) => {
-      FaUtils.showResponse(res, `新增${serviceName}`);
-      setOpen(false);
-      if (fetchFinish) fetchFinish();
-    });
-  }
-
-  /** 更新Item */
-  function invokeUpdateTask(params: any) {
-    api.update(params.id, params).then((res) => {
-      FaUtils.showResponse(res, `更新${serviceName}`);
-      setOpen(false);
-      if (fetchFinish) fetchFinish();
-    });
-  }
-
-  /** 提交表单 */
-  function onFinish(fieldsValue: any) {
-    const values = {
-      ...fieldsValue,
-    };
-    if (record) {
-      invokeUpdateTask({ ...record, ...values });
-    } else {
-      invokeInsertTask({ ...values });
-    }
-  }
 
   function getInitialValues(initialDepartmentId = defaultDepartmentId) {
     const isSuperAdmin = get(record, 'superAdmin', false) === true;
@@ -89,11 +47,9 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     };
   }
 
-  function showModal() {
-    setOpen(true);
-
+  function prepareForm(initialDepartmentId = defaultDepartmentId) {
     form.resetFields();
-    form.setFieldsValue(getInitialValues());
+    form.setFieldsValue(getInitialValues(initialDepartmentId));
     if (record !== undefined) {
       rbacUserRoleApi.getUserRoles(record.id).then((res) => {
         const roleIds = res.data
@@ -104,19 +60,92 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     }
   }
 
+  useBus(
+    ['@@UserModal/SHOW_ADD'],
+    ({ payload }) => {
+      if (record === undefined) {
+        prepareForm(payload.departmentId);
+        setOpen(true);
+      }
+    },
+    [record, defaultDepartmentId, selectedTenant?.tenantId, systemConfig.tenantEnabled, user.superAdmin],
+  );
+
+  /** 新增Item */
+  function invokeInsertTask(params: any) {
+    api.save(params).then((res) => {
+      FaUtils.showResponse(res, `新增${serviceName}`);
+      if (res?.status !== Fa.RES_CODE.OK) {
+        message.error(res?.message || '新增用户失败');
+        return;
+      }
+      form.resetFields();
+      setOpen(false);
+      fetchFinish?.();
+    }).catch(() => message.error('新增用户失败，请重试'));
+  }
+
+  /** 更新Item */
+  function invokeUpdateTask(params: any) {
+    api.update(params.id, params).then((res) => {
+      FaUtils.showResponse(res, `更新${serviceName}`);
+      if (res?.status !== Fa.RES_CODE.OK) {
+        message.error(res?.message || '更新用户失败');
+        return;
+      }
+      form.resetFields();
+      setOpen(false);
+      fetchFinish?.();
+    }).catch(() => message.error('更新用户失败，请重试'));
+  }
+
+  /** 提交表单 */
+  function onFinish(fieldsValue: any) {
+    const values = {
+      ...fieldsValue,
+    };
+    if (record) {
+      invokeUpdateTask({ ...record, ...values });
+    } else {
+      invokeInsertTask({ ...values });
+    }
+  }
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+    if (nextOpen) {
+      prepareForm();
+    } else {
+      form.resetFields();
+    }
+  }
+
   const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
-  return (
+  const triggerDom = (
     <span>
-      <span onClick={showModal}>
-        {children}
-        {addBtn && (
-          <Button icon={<PlusOutlined />} type="primary">
-            新增用户
-          </Button>
-        )}
-        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
-      </span>
-      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
+      {children}
+      {addBtn && (
+        <Button icon={<PlusOutlined />} type="primary">
+          新增用户
+        </Button>
+      )}
+      {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+    </span>
+  );
+
+  return (
+    <FaFullContentModal
+      title={title}
+      triggerDom={triggerDom}
+      open={open}
+      onOpenChange={handleOpenChange}
+      okText={record ? '保存修改' : '创建用户'}
+      confirmLoading={loading}
+      onOk={() => {
+        if (!loading) form.submit();
+      }}
+      onCancel={() => form.resetFields()}
+    >
         <Form form={form} onFinish={onFinish}>
           <Form.Item name="departmentId" label="部门" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
             <DepartmentCascade />
@@ -165,7 +194,6 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <Input.TextArea autoSize />
           </Form.Item>
         </Form>
-      </DragModal>
-    </span>
+    </FaFullContentModal>
   );
 }
