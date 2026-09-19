@@ -254,6 +254,27 @@
   min-width: 0;
 }
 
+.fa-menu-status-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fa-menu-status-control__feedback {
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.fa-menu-status-control__feedback--success {
+  color: var(--ant-color-success, #52c41a);
+}
+
+.fa-menu-status-control__feedback--error {
+  color: var(--ant-color-error, #ff4d4f);
+}
+
 .fa-menu-item__type {
   min-width: 0;
   overflow: hidden;

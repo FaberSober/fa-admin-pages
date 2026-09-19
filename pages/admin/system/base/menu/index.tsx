@@ -109,6 +109,16 @@ function countMatchingMenuNodes(nodes: MenuTreeNode[] | undefined, filters: Menu
   return nodes.reduce((total, node) => total + (matchesMenuNode(node, filters) ? 1 : 0) + countMatchingMenuNodes(node.children, filters), 0);
 }
 
+function updateMenuNodeStatus(nodes: MenuTreeNode[], id: string, status: boolean): MenuTreeNode[] {
+  return nodes.map((node) => {
+    if (String(node.id) === id) {
+      return { ...node, sourceData: { ...node.sourceData, status } };
+    }
+    if (!node.children?.length) return node;
+    return { ...node, children: updateMenuNodeStatus(node.children, id, status) };
+  });
+}
+
 function toMenuViewTree(nodes: MenuTreeNode[]): MenuViewTreeNode[] {
   return nodes.map((node) => {
     const children = node.children ? toMenuViewTree(node.children) : undefined;
@@ -310,6 +320,10 @@ export default function Menu() {
   const totalCount = countMenuNodes(sourceTree);
   const matchingCount = countMatchingMenuNodes(sourceTree, filters);
 
+  function handleStatusChange(id: string, status: boolean) {
+    setSourceTree((tree) => (tree ? updateMenuNodeStatus(tree, id, status) : tree));
+  }
+
   useEffect(() => {
     if (!hasFilters) return;
     matchingKeys.forEach((key) => {
@@ -489,7 +503,7 @@ export default function Menu() {
                   <span className="fa-menu-item__link fa-menu-item__placeholder">—</span>
                 )}
                 <div className="fa-menu-item__status">
-                  <MenuStatusSwitch item={item.sourceData} />
+                  <MenuStatusSwitch item={item.sourceData} onChange={(status) => handleStatusChange(item.id, status)} />
                 </div>
                 <div className="fa-menu-item__actions">
                   <MenuRowActions item={item} scope={scope} onRefresh={refreshData} onDelete={handleDelete} />
