@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { userApi as api } from '@features/fa-admin-pages/services';
-import { Switch } from 'antd';
+import { Fa, FaUtils } from '@fa/ui';
+import { message, Switch } from 'antd';
 
 export interface UserStatusColProps {
   item: Admin.User;
@@ -22,11 +23,16 @@ export default function UserStatusCol({ item, onChange }: UserStatusColProps) {
     setLoading(true);
     api
       .updateSimpleById(item.id, { id: item.id, status })
-      .then((_res) => {
-        setLoading(false);
-        onChange(item);
+      .then((res: Fa.Ret) => {
+        if (res?.status !== Fa.RES_CODE.OK) {
+          message.error(res?.message || '更新账户状态失败');
+          return;
+        }
+        FaUtils.showResponse(res, '更新账户状态');
+        onChange({ ...item, status });
       })
-      .catch(() => setLoading(false));
+      .catch(() => message.error('更新账户状态失败，请重试'))
+      .finally(() => setLoading(false));
   }
 
   return (

@@ -125,8 +125,8 @@ export default function UserList({ departmentId, departmentName, superMode = fal
         render: (_v, r) => (
           <UserStatusCol
             item={r}
-            onChange={() => {
-              setList(list.map((i) => (i.id === r.id ? { ...i, status: !i.status } : i)));
+            onChange={(updated) => {
+              setList(list.map((i) => (i.id === updated.id ? { ...i, ...updated } : i)));
             }}
           />
         ),

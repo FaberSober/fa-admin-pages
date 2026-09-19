@@ -1,6 +1,7 @@
 import { userApi as api } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
-import { Switch } from 'antd';
+import { Fa, FaUtils } from '@fa/ui';
+import { message, Switch } from 'antd';
 import { useState } from 'react';
 
 export interface UserAdminAccessColProps {
@@ -15,8 +16,15 @@ export default function UserAdminAccessCol({ item, onChange }: UserAdminAccessCo
     setLoading(true);
     api
       .updateSimpleById(item.id, { adminEnabled })
-      .then(() => onChange({ ...item, adminEnabled }))
-      .catch(() => undefined)
+      .then((res: Fa.Ret) => {
+        if (res?.status !== Fa.RES_CODE.OK) {
+          message.error(res?.message || '更新后台访问失败');
+          return;
+        }
+        FaUtils.showResponse(res, '更新后台访问');
+        onChange({ ...item, adminEnabled });
+      })
+      .catch(() => message.error('更新后台访问失败，请重试'))
       .finally(() => setLoading(false));
   }
 
