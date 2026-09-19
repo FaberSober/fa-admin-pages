@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BaseTree } from '@fa/ui';
 import type { Admin } from '@/types';
 import { departmentApi } from '@features/fa-admin-pages/services';
@@ -57,7 +57,7 @@ export default function UserDepartmentManage() {
         {/* 右侧面板 */}
         <Splitter.Panel>
           <div className="fa-flex-column fa-full fa-relative">
-            <UserList departmentId={viewRecord?.id} />
+            <UserList departmentId={viewRecord?.id} departmentName={viewRecord?.name} />
           </div>
         </Splitter.Panel>
       </Splitter>

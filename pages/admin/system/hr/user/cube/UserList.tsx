@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { get } from 'lodash';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Badge, Button, Drawer, Form, Input, Space } from 'antd';
+import { Badge, Button, Drawer, Form, Input, Space, Tag, Typography } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -31,13 +31,16 @@ const biz = 'UserList-v3';
 
 interface IProps {
   departmentId?: string;
+  departmentName?: string;
   superMode?: boolean;
 }
 
-export default function UserList({ departmentId, superMode = false }: IProps) {
+export default function UserList({ departmentId, departmentName, superMode = false }: IProps) {
   const [form] = Form.useForm();
   const pageApi = superMode ? userApi.pageSuper : userApi.page;
   const extraParams = superMode ? {} : { departmentIdSuper: departmentId };
+  const scopeDescription = superMode ? '全部用户（跨租户）' : departmentName ? `${departmentName}及下属部门` : '全部部门';
+  const scopeHint = superMode ? '不受当前部门和租户范围限制' : departmentName ? '包含当前部门及其下属部门' : '包含全部部门用户';
 
   const {
     queryParams,
@@ -144,6 +147,19 @@ export default function UserList({ departmentId, superMode = false }: IProps) {
 
   return (
     <div className="fa-full-content fa-flex-column fa-p12 fa-bg-white">
+      <div className="fa-flex-row-center fa-border-b fa-mb12" style={{ gap: 12, paddingBottom: 12 }}>
+        <div className="fa-flex-column" style={{ gap: 4 }}>
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            用户管理
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            当前范围：{scopeDescription} · {scopeHint}
+          </Typography.Text>
+        </div>
+        <div className="fa-flex-1" />
+        <Tag color={superMode ? 'gold' : departmentId ? 'blue' : 'default'}>{superMode ? '超级用户' : departmentId ? '部门范围' : '全部部门'}</Tag>
+      </div>
+
       <SearchGrid
         form={form}
         onFinish={setFormValues}
