@@ -27,6 +27,12 @@ namespace Tn {
     description: string;
   }
 
+  /** 租户及初始权限范围创建请求 */
+  export interface TenantCreateReq {
+    tenant: Tenant;
+    menuIds: number[];
+  }
+
   /** 租户用户关联 */
   export interface TenantUser extends Fa.BaseDelEntity {
     /** ID */
