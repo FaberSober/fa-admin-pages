@@ -19,10 +19,11 @@ interface RbacMenuModalProps extends CommonModalProps<Rbac.RbacMenu> {
 /**
  * BASE-权限表实体新增、编辑弹框
  */
-export default function RbacMenuModal({ children, title, record, scope, parentId, fetchFinish, ...props }: RbacMenuModalProps) {
+export default function RbacMenuModal({ children, title, record, scope, parentId, fetchFinish, open: controlledOpen, onCancel, onOpen, ...props }: RbacMenuModalProps) {
   const [form] = Form.useForm();
 
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const modalOpen = controlledOpen ?? internalOpen;
   const [level, setLevel] = useState<FaEnums.RbacMenuLevelEnum | undefined>(() => {
     return record ? record.level : FaEnums.RbacMenuLevelEnum.MENU;
   });
@@ -34,7 +35,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
   function invokeInsertTask(params: any) {
     api.save(params).then((res) => {
       FaUtils.showResponse(res, `新增${serviceName}`);
-      setOpen(false);
+      closeModal();
       if (fetchFinish) fetchFinish();
     });
   }
@@ -43,7 +44,7 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
   function invokeUpdateTask(params: any) {
     api.update(params.id, params).then((res) => {
       FaUtils.showResponse(res, `更新${serviceName}`);
-      setOpen(false);
+      closeModal();
       if (fetchFinish) fetchFinish();
     });
   }
@@ -74,28 +75,37 @@ export default function RbacMenuModal({ children, title, record, scope, parentId
   }
 
   function showModal() {
-    setOpen(true);
+    if (controlledOpen === undefined) {
+      setInternalOpen(true);
+    }
+    onOpen?.();
     setLevel(record ? record.level : FaEnums.RbacMenuLevelEnum.MENU);
     setLinkType(record ? record.linkType : FaEnums.RbacLinkTypeEnum.INNER);
     form.setFieldsValue(getInitialValues());
   }
 
+  function closeModal() {
+    if (controlledOpen === undefined) {
+      setInternalOpen(false);
+    }
+  }
+
   useEffect(() => {
-    if (!props.open) return;
+    if (!modalOpen) return;
     setLevel(record ? record.level : FaEnums.RbacMenuLevelEnum.MENU);
     setLinkType(record ? record.linkType : FaEnums.RbacLinkTypeEnum.INNER);
     form.setFieldsValue(getInitialValues());
-  }, [record]);
+  }, [modalOpen, record]);
 
   const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
+      <DragModal title={title} open={modalOpen} onOk={() => form.submit()} confirmLoading={loading} onCancel={(event) => { closeModal(); onCancel?.(event); }} width={700} {...props}>
         <Form
           form={form}
           onFinish={onFinish}
-          onValuesChange={(cv, av) => {
+          onValuesChange={(_cv, av) => {
             if (av.level !== level) {
               setLevel(av.level);
             }

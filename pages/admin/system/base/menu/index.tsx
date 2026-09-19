@@ -1,6 +1,9 @@
 import {
+  CopyOutlined,
+  DeleteOutlined,
   EditOutlined,
   MinusCircleOutlined,
+  MoreOutlined,
   PlusCircleOutlined,
   PlusOutlined,
   ReloadOutlined,
@@ -9,10 +12,11 @@ import {
   SettingOutlined,
   SisternodeOutlined,
 } from '@ant-design/icons';
-import { AuthDelBtn, BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaHref, FaUtils, useApiLoading, useDelete } from '@fa/ui';
+import { BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
-import { Button, Input, Segmented, Select, Space, Tag } from 'antd';
+import { Button, Dropdown, Input, Modal, Segmented, Select, Space, Tag } from 'antd';
+import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
 import type { Rbac } from '@/types';
@@ -127,6 +131,89 @@ function getMenuLevelClassName(level: FaEnums.RbacMenuLevelEnum): string {
   if (level === FaEnums.RbacMenuLevelEnum.APP) return 'fa-menu-item--module';
   if (level === FaEnums.RbacMenuLevelEnum.BUTTON) return 'fa-menu-item--button';
   return 'fa-menu-item--menu';
+}
+
+interface MenuRowActionsProps {
+  item: MenuTreeNode;
+  scope: FaEnums.RbacMenuScopeEnum;
+  onRefresh: () => void;
+  onDelete: (id: string) => void;
+}
+
+function MenuRowActions({ item, scope, onRefresh, onDelete }: MenuRowActionsProps) {
+  const [action, setAction] = useState<'add-child' | 'edit'>();
+
+  function handleMenuClick({ key }: { key: string }) {
+    if (key === 'add-child' || key === 'edit') {
+      setAction(key);
+      return;
+    }
+    if (key === 'copy-name') {
+      FaUtils.copyToClipboard(item.name);
+      return;
+    }
+    if (key === 'copy-id') {
+      FaUtils.copyToClipboard(item.sourceData.id);
+      return;
+    }
+    if (key === 'copy-link') {
+      FaUtils.copyToClipboard(item.sourceData.linkUrl);
+      return;
+    }
+    if (key === 'delete') {
+      Modal.confirm({
+        title: '删除菜单',
+        content: `确认删除菜单【${item.name}】？`,
+        okText: '删除',
+        okButtonProps: { danger: true },
+        onOk: () => onDelete(item.id),
+        cancelText: '取消',
+      });
+    }
+  }
+
+  return (
+    <>
+      <Dropdown
+        trigger={['click']}
+        placement="bottomRight"
+        menu={{
+          items: [
+            { key: 'add-child', icon: <SisternodeOutlined />, label: '新增子节点' },
+            { key: 'edit', icon: <EditOutlined />, label: '编辑菜单' },
+            { type: 'divider' },
+            { key: 'copy-name', icon: <CopyOutlined />, label: '复制菜单名称' },
+            { key: 'copy-id', icon: <CopyOutlined />, label: '复制菜单 ID' },
+            {
+              key: 'copy-link',
+              icon: <CopyOutlined />,
+              label: '复制路由 / 权限标识',
+              disabled: !item.sourceData.linkUrl,
+            },
+            { type: 'divider' },
+            { key: 'delete', danger: true, icon: <DeleteOutlined />, label: '删除菜单' },
+          ],
+          onClick: handleMenuClick,
+        }}
+      >
+        <Button className="fa-menu-action-trigger" type="text" size="small" icon={<MoreOutlined />} aria-label="更多操作" title="更多操作">
+          更多操作
+        </Button>
+      </Dropdown>
+      <RbacMenuModal
+        title={action === 'edit' ? '编辑菜单' : '新增菜单'}
+        record={action === 'edit' ? item.sourceData : undefined}
+        scope={scope}
+        parentId={action === 'add-child' ? item.id : undefined}
+        open={Boolean(action)}
+        onCancel={() => setAction(undefined)}
+        fetchFinish={() => {
+          setAction(undefined);
+          onRefresh();
+        }}
+      />
+    </>
+  );
 }
 
 /**
@@ -251,7 +338,6 @@ export default function Menu() {
             ref={treeRef}
             className="fa-menu-tree"
             // showRoot
-            showOprBtn
             // onSelect={(keys) => console.log('onSelect', keys)}
             onAfterDelItem={() => {}}
             // 自定义配置
@@ -268,17 +354,15 @@ export default function Menu() {
             showTopBtn={false}
             // @ts-expect-error
             titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
-              <div className={`fa-menu-item ${getMenuLevelClassName(item.sourceData.level)}`}>
+              <div
+                className={`fa-menu-item ${getMenuLevelClassName(item.sourceData.level)}`}
+                style={{ '--fa-menu-depth': Math.max(0, item.level - 1) } as CSSProperties}
+              >
                 <div className="fa-menu-item__name-cell">
                   <span className="fa-menu-item__level-marker" aria-hidden="true" />
-                  <button
-                    type="button"
-                    className="fa-menu-item__name fa-menu-item__copy"
-                    title="点击复制菜单名称"
-                    onClick={() => FaUtils.copyToClipboard(item.name)}
-                  >
+                  <span className="fa-menu-item__name" title={item.name}>
                     {item.name}
-                  </button>
+                  </span>
                 </div>
                 <div className="fa-menu-item__type">
                   {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && (
@@ -294,40 +378,25 @@ export default function Menu() {
                 <div className="fa-menu-item__icon fa-flex-center">
                   {item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : <span className="fa-menu-item__placeholder">—</span>}
                 </div>
-                <button
-                  type="button"
-                  className="fa-menu-item__id fa-menu-item__copy"
-                  title="点击复制菜单 ID"
-                  onClick={() => FaUtils.copyToClipboard(item.sourceData.id)}
-                >
+                <span className="fa-menu-item__id" title={item.sourceData.id}>
                   {item.sourceData.id}
-                </button>
+                </span>
                 {item.sourceData.linkUrl ? (
-                  <button
-                    type="button"
-                    className="fa-menu-item__link fa-menu-item__copy"
-                    title="点击复制路由或权限标识"
-                    onClick={() => FaUtils.copyToClipboard(item.sourceData.linkUrl)}
-                  >
+                  <span className="fa-menu-item__link" title={item.sourceData.linkUrl}>
                     {item.sourceData.linkUrl}
-                  </button>
+                  </span>
                 ) : (
                   <span className="fa-menu-item__link fa-menu-item__placeholder">—</span>
                 )}
                 <div className="fa-menu-item__status">
                   <MenuStatusSwitch item={item.sourceData} />
                 </div>
-                <Space className="fa-menu-item__actions">
-                  <RbacMenuModal title="新增菜单" scope={scope} parentId={item.id} fetchFinish={refreshData}>
-                    <FaHref icon={<SisternodeOutlined />} text="新增子节点" />
-                  </RbacMenuModal>
-                  <RbacMenuModal title="编辑菜单" record={item.sourceData} scope={scope} fetchFinish={refreshData}>
-                    <FaHref icon={<EditOutlined />} text="编辑" />
-                  </RbacMenuModal>
-                  <AuthDelBtn handleDelete={() => handleDelete(item.id)} />
-                </Space>
+                <div className="fa-menu-item__actions">
+                  <MenuRowActions item={item} scope={scope} onRefresh={refreshData} onDelete={handleDelete} />
+                </div>
               </div>
             )}
+            showOprBtn={false}
             showLine={{ showLeafIcon: false }}
             draggable={hasFilters ? false : { icon: false }}
             extraEffectArgs={[current]}
