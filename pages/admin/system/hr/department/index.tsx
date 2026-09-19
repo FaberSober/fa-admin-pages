@@ -11,15 +11,17 @@ import {
 import { type Fa, FaHref, FaUtils, ShiroPermissionContainer, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
-import { Button, Form, Input, Popconfirm, Space, Table, Tag } from 'antd';
+import { Button, Empty, Form, Input, Popconfirm, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { SearchGrid } from '@/components';
 import DepartmentModal from '../user/modal/DepartmentModal';
+import './index.scss';
 
 const serviceName = '部门';
 
 type DepartmentRow = Admin.DepartmentVo & {
   hasChildren: boolean;
+  level: number;
   children?: DepartmentRow[];
 };
 
@@ -38,6 +40,7 @@ function parseRows(nodes: Fa.TreeNode<Admin.DepartmentVo, string>[] = []): Depar
       parentId: node.sourceData?.parentId || node.parentId,
       name: node.sourceData?.name || node.name,
       hasChildren: node.hasChildren,
+      level: node.level,
       children,
     };
   });
@@ -107,13 +110,23 @@ export default function DepartmentManage() {
       title: '部门名称',
       dataIndex: 'name',
       width: 260,
+      render: (value, record) => {
+        const name = value || '未命名部门';
+        const level = Math.min(Math.max(record.level, 1), 4);
+        return (
+          <div className={`fa-department-name-cell fa-department-name-cell--level-${level}`} title={name}>
+            <span className="fa-department-level-marker" aria-hidden="true" />
+            <span className="fa-department-name">{name}</span>
+          </div>
+        );
+      },
     },
     {
       title: '类型',
       dataIndex: 'type',
       width: 100,
       render: (value) => {
-        const type = departmentTypeMap[value] || { text: value || '-', color: 'default' };
+        const type = departmentTypeMap[value] || { text: value || '未设置', color: 'default' };
         return <Tag color={type.color}>{type.text}</Tag>;
       },
     },
@@ -121,27 +134,34 @@ export default function DepartmentManage() {
       title: '负责人',
       dataIndex: ['manager', 'name'],
       width: 140,
-      render: (_, record) => record.manager?.name || record.managerId || '-',
+      render: (_, record) => {
+        const manager = record.manager?.name || record.managerId || '未设置负责人';
+        return <span title={manager}>{manager}</span>;
+      },
     },
     {
       title: '排序',
       dataIndex: 'sort',
       width: 90,
+      render: (value) => value ?? '—',
     },
     {
       title: '描述',
       dataIndex: 'description',
       ellipsis: true,
+      render: (value) => (value ? <span title={value}>{value}</span> : <span className="fa-department-cell-placeholder">—</span>),
     },
     {
       title: '创建时间',
       dataIndex: 'crtTime',
       width: 170,
+      render: (value) => value || '—',
     },
     {
       title: '更新时间',
       dataIndex: 'updTime',
       width: 170,
+      render: (value) => value || '—',
     },
     {
       title: '操作',
@@ -175,7 +195,7 @@ export default function DepartmentManage() {
   ];
 
   return (
-    <div className="fa-full-content fa-flex-column fa-p12 fa-bg-white">
+    <div className="fa-full-content-p12 fa-flex-column fa-content fa-pl12 fa-pr12 fa-department-page">
       <SearchGrid
         form={form}
         onFinish={handleSearch}
@@ -196,7 +216,7 @@ export default function DepartmentManage() {
           </Space>
         )}
         defaultCount={2}
-        className="fa-mb12"
+        className="fa-department-search fa-mb12"
       >
         <Form.Item name="name" label="部门名称">
           <Input placeholder="请输入部门名称" allowClear />
@@ -208,12 +228,17 @@ export default function DepartmentManage() {
 
       <Table<DepartmentRow>
         rowKey="id"
+        className="fa-department-table"
         columns={columns}
         dataSource={treeData}
         loading={loading}
         pagination={false}
         size="middle"
-        scroll={{ x: 1200 }}
+        sticky={{ offsetHeader: 56 }}
+        tableLayout="fixed"
+        scroll={{ x: 1280 }}
+        locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无部门数据" /> }}
+        rowClassName={() => 'fa-department-row'}
         expandable={{
           expandedRowKeys,
           rowExpandable: (record) => record.hasChildren,

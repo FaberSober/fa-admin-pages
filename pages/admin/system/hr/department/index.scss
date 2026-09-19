@@ -1,0 +1,103 @@
+.fa-department-page {
+  min-width: 0;
+  overflow: auto;
+  background: var(--fa-bg-color) !important;
+  isolation: isolate;
+
+  .fa-department-search {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin: -12px -12px 12px;
+    padding: 12px;
+    background-color: var(--fa-bg-color) !important;
+    border-bottom: 1px solid var(--fa-border-color);
+    box-shadow: 0 1px 0 var(--fa-border-color);
+  }
+
+  .fa-department-table {
+    min-height: 0;
+
+    .ant-table,
+    .ant-table-container,
+    .ant-table-content {
+      background: var(--fa-bg-color);
+    }
+
+    .ant-table-sticky-holder,
+    .ant-table-sticky-scroll {
+      background: var(--fa-bg-color) !important;
+    }
+
+    .ant-table-sticky-scroll {
+      border-top-color: var(--fa-border-color) !important;
+    }
+
+    .ant-table-thead > tr > th {
+      background: var(--fa-bg-color2);
+      border-bottom: 1px solid var(--fa-border-color);
+      color: var(--fa-subtitle-color);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .ant-table-tbody > tr.fa-department-row > td {
+      border-bottom: 1px solid var(--fa-border-color);
+      transition: background-color 0.15s ease;
+    }
+
+    .ant-table-tbody > tr.fa-department-row:hover > td {
+      background: var(--fa-bg-color-hover) !important;
+    }
+  }
+}
+
+.fa-department-name-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.fa-department-level-marker {
+  width: 3px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--ant-color-primary, #1677ff);
+  opacity: 0.65;
+}
+
+.fa-department-name-cell--level-1 .fa-department-level-marker {
+  opacity: 1;
+}
+
+.fa-department-name-cell--level-2 .fa-department-level-marker {
+  opacity: 0.82;
+}
+
+.fa-department-name-cell--level-3 .fa-department-level-marker {
+  opacity: 0.68;
+}
+
+.fa-department-name-cell--level-4 .fa-department-level-marker {
+  opacity: 0.54;
+}
+
+.fa-department-name,
+.fa-department-cell-placeholder {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fa-department-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.fa-department-cell-placeholder {
+  color: var(--fa-subtitle-color);
+}
