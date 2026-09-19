@@ -1,11 +1,11 @@
-import type { Rbac } from '@/types';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { BaseBoolRadio, type CommonModalProps, DragModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { rbacRoleApi as api } from '@features/fa-admin-pages/services';
 import { Button, Form, Input, Select } from 'antd';
 import { get } from 'lodash';
 import { useContext, useState } from 'react';
-import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
+import type { Rbac } from '@/types';
 
 const serviceName = '';
 
@@ -44,7 +44,7 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
 
   /** 提交表单 */
   function onFinish(fieldsValue: any) {
-    const type = user.superAdmin ? fieldsValue.type : fieldsValue.type || 3;
+    const type = user.superAdmin ? fieldsValue.type : 3;
     const values = {
       ...fieldsValue,
       type,
@@ -73,7 +73,7 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
     form.setFieldsValue(getInitialValues());
   }
 
-  const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
+  const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
   return (
     <span>
       <span onClick={showModal}>
@@ -97,7 +97,7 @@ export default function RbacRoleModal({ children, title, record, fetchFinish, ad
             <BaseBoolRadio />
           </Form.Item>
           <Form.Item name="type" label="类型" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Select options={user.superAdmin ? ROLE_TYPE_OPTIONS : ROLE_TYPE_OPTIONS.filter((item) => item.value !== 1)} />
+            <Select options={user.superAdmin ? ROLE_TYPE_OPTIONS : ROLE_TYPE_OPTIONS.filter((item) => item.value === 3)} />
           </Form.Item>
         </Form>
       </DragModal>

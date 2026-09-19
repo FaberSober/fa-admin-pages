@@ -1,14 +1,22 @@
-import { FaEnums, type Rbac } from '@/types';
 import { MobileOutlined } from '@ant-design/icons';
 import { type Fa, FaUtils, treeUtils, useApiLoading } from '@fa/ui';
-import { rbacMenuApi, rbacRoleMenuApi } from '@features/fa-admin-pages/services';
+import { rbacMenuApi, rbacRoleMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
 import { Button, Drawer, type DrawerProps, Tree } from 'antd';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { FaEnums, type Rbac } from '@/types';
 
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
   record: Rbac.RbacRole;
   success?: () => void;
+}
+
+function filterMenuTree(tree: Fa.TreeNode<Rbac.RbacMenu>[], allowedMenuIds: Set<string>): Fa.TreeNode<Rbac.RbacMenu>[] {
+  return tree.flatMap((node) => {
+    const children = node.children ? filterMenuTree(node.children, allowedMenuIds) : [];
+    if (!allowedMenuIds.has(String(node.id)) && children.length === 0) return [];
+    return [{ ...node, children: children.length > 0 ? children : undefined }];
+  });
 }
 
 /**
@@ -29,11 +37,16 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
   }, [tree, checkedMenuIds]);
 
   async function refreshData() {
-    const res = await rbacMenuApi.getTree({ query: { status: true }, sorter: 'scope ASC' });
-    setTree(res.data);
-
-    const res2 = await rbacRoleMenuApi.getRoleMenu(record.id);
-    setCheckedMenuIds(res2.data.checkedMenuIds);
+    const isTenantRole = record.type === 3 || Boolean(record.tenantId);
+    const [menuRes, roleMenuRes, tenantPermissionRes] = await Promise.all([
+      rbacMenuApi.getTree({ query: { status: true }, sorter: 'scope ASC' }),
+      rbacRoleMenuApi.getRoleMenu(record.id),
+      isTenantRole && record.tenantId ? tenantPermissionApi.getMenuIds(record.tenantId) : Promise.resolve(null),
+    ]);
+    const allowedMenuIds = tenantPermissionRes?.data ? new Set(tenantPermissionRes.data.map(String)) : undefined;
+    setTree(allowedMenuIds ? filterMenuTree(menuRes.data || [], allowedMenuIds) : menuRes.data || []);
+    const roleMenuIds = roleMenuRes.data?.checkedMenuIds || [];
+    setCheckedMenuIds(allowedMenuIds ? roleMenuIds.filter((id) => allowedMenuIds.has(String(id))) : roleMenuIds);
   }
 
   function handleSave() {
@@ -53,7 +66,11 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
     await refreshData();
   }
 
-  const loading = useApiLoading([rbacRoleMenuApi.getUrl('updateRoleMenu')]);
+  const loadingKeys = [rbacRoleMenuApi.getUrl('updateRoleMenu'), rbacRoleMenuApi.getUrl(`getRoleMenu/${record.id}`)];
+  if ((record.type === 3 || record.tenantId) && record.tenantId) {
+    loadingKeys.push(tenantPermissionApi.getUrl(`getMenuIds/${record.tenantId}`));
+  }
+  const loading = useApiLoading(loadingKeys);
   return (
     <span>
       <span onClick={showModal}>{children}</span>
