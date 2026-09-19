@@ -1,5 +1,5 @@
 .fa-menu-div {
-  --fa-menu-table-columns: minmax(240px, 1.25fr) 82px 56px 120px minmax(240px, 1.5fr) 96px 108px;
+  --fa-menu-table-columns: minmax(240px, 1.25fr) 82px 56px 120px minmax(240px, 1.5fr) 96px 250px;
   --fa-menu-tag-module-color: #ad6800;
   --fa-menu-tag-module-background: #fff7e6;
   --fa-menu-tag-module-border: #ffd591;
@@ -107,6 +107,8 @@
   }
 
   .ant-tree-switcher {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -246,6 +248,16 @@
   justify-content: flex-end;
   overflow: visible;
   white-space: nowrap;
+}
+
+.fa-menu-inline-actions {
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+
+.fa-menu-inline-actions .ant-btn {
+  padding-inline: 2px;
+  font-size: 12px;
 }
 
 .fa-menu-action-trigger {

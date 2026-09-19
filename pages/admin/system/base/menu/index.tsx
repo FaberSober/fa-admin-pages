@@ -142,6 +142,7 @@ interface MenuRowActionsProps {
 
 function MenuRowActions({ item, scope, onRefresh, onDelete }: MenuRowActionsProps) {
   const [action, setAction] = useState<'add-child' | 'edit'>();
+  const canAddChild = item.sourceData.level !== FaEnums.RbacMenuLevelEnum.BUTTON;
 
   function handleMenuClick({ key }: { key: string }) {
     if (key === 'add-child' || key === 'edit') {
@@ -174,32 +175,39 @@ function MenuRowActions({ item, scope, onRefresh, onDelete }: MenuRowActionsProp
 
   return (
     <>
-      <Dropdown
-        trigger={['click']}
-        placement="bottomRight"
-        menu={{
-          items: [
-            { key: 'add-child', icon: <SisternodeOutlined />, label: '新增子节点' },
-            { key: 'edit', icon: <EditOutlined />, label: '编辑菜单' },
-            { type: 'divider' },
-            { key: 'copy-name', icon: <CopyOutlined />, label: '复制菜单名称' },
-            { key: 'copy-id', icon: <CopyOutlined />, label: '复制菜单 ID' },
-            {
-              key: 'copy-link',
-              icon: <CopyOutlined />,
-              label: '复制路由 / 权限标识',
-              disabled: !item.sourceData.linkUrl,
-            },
-            { type: 'divider' },
-            { key: 'delete', danger: true, icon: <DeleteOutlined />, label: '删除菜单' },
-          ],
-          onClick: handleMenuClick,
-        }}
-      >
-        <Button className="fa-menu-action-trigger" type="text" size="small" icon={<MoreOutlined />} aria-label="更多操作" title="更多操作">
-          更多操作
+      <Space className="fa-menu-inline-actions" size={2}>
+        {canAddChild && (
+          <Button type="link" size="small" icon={<SisternodeOutlined />} onClick={() => setAction('add-child')}>
+            新增子节点
+          </Button>
+        )}
+        <Button type="link" size="small" icon={<EditOutlined />} onClick={() => setAction('edit')}>
+          编辑菜单
         </Button>
-      </Dropdown>
+        <Dropdown
+          trigger={['click']}
+          placement="bottomRight"
+          menu={{
+            items: [
+              { key: 'copy-name', icon: <CopyOutlined />, label: '复制菜单名称' },
+              { key: 'copy-id', icon: <CopyOutlined />, label: '复制菜单 ID' },
+              {
+                key: 'copy-link',
+                icon: <CopyOutlined />,
+                label: '复制路由 / 权限标识',
+                disabled: !item.sourceData.linkUrl,
+              },
+              { type: 'divider' },
+              { key: 'delete', danger: true, icon: <DeleteOutlined />, label: '删除菜单' },
+            ],
+            onClick: handleMenuClick,
+          }}
+        >
+          <Button className="fa-menu-action-trigger" type="text" size="small" icon={<MoreOutlined />} aria-label="更多操作" title="更多操作">
+            更多操作
+          </Button>
+        </Dropdown>
+      </Space>
       <RbacMenuModal
         title={action === 'edit' ? '编辑菜单' : '新增菜单'}
         record={action === 'edit' ? item.sourceData : undefined}
