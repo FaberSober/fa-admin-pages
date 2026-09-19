@@ -123,6 +123,12 @@ function toMenuViewTree(nodes: MenuTreeNode[]): MenuViewTreeNode[] {
   });
 }
 
+function getMenuLevelClassName(level: FaEnums.RbacMenuLevelEnum): string {
+  if (level === FaEnums.RbacMenuLevelEnum.APP) return 'fa-menu-item--module';
+  if (level === FaEnums.RbacMenuLevelEnum.BUTTON) return 'fa-menu-item--button';
+  return 'fa-menu-item--menu';
+}
+
 /**
  * RBAC Menu Manage
  * @author xu.pengfei
@@ -262,15 +268,18 @@ export default function Menu() {
             showTopBtn={false}
             // @ts-expect-error
             titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
-              <div className="fa-menu-item">
-                <button
-                  type="button"
-                  className="fa-menu-item__name fa-menu-item__copy"
-                  title="点击复制菜单名称"
-                  onClick={() => FaUtils.copyToClipboard(item.name)}
-                >
-                  {item.name}
-                </button>
+              <div className={`fa-menu-item ${getMenuLevelClassName(item.sourceData.level)}`}>
+                <div className="fa-menu-item__name-cell">
+                  <span className="fa-menu-item__level-marker" aria-hidden="true" />
+                  <button
+                    type="button"
+                    className="fa-menu-item__name fa-menu-item__copy"
+                    title="点击复制菜单名称"
+                    onClick={() => FaUtils.copyToClipboard(item.name)}
+                  >
+                    {item.name}
+                  </button>
+                </div>
                 <div className="fa-menu-item__type">
                   {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && (
                     <Tag className="fa-menu-tag fa-menu-tag--module">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
@@ -319,7 +328,7 @@ export default function Menu() {
                 </Space>
               </div>
             )}
-            showLine={false}
+            showLine={{ showLeafIcon: false }}
             draggable={hasFilters ? false : { icon: false }}
             extraEffectArgs={[current]}
           />

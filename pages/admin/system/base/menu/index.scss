@@ -160,6 +160,8 @@
 }
 
 .fa-menu-item {
+  --fa-menu-level-color: var(--fa-menu-tag-menu-border);
+
   display: grid;
   grid-template-columns: var(--fa-menu-table-columns);
   align-items: center;
@@ -167,6 +169,45 @@
   min-width: 0;
   min-height: 38px;
   padding-right: 12px;
+}
+
+.fa-menu-item--module {
+  --fa-menu-level-color: var(--fa-menu-tag-module-color);
+}
+
+.fa-menu-item--button {
+  --fa-menu-level-color: var(--fa-menu-tag-button-border);
+}
+
+.fa-menu-item__name-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.fa-menu-item__level-marker {
+  width: 3px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--fa-menu-level-color);
+  opacity: 0.85;
+}
+
+.fa-menu-item--module .fa-menu-item__name {
+  font-weight: 600;
+}
+
+.fa-menu-item--button .fa-menu-item__name {
+  color: var(--fa-subtitle-color);
+}
+
+.fa-menu-item--button .fa-menu-item__level-marker {
+  width: 2px;
+  height: 14px;
+  opacity: 0.7;
 }
 
 .fa-menu-item__name,
@@ -177,6 +218,10 @@
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fa-menu-item__name {
+  flex: 1;
 }
 
 .fa-menu-item__copy {
