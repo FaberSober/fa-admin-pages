@@ -124,7 +124,7 @@ export default function DepartmentManage() {
     },
     {
       title: '排序',
-      dataIndex: 'sortId',
+      dataIndex: 'sort',
       width: 90,
     },
     {
