@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
 import { DownloadOutlined, SearchOutlined, UnorderedListOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space, Tag } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseDrawer, BaseTableUtils, clearForm, type FaberTable, FaHref, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import type { Rbac } from '@/types';
-import { rbacRoleApi } from '@features/fa-admin-pages/services';
 import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
-import RbacRoleModal from './modal/RbacRoleModal';
-import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
+import { rbacRoleApi } from '@features/fa-admin-pages/services';
+import { Button, Form, Input, Space, Tag } from 'antd';
+import { useContext } from 'react';
+import type { Rbac } from '@/types';
 import RbacUserRoleList from './list/RbacUserRoleList';
+import RbacRoleMenuDrawer from './modal/RbacRoleMenuDrawer';
+import RbacRoleModal from './modal/RbacRoleModal';
 
 const serviceName = '';
 const biz = 'base_rbac_role';
@@ -38,7 +38,7 @@ export default function RbacRoleList() {
     const type = getRoleType(record);
     if (user.superAdmin) return true;
     if (type === 1 || !selectedTenant?.isAdmin) return false;
-    return type === 2 || record.tenantId === selectedTenant.tenantId;
+    return type === 3 && record.tenantId === selectedTenant.tenantId;
   }
 
   function canCreateRole() {
@@ -52,13 +52,11 @@ export default function RbacRoleList() {
       BaseTableUtils.genSimpleSorterColumn('角色名称', 'name', 200, sorter),
       BaseTableUtils.genSimpleSorterColumn('角色描述', 'remarks', undefined, sorter),
       {
-        title: '类型',
-        dataIndex: 'type',
+        ...BaseTableUtils.genSimpleSorterColumn('类型', 'type', 110, sorter),
         render: (_, record) => {
           const option = ROLE_TYPE_OPTIONS.find((item) => item.value === getRoleType(record));
           return <Tag color={option?.color}>{option?.label}</Tag>;
         },
-        width: 110,
       },
       {
         ...BaseTableUtils.genSimpleSorterColumn('租户名称', 'tenantId', 180, sorter),
@@ -124,6 +122,13 @@ export default function RbacRoleList() {
         pagination={paginationProps}
         loading={loading}
         dataSource={user.superAdmin ? list : list.filter((item) => getRoleType(item) !== 1)}
+        rowSelection={
+          user.superAdmin
+            ? undefined
+            : {
+                getCheckboxProps: (record) => ({ disabled: !canManageRole(record) }),
+              }
+        }
         rowKey={(item) => item.id}
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}

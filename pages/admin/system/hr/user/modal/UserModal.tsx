@@ -1,13 +1,15 @@
-import type { Admin } from '@/types';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { type CommonModalProps, DictEnumApiRadio, DictEnumApiSelector, DragModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import RbacRoleSelect from '@features/fa-admin-pages/components/helper/RbacRoleSelect';
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
+import UserLayoutContext from '@features/fa-admin-pages/layout/user/context/UserLayoutContext';
 import { userApi as api, rbacUserRoleApi } from '@features/fa-admin-pages/services';
 import { Button, Form, Input, Switch } from 'antd';
 import { get } from 'lodash';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import useBus from 'use-bus';
+import type { Admin } from '@/types';
 
 const serviceName = '';
 
@@ -17,6 +19,8 @@ const serviceName = '';
 export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.User>) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
+  const { systemConfig } = useContext(ConfigLayoutContext);
+  const { user, selectedTenant } = useContext(UserLayoutContext);
 
   useBus(
     ['@@UserModal/SHOW_ADD'],
@@ -84,12 +88,15 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     form.setFieldsValue(getInitialValues());
     if (record !== undefined) {
       rbacUserRoleApi.getUserRoles(record.id).then((res) => {
-        form.setFieldsValue({ roleIds: res.data.map((i) => i.id) });
+        const roleIds = res.data
+          .filter((role) => !systemConfig.tenantEnabled || user.superAdmin || (role.type === 3 && role.tenantId === selectedTenant?.tenantId))
+          .map((role) => role.id);
+        form.setFieldsValue({ roleIds });
       });
     }
   }
 
-  const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
+  const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
   return (
     <span>
       <span onClick={showModal}>

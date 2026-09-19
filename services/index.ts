@@ -38,6 +38,7 @@ export { default as logMonitorApi } from './base/system/logMonitor';
 
 // ------------------------------------- Tenant -------------------------------------
 export { default as tenantApi } from './base/tn/tenant';
+export { default as tenantPermissionApi } from './base/tn/tenantPermission';
 export { default as tenantUserApi } from './base/tn/tenantUser';
 
 // ------------------------------------- Rbac -------------------------------------
