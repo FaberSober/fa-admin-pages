@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
+  DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   ReloadOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { AuthDelBtn, type Fa, FaHref, FaUtils, useApiLoading, useDelete } from '@fa/ui';
+import { type Fa, FaHref, FaUtils, ShiroPermissionContainer, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@/types';
-import { Button, Form, Input, Space, Table, Tag } from 'antd';
+import { Button, Form, Input, Popconfirm, Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { SearchGrid } from '@/components';
 import DepartmentModal from '../user/modal/DepartmentModal';
@@ -157,7 +158,17 @@ export default function DepartmentManage() {
           </DepartmentModal>
           <FaHref icon={<ArrowUpOutlined />} text="上移" onClick={() => handleMove(record.id, 'up')} />
           <FaHref icon={<ArrowDownOutlined />} text="下移" onClick={() => handleMove(record.id, 'down')} />
-          <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+          {record.hasChildren ? (
+            <ShiroPermissionContainer>
+              <FaHref text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
+            </ShiroPermissionContainer>
+          ) : (
+            <ShiroPermissionContainer>
+              <Popconfirm title={`确认删除部门“${record.name}”？`} onConfirm={() => handleDelete(record.id)} placement="topRight">
+                <FaHref icon={<DeleteOutlined />} text="删除" color="red" />
+              </Popconfirm>
+            </ShiroPermissionContainer>
+          )}
         </Space>
       ),
     },
