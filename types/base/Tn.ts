@@ -27,8 +27,8 @@ namespace Tn {
     description: string;
   }
 
-  /** 租户及初始权限范围创建请求 */
-  export interface TenantCreateReq {
+  /** 租户及权限范围请求 */
+  export interface TenantWithPermissionsReq {
     tenant: Tenant;
     menuIds: number[];
   }

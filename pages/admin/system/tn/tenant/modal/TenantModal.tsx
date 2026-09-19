@@ -1,7 +1,7 @@
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, treeUtils, useApiLoading } from '@fa/ui';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
-import { tenantApi as api, rbacMenuApi } from '@features/fa-admin-pages/services';
+import { tenantApi as api, rbacMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
 import { Button, DatePicker, Form, Input, InputNumber, message, Space, Spin, Tag, Tree } from 'antd';
 import { get } from 'lodash';
 import React, { useContext, useEffect, useState } from 'react';
@@ -34,6 +34,11 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     setExpandedMenuKeys(getMenuKeys(tree));
   }
 
+  async function loadTenantPermissions(tenantId: string) {
+    const res = await tenantPermissionApi.getMenuIds(tenantId);
+    setCheckedMenuIds(res.data || []);
+  }
+
   function getInitialValues() {
     return {
       code: get(record, 'code'),
@@ -56,14 +61,17 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     form.resetFields();
     form.setFieldsValue(getInitialValues());
     setCheckedMenuIds([]);
-    if (!record && systemConfig.tenantEnabled) {
+    if (systemConfig.tenantEnabled) {
       setMenuTree([]);
       setExpandedMenuKeys([]);
       void loadMenuTree();
+      if (record?.id) {
+        void loadTenantPermissions(record.id);
+      }
     }
   }
 
-  function invokeInsertTask(params: Tn.TenantCreateReq) {
+  function invokeInsertTask(params: Tn.TenantWithPermissionsReq) {
     api.createWithPermissions(params).then((res) => {
       FaUtils.showResponse(res, `新增${serviceName}`);
       if (res?.status === Fa.RES_CODE.OK) {
@@ -73,8 +81,8 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     });
   }
 
-  function invokeUpdateTask(params: Tn.Tenant) {
-    api.update(params.id, params).then((res) => {
+  function invokeUpdateTask(params: Tn.TenantWithPermissionsReq) {
+    api.updateWithPermissions(params).then((res) => {
       FaUtils.showResponse(res, `更新${serviceName}`);
       if (res?.status === Fa.RES_CODE.OK) {
         setOpen(false);
@@ -90,7 +98,10 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     } as Tn.Tenant;
 
     if (record) {
-      invokeUpdateTask({ ...record, ...tenant });
+      invokeUpdateTask({
+        tenant: { ...record, ...tenant },
+        menuIds: checkedMenuIds.map((id) => Number(id)),
+      });
       return;
     }
 
@@ -104,8 +115,14 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     });
   }
 
-  const loading = useApiLoading([api.getUrl('createWithPermissions'), api.getUrl('update'), rbacMenuApi.getUrl('getTree')]);
-  const menuLoading = useApiLoading([rbacMenuApi.getUrl('getTree')]);
+  const tenantPermissionsUrl = tenantPermissionApi.getUrl(record?.id ? `getMenuIds/${record.id}` : 'getMenuIds');
+  const loading = useApiLoading([
+    api.getUrl('createWithPermissions'),
+    api.getUrl('updateWithPermissions'),
+    rbacMenuApi.getUrl('getTree'),
+    tenantPermissionsUrl,
+  ]);
+  const menuLoading = useApiLoading([rbacMenuApi.getUrl('getTree'), tenantPermissionsUrl]);
   const triggerDom = (
     <span>
       {children}
@@ -175,12 +192,14 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
             </Form.Item>
           </section>
 
-          {!record && systemConfig.tenantEnabled && (
+          {systemConfig.tenantEnabled && (
             <section className="tenant-form-section fa-card">
               <div className="tenant-form-section-header">
                 <div>
                   <div className="fa-h3">租户权限范围</div>
-                  <div className="tenant-form-section-hint">所选权限将作为该租户管理员的初始权限范围，创建后仍可继续调整</div>
+                  <div className="tenant-form-section-hint">
+                    {record ? '修改后将同步该租户管理员的权限范围' : '所选权限将作为该租户管理员的初始权限范围，创建后仍可继续调整'}
+                  </div>
                 </div>
                 <Space className="tenant-permission-actions" size={4}>
                   <Tag color="blue">已选 {checkedMenuIds.length} 项</Tag>
