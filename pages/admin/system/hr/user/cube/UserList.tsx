@@ -169,14 +169,17 @@ export default function UserList({ departmentId, departmentName, superMode = fal
             </Button>
             <Button onClick={() => clearForm(form)}>重置</Button>
         </>)}
-        defaultCount={2}
+        defaultCount={4}
         className='fa-mb12'
       >
-        <Form.Item name="tel" label="手机号">
-          <Input placeholder="请输入手机号" allowClear />
+        <Form.Item name="username" label="账户">
+          <Input placeholder="请输入账户" allowClear />
         </Form.Item>
         <Form.Item name="name" label="姓名">
           <Input placeholder="请输入员工姓名" allowClear />
+        </Form.Item>
+        <Form.Item name="tel" label="手机号">
+          <Input placeholder="请输入手机号" allowClear />
         </Form.Item>
         <Form.Item name="workStatus" label="工作状态">
           <DictEnumApiSelector enumName="UserWorkStatusEnum" />
