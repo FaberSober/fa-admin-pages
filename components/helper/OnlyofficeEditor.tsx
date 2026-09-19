@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import { PageLoading } from '@fa/ui';
-import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { onlyofficeApi } from '@features/fa-admin-pages/services';
+import { DocumentEditor } from '@onlyoffice/document-editor-react';
+import { Empty } from 'antd';
+import { useEffect, useState } from 'react';
 
 export interface OnlyofficeEditorProps {
   fileId: string; // fileSave表的ID
@@ -15,17 +16,41 @@ export interface OnlyofficeEditorProps {
 export default function OnlyofficeEditor({ fileId, mode }: OnlyofficeEditorProps) {
   const [documentServerUrl, setDocumentServerUrl] = useState<string>();
   const [config, setConfig] = useState<any>();
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
-    onlyofficeApi.openFile(fileId, mode).then((res) => {
-      setDocumentServerUrl(res.data.documentApi);
-      setConfig(res.data.fileModel);
-    });
-  }, [fileId]);
+    let active = true;
+    const controller = new AbortController();
+    setDocumentServerUrl(undefined);
+    setConfig(undefined);
+    setError(undefined);
 
-  const onDocumentReady = (event: any) => {
-    console.log('Document is loaded', event);
+    onlyofficeApi
+      .openFile(fileId, mode, { signal: controller.signal, headers: { hideErrorMsg: '1' } })
+      .then((res) => {
+        if (!active) return;
+        setDocumentServerUrl(res.data.documentApi);
+        setConfig(res.data.fileModel);
+      })
+      .catch(() => {
+        if (active) setError('ONLYOFFICE 服务不可用或无权访问');
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [fileId, mode]);
+
+  const onLoadComponentError = (_errorCode: number, errorDescription: string) => {
+    setError(errorDescription || 'ONLYOFFICE 加载失败');
   };
+
+  const onDocumentError = () => {
+    setError('ONLYOFFICE 文档加载失败');
+  };
+
+  if (error) return <Empty description={error} />;
 
   if (config === undefined || documentServerUrl === undefined) return <PageLoading />;
 
@@ -55,7 +80,8 @@ export default function OnlyofficeEditor({ fileId, mode }: OnlyofficeEditorProps
         //   // onlyoffice server使用了jwt加密，需要对config里除了token的部分加密。参考：D:\code\learn\onlyoffice\Java Spring Example\src\main\java\com\onlyoffice\integration\services\configurers\implementations\DefaultFileConfigurer.java
         //   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkb2N1bWVudCI6eyJmaWxlVHlwZSI6ImRvY3giLCJrZXkiOiJ0ZXN0ZG9jeDAwMDAxIiwidGl0bGUiOiJFeGFtcGxlIERvY3VtZW50IFRpdGxlLmRvY3giLCJ1cmwiOiJodHRwOi8vZmlsZS5xaW5pdS50ZXN0LmR3YXJkLmNuL3RtcC9kb2MvdGVzdC5kb2N4In0sImRvY3VtZW50VHlwZSI6IndvcmQiLCJlZGl0b3JDb25maWciOnsiY2FsbGJhY2tVcmwiOiJodHRwczovL2V4YW1wbGUuY29tL3VybC10by1jYWxsYmFjay5hc2h4IiwibGFuZyI6InpoIiwidXNlciI6eyJpZCI6IjEiLCJuYW1lIjoi546L576O5Li9IiwiZ3JvdXAiOiIifX19.UTBm5TdfZIYGXE4vwuRvRePYHf9fF-3wTux4jXwrHFM",
         // }}
-        events_onDocumentReady={onDocumentReady}
+        onLoadComponentError={onLoadComponentError}
+        events_onError={onDocumentError}
       />
     </div>
   );

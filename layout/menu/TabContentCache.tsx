@@ -117,6 +117,7 @@ export default function TabContentCache({ activeKey, currentPathname, currentRou
         return (
           <div
             key={tabKey}
+            data-fa-tab-panel={tabKey}
             aria-hidden={!isActive}
             style={{
               position: 'absolute',

@@ -19,14 +19,13 @@ export default function FaFileUrlView({ url, filename, waterMark = true, style }
   const { systemConfig } = useContext(ConfigLayoutContext);
   const { user } = useContext(UserLayoutContext);
 
-
   if (url === undefined) return <Empty description="未传入文件" />;
 
-  const originUrl = url; //要预览文件的访问地址
-  let previewUrl = originUrl + '?fullfilename=' + filename;
+  const previewUrl = new URL(url, window.location.origin);
+  previewUrl.searchParams.set('fullfilename', filename);
   if (waterMark) {
-    previewUrl += '&watermarkTxt=' + encodeURIComponent(user.name + '/' + user.username);
+    previewUrl.searchParams.set('watermarkTxt', user.name + '/' + user.username);
   }
-  const kkUrl = systemConfig.kkFileViewUrl + '/onlinePreview?url=' + encodeURIComponent(FaCipher.encryptByBase64(previewUrl));
+  const kkUrl = `${systemConfig.kkFileViewUrl.replace(/\/$/, '')}/onlinePreview?url=${encodeURIComponent(FaCipher.encryptByBase64(previewUrl.toString()))}`;
   return <iframe src={kkUrl} className="fa-full fa-iframe" style={{ border: 'none', ...style }} />;
 }
