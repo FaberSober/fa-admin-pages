@@ -47,7 +47,11 @@ export default function TabContentCache({ activeKey, currentPathname, currentRou
   }, [openTabs]);
   const activeTab = tabsByKey.get(activeKey);
   const currentRouteBelongsToActiveTab =
-    activeTab === undefined || activeTab.type === 'iframe' || activeTab.path === currentRouteKey || activeTab.path === currentPathname;
+    activeTab === undefined ||
+    activeTab.type === 'iframe' ||
+    activeTab.path === currentRouteKey ||
+    activeTab.path === currentPathname ||
+    currentPathname.startsWith(`${activeTab.path}/`);
 
   const tabKeys = useMemo(() => {
     const keys = openTabs.map((tab) => tab.key);

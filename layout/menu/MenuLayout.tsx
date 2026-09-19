@@ -72,7 +72,8 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
       find(tabs, (item) => item.type !== 'iframe' && item.path === location.pathname)
     );
   }, [currentRouteKey, location.pathname, openTabs]);
-  const activeTabKey = locationTab?.key ?? curTab?.key ?? currentRouteKey;
+  // 自定义详情路由没有独立菜单 Tab 时，必须使用当前路由作为内容缓存键，不能回退到上一个菜单 Tab。
+  const activeTabKey = locationTab?.key ?? currentRouteKey;
 
   // 浏览器前进/后退或直接通过 URL 导航时，同步 Tab 高亮状态。
   useEffect(() => {
