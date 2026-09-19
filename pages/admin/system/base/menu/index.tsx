@@ -12,7 +12,7 @@ import {
   SettingOutlined,
   SisternodeOutlined,
 } from '@ant-design/icons';
-import { BaseTree, type Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
+import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
 import { Button, Dropdown, Input, Modal, Segmented, Select, Space, Tag } from 'antd';
@@ -133,6 +133,53 @@ function getMenuLevelClassName(level: FaEnums.RbacMenuLevelEnum): string {
   return 'fa-menu-item--menu';
 }
 
+interface MenuDropNode {
+  key?: string | number;
+  parentId?: string | number;
+  sourceData?: Rbac.RbacMenu;
+}
+
+function findMenuNodeById(nodes: MenuTreeNode[] | undefined, id: string): MenuTreeNode | undefined {
+  if (!nodes) return undefined;
+  for (const node of nodes) {
+    if (String(node.id) === id) return node;
+    const found = findMenuNodeById(node.children, id);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function containsMenuNode(node: MenuTreeNode | undefined, id: string): boolean {
+  return Boolean(node?.children?.some((child) => String(child.id) === id || containsMenuNode(child, id)));
+}
+
+function canMenuNodeBeChild(level: FaEnums.RbacMenuLevelEnum, parentLevel: FaEnums.RbacMenuLevelEnum | undefined): boolean {
+  if (level === FaEnums.RbacMenuLevelEnum.APP) return parentLevel === undefined;
+  if (level === FaEnums.RbacMenuLevelEnum.MENU) {
+    return parentLevel === FaEnums.RbacMenuLevelEnum.APP || parentLevel === FaEnums.RbacMenuLevelEnum.MENU;
+  }
+  return level === FaEnums.RbacMenuLevelEnum.BUTTON && parentLevel === FaEnums.RbacMenuLevelEnum.MENU;
+}
+
+function isMenuDropAllowed(
+  sourceTree: MenuTreeNode[] | undefined,
+  scope: FaEnums.RbacMenuScopeEnum,
+  dragNode: MenuDropNode,
+  dropNode: MenuDropNode,
+  dropPosition: number,
+): boolean {
+  const dragData = dragNode.sourceData;
+  const dropData = dropNode.sourceData;
+  if (!dragData || !dropData || dragData.scope !== scope || dropData.scope !== scope) return false;
+
+  const dragId = String(dragNode.key ?? dragData.id);
+  const parentId = dropPosition === 0 ? String(dropNode.key ?? dropData.id) : dropNode.parentId == null ? undefined : String(dropNode.parentId);
+  if (parentId && parentId !== '0' && (parentId === dragId || containsMenuNode(findMenuNodeById(sourceTree, dragId), parentId))) return false;
+
+  const parentLevel = parentId === undefined || parentId === '0' ? undefined : findMenuNodeById(sourceTree, parentId)?.sourceData.level;
+  return canMenuNodeBeChild(dragData.level, parentLevel);
+}
+
 interface MenuRowActionsProps {
   item: MenuTreeNode;
   scope: FaEnums.RbacMenuScopeEnum;
@@ -234,6 +281,7 @@ export default function Menu() {
   const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
   const [filters, setFilters] = useState<MenuFilters>(INITIAL_MENU_FILTERS);
   const [sourceTree, setSourceTree] = useState<MenuTreeNode[]>();
+  const [sortFeedback, setSortFeedback] = useState<'idle' | 'success' | 'error'>('idle');
   const treeRef = useRef<{ expandKeys: (key: string) => void; collapseAll: () => void; expandAll: () => void }>(null);
 
   useEffect(() => {
@@ -242,6 +290,7 @@ export default function Menu() {
 
   function refreshData() {
     setSourceTree(undefined);
+    setSortFeedback('idle');
     inc();
   }
 
@@ -271,6 +320,30 @@ export default function Menu() {
   const [handleDelete] = useDelete<string>(rbacMenuApi.remove, refreshData, '菜单');
 
   const loadingTree = useApiLoading([rbacMenuApi.getUrl('allTree')]);
+  const sortingLoading = useApiLoading([rbacMenuApi.getUrl('changePos')]);
+
+  function handleChangePos(changeItems: Fa.TreePosChangeVo[]): Promise<Fa.Ret> {
+    if (changeItems.length === 0) {
+      return Promise.resolve({ status: Fa.RES_CODE.OK, message: '', data: null });
+    }
+
+    setSortFeedback('idle');
+    return rbacMenuApi
+      .changePos(changeItems)
+      .then((res) => {
+        if (res.status === Fa.RES_CODE.OK) {
+          setSortFeedback('success');
+        } else {
+          setSortFeedback('error');
+        }
+        return res;
+      })
+      .catch(() => {
+        setSortFeedback('error');
+        return { status: 500, message: '菜单排序失败', data: null };
+      });
+  }
+
   return (
     <div className="fa-full-content fa-flex-column fa-menu-div">
       <div className="fa-m12 fa-menu-toolbar">
@@ -311,20 +384,35 @@ export default function Menu() {
               onChange={(value: MenuFilterLevel) => setFilters((currentFilters) => ({ ...currentFilters, level: value }))}
             />
             {sourceTree && <span className="fa-menu-toolbar__summary">{hasFilters ? `命中 ${matchingCount} 项` : `共 ${totalCount} 项`}</span>}
+            {sortingLoading && (
+              <output className="fa-menu-toolbar__sort-status fa-menu-toolbar__sort-status--saving" aria-live="polite">
+                正在保存排序...
+              </output>
+            )}
+            {!sortingLoading && sortFeedback === 'success' && (
+              <output className="fa-menu-toolbar__sort-status fa-menu-toolbar__sort-status--success" aria-live="polite">
+                排序已保存
+              </output>
+            )}
+            {!sortingLoading && sortFeedback === 'error' && (
+              <output className="fa-menu-toolbar__sort-status fa-menu-toolbar__sort-status--error" aria-live="polite">
+                排序失败，已恢复原顺序
+              </output>
+            )}
           </Space>
         </div>
         <Space className="fa-menu-toolbar__actions">
-          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree}>
+          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree} disabled={sortingLoading}>
             刷新
           </Button>
-          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree}>
+          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree || sortingLoading}>
             折叠
           </Button>
-          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree}>
+          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading}>
             展开
           </Button>
           <RbacMenuModal title="新增菜单" scope={scope} fetchFinish={refreshData}>
-            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree}>
+            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree} disabled={sortingLoading}>
               新增菜单
             </Button>
           </RbacMenuModal>
@@ -354,12 +442,16 @@ export default function Menu() {
             serviceApi={{
               ...rbacMenuApi,
               allTree: () => rbacMenuApi.getTree({ query: { scope } }),
+              changePos: handleChangePos,
             }}
             treeData={filteredTreeData as any}
             onGetTree={(tree) => setSourceTree(tree as MenuTreeNode[])}
             bodyStyle={{ width: '100%', height: '100%', minHeight: 0 }}
             showTips={false}
             showTopBtn={false}
+            allowDrop={({ dragNode, dropNode, dropPosition }) =>
+              !sortingLoading && isMenuDropAllowed(sourceTree, scope, dragNode as MenuDropNode, dropNode as MenuDropNode, dropPosition)
+            }
             // @ts-expect-error
             titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
               <div
@@ -406,7 +498,7 @@ export default function Menu() {
             )}
             showOprBtn={false}
             showLine={{ showLeafIcon: false }}
-            draggable={hasFilters ? false : { icon: false }}
+            draggable={hasFilters || sortingLoading ? false : { icon: false }}
             extraEffectArgs={[current]}
           />
         </div>

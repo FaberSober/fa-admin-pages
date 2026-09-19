@@ -43,6 +43,24 @@
     white-space: nowrap;
   }
 
+  .fa-menu-toolbar__sort-status {
+    flex: 0 0 auto;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .fa-menu-toolbar__sort-status--saving {
+    color: var(--ant-color-primary, #1677ff);
+  }
+
+  .fa-menu-toolbar__sort-status--success {
+    color: var(--ant-color-success, #52c41a);
+  }
+
+  .fa-menu-toolbar__sort-status--error {
+    color: var(--ant-color-error, #ff4d4f);
+  }
+
   .fa-menu-toolbar__actions {
     flex-wrap: wrap;
     justify-content: flex-end;
