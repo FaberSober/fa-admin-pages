@@ -207,7 +207,7 @@ export default function UserList({ departmentId, departmentName, superMode = fal
         onRow={(r) => ({ onDoubleClick: () => show(r) })}
         topBtns={(
           <Space>
-            <UserModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
+            <UserModal addBtn title="新增用户" defaultDepartmentId={departmentId} fetchFinish={fetchPageList} />
             <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
               导出
             </Button>

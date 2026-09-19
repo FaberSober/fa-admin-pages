@@ -13,10 +13,14 @@ import type { Admin } from '@/types';
 
 const serviceName = '';
 
+interface UserModalProps extends CommonModalProps<Admin.User> {
+  defaultDepartmentId?: string;
+}
+
 /**
  * 用户实体新增、编辑弹框
  */
-export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.User>) {
+export default function UserModal({ children, title, record, fetchFinish, addBtn, editBtn, defaultDepartmentId, ...props }: UserModalProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const { systemConfig } = useContext(ConfigLayoutContext);
@@ -26,7 +30,8 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     ['@@UserModal/SHOW_ADD'],
     ({ payload }) => {
       if (record === undefined) {
-        form.setFieldsValue({ departmentId: payload.departmentId });
+        form.resetFields();
+        form.setFieldsValue(getInitialValues(payload.departmentId));
         setOpen(true);
       }
     },
@@ -63,14 +68,14 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
     }
   }
 
-  function getInitialValues() {
+  function getInitialValues(initialDepartmentId = defaultDepartmentId) {
     return {
       name: get(record, 'name'),
       username: get(record, 'username'),
       tel: get(record, 'tel'),
       email: get(record, 'email'),
       password: get(record, 'password'),
-      departmentId: get(record, 'departmentId'),
+      departmentId: get(record, 'departmentId', initialDepartmentId),
       sex: get(record, 'sex'),
       status: get(record, 'status', true),
       adminEnabled: get(record, 'adminEnabled', false),
@@ -85,6 +90,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
   function showModal() {
     setOpen(true);
 
+    form.resetFields();
     form.setFieldsValue(getInitialValues());
     if (record !== undefined) {
       rbacUserRoleApi.getUserRoles(record.id).then((res) => {
@@ -103,7 +109,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
         {children}
         {addBtn && (
           <Button icon={<PlusOutlined />} type="primary">
-            新增
+            新增用户
           </Button>
         )}
         {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
