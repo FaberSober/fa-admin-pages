@@ -196,7 +196,8 @@ export default function UserList({ departmentId, departmentName, superMode = fal
         onChange={handleTableChange}
         refreshList={() => fetchPageList()}
         batchDelete={(ids) => userApi.removeBatchByIds(ids)}
-        showComplexQuery={false}
+        showComplexQuery
+        showTableColConfigBtn
         showBatchDelBtn={false}
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
