@@ -1,4 +1,73 @@
 .fa-menu-div {
+  --fa-menu-table-columns: minmax(240px, 1.25fr) 82px 56px 120px minmax(240px, 1.5fr) 96px 190px;
+  --fa-menu-tag-module-color: #ad6800;
+  --fa-menu-tag-module-background: #fff7e6;
+  --fa-menu-tag-module-border: #ffd591;
+  --fa-menu-tag-menu-color: #0958d9;
+  --fa-menu-tag-menu-background: #e6f4ff;
+  --fa-menu-tag-menu-border: #91caff;
+  --fa-menu-tag-button-color: #389e0d;
+  --fa-menu-tag-button-background: #f6ffed;
+  --fa-menu-tag-button-border: #b7eb8f;
+
+  .fa-menu-table {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .fa-menu-table-head {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: var(--fa-menu-table-columns);
+    align-items: center;
+    column-gap: 12px;
+    min-height: 36px;
+    padding: 0 12px 0 28px;
+    border-bottom: 1px solid var(--fa-border-color);
+    color: var(--fa-subtitle-color);
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--fa-bg-color2);
+  }
+
+  .fa-menu-table-head > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fa-menu-tree {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .fa-menu-tag {
+    margin-inline-end: 0;
+    font-size: 12px;
+  }
+
+  .fa-menu-tag--module {
+    color: var(--fa-menu-tag-module-color);
+    border-color: var(--fa-menu-tag-module-border);
+    background: var(--fa-menu-tag-module-background);
+  }
+
+  .fa-menu-tag--menu {
+    color: var(--fa-menu-tag-menu-color);
+    border-color: var(--fa-menu-tag-menu-border);
+    background: var(--fa-menu-tag-menu-background);
+  }
+
+  .fa-menu-tag--button {
+    color: var(--fa-menu-tag-button-color);
+    border-color: var(--fa-menu-tag-button-border);
+    background: var(--fa-menu-tag-button-background);
+  }
+
   .ant-tree-switcher {
     display: flex;
     align-items: center;
@@ -18,9 +87,66 @@
   }
 }
 
+[data-theme='dark'] .fa-menu-div {
+  --fa-menu-tag-module-color: #ffd666;
+  --fa-menu-tag-module-background: rgba(250, 173, 20, 0.16);
+  --fa-menu-tag-module-border: rgba(255, 214, 102, 0.45);
+  --fa-menu-tag-menu-color: #69b1ff;
+  --fa-menu-tag-menu-background: rgba(22, 119, 255, 0.16);
+  --fa-menu-tag-menu-border: rgba(105, 177, 255, 0.45);
+  --fa-menu-tag-button-color: #95de64;
+  --fa-menu-tag-button-background: rgba(82, 196, 26, 0.16);
+  --fa-menu-tag-button-border: rgba(149, 222, 100, 0.45);
+}
+
 .fa-menu-item {
-  height: 38px;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: var(--fa-menu-table-columns);
   align-items: center;
+  column-gap: 12px;
+  min-width: 0;
+  min-height: 38px;
+  padding-right: 12px;
+}
+
+.fa-menu-item__name,
+.fa-menu-item__id,
+.fa-menu-item__link {
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fa-menu-item__copy {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: none;
+  cursor: pointer;
+}
+
+.fa-menu-item__copy:hover {
+  color: var(--ant-color-primary, #1677ff);
+}
+
+.fa-menu-item__icon,
+.fa-menu-item__status {
+  min-width: 0;
+}
+
+.fa-menu-item__type,
+.fa-menu-item__actions {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.fa-menu-item__actions {
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.fa-menu-item__placeholder {
+  color: var(--fa-subtitle-color);
 }
