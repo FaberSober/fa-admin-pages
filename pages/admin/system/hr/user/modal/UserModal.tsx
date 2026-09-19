@@ -69,6 +69,8 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
   }
 
   function getInitialValues(initialDepartmentId = defaultDepartmentId) {
+    const isSuperAdmin = get(record, 'superAdmin', false) === true;
+
     return {
       name: get(record, 'name'),
       username: get(record, 'username'),
@@ -77,7 +79,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
       password: get(record, 'password'),
       departmentId: get(record, 'departmentId', initialDepartmentId),
       sex: get(record, 'sex'),
-      status: get(record, 'status', true),
+      status: isSuperAdmin ? true : get(record, 'status', true),
       adminEnabled: get(record, 'adminEnabled', false),
       description: get(record, 'description'),
       post: get(record, 'post'),
@@ -137,7 +139,12 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
             <RbacRoleSelect mode="multiple" />
           </Form.Item>
           <Form.Item name="status" label="账户有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout} valuePropName="checked">
-            <Switch checkedChildren="有效" unCheckedChildren="禁止" />
+            <Switch
+              checkedChildren="有效"
+              unCheckedChildren="禁止"
+              disabled={record?.superAdmin === true}
+              title={record?.superAdmin === true ? '超级管理员账户必须保持有效' : undefined}
+            />
           </Form.Item>
           <Form.Item name="adminEnabled" label="后台访问" rules={[{ required: true }]} {...FaUtils.formItemFullLayout} valuePropName="checked">
             <Switch checkedChildren="允许" unCheckedChildren="禁止" />

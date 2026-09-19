@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { get } from 'lodash';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Badge, Button, Drawer, Form, Input, Space, Tag, Typography } from 'antd';
+import { Avatar, Badge, Button, Drawer, Form, Input, Space, Tag, Typography } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -15,7 +15,7 @@ import {
   useViewItem,
 } from '@fa/ui';
 import { type Admin, FaEnums } from '@/types';
-import { userApi } from '@features/fa-admin-pages/services';
+import { fileSaveApi, userApi } from '@features/fa-admin-pages/services';
 import UserModal from '../modal/UserModal';
 import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
 import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
@@ -28,6 +28,26 @@ import { SearchGrid } from '@/components';
 
 const serviceName = '';
 const biz = 'UserList-v3';
+
+function UserIdentityCell({ record }: { record: Admin.UserWeb }) {
+  const accountInfo = [record.username, record.tel].filter(Boolean).join(' · ');
+
+  return (
+    <Space size={8} align="center">
+      <Avatar size={32} src={record.img ? fileSaveApi.genLocalGetFilePreview(record.img) : undefined}>
+        {record.name?.slice(0, 1)}
+      </Avatar>
+      <div style={{ minWidth: 0 }}>
+        <Typography.Text strong ellipsis style={{ display: 'block' }}>
+          {record.name || '-'}
+        </Typography.Text>
+        <Typography.Text type="secondary" ellipsis style={{ display: 'block' }}>
+          {accountInfo || '-'}
+        </Typography.Text>
+      </div>
+    </Space>
+  );
+}
 
 interface IProps {
   departmentId?: string;
@@ -71,17 +91,20 @@ export default function UserList({ departmentId, departmentName, superMode = fal
     const { sorter } = queryParams;
     return [
       BaseTableUtils.genSimpleSorterColumn('ID', 'id', 340, sorter, false),
-      BaseTableUtils.genSimpleSorterColumn('手机号', 'tel', 120, sorter),
-      BaseTableUtils.genSimpleSorterColumn('账户', 'username', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 100, sorter),
-      BaseTableUtils.genSimpleSorterColumn('角色', 'roleNames', undefined, sorter),
       {
-        ...BaseTableUtils.genSimpleSorterColumn('部门', 'departmentId', 200, sorter),
+        ...BaseTableUtils.genSimpleSorterColumn('人员', 'name', 220, sorter),
+        render: (_, record) => <UserIdentityCell record={record} />,
+      },
+      BaseTableUtils.genSimpleSorterColumn('账户', 'username', 130, sorter, false),
+      BaseTableUtils.genSimpleSorterColumn('手机号', 'tel', 130, sorter, false),
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('部门', 'departmentId', 180, sorter),
         render: (_, record) => record.departmentName,
         tcCondComponent: ({ index, value, callback, ...props }: FaberTable.TcCondProp) => (
           <DepartmentCascade value={value} onChangeWithItem={(v: any, item: any) => callback(v, index, get(item, 'name'))} {...props} />
         ),
       },
+      BaseTableUtils.genSimpleSorterColumn('角色', 'roleNames', 160, sorter),
       {
         ...BaseTableUtils.genEnumSorterColumn('工作状态', 'workStatus', 100, sorter, dicts),
         render: (_, record) => {
@@ -119,14 +142,14 @@ export default function UserList({ departmentId, departmentName, superMode = fal
           />
         ),
       },
-      BaseTableUtils.genEnumSorterColumn('性别', 'sex', 100, sorter, dicts),
+      BaseTableUtils.genEnumSorterColumn('性别', 'sex', 100, sorter, dicts, false),
       BaseTableUtils.genTimeSorterColumn('最后在线时间', 'lastOnlineTime', 165, sorter),
       BaseTableUtils.genSimpleSorterColumn('邮箱', 'email', 150, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('地址', 'address', 200, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('描述', 'description', undefined, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('开放平台的唯一标识符', 'wxUnionId', 100, sorter, false),
       BaseTableUtils.genSimpleSorterColumn('微信小程序用户唯一标识', 'wxMaOpenid', 100, sorter, false),
-      ...BaseTableUtils.genCtrColumns(sorter),
+      ...BaseTableUtils.genCtrColumns(sorter, false),
       ...BaseTableUtils.genUpdateColumns(sorter),
       {
         title: '操作',
