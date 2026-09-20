@@ -1,5 +1,5 @@
 .fa-menu-div {
-  --fa-menu-table-columns: minmax(240px, 1.25fr) 82px 56px 120px minmax(240px, 1.5fr) 96px 250px;
+  --fa-menu-table-columns: minmax(240px, 1.25fr) 82px 56px 120px minmax(240px, 1.5fr) 96px 96px 250px;
   --fa-menu-tag-module-color: #ad6800;
   --fa-menu-tag-module-background: #fff7e6;
   --fa-menu-tag-module-border: #ffd591;
@@ -283,7 +283,8 @@
 }
 
 .fa-menu-item__icon,
-.fa-menu-item__status {
+.fa-menu-item__status,
+.fa-menu-item__tenant-required {
   min-width: 0;
 }
 

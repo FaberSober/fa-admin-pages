@@ -3,7 +3,6 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
-  LockOutlined,
   MinusCircleOutlined,
   MoreOutlined,
   PlusCircleOutlined,
@@ -31,13 +30,15 @@ import RbacMenuModal from './modal/RbacMenuModal';
 type MenuTreeNode = Fa.TreeNode<Rbac.RbacMenu, string>;
 type MenuFilterStatus = 'all' | 'enabled' | 'disabled';
 type MenuFilterLevel = 'all' | FaEnums.RbacMenuLevelEnum;
-type MenuBatchAction = 'enable' | 'disable' | 'move' | 'delete';
+type MenuFilterTenantRequired = 'all' | 'required' | 'optional';
+type MenuBatchAction = 'enable' | 'disable' | 'tenant-required' | 'tenant-optional' | 'move' | 'delete';
 type MenuContextAction = 'select-descendants' | 'unselect-descendants' | 'clear-selection';
 
 interface MenuFilters {
   keyword: string;
   status: MenuFilterStatus;
   level: MenuFilterLevel;
+  tenantRequired: MenuFilterTenantRequired;
 }
 
 interface MenuViewTreeNode {
@@ -57,6 +58,7 @@ const INITIAL_MENU_FILTERS: MenuFilters = {
   keyword: '',
   status: 'all',
   level: 'all',
+  tenantRequired: 'all',
 };
 
 const MENU_STATUS_OPTIONS = [
@@ -72,8 +74,14 @@ const MENU_LEVEL_OPTIONS = [
   { label: FaEnums.RbacMenuLevelEnumMap[FaEnums.RbacMenuLevelEnum.BUTTON], value: FaEnums.RbacMenuLevelEnum.BUTTON },
 ];
 
+const MENU_TENANT_REQUIRED_OPTIONS = [
+  { label: '全部租户权限', value: 'all' },
+  { label: '租户必选', value: 'required' },
+  { label: '非租户必选', value: 'optional' },
+];
+
 function hasActiveMenuFilters(filters: MenuFilters): boolean {
-  return Boolean(filters.keyword.trim()) || filters.status !== 'all' || filters.level !== 'all';
+  return Boolean(filters.keyword.trim()) || filters.status !== 'all' || filters.level !== 'all' || filters.tenantRequired !== 'all';
 }
 
 function matchesMenuNode(node: MenuTreeNode, filters: MenuFilters): boolean {
@@ -83,6 +91,7 @@ function matchesMenuNode(node: MenuTreeNode, filters: MenuFilters): boolean {
   if (keyword && !searchableText.includes(keyword)) return false;
   if (filters.status !== 'all' && Boolean(node.sourceData.status) !== (filters.status === 'enabled')) return false;
   if (filters.level !== 'all' && node.sourceData.level !== filters.level) return false;
+  if (filters.tenantRequired !== 'all' && Boolean(node.sourceData.tenantRequired) !== (filters.tenantRequired === 'required')) return false;
   return true;
 }
 
@@ -122,6 +131,16 @@ function updateMenuNodeStatus(nodes: MenuTreeNode[], id: string, status: boolean
     }
     if (!node.children?.length) return node;
     return { ...node, children: updateMenuNodeStatus(node.children, id, status) };
+  });
+}
+
+function updateMenuNodeTenantRequired(nodes: MenuTreeNode[], id: string, tenantRequired: boolean): MenuTreeNode[] {
+  return nodes.map((node) => {
+    if (String(node.id) === id) {
+      return { ...node, sourceData: { ...node.sourceData, tenantRequired } };
+    }
+    if (!node.children?.length) return node;
+    return { ...node, children: updateMenuNodeTenantRequired(node.children, id, tenantRequired) };
   });
 }
 
@@ -496,6 +515,10 @@ export default function Menu() {
     setSourceTree((tree) => (tree ? updateMenuNodeStatus(tree, id, status) : tree));
   }
 
+  function handleTenantRequiredChange(id: string, tenantRequired: boolean) {
+    setSourceTree((tree) => (tree ? updateMenuNodeTenantRequired(tree, id, tenantRequired) : tree));
+  }
+
   async function runBatchRequests(requests: Array<() => Promise<Fa.Ret>>, successText: string) {
     setBatchLoading(true);
     const results = await Promise.allSettled(requests.map((request) => request()));
@@ -518,6 +541,20 @@ export default function Menu() {
       onOk: () =>
         runBatchRequests(
           selectedMenuNodes.map((node) => () => rbacMenuApi.update(node.sourceData.id, { ...node.sourceData, status })),
+          `批量${action}成功`,
+        ),
+      cancelText: '取消',
+    });
+  }
+
+  function confirmBatchTenantRequired(tenantRequired: boolean) {
+    const action = tenantRequired ? '设置租户必选' : '取消租户必选';
+    Modal.confirm({
+      title: `批量${action}`,
+      content: `确认${action}选中的 ${selectedMenuNodes.length} 个菜单？`,
+      onOk: () =>
+        runBatchRequests(
+          selectedMenuNodes.map((node) => () => rbacMenuApi.update(node.sourceData.id, { ...node.sourceData, tenantRequired })),
           `批量${action}成功`,
         ),
       cancelText: '取消',
@@ -601,6 +638,10 @@ export default function Menu() {
       confirmBatchStatus(true);
     } else if (action === 'disable') {
       confirmBatchStatus(false);
+    } else if (action === 'tenant-required') {
+      confirmBatchTenantRequired(true);
+    } else if (action === 'tenant-optional') {
+      confirmBatchTenantRequired(false);
     } else if (action === 'delete') {
       confirmBatchDelete();
     } else if (canBatchMove) {
@@ -760,6 +801,11 @@ export default function Menu() {
               options={MENU_LEVEL_OPTIONS}
               onChange={(value: MenuFilterLevel) => setFilters((currentFilters) => ({ ...currentFilters, level: value }))}
             />
+            <Select
+              value={filters.tenantRequired}
+              options={MENU_TENANT_REQUIRED_OPTIONS}
+              onChange={(value: MenuFilterTenantRequired) => setFilters((currentFilters) => ({ ...currentFilters, tenantRequired: value }))}
+            />
             {sourceTree && <span className="fa-menu-toolbar__summary">{hasFilters ? `命中 ${matchingCount} 项` : `共 ${totalCount} 项`}</span>}
             {sortingLoading && (
               <output className="fa-menu-toolbar__sort-status fa-menu-toolbar__sort-status--saving" aria-live="polite">
@@ -808,6 +854,8 @@ export default function Menu() {
               items: [
                 { key: 'enable', label: '批量启用' },
                 { key: 'disable', label: '批量禁用' },
+                { key: 'tenant-required', label: '批量设置租户必选' },
+                { key: 'tenant-optional', label: '批量取消租户必选' },
                 { key: 'move', label: '批量移动', disabled: !canBatchMove },
                 { type: 'divider' },
                 { key: 'delete', danger: true, label: '批量删除' },
@@ -911,6 +959,7 @@ export default function Menu() {
             <span>菜单 ID</span>
             <span>路由 / 权限标识</span>
             <span>状态</span>
+            <span>租户必选</span>
             <span>操作</span>
           </div>
           <BaseTree
@@ -994,11 +1043,6 @@ export default function Menu() {
                       {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && (
                         <Tag className="fa-menu-tag fa-menu-tag--button">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
                       )}
-                      {item.sourceData.tenantRequired && (
-                        <Tag color="gold" icon={<LockOutlined />}>
-                          租户必选
-                        </Tag>
-                      )}
                     </div>
                     <div className="fa-menu-item__icon fa-flex-center">
                       {item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : <span className="fa-menu-item__placeholder">—</span>}
@@ -1015,6 +1059,13 @@ export default function Menu() {
                     )}
                     <div className="fa-menu-item__status">
                       <MenuStatusSwitch item={item.sourceData} onChange={(status) => handleStatusChange(item.id, status)} />
+                    </div>
+                    <div className="fa-menu-item__tenant-required">
+                      <MenuStatusSwitch
+                        item={item.sourceData}
+                        field="tenantRequired"
+                        onChange={(tenantRequired) => handleTenantRequiredChange(item.id, tenantRequired)}
+                      />
                     </div>
                     <div className="fa-menu-item__actions">
                       <MenuRowActions

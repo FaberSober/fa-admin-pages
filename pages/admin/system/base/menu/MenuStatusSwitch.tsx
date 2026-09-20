@@ -6,19 +6,20 @@ import type { Rbac } from '@/types';
 
 interface MenuStatusSwitchProps {
   item: Rbac.RbacMenu;
-  onChange: (status: boolean) => void;
+  field?: 'status' | 'tenantRequired';
+  onChange: (value: boolean) => void;
 }
 
 type StatusFeedback = 'idle' | 'success' | 'error';
 
-export default function MenuStatusSwitch({ item, onChange }: MenuStatusSwitchProps) {
-  const [checked, setChecked] = useState(item.status);
+export default function MenuStatusSwitch({ item, field = 'status', onChange }: MenuStatusSwitchProps) {
+  const [checked, setChecked] = useState(item[field]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<StatusFeedback>('idle');
 
   useEffect(() => {
-    setChecked(item.status);
-  }, [item.status]);
+    setChecked(item[field]);
+  }, [field, item[field]]);
 
   function handleChange(status: boolean) {
     const prevStatus = checked;
@@ -27,7 +28,7 @@ export default function MenuStatusSwitch({ item, onChange }: MenuStatusSwitchPro
     setLoading(true);
 
     rbacMenuApi
-      .update(item.id, { ...item, status })
+      .update(item.id, { ...item, [field]: status })
       .then((res) => {
         if (res.status !== Fa.RES_CODE.OK) {
           setChecked(prevStatus);
@@ -49,7 +50,13 @@ export default function MenuStatusSwitch({ item, onChange }: MenuStatusSwitchPro
 
   return (
     <span className="fa-menu-status-control">
-      <Switch checkedChildren="启用" unCheckedChildren="禁用" checked={checked} loading={loading} onChange={handleChange} />
+      <Switch
+        checkedChildren={field === 'status' ? '启用' : '必选'}
+        unCheckedChildren={field === 'status' ? '禁用' : '可选'}
+        checked={checked}
+        loading={loading}
+        onChange={handleChange}
+      />
       {feedback === 'success' && (
         <output className="fa-menu-status-control__feedback fa-menu-status-control__feedback--success" aria-live="polite">
           已保存
