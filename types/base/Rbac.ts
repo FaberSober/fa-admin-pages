@@ -5,6 +5,8 @@ namespace Rbac {
   export interface RbacMenu extends Fa.BaseDelEntity {
     /** ID */
     id: string;
+    /** 跨环境菜单配置标识 */
+    configKey: string;
     /** 父级ID */
     parentId: string;
     /** 模块：1-web/2-app */

@@ -1,6 +1,7 @@
 import {
   CopyOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   MinusCircleOutlined,
   MoreOutlined,
@@ -573,6 +574,17 @@ export default function Menu() {
 
   const loadingTree = useApiLoading([rbacMenuApi.getUrl('allTree')]);
   const sortingLoading = useApiLoading([rbacMenuApi.getUrl('changePos')]);
+  const exporting = useApiLoading([rbacMenuApi.getUrl('exportJson')]);
+
+  function handleExport() {
+    Modal.confirm({
+      title: '导出菜单 JSON',
+      content: `确认导出当前${scope === FaEnums.RbacMenuScopeEnum.WEB ? '网页' : 'APP'} scope 的全部菜单配置？`,
+      okText: '导出',
+      cancelText: '取消',
+      onOk: () => rbacMenuApi.exportJson(scope),
+    });
+  }
 
   function handleChangePos(changeItems: Fa.TreePosChangeVo[]): Promise<Fa.Ret> {
     if (changeItems.length === 0) {
@@ -662,6 +674,9 @@ export default function Menu() {
           </Button>
           <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading || batchLoading}>
             展开
+          </Button>
+          <Button icon={<DownloadOutlined />} onClick={handleExport} loading={exporting} disabled={loadingTree || sortingLoading || batchLoading}>
+            导出 JSON
           </Button>
           <Dropdown
             trigger={['click']}
