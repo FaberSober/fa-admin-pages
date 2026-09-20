@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, MinusCircleOutlined, PlusCircleOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { type Fa, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
+import { Fa, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import type { TableProps } from 'antd';
 import { Button, Empty, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
@@ -15,6 +15,8 @@ type DepartmentRow = Admin.DepartmentVo & {
   level: number;
   children?: DepartmentRow[];
 };
+
+type DepartmentDropPosition = 'before' | 'after';
 
 const departmentTypeMap: Record<string, { text: string; color: string }> = {
   CORP: { text: '公司', color: 'blue' },
@@ -97,6 +99,55 @@ function countMatchingRows(rows: DepartmentRow[], query: Record<string, any>): n
   return rows.reduce((count, row) => count + (matchesDepartment(row, query) ? 1 : 0) + countMatchingRows(row.children || [], query), 0);
 }
 
+function findDepartmentRow(rows: DepartmentRow[], id: string): DepartmentRow | undefined {
+  for (const row of rows) {
+    if (String(row.id) === id) return row;
+    const found = findDepartmentRow(row.children || [], id);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function moveDepartmentRow(rows: DepartmentRow[], dragId: string, dropId: string, position: DepartmentDropPosition): DepartmentRow[] {
+  let draggedRow: DepartmentRow | undefined;
+
+  function removeDraggedRow(nodes: DepartmentRow[]): DepartmentRow[] {
+    return nodes.flatMap((row) => {
+      if (String(row.id) === dragId) {
+        draggedRow = row;
+        return [];
+      }
+      if (!row.children?.length) return [row];
+      return [{ ...row, children: removeDraggedRow(row.children) }];
+    });
+  }
+
+  function insertDraggedRow(nodes: DepartmentRow[]): DepartmentRow[] {
+    return nodes.flatMap((row) => {
+      if (String(row.id) === dropId && draggedRow) {
+        return position === 'before' ? [draggedRow, row] : [row, draggedRow];
+      }
+      if (!row.children?.length) return [row];
+      return [{ ...row, children: insertDraggedRow(row.children) }];
+    });
+  }
+
+  const treeWithoutDraggedRow = removeDraggedRow(rows);
+  return draggedRow ? insertDraggedRow(treeWithoutDraggedRow) : rows;
+}
+
+function flattenDepartmentPositions(rows: DepartmentRow[], parentId = '0'): Fa.TreePosChangeVo[] {
+  return rows.flatMap((row, index) => [{ key: String(row.id), index, pid: parentId }, ...flattenDepartmentPositions(row.children || [], String(row.id))]);
+}
+
+function getChangedDepartmentPositions(before: DepartmentRow[], after: DepartmentRow[]): Fa.TreePosChangeVo[] {
+  const oldPositions = new Map(flattenDepartmentPositions(before).map((item) => [String(item.key), item]));
+  return flattenDepartmentPositions(after).filter((item) => {
+    const oldItem = oldPositions.get(String(item.key));
+    return !oldItem || oldItem.index !== item.index || String(oldItem.pid) !== String(item.pid);
+  });
+}
+
 /**
  * 部门管理
  * @author xu.pengfei
@@ -106,12 +157,16 @@ export default function DepartmentManage() {
   const [query, setQuery] = useState<Record<string, any>>({});
   const [sourceTreeData, setSourceTreeData] = useState<DepartmentRow[]>([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [draggingDepartmentId, setDraggingDepartmentId] = useState<string>();
+  const [dragOverDepartment, setDragOverDepartment] = useState<{ id: string; position: DepartmentDropPosition }>();
+  const [sortFeedback, setSortFeedback] = useState<'idle' | 'success' | 'error'>('idle');
 
   const hasFilters = hasDepartmentFilters(query);
   const treeData = useMemo(() => filterDepartmentTree(sourceTreeData, query), [query, sourceTreeData]);
   const matchingCount = hasFilters ? countMatchingRows(sourceTreeData, query) : countRows(sourceTreeData);
 
   const loading = useApiLoading([departmentApi.getUrl('getTree'), departmentApi.getUrl('remove')]);
+  const sortingLoading = useApiLoading([departmentApi.getUrl('changePos')]);
 
   const [handleDelete] = useDelete<string>(departmentApi.remove, fetchTreeData, serviceName);
 
@@ -144,6 +199,77 @@ export default function DepartmentManage() {
 
   function collapseAll() {
     setExpandedRowKeys([]);
+  }
+
+  function clearDragState() {
+    setDraggingDepartmentId(undefined);
+    setDragOverDepartment(undefined);
+  }
+
+  function handleDepartmentDragStart(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
+    if (hasFilters || loading || sortingLoading) {
+      event.preventDefault();
+      return;
+    }
+    const id = String(record.id);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', id);
+    setDraggingDepartmentId(id);
+  }
+
+  function handleDepartmentDragOver(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
+    const dragId = draggingDepartmentId || event.dataTransfer.getData('text/plain');
+    const draggedRow = dragId ? findDepartmentRow(sourceTreeData, dragId) : undefined;
+    const sameParent = draggedRow && String(draggedRow.parentId || '0') === String(record.parentId || '0');
+    if (!draggedRow || dragId === String(record.id) || !sameParent || hasFilters || loading || sortingLoading) {
+      setDragOverDepartment(undefined);
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const bounds = event.currentTarget.getBoundingClientRect();
+    setDragOverDepartment({
+      id: String(record.id),
+      position: event.clientY < bounds.top + bounds.height / 2 ? 'before' : 'after',
+    });
+  }
+
+  function handleDepartmentDrop(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
+    event.preventDefault();
+    const dragId = draggingDepartmentId || event.dataTransfer.getData('text/plain');
+    const dropPosition = dragOverDepartment?.id === String(record.id) ? dragOverDepartment.position : undefined;
+    const draggedRow = dragId ? findDepartmentRow(sourceTreeData, dragId) : undefined;
+    const sameParent = draggedRow && String(draggedRow.parentId || '0') === String(record.parentId || '0');
+
+    clearDragState();
+    if (!dragId || !dropPosition || !draggedRow || dragId === String(record.id) || !sameParent) return;
+
+    const nextTreeData = moveDepartmentRow(sourceTreeData, dragId, String(record.id), dropPosition);
+    const changes = getChangedDepartmentPositions(sourceTreeData, nextTreeData);
+    if (changes.length === 0) return;
+
+    setSourceTreeData(nextTreeData);
+    setSortFeedback('idle');
+    departmentApi
+      .changePos(changes)
+      .then((res) => {
+        if (res.status === Fa.RES_CODE.OK) {
+          setSortFeedback('success');
+        } else {
+          setSortFeedback('error');
+        }
+        fetchTreeData();
+      })
+      .catch(() => {
+        setSortFeedback('error');
+        fetchTreeData();
+      });
+  }
+
+  function handleRefresh() {
+    setSortFeedback('idle');
+    fetchTreeData();
   }
 
   useEffect(() => {
@@ -269,20 +395,35 @@ export default function DepartmentManage() {
             <span className="fa-department-toolbar__summary" aria-live="polite">
               {hasFilters ? `命中 ${matchingCount} 项` : `共 ${matchingCount} 项`}
             </span>
+            {sortingLoading && (
+              <output className="fa-department-toolbar__sort-status fa-department-toolbar__sort-status--saving" aria-live="polite">
+                正在保存排序...
+              </output>
+            )}
+            {!sortingLoading && sortFeedback === 'success' && (
+              <output className="fa-department-toolbar__sort-status fa-department-toolbar__sort-status--success" aria-live="polite">
+                排序已保存
+              </output>
+            )}
+            {!sortingLoading && sortFeedback === 'error' && (
+              <output className="fa-department-toolbar__sort-status fa-department-toolbar__sort-status--error" aria-live="polite">
+                排序失败，已恢复原顺序
+              </output>
+            )}
           </Space>
         </div>
         <Space className="fa-department-toolbar__actions">
-          <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchTreeData}>
+          <Button icon={<ReloadOutlined />} loading={loading} disabled={sortingLoading} onClick={handleRefresh}>
             刷新
           </Button>
-          <Button icon={<MinusCircleOutlined />} disabled={loading || treeData.length === 0} onClick={collapseAll}>
+          <Button icon={<MinusCircleOutlined />} disabled={loading || sortingLoading || treeData.length === 0} onClick={collapseAll}>
             折叠
           </Button>
-          <Button icon={<PlusCircleOutlined />} disabled={loading || treeData.length === 0} onClick={expandAll}>
+          <Button icon={<PlusCircleOutlined />} disabled={loading || sortingLoading || treeData.length === 0} onClick={expandAll}>
             展开
           </Button>
           <DepartmentModal title="新增部门" parentId={0} fetchFinish={fetchTreeData}>
-            <Button type="primary" icon={<PlusOutlined />}>
+            <Button type="primary" icon={<PlusOutlined />} disabled={sortingLoading}>
               新增部门
             </Button>
           </DepartmentModal>
@@ -301,7 +442,20 @@ export default function DepartmentManage() {
         tableLayout="fixed"
         scroll={{ x: 1280 }}
         locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无部门数据" /> }}
-        rowClassName={() => 'fa-department-row'}
+        rowClassName={(record) => {
+          const rowId = String(record.id);
+          const classNames = ['fa-department-row'];
+          if (draggingDepartmentId === rowId) classNames.push('fa-department-row--dragging');
+          if (dragOverDepartment?.id === rowId) classNames.push(`fa-department-row--drop-${dragOverDepartment.position}`);
+          return classNames.join(' ');
+        }}
+        onRow={(record) => ({
+          draggable: !hasFilters && !loading && !sortingLoading,
+          onDragStart: (event) => handleDepartmentDragStart(event, record),
+          onDragOver: (event) => handleDepartmentDragOver(event, record),
+          onDrop: (event) => handleDepartmentDrop(event, record),
+          onDragEnd: clearDragState,
+        })}
         expandable={{
           expandedRowKeys,
           rowExpandable: (record) => record.hasChildren,
