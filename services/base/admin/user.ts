@@ -1,5 +1,5 @@
-import { GATE_APP } from '@/configs';
 import { BaseApi, type Fa } from '@fa/ui';
+import { GATE_APP } from '@/configs';
 import type { Admin } from '@/types';
 
 const serviceModule = 'user';
@@ -33,6 +33,9 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 超级用户分页查询，不按当前租户过滤 */
   pageSuper = (params: Fa.BasePageProps): Promise<Fa.Ret<Fa.Page<Admin.UserWeb>>> => this.post('pageSuper', params);
+
+  /** 超级用户导出，不按当前租户过滤 */
+  exportExcelSuper = (params: Fa.BasePageProps): Promise<undefined> => this.download('exportExcelSuper', params);
 
   /** 批量更新部门 */
   updateBatchDept = (params: { userIds: string[]; departmentId: string }): Promise<Fa.Ret> => this.post('updateBatchDept', params);

@@ -86,7 +86,8 @@ export default function UserList({ departmentId, departmentName, superMode = fal
     paginationProps,
   } = useTableQueryParams<Admin.UserWeb>(pageApi, { extraParams, sorter: { field: 'crtTime', order: 'descend' } }, serviceName);
 
-  const [exporting, fetchExportExcel] = useExport(userApi.exportExcel, {
+  const exportApi = superMode ? userApi.exportExcelSuper : userApi.exportExcel;
+  const [exporting, fetchExportExcel] = useExport(exportApi, {
     ...queryParams,
     extraParams,
   });
