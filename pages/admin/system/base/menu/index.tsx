@@ -29,6 +29,7 @@ type MenuTreeNode = Fa.TreeNode<Rbac.RbacMenu, string>;
 type MenuFilterStatus = 'all' | 'enabled' | 'disabled';
 type MenuFilterLevel = 'all' | FaEnums.RbacMenuLevelEnum;
 type MenuBatchAction = 'enable' | 'disable' | 'move' | 'delete';
+type MenuContextAction = 'select-descendants' | 'unselect-descendants' | 'clear-selection';
 
 interface MenuFilters {
   keyword: string;
@@ -169,6 +170,13 @@ function collectMenuNodeIds(node: MenuTreeNode, ids: Set<string>) {
   ids.add(String(node.id));
   node.children?.forEach((child) => {
     collectMenuNodeIds(child, ids);
+  });
+}
+
+function collectDescendantMenuIds(node: MenuTreeNode, ids: Set<string>) {
+  node.children?.forEach((child) => {
+    ids.add(String(child.id));
+    collectDescendantMenuIds(child, ids);
   });
 }
 
@@ -417,6 +425,22 @@ export default function Menu() {
   function handleCheckedKeys(keys: Key[] | { checked: Key[]; halfChecked: Key[] }) {
     const checkedKeys = Array.isArray(keys) ? keys : keys.checked;
     setCheckedMenuKeys(checkedKeys.map(String));
+  }
+
+  function handleMenuContextAction(action: MenuContextAction, node: MenuTreeNode | undefined) {
+    if (action === 'clear-selection') {
+      setCheckedMenuKeys([]);
+      return;
+    }
+    if (!node || hasFilters) return;
+
+    const subtreeIds = new Set<string>();
+    collectMenuNodeIds(node, subtreeIds);
+    if (action === 'select-descendants') {
+      setCheckedMenuKeys((currentKeys) => [...new Set([...currentKeys, ...subtreeIds])]);
+      return;
+    }
+    setCheckedMenuKeys((currentKeys) => currentKeys.filter((key) => !subtreeIds.has(key)));
   }
 
   function handleStatusChange(id: string, status: boolean) {
@@ -707,55 +731,89 @@ export default function Menu() {
               !sortingLoading && !batchLoading && isMenuDropAllowed(sourceTree, scope, dragNode as MenuDropNode, dropNode as MenuDropNode, dropPosition)
             }
             // @ts-expect-error
-            titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
-              <div
-                className={`fa-menu-item ${getMenuLevelClassName(item.sourceData.level)}`}
-                style={{ '--fa-menu-depth': Math.max(0, item.level - 1) } as CSSProperties}
-              >
-                <div className="fa-menu-item__name-cell">
-                  <span className="fa-menu-item__level-marker" aria-hidden="true" />
-                  <span className="fa-menu-item__name" title={item.name}>
-                    {item.name}
-                  </span>
-                </div>
-                <div className="fa-menu-item__type">
-                  {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && (
-                    <Tag className="fa-menu-tag fa-menu-tag--module">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
-                  )}
-                  {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && (
-                    <Tag className="fa-menu-tag fa-menu-tag--menu">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
-                  )}
-                  {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && (
-                    <Tag className="fa-menu-tag fa-menu-tag--button">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
-                  )}
-                </div>
-                <div className="fa-menu-item__icon fa-flex-center">
-                  {item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : <span className="fa-menu-item__placeholder">—</span>}
-                </div>
-                <span className="fa-menu-item__id" title={item.sourceData.id}>
-                  {item.sourceData.id}
-                </span>
-                {item.sourceData.linkUrl ? (
-                  <span className="fa-menu-item__link" title={item.sourceData.linkUrl}>
-                    {item.sourceData.linkUrl}
-                  </span>
-                ) : (
-                  <span className="fa-menu-item__link fa-menu-item__placeholder">—</span>
-                )}
-                <div className="fa-menu-item__status">
-                  <MenuStatusSwitch item={item.sourceData} onChange={(status) => handleStatusChange(item.id, status)} />
-                </div>
-                <div className="fa-menu-item__actions">
-                  <MenuRowActions
-                    item={item}
-                    scope={scope}
-                    onRefresh={refreshData}
-                    onDelete={handleDelete}
-                    descendantCount={countMenuNodes(findMenuNodeById(sourceTree, item.id)?.children)}
-                  />
-                </div>
-              </div>
-            )}
+            titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => {
+              const contextNode = findMenuNodeById(sourceTree, String(item.id));
+              const descendantIds = new Set<string>();
+              if (contextNode) collectDescendantMenuIds(contextNode, descendantIds);
+              const subtreeIds = new Set<string>();
+              if (contextNode) collectMenuNodeIds(contextNode, subtreeIds);
+              const selectedSubtreeCount = [...subtreeIds].filter((id) => selectedMenuIds.has(id)).length;
+
+              return (
+                <Dropdown
+                  trigger={['contextMenu']}
+                  menu={{
+                    items: [
+                      ...(hasFilters ? [{ key: 'filter-hint', disabled: true, label: '清除筛选后可操作子节点' }] : []),
+                      {
+                        key: 'select-descendants',
+                        label: `全选子节点（含自身，共 ${subtreeIds.size}）`,
+                        disabled: hasFilters || descendantIds.size === 0 || selectedSubtreeCount === subtreeIds.size,
+                      },
+                      {
+                        key: 'unselect-descendants',
+                        label: '取消选择子节点（含自身）',
+                        disabled: hasFilters || selectedSubtreeCount === 0,
+                      },
+                      { type: 'divider' },
+                      { key: 'clear-selection', label: '清空全部选择', disabled: checkedMenuKeys.length === 0 },
+                    ],
+                    onClick: ({ key, domEvent }) => {
+                      domEvent.stopPropagation();
+                      handleMenuContextAction(key as MenuContextAction, contextNode);
+                    },
+                  }}
+                >
+                  <div
+                    className={`fa-menu-item ${getMenuLevelClassName(item.sourceData.level)}`}
+                    style={{ '--fa-menu-depth': Math.max(0, item.level - 1) } as CSSProperties}
+                  >
+                    <div className="fa-menu-item__name-cell">
+                      <span className="fa-menu-item__level-marker" aria-hidden="true" />
+                      <span className="fa-menu-item__name" title={item.name}>
+                        {item.name}
+                      </span>
+                    </div>
+                    <div className="fa-menu-item__type">
+                      {item.sourceData.level === FaEnums.RbacMenuLevelEnum.APP && (
+                        <Tag className="fa-menu-tag fa-menu-tag--module">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
+                      )}
+                      {item.sourceData.level === FaEnums.RbacMenuLevelEnum.MENU && (
+                        <Tag className="fa-menu-tag fa-menu-tag--menu">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
+                      )}
+                      {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && (
+                        <Tag className="fa-menu-tag fa-menu-tag--button">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
+                      )}
+                    </div>
+                    <div className="fa-menu-item__icon fa-flex-center">
+                      {item.sourceData.icon ? <FaIconPro icon={item.sourceData.icon} /> : <span className="fa-menu-item__placeholder">—</span>}
+                    </div>
+                    <span className="fa-menu-item__id" title={item.sourceData.id}>
+                      {item.sourceData.id}
+                    </span>
+                    {item.sourceData.linkUrl ? (
+                      <span className="fa-menu-item__link" title={item.sourceData.linkUrl}>
+                        {item.sourceData.linkUrl}
+                      </span>
+                    ) : (
+                      <span className="fa-menu-item__link fa-menu-item__placeholder">—</span>
+                    )}
+                    <div className="fa-menu-item__status">
+                      <MenuStatusSwitch item={item.sourceData} onChange={(status) => handleStatusChange(item.id, status)} />
+                    </div>
+                    <div className="fa-menu-item__actions">
+                      <MenuRowActions
+                        item={item}
+                        scope={scope}
+                        onRefresh={refreshData}
+                        onDelete={handleDelete}
+                        descendantCount={countMenuNodes(findMenuNodeById(sourceTree, item.id)?.children)}
+                      />
+                    </div>
+                  </div>
+                </Dropdown>
+              );
+            }}
             showOprBtn={false}
             showLine={{ showLeafIcon: false }}
             draggable={hasFilters || sortingLoading || batchLoading ? false : { icon: false }}
