@@ -323,7 +323,7 @@ export default function DepartmentManage() {
                       </DepartmentModal>
                       {item.hasChildren ? (
                         <ShiroPermissionContainer>
-                          <FaHref text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
+                          <FaHref icon={<DeleteOutlined />} text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
                         </ShiroPermissionContainer>
                       ) : (
                         <ShiroPermissionContainer>
