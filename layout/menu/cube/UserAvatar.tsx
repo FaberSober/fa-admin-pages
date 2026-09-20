@@ -1,19 +1,18 @@
-import React, { useContext, useMemo } from 'react';
-import { LogoutOutlined, MessageOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Divider, Menu, Popover, Switch } from 'antd';
-import { useIntl } from 'react-intl';
+import { IdcardOutlined, LogoutOutlined, MailOutlined, MessageOutlined, PhoneOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
-import { InputColor, ThemeLayoutContext } from '@fa/ui';
+import { Avatar, Menu, Popover } from 'antd';
+import { useContext, useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import UserLayoutContext from '../../user/context/UserLayoutContext';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import './UserAvatar.scss';
 
 const UserPopoverContent = () => {
   const intl = useIntl();
-  const { setColorPrimary, themeDark, setThemeDark } = useContext(ThemeLayoutContext);
   const { logout } = useContext(UserLayoutContext);
-  const { addTab, showTabs, setShowTabs } = useContext(MenuLayoutContext);
+  const { addTab } = useContext(MenuLayoutContext);
   const { user } = useContext(UserLayoutContext);
+  const displayName = user.name || user.username || '-';
 
   // 头像下拉弹框-菜单点击
   function handleHeadDropdownClick(key: any) {
@@ -72,51 +71,52 @@ const UserPopoverContent = () => {
     [],
   );
 
-  function handleChangeThemeColor(color: string) {
-    // set antd theme primary color
-    setColorPrimary(color);
-
-    // set css theme color
-    const rootDom = document.getElementsByTagName('body')[0].style;
-    rootDom.setProperty('--primary-color', color);
-  }
-
-  const primaryColor = document.body.style.getPropertyValue('--primary-color');
-
   return (
-    <div style={{ minWidth: 240 }}>
-      {/* <div className="fa-flex-row-center" >
-        <InputColor value={primaryColor} onChange={(v: string) => handleChangeThemeColor(v)} style={{ width: 25, height: 25 }} />
-
-        <div className="fa-flex-row-center fa-mr8">
-          {['#F5222D', '#faad14', '#50CEE3', '#1677ff', '#722ED1', '#053553'].map((i) => (
-            <div key={i} className="fa-hover" style={{ width: 25, height: 25, background: i }} onClick={() => handleChangeThemeColor(i)} />
-          ))}
-        </div>
-
-        <Switch checkedChildren="暗色" unCheckedChildren="亮色" checked={themeDark} onChange={setThemeDark} />
-      </div>
-
-      <div className="fa-flex-row-center fa-mt12 fa-mb12" >
-        <div className="fa-flex-1" style={{ paddingLeft: 20 }}>
-          是否展示标签栏
-        </div>
-        <div>
-          <Switch checkedChildren="展示" unCheckedChildren="隐藏" checked={showTabs} onChange={setShowTabs} />
-        </div>
-      </div> */}
-
-      <div className='fa-p12 fa-flex-row fa-border-b'>
+    <div className="fa-user-popover">
+      <div className="fa-user-popover__profile">
         <div className="fa-user-avatar-big">
-          <img src={fileSaveApi.genLocalGetFilePreview(user.img)} alt={user.name} />
-          <div className='fa-user-online-badge' />
+          <Avatar size={56} src={user.img ? fileSaveApi.genLocalGetFilePreview(user.img) : undefined} alt={displayName}>
+            {displayName.slice(0, 1)}
+          </Avatar>
+          <div className="fa-user-online-badge" />
         </div>
-        <div className='fa-ml12'>
-          <div className='fa-text-bold'>{user.name}</div>
-          <div className='fa-text-muted'>{user.email}</div>
+        <div className="fa-user-popover__identity">
+          <div className="fa-user-popover__name-row">
+            <div className="fa-user-popover__name" title={displayName}>
+              {displayName}
+            </div>
+            <span className="fa-user-popover__status">
+              <span className="fa-user-popover__status-dot" aria-hidden="true" />
+              在线
+            </span>
+          </div>
+          <div className="fa-user-popover__subtitle">{user.roleNames || user.departmentName || '系统用户'}</div>
         </div>
       </div>
-      <Menu selectedKeys={[]} onClick={(menu) => handleHeadDropdownClick(menu.key)} items={items} style={{ border: 'none' }} />
+      <div className="fa-user-popover__details">
+        <div className="fa-user-popover__detail">
+          <IdcardOutlined className="fa-user-popover__detail-icon" aria-hidden="true" />
+          <span className="fa-user-popover__detail-label">账户</span>
+          <span className="fa-user-popover__detail-value" title={user.username || undefined}>
+            {user.username || '未设置'}
+          </span>
+        </div>
+        <div className="fa-user-popover__detail">
+          <PhoneOutlined className="fa-user-popover__detail-icon" aria-hidden="true" />
+          <span className="fa-user-popover__detail-label">手机</span>
+          <span className="fa-user-popover__detail-value" title={user.tel || undefined}>
+            {user.tel || '未设置'}
+          </span>
+        </div>
+        <div className="fa-user-popover__detail">
+          <MailOutlined className="fa-user-popover__detail-icon" aria-hidden="true" />
+          <span className="fa-user-popover__detail-label">邮箱</span>
+          <span className="fa-user-popover__detail-value" title={user.email || undefined}>
+            {user.email || '未设置'}
+          </span>
+        </div>
+      </div>
+      <Menu className="fa-user-popover__menu" selectedKeys={[]} onClick={(menu) => handleHeadDropdownClick(menu.key)} items={items} />
     </div>
   );
 };
@@ -126,6 +126,7 @@ const UserPopoverContent = () => {
  */
 export default function UserAvatar() {
   const { user } = useContext(UserLayoutContext);
+  const displayName = user.name || user.username || '-';
   return (
     <Popover
       placement="bottom"
@@ -139,8 +140,10 @@ export default function UserAvatar() {
       }}
     >
       <div className="fa-user-avatar">
-        <img src={fileSaveApi.genLocalGetFilePreview(user.img)} alt={user.name} />
-        <div className='fa-user-online-badge' />
+        <Avatar size={32} src={user.img ? fileSaveApi.genLocalGetFilePreview(user.img) : undefined} alt={displayName}>
+          {displayName.slice(0, 1)}
+        </Avatar>
+        <div className="fa-user-online-badge" />
         {/* <span style={{ marginLeft: 12 }}>{user?.name}</span> */}
       </div>
     </Popover>
