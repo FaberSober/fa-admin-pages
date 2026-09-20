@@ -13,11 +13,12 @@ import {
   SearchOutlined,
   SettingOutlined,
   SisternodeOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
-import { Alert, Button, Dropdown, Input, Modal, message, Segmented, Select, Space, Tag } from 'antd';
+import { Alert, Button, Dropdown, Input, Modal, message, Segmented, Select, Space, Table, Tag, Upload } from 'antd';
 import type { CSSProperties, Key } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
@@ -146,6 +147,30 @@ function getMenuLevelClassName(level: FaEnums.RbacMenuLevelEnum): string {
   if (level === FaEnums.RbacMenuLevelEnum.APP) return 'fa-menu-item--module';
   if (level === FaEnums.RbacMenuLevelEnum.BUTTON) return 'fa-menu-item--button';
   return 'fa-menu-item--menu';
+}
+
+function getImportChangeLabel(type: Rbac.RbacMenuImportChangeType): string {
+  return {
+    CREATE: '新增',
+    UPDATE: '更新',
+    MOVE: '移动',
+    SORT: '排序',
+    UNCHANGED: '无变化',
+    CONFLICT: '冲突',
+    EXTRA: '目标保留',
+  }[type];
+}
+
+function getImportChangeColor(type: Rbac.RbacMenuImportChangeType): string {
+  return {
+    CREATE: 'green',
+    UPDATE: 'blue',
+    MOVE: 'cyan',
+    SORT: 'geekblue',
+    UNCHANGED: 'default',
+    CONFLICT: 'red',
+    EXTRA: 'orange',
+  }[type];
 }
 
 interface MenuDropNode {
@@ -371,6 +396,11 @@ export default function Menu() {
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [moveParentId, setMoveParentId] = useState<string>();
   const [sortFeedback, setSortFeedback] = useState<'idle' | 'success' | 'error'>('idle');
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [importFileName, setImportFileName] = useState('');
+  const [importConfig, setImportConfig] = useState<Rbac.RbacMenuExport>();
+  const [importPreview, setImportPreview] = useState<Rbac.RbacMenuImportPreview>();
+  const [importLoading, setImportLoading] = useState(false);
   const treeRef = useRef<{ expandKeys: (key: string) => void; collapseAll: () => void; expandAll: () => void }>(null);
 
   useEffect(() => {
@@ -384,6 +414,23 @@ export default function Menu() {
     setMoveParentId(undefined);
     setSortFeedback('idle');
     inc();
+  }
+
+  function resetImportState() {
+    setImportFileName('');
+    setImportConfig(undefined);
+    setImportPreview(undefined);
+    setImportLoading(false);
+  }
+
+  function closeImportModal() {
+    setImportModalOpen(false);
+    resetImportState();
+  }
+
+  function handleScopeChange(nextScope: FaEnums.RbacMenuScopeEnum) {
+    setScope(nextScope);
+    closeImportModal();
   }
 
   const hasFilters = hasActiveMenuFilters(filters);
@@ -587,6 +634,71 @@ export default function Menu() {
     });
   }
 
+  function handleImportFile(file: File) {
+    if (file.size > 5 * 1024 * 1024) {
+      message.error('菜单 JSON 文件不能超过 5 MB');
+      return;
+    }
+    setImportFileName(file.name);
+    setImportLoading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result || '')) as Partial<Rbac.RbacMenuExport>;
+        if (parsed.schema !== 'fa-admin.menu' || parsed.version !== 1 || !Array.isArray(parsed.nodes)) {
+          throw new Error('文件不是有效的菜单 JSON');
+        }
+        const config = parsed as Rbac.RbacMenuExport;
+        setImportConfig(config);
+        rbacMenuApi
+          .previewImport({ scope, config })
+          .then((res) => {
+            if (res.status === Fa.RES_CODE.OK) {
+              setImportPreview(res.data);
+            } else {
+              message.error(res.message || '菜单导入预览失败');
+              setImportConfig(undefined);
+            }
+          })
+          .catch(() => {
+            setImportConfig(undefined);
+            message.error('菜单导入预览失败，请重试');
+          })
+          .finally(() => setImportLoading(false));
+      } catch (error) {
+        setImportFileName('');
+        setImportConfig(undefined);
+        setImportPreview(undefined);
+        setImportLoading(false);
+        message.error(error instanceof Error ? error.message : '菜单 JSON 解析失败');
+      }
+    };
+    reader.onerror = () => {
+      setImportFileName('');
+      setImportLoading(false);
+      message.error('菜单 JSON 文件读取失败');
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  function handleImportCommit() {
+    if (!importConfig || !importPreview || importPreview.conflictCount > 0) return;
+    setImportLoading(true);
+    rbacMenuApi
+      .commitImport({ scope, config: importConfig })
+      .then((res) => {
+        if (res.status !== Fa.RES_CODE.OK) {
+          message.error(res.message || '菜单导入失败');
+          return;
+        }
+        message.success(`菜单导入成功，新增 ${res.data.createdCount} 项，更新 ${res.data.updatedCount} 项`);
+        closeImportModal();
+        refreshData();
+      })
+      .catch(() => message.error('菜单导入失败，请重试'))
+      .finally(() => setImportLoading(false));
+  }
+
   function handleChangePos(changeItems: Fa.TreePosChangeVo[]): Promise<Fa.Ret> {
     if (changeItems.length === 0) {
       return Promise.resolve({ status: Fa.RES_CODE.OK, message: '', data: null });
@@ -615,7 +727,7 @@ export default function Menu() {
         <div className="fa-menu-toolbar__filters">
           <Segmented
             value={scope}
-            onChange={(value) => setScope(value as FaEnums.RbacMenuScopeEnum)}
+            onChange={(value) => handleScopeChange(value as FaEnums.RbacMenuScopeEnum)}
             options={[
               {
                 label: '网页',
@@ -679,6 +791,17 @@ export default function Menu() {
           <Button icon={<DownloadOutlined />} onClick={handleExport} loading={exporting} disabled={loadingTree || sortingLoading || batchLoading}>
             导出 JSON
           </Button>
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              resetImportState();
+              setImportModalOpen(true);
+            }}
+            loading={importLoading}
+            disabled={loadingTree || sortingLoading || batchLoading}
+          >
+            导入 JSON
+          </Button>
           <Dropdown
             trigger={['click']}
             menu={{
@@ -707,6 +830,77 @@ export default function Menu() {
           </RbacMenuModal>
         </Space>
       </div>
+
+      <Modal
+        title="导入菜单 JSON"
+        open={importModalOpen}
+        width={960}
+        destroyOnClose
+        confirmLoading={importLoading}
+        okText="确认覆盖更新"
+        cancelText="取消"
+        okButtonProps={{ disabled: !importPreview || importPreview.conflictCount > 0 }}
+        onCancel={closeImportModal}
+        onOk={handleImportCommit}
+      >
+        {!importPreview ? (
+          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+            <Upload
+              beforeUpload={(file) => {
+                handleImportFile(file);
+                return false;
+              }}
+              accept=".json,application/json"
+              showUploadList={false}
+            >
+              <Button icon={<UploadOutlined />} loading={importLoading}>
+                选择菜单 JSON 文件
+              </Button>
+            </Upload>
+            <span>仅支持由菜单管理页导出的 JSON；导入只新增或覆盖更新，不会删除目标环境多余菜单。</span>
+          </Space>
+        ) : (
+          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+            <Alert
+              type={importPreview.conflictCount > 0 ? 'error' : 'info'}
+              showIcon
+              message={`${importFileName}：共 ${importPreview.total} 个源菜单`}
+              description={
+                importPreview.conflictCount > 0
+                  ? '存在冲突，无法提交。请修正 JSON 或选择正确的目标 scope 后重新预览。'
+                  : `确认后将新增或覆盖更新菜单，目标环境额外的 ${importPreview.extraCount} 个菜单会保留。已有菜单 ID 和角色权限关联不会改变。`
+              }
+            />
+            <Space wrap size={[8, 8]}>
+              <Tag color="green">新增 {importPreview.createCount}</Tag>
+              <Tag color="blue">更新 {importPreview.updateCount}</Tag>
+              <Tag color="cyan">移动 {importPreview.moveCount}</Tag>
+              <Tag color="geekblue">排序 {importPreview.sortCount}</Tag>
+              <Tag>无变化 {importPreview.unchangedCount}</Tag>
+              <Tag color="red">冲突 {importPreview.conflictCount}</Tag>
+              <Tag color="orange">目标保留 {importPreview.extraCount}</Tag>
+            </Space>
+            <Table<Rbac.RbacMenuImportChange>
+              size="small"
+              rowKey={(record) => `${record.type}-${record.configKey}`}
+              pagination={{ pageSize: 10, showSizeChanger: false }}
+              scroll={{ y: 360 }}
+              dataSource={importPreview.changes}
+              columns={[
+                {
+                  title: '变更',
+                  dataIndex: 'type',
+                  width: 90,
+                  render: (type: Rbac.RbacMenuImportChangeType) => <Tag color={getImportChangeColor(type)}>{getImportChangeLabel(type)}</Tag>,
+                },
+                { title: '菜单名称', dataIndex: 'name', width: 180, ellipsis: true },
+                { title: 'configKey', dataIndex: 'configKey', width: 240, ellipsis: true },
+                { title: '说明', dataIndex: 'detail', ellipsis: true },
+              ]}
+            />
+          </Space>
+        )}
+      </Modal>
 
       <FaFlexRestLayout className="fa-full-content fa-card fa-p0" style={{ top: 12, bottom: 12 }}>
         <div className="fa-menu-table">

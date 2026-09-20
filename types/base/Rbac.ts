@@ -29,6 +29,62 @@ namespace Rbac {
     linkUrl: string;
   }
 
+  /** 菜单 JSON 导出配置。 */
+  export interface RbacMenuExportNode {
+    configKey: string;
+    id?: number | string;
+    parentConfigKey?: string | null;
+    name: string;
+    sort: number;
+    level: FaEnums.RbacMenuLevelEnum;
+    icon?: string | null;
+    status: boolean;
+    tenantRequired?: boolean | null;
+    linkType: FaEnums.RbacLinkTypeEnum;
+    linkUrl?: string | null;
+  }
+
+  export interface RbacMenuExport {
+    schema: 'fa-admin.menu';
+    version: 1;
+    scope: FaEnums.RbacMenuScopeEnum;
+    exportedAt: string;
+    nodes: RbacMenuExportNode[];
+  }
+
+  export type RbacMenuImportChangeType = 'CREATE' | 'UPDATE' | 'MOVE' | 'SORT' | 'UNCHANGED' | 'CONFLICT' | 'EXTRA';
+
+  export interface RbacMenuImportChange {
+    type: RbacMenuImportChangeType;
+    configKey: string;
+    name: string;
+    detail: string;
+  }
+
+  export interface RbacMenuImportRequest {
+    scope: FaEnums.RbacMenuScopeEnum;
+    config: RbacMenuExport;
+  }
+
+  export interface RbacMenuImportPreview {
+    scope: FaEnums.RbacMenuScopeEnum;
+    total: number;
+    createCount: number;
+    updateCount: number;
+    moveCount: number;
+    sortCount: number;
+    unchangedCount: number;
+    conflictCount: number;
+    extraCount: number;
+    changes: RbacMenuImportChange[];
+  }
+
+  export interface RbacMenuImportResult {
+    createdCount: number;
+    updatedCount: number;
+    unchangedCount: number;
+  }
+
   /** BASE-角色表 */
   export interface RbacRole extends Fa.BaseDelEntity {
     /** ID */
