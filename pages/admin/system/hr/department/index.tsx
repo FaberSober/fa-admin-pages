@@ -5,7 +5,7 @@ import type { TableProps } from 'antd';
 import { Button, Empty, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { Admin } from '@/types';
-import DepartmentModal from '../user/modal/DepartmentModal';
+import DepartmentModal from './modal/DepartmentModal';
 import './index.scss';
 
 const serviceName = '部门';
