@@ -1,0 +1,29 @@
+.sys-news-form-shell {
+  box-sizing: border-box;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 24px 28px 8px;
+  background-color: var(--fa-bg-color);
+  border: 1px solid var(--fa-border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+}
+
+.sys-news-form .ant-form-item {
+  margin-bottom: 18px;
+}
+
+.sys-news-form .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.sys-news-editor-frame {
+  height: 300px;
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .sys-news-form-shell {
+    padding: 16px 12px 4px;
+  }
+}

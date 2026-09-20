@@ -5,6 +5,7 @@ import { Button, DatePicker, Form, Input } from 'antd';
 import { get } from 'lodash';
 import { useState } from 'react';
 import type { Admin } from '@/types';
+import './SysNewsModal.css';
 
 /**
  * BASE-系统-新闻实体新增、编辑弹框
@@ -84,23 +85,27 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
       onCancel={() => setOpen(false)}
       okText="保存"
     >
-      <Form form={form} onFinish={onFinish}>
-        <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <Input placeholder="请输入标题" />
-        </Form.Item>
-        <Form.Item name="cover" label="封面" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <UploadImgLocal />
-        </Form.Item>
-        <Form.Item name="author" label="作者" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <Input placeholder="请输入作者" />
-        </Form.Item>
-        <Form.Item name="pubTime" label="发布时间" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <DatePicker showTime placeholder="请输入发布时间" />
-        </Form.Item>
-        <Form.Item name="content" label="内容" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
-          <BaseTinyMCE style={{ width: 812, height: 300 }} />
-        </Form.Item>
-      </Form>
+      <div className="sys-news-form-shell">
+        <Form form={form} onFinish={onFinish} className="sys-news-form">
+          <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <Input placeholder="请输入标题" />
+          </Form.Item>
+          <Form.Item name="cover" label="封面" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <UploadImgLocal />
+          </Form.Item>
+          <Form.Item name="author" label="作者" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <Input placeholder="请输入作者" />
+          </Form.Item>
+          <Form.Item name="pubTime" label="发布时间" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+            <DatePicker showTime placeholder="请输入发布时间" />
+          </Form.Item>
+          <Form.Item name="content" label="内容" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
+            <div className="sys-news-editor-frame">
+              <BaseTinyMCE editorInit={{ height: 300 }} style={{ width: '100%', height: 300 }} />
+            </div>
+          </Form.Item>
+        </Form>
+      </div>
     </FaFullContentModal>
   );
 }
