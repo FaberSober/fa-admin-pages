@@ -46,38 +46,40 @@ export default function AccountBase() {
 
   if (userDetail === undefined) return <PageLoading />;
   return (
-    <Card title="基本信息">
-      <div>
-        <Form style={{ width: 600 }} form={form} onFinish={onFinish}>
-          <Form.Item name="img" label="头像" {...formItemFullLayout}>
-            <UploadImgLocal />
-          </Form.Item>
-          <Form.Item name="username" label="账户" rules={[{ required: true }]} {...formItemFullLayout}>
-            <Input disabled />
-          </Form.Item>
-          <Form.Item name="name" label="姓名" rules={[{ required: true }]} {...formItemFullLayout}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="tel" label="手机号" rules={[{ required: true }]} {...formItemFullLayout}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="sex" label="性别" {...formItemFullLayout}>
-            <DictEnumApiSelector enumName="SexEnum" />
-          </Form.Item>
-          <Form.Item name="email" label="邮箱" {...formItemFullLayout}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="个人简介" {...formItemFullLayout}>
-            <Input.TextArea maxLength={255} />
-          </Form.Item>
+    <div className="fa-full-content-p12 fa-flex-column fa-content">
+      <Card title="基本信息">
+        <div>
+          <Form style={{ width: 600 }} form={form} onFinish={onFinish}>
+            <Form.Item name="img" label="头像" {...formItemFullLayout}>
+              <UploadImgLocal />
+            </Form.Item>
+            <Form.Item name="username" label="账户" rules={[{ required: true }]} {...formItemFullLayout}>
+              <Input disabled />
+            </Form.Item>
+            <Form.Item name="name" label="姓名" rules={[{ required: true }]} {...formItemFullLayout}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="tel" label="手机号" rules={[{ required: true }]} {...formItemFullLayout}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="sex" label="性别" {...formItemFullLayout}>
+              <DictEnumApiSelector enumName="SexEnum" />
+            </Form.Item>
+            <Form.Item name="email" label="邮箱" {...formItemFullLayout}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="description" label="个人简介" {...formItemFullLayout}>
+              <Input.TextArea maxLength={255} />
+            </Form.Item>
 
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              更新信息
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
-    </Card>
+            <Form.Item {...tailLayout}>
+              <Button type="primary" htmlType="submit" loading={loading}>
+                更新信息
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Card>
+    </div>
   );
 }

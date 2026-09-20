@@ -44,24 +44,26 @@ export default function AccountPwdUpdate() {
 
   const loading = useApiLoading([userApi.getUrl('updateMyPwd')]);
   return (
-    <Card title="更新密码">
-      <Form style={{ width: 600 }} form={form} onFinish={onFinish}>
-        <Form.Item name="oldPwd" label="原密码" rules={[{ required: true }]} {...formItemFullLayout}>
-          <Input.Password placeholder="请输入原密码" />
-        </Form.Item>
-        <Form.Item name="newPwd" label="新密码" rules={[{ required: true }, { validator: validateNewPwd }]} {...formItemFullLayout}>
-          <Input.Password placeholder="请输入新密码" />
-        </Form.Item>
-        <Form.Item name="newPwdConfirm" label="新密码确认" rules={[{ required: true }, { validator: validateNewPwdConfirm }]} {...formItemFullLayout}>
-          <Input.Password placeholder="请再次输入新密码" />
-        </Form.Item>
+    <div className="fa-full-content-p12 fa-flex-column fa-content">
+      <Card title="更新密码">
+        <Form style={{ width: 600 }} form={form} onFinish={onFinish}>
+          <Form.Item name="oldPwd" label="原密码" rules={[{ required: true }]} {...formItemFullLayout}>
+            <Input.Password placeholder="请输入原密码" />
+          </Form.Item>
+          <Form.Item name="newPwd" label="新密码" rules={[{ required: true }, { validator: validateNewPwd }]} {...formItemFullLayout}>
+            <Input.Password placeholder="请输入新密码" />
+          </Form.Item>
+          <Form.Item name="newPwdConfirm" label="新密码确认" rules={[{ required: true }, { validator: validateNewPwdConfirm }]} {...formItemFullLayout}>
+            <Input.Password placeholder="请再次输入新密码" />
+          </Form.Item>
 
-        <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            更新密码
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          <Form.Item {...tailLayout}>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              更新密码
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 }
