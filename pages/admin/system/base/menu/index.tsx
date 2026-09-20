@@ -15,18 +15,20 @@ import {
 import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaUtils, useApiLoading, useDelete } from '@fa/ui';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { rbacMenuApi } from '@features/fa-admin-pages/services';
-import { Alert, Button, Dropdown, Input, Modal, Segmented, Select, Space, Tag } from 'antd';
-import type { CSSProperties } from 'react';
+import { Alert, Button, Dropdown, Input, Modal, message, Segmented, Select, Space, Tag } from 'antd';
+import type { CSSProperties, Key } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
 import type { Rbac } from '@/types';
 import './index.scss';
+import RbacMenuCascader from './helper/RbacMenuCascader';
 import MenuStatusSwitch from './MenuStatusSwitch';
 import RbacMenuModal from './modal/RbacMenuModal';
 
 type MenuTreeNode = Fa.TreeNode<Rbac.RbacMenu, string>;
 type MenuFilterStatus = 'all' | 'enabled' | 'disabled';
 type MenuFilterLevel = 'all' | FaEnums.RbacMenuLevelEnum;
+type MenuBatchAction = 'enable' | 'disable' | 'move' | 'delete';
 
 interface MenuFilters {
   keyword: string;
@@ -157,6 +159,55 @@ function findMenuNodeById(nodes: MenuTreeNode[] | undefined, id: string): MenuTr
     if (found) return found;
   }
   return undefined;
+}
+
+function flattenMenuPositions(nodes: MenuTreeNode[], parentId = '0'): Fa.TreePosChangeVo[] {
+  return nodes.flatMap((node, index) => [{ key: String(node.id), index, pid: parentId }, ...flattenMenuPositions(node.children || [], String(node.id))]);
+}
+
+function collectMenuNodeIds(node: MenuTreeNode, ids: Set<string>) {
+  ids.add(String(node.id));
+  node.children?.forEach((child) => {
+    collectMenuNodeIds(child, ids);
+  });
+}
+
+function hasSelectedMenuAncestor(node: MenuTreeNode, selectedIds: Set<string>, tree: MenuTreeNode[] | undefined): boolean {
+  let parentId = node.parentId;
+  while (parentId != null && String(parentId) !== '0') {
+    if (selectedIds.has(String(parentId))) return true;
+    const parent = findMenuNodeById(tree, String(parentId));
+    if (!parent) return false;
+    parentId = parent.parentId;
+  }
+  return false;
+}
+
+function moveMenuNodes(nodes: MenuTreeNode[], selectedIds: Set<string>, targetId: string): MenuTreeNode[] {
+  const movingNodes: MenuTreeNode[] = [];
+
+  function removeSelected(tree: MenuTreeNode[]): MenuTreeNode[] {
+    return tree.flatMap((node) => {
+      if (selectedIds.has(String(node.id))) {
+        movingNodes.push(node);
+        return [];
+      }
+      if (!node.children?.length) return [node];
+      return [{ ...node, children: removeSelected(node.children) }];
+    });
+  }
+
+  function appendToTarget(tree: MenuTreeNode[]): MenuTreeNode[] {
+    return tree.map((node) => {
+      if (String(node.id) === targetId) {
+        return { ...node, children: [...(node.children || []), ...movingNodes], hasChildren: true };
+      }
+      if (!node.children?.length) return node;
+      return { ...node, children: appendToTarget(node.children) };
+    });
+  }
+
+  return appendToTarget(removeSelected(nodes));
 }
 
 function containsMenuNode(node: MenuTreeNode | undefined, id: string): boolean {
@@ -305,6 +356,10 @@ export default function Menu() {
   const [scope, setScope] = useState<FaEnums.RbacMenuScopeEnum>(FaEnums.RbacMenuScopeEnum.WEB);
   const [filters, setFilters] = useState<MenuFilters>(INITIAL_MENU_FILTERS);
   const [sourceTree, setSourceTree] = useState<MenuTreeNode[]>();
+  const [checkedMenuKeys, setCheckedMenuKeys] = useState<string[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [moveParentId, setMoveParentId] = useState<string>();
   const [sortFeedback, setSortFeedback] = useState<'idle' | 'success' | 'error'>('idle');
   const treeRef = useRef<{ expandKeys: (key: string) => void; collapseAll: () => void; expandAll: () => void }>(null);
 
@@ -314,6 +369,9 @@ export default function Menu() {
 
   function refreshData() {
     setSourceTree(undefined);
+    setCheckedMenuKeys([]);
+    setMoveModalOpen(false);
+    setMoveParentId(undefined);
     setSortFeedback('idle');
     inc();
   }
@@ -333,9 +391,151 @@ export default function Menu() {
   }, [filters, hasFilters, sourceTree]);
   const totalCount = countMenuNodes(sourceTree);
   const matchingCount = countMatchingMenuNodes(sourceTree, filters);
+  const selectedMenuNodes = useMemo(
+    () => checkedMenuKeys.map((key) => findMenuNodeById(sourceTree, key)).filter((node): node is MenuTreeNode => Boolean(node)),
+    [checkedMenuKeys, sourceTree],
+  );
+  const selectedMenuIds = useMemo(() => new Set(selectedMenuNodes.map((node) => String(node.id))), [selectedMenuNodes]);
+  const topLevelSelectedMenuNodes = useMemo(
+    () => selectedMenuNodes.filter((node) => !hasSelectedMenuAncestor(node, selectedMenuIds, sourceTree)),
+    [selectedMenuNodes, selectedMenuIds, sourceTree],
+  );
+  const moveDisabledIds = useMemo(() => {
+    const ids = new Set<string>();
+    selectedMenuNodes.forEach((node) => {
+      collectMenuNodeIds(node, ids);
+    });
+    return [...ids];
+  }, [selectedMenuNodes]);
+  const moveChildLevel = selectedMenuNodes.some((node) => node.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON)
+    ? FaEnums.RbacMenuLevelEnum.BUTTON
+    : FaEnums.RbacMenuLevelEnum.MENU;
+  const canBatchMove =
+    selectedMenuNodes.length > 0 &&
+    selectedMenuNodes.every((node) => node.sourceData.level !== FaEnums.RbacMenuLevelEnum.APP && !hasSelectedMenuAncestor(node, selectedMenuIds, sourceTree));
+
+  function handleCheckedKeys(keys: Key[] | { checked: Key[]; halfChecked: Key[] }) {
+    const checkedKeys = Array.isArray(keys) ? keys : keys.checked;
+    setCheckedMenuKeys(checkedKeys.map(String));
+  }
 
   function handleStatusChange(id: string, status: boolean) {
     setSourceTree((tree) => (tree ? updateMenuNodeStatus(tree, id, status) : tree));
+  }
+
+  async function runBatchRequests(requests: Array<() => Promise<Fa.Ret>>, successText: string) {
+    setBatchLoading(true);
+    const results = await Promise.allSettled(requests.map((request) => request()));
+    const failedCount = results.filter((result) => result.status === 'rejected' || result.value.status !== Fa.RES_CODE.OK).length;
+    if (failedCount === 0) {
+      message.success(successText);
+    } else {
+      message.error(`${successText}，${failedCount}项失败`);
+    }
+    setCheckedMenuKeys([]);
+    refreshData();
+    setBatchLoading(false);
+  }
+
+  function confirmBatchStatus(status: boolean) {
+    const action = status ? '启用' : '禁用';
+    Modal.confirm({
+      title: `批量${action}菜单`,
+      content: `确认${action}选中的 ${selectedMenuNodes.length} 个菜单？`,
+      onOk: () =>
+        runBatchRequests(
+          selectedMenuNodes.map((node) => () => rbacMenuApi.update(node.sourceData.id, { ...node.sourceData, status })),
+          `批量${action}成功`,
+        ),
+      cancelText: '取消',
+    });
+  }
+
+  function confirmBatchDelete() {
+    const cascadedCount = selectedMenuNodes.length - topLevelSelectedMenuNodes.length;
+    Modal.confirm({
+      title: '批量删除菜单',
+      content: (
+        <Space direction="vertical" size={8} style={{ width: '100%' }}>
+          <span>确认删除选中的 {topLevelSelectedMenuNodes.length} 个菜单？</span>
+          {cascadedCount > 0 && (
+            <Alert type="warning" showIcon message={`已自动合并 ${cascadedCount} 个下级节点`} description="删除上级菜单会级联删除其下级菜单和权限按钮。" />
+          )}
+          <span>删除后不可恢复。</span>
+        </Space>
+      ),
+      okText: '删除',
+      okButtonProps: { danger: true },
+      onOk: () =>
+        runBatchRequests(
+          topLevelSelectedMenuNodes.map((node) => () => rbacMenuApi.remove(node.id)),
+          '批量删除成功',
+        ),
+      cancelText: '取消',
+    });
+  }
+
+  function handleBatchMove() {
+    if (!sourceTree || !moveParentId) {
+      message.warning('请选择目标父级菜单');
+      return;
+    }
+    if (!canBatchMove) {
+      message.warning('批量移动仅支持不包含模块且不存在父子关系的选中菜单');
+      return;
+    }
+
+    const targetNode = findMenuNodeById(sourceTree, moveParentId);
+    if (!targetNode || !selectedMenuNodes.every((node) => canMenuNodeBeChild(node.sourceData.level, targetNode.sourceData.level))) {
+      message.error('目标父级菜单与选中菜单的层级不匹配');
+      return;
+    }
+
+    const oldPositions = flattenMenuPositions(sourceTree);
+    const nextPositions = flattenMenuPositions(moveMenuNodes(sourceTree, selectedMenuIds, moveParentId));
+    const oldPositionMap = new Map(oldPositions.map((item) => [String(item.key), item]));
+    const changes = nextPositions.filter((item) => {
+      const oldItem = oldPositionMap.get(String(item.key));
+      return !oldItem || oldItem.index !== item.index || String(oldItem.pid) !== String(item.pid);
+    });
+
+    if (changes.length === 0) {
+      setMoveModalOpen(false);
+      message.info('选中的菜单无需移动');
+      return;
+    }
+
+    setBatchLoading(true);
+    rbacMenuApi
+      .changePos(changes)
+      .then((res) => {
+        if (res.status === Fa.RES_CODE.OK) {
+          message.success('批量移动成功');
+          setMoveModalOpen(false);
+        } else {
+          message.error(res.message || '批量移动失败');
+        }
+      })
+      .catch(() => message.error('批量移动失败，请重试'))
+      .finally(() => {
+        setBatchLoading(false);
+        refreshData();
+      });
+  }
+
+  function handleBatchAction(action: MenuBatchAction) {
+    if (action === 'enable') {
+      confirmBatchStatus(true);
+    } else if (action === 'disable') {
+      confirmBatchStatus(false);
+    } else if (action === 'delete') {
+      confirmBatchDelete();
+    } else if (canBatchMove) {
+      setMoveParentId(undefined);
+      setMoveModalOpen(true);
+    } else {
+      message.warning('批量移动仅支持不包含模块且不存在父子关系的选中菜单');
+    }
   }
 
   useEffect(() => {
@@ -430,17 +630,38 @@ export default function Menu() {
           </Space>
         </div>
         <Space className="fa-menu-toolbar__actions">
-          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree} disabled={sortingLoading}>
+          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree} disabled={sortingLoading || batchLoading}>
             刷新
           </Button>
-          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree || sortingLoading}>
+          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree || sortingLoading || batchLoading}>
             折叠
           </Button>
-          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading}>
+          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading || batchLoading}>
             展开
           </Button>
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [
+                { key: 'enable', label: '批量启用' },
+                { key: 'disable', label: '批量禁用' },
+                { key: 'move', label: '批量移动', disabled: !canBatchMove },
+                { type: 'divider' },
+                { key: 'delete', danger: true, label: '批量删除' },
+              ],
+              onClick: ({ key }) => handleBatchAction(key as MenuBatchAction),
+            }}
+          >
+            <Button
+              icon={<SettingOutlined />}
+              loading={batchLoading}
+              disabled={loadingTree || sortingLoading || batchLoading || selectedMenuNodes.length === 0}
+            >
+              {selectedMenuNodes.length > 0 ? `批量操作（${selectedMenuNodes.length}）` : '批量操作'}
+            </Button>
+          </Dropdown>
           <RbacMenuModal title="新增菜单" scope={scope} fetchFinish={refreshData}>
-            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree} disabled={sortingLoading}>
+            <Button type="primary" icon={<PlusOutlined />} loading={loadingTree} disabled={sortingLoading || batchLoading}>
               新增菜单
             </Button>
           </RbacMenuModal>
@@ -477,9 +698,13 @@ export default function Menu() {
             bodyStyle={{ width: '100%', height: '100%', minHeight: 0 }}
             showTips={false}
             showTopBtn={false}
+            checkable
+            checkStrictly
+            checkedKeys={checkedMenuKeys}
+            onCheck={handleCheckedKeys}
             selectable={false}
             allowDrop={({ dragNode, dropNode, dropPosition }) =>
-              !sortingLoading && isMenuDropAllowed(sourceTree, scope, dragNode as MenuDropNode, dropNode as MenuDropNode, dropPosition)
+              !sortingLoading && !batchLoading && isMenuDropAllowed(sourceTree, scope, dragNode as MenuDropNode, dropNode as MenuDropNode, dropPosition)
             }
             // @ts-expect-error
             titleRender={(item: Fa.TreeNode<Rbac.RbacMenu, string> & { updating: boolean }) => (
@@ -533,11 +758,30 @@ export default function Menu() {
             )}
             showOprBtn={false}
             showLine={{ showLeafIcon: false }}
-            draggable={hasFilters || sortingLoading ? false : { icon: false }}
+            draggable={hasFilters || sortingLoading || batchLoading ? false : { icon: false }}
             extraEffectArgs={[current]}
           />
         </div>
       </FaFlexRestLayout>
+      <Modal
+        title={`批量移动菜单（${selectedMenuNodes.length}项）`}
+        open={moveModalOpen}
+        onOk={handleBatchMove}
+        confirmLoading={batchLoading}
+        onCancel={() => setMoveModalOpen(false)}
+      >
+        <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Alert type="info" showIcon message="选中菜单将移动到目标父级的末尾，原有层级关系会保持不变。" />
+          <RbacMenuCascader
+            style={{ width: '100%' }}
+            scope={scope}
+            childLevel={moveChildLevel}
+            disabledIds={moveDisabledIds}
+            value={moveParentId}
+            onChange={(value) => setMoveParentId(value as string | undefined)}
+          />
+        </Space>
+      </Modal>
     </div>
   );
 }

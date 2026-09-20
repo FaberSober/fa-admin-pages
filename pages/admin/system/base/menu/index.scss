@@ -93,7 +93,7 @@
     align-items: center;
     column-gap: 12px;
     min-height: 36px;
-    padding: 0 12px 0 28px;
+    padding: 0 12px 0 52px;
     border-bottom: 1px solid var(--fa-border-color);
     color: var(--fa-subtitle-color);
     font-size: 12px;
@@ -154,6 +154,27 @@
     border-bottom: 1px solid var(--fa-border-color);
     padding: 0;
     margin-bottom: 0;
+  }
+
+  .fa-menu-tree .ant-tree-indent-unit::before,
+  .fa-menu-tree .ant-tree-switcher-leaf-line::before {
+    bottom: 0;
+  }
+
+  .fa-menu-tree .ant-tree-switcher-leaf-line::after {
+    top: 50%;
+    height: 0;
+  }
+
+  .fa-menu-tree .ant-tree-treenode-leaf-last .ant-tree-switcher-leaf-line::before {
+    top: 0 !important;
+    bottom: auto !important;
+    height: 50% !important;
+  }
+
+  .fa-menu-tree .ant-tree-checkbox {
+    align-self: center;
+    margin-block-start: 0;
   }
 }
 
