@@ -477,6 +477,7 @@ export default function Menu() {
             bodyStyle={{ width: '100%', height: '100%', minHeight: 0 }}
             showTips={false}
             showTopBtn={false}
+            selectable={false}
             allowDrop={({ dragNode, dropNode, dropPosition }) =>
               !sortingLoading && isMenuDropAllowed(sourceTree, scope, dragNode as MenuDropNode, dropNode as MenuDropNode, dropPosition)
             }
