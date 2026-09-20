@@ -1,15 +1,15 @@
-import type { Admin } from '@/types';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { BaseTinyMCE, type CommonModalProps, DragModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
+import { BaseTinyMCE, type CommonModalProps, FaFullContentModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
 import { sysNewsApi as api } from '@features/fa-admin-pages/services';
 import { Button, DatePicker, Form, Input } from 'antd';
 import { get } from 'lodash';
 import { useState } from 'react';
+import type { Admin } from '@/types';
 
 /**
  * BASE-系统-新闻实体新增、编辑弹框
  */
-export default function SysNewsModal({ children, title, record, fetchFinish, addBtn, editBtn, ...props }: CommonModalProps<Admin.SysNews>) {
+export default function SysNewsModal({ children, title, record, fetchFinish, addBtn, editBtn }: CommonModalProps<Admin.SysNews>) {
   const [form] = Form.useForm();
 
   const [open, setOpen] = useState(false);
@@ -55,42 +55,52 @@ export default function SysNewsModal({ children, title, record, fetchFinish, add
     };
   }
 
-  function showModal() {
-    setOpen(true);
-    form.setFieldsValue(getInitialValues());
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen) {
+      form.setFieldsValue(getInitialValues());
+    }
+    setOpen(nextOpen);
   }
 
-  const loading = useApiLoading([ api.getUrl('save'), api.getUrl('update')]);
+  const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
   return (
-    <span>
-      <span onClick={showModal}>
-        {children}
-        {addBtn && (
-          <Button icon={<PlusOutlined />} type="primary">
-            新增
-          </Button>
-        )}
-        {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
-      </span>
-      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={1000} {...props}>
-        <Form form={form} onFinish={onFinish}>
-          <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input placeholder="请输入标题" />
-          </Form.Item>
-          <Form.Item name="cover" label="封面" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <UploadImgLocal />
-          </Form.Item>
-          <Form.Item name="author" label="作者" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input placeholder="请输入作者" />
-          </Form.Item>
-          <Form.Item name="pubTime" label="发布时间" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DatePicker showTime placeholder="请输入发布时间" />
-          </Form.Item>
-          <Form.Item name="content" label="内容" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
-            <BaseTinyMCE style={{ width: 812, height: 300 }} />
-          </Form.Item>
-        </Form>
-      </DragModal>
-    </span>
+    <FaFullContentModal
+      title={title}
+      triggerDom={
+        <span>
+          {children}
+          {addBtn && (
+            <Button icon={<PlusOutlined />} type="primary">
+              新增
+            </Button>
+          )}
+          {editBtn && <FaHref icon={<EditOutlined />} text="编辑" />}
+        </span>
+      }
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOk={() => form.submit()}
+      confirmLoading={loading}
+      onCancel={() => setOpen(false)}
+      okText="保存"
+    >
+      <Form form={form} onFinish={onFinish}>
+        <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+          <Input placeholder="请输入标题" />
+        </Form.Item>
+        <Form.Item name="cover" label="封面" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+          <UploadImgLocal />
+        </Form.Item>
+        <Form.Item name="author" label="作者" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+          <Input placeholder="请输入作者" />
+        </Form.Item>
+        <Form.Item name="pubTime" label="发布时间" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+          <DatePicker showTime placeholder="请输入发布时间" />
+        </Form.Item>
+        <Form.Item name="content" label="内容" rules={[{ required: false }]} {...FaUtils.formItemFullLayout}>
+          <BaseTinyMCE style={{ width: 812, height: 300 }} />
+        </Form.Item>
+      </Form>
+    </FaFullContentModal>
   );
 }
