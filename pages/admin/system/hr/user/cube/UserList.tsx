@@ -19,6 +19,7 @@ import { get } from 'lodash';
 import { useEffect } from 'react';
 import { SearchGrid } from '@/components';
 import { type Admin, FaEnums } from '@/types';
+import UserImportModal from '../modal/UserImportModal';
 import UserModal from '../modal/UserModal';
 import UserAdminAccessCol from './cube/UserAdminAccessCol';
 import UserStatusCol from './cube/UserStatusCol';
@@ -246,6 +247,7 @@ export default function UserList({ departmentId, departmentName, superMode = fal
         topBtns={
           <Space>
             <UserModal addBtn title="新增用户" defaultDepartmentId={departmentId} fetchFinish={fetchPageList} />
+            <UserImportModal departmentId={departmentId} superMode={superMode} scopeDescription={scopeDescription} fetchFinish={fetchPageList} />
             <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
               导出
             </Button>

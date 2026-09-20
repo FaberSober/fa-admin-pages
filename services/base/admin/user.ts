@@ -24,6 +24,33 @@ export interface UserForgetResetPwdVo {
   passwordConfirm: string;
 }
 
+export interface UserImportReq {
+  fileId: string;
+  departmentIdSuper?: string;
+  superMode?: boolean;
+}
+
+export interface UserImportError {
+  rowNumber: number;
+  username?: string;
+  message: string;
+}
+
+export interface UserImportPreview {
+  totalCount: number;
+  validCount: number;
+  errorCount: number;
+  createCount: number;
+  updateCount: number;
+  errors: UserImportError[];
+}
+
+export interface UserImportResult {
+  totalCount: number;
+  createCount: number;
+  updateCount: number;
+}
+
 class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
   /** 获取用户信息 */
   getLoginUser = (): Promise<Fa.Ret<Admin.User>> => this.get('getLoginUser');
@@ -36,6 +63,15 @@ class User extends BaseApi<Admin.User, string, Admin.UserWeb> {
 
   /** 超级用户导出，不按当前租户过滤 */
   exportExcelSuper = (params: Fa.BasePageProps): Promise<undefined> => this.download('exportExcelSuper', params);
+
+  /** 用户专用导入模板 */
+  downloadImportTemplate = (): Promise<undefined> => this.download('import/template', {});
+
+  /** 用户专用导入预览 */
+  previewImport = (params: UserImportReq): Promise<Fa.Ret<UserImportPreview>> => this.post('import/preview', params);
+
+  /** 用户专用导入提交 */
+  commitImport = (params: UserImportReq): Promise<Fa.Ret<UserImportResult>> => this.post('import/commit', params);
 
   /** 批量更新部门 */
   updateBatchDept = (params: { userIds: string[]; departmentId: string }): Promise<Fa.Ret> => this.post('updateBatchDept', params);
