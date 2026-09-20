@@ -15,6 +15,7 @@ import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
 import type { Admin } from '@/types';
+import DepartmentImportModal from './modal/DepartmentImportModal';
 import DepartmentModal from './modal/DepartmentModal';
 import './index.scss';
 
@@ -242,6 +243,7 @@ export default function DepartmentManage() {
           <Button icon={<DownloadOutlined />} loading={exporting} onClick={() => fetchExportExcel()} disabled={sortingLoading}>
             导出
           </Button>
+          <DepartmentImportModal fetchFinish={refreshData} />
           <DepartmentModal title="新增部门" parentId={0} fetchFinish={refreshData}>
             <Button type="primary" icon={<PlusOutlined />} disabled={sortingLoading}>
               新增部门
