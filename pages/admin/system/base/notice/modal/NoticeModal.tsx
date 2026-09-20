@@ -4,6 +4,7 @@ import { noticeApi as api } from '@features/fa-admin-pages/services';
 import { Button, Form, Input } from 'antd';
 import { get } from 'lodash';
 import { useState } from 'react';
+import './NoticeModal.css';
 
 const serviceName = '通知与公告';
 
@@ -86,20 +87,24 @@ export default function NoticeModal({ children, title, record, fetchFinish, addB
       confirmLoading={loading}
       onCancel={() => setOpen(false)}
     >
-      <Form form={form} onFinish={onFinish}>
-        <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <Input maxLength={50} />
-        </Form.Item>
-        <Form.Item name="content" label="内容" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <BaseTinyMCE style={{ height: 500 }} />
-        </Form.Item>
-        <Form.Item name="status" label="是否有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <BaseBoolRadio />
-        </Form.Item>
-        <Form.Item name="strongNotice" label="是否强提醒" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-          <BaseBoolRadio />
-        </Form.Item>
-      </Form>
+      <div className="notice-form-content">
+        <div className="notice-form-shell">
+          <Form form={form} onFinish={onFinish} className="notice-form">
+            <Form.Item name="title" label="标题" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+              <Input maxLength={50} />
+            </Form.Item>
+            <Form.Item name="content" label="内容" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+              <BaseTinyMCE style={{ height: 500 }} />
+            </Form.Item>
+            <Form.Item name="status" label="是否有效" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+              <BaseBoolRadio />
+            </Form.Item>
+            <Form.Item name="strongNotice" label="是否强提醒" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
+              <BaseBoolRadio />
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
     </FaFullContentModal>
   );
 }
