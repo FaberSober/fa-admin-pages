@@ -11,7 +11,6 @@ import {
 import { BaseTree, Fa, FaFlexRestLayout, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete, useExportBase } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import { Button, Input, Popconfirm, Select, Space, Tag } from 'antd';
-import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCounter } from 'react-use';
 import type { Admin } from '@/types';
@@ -292,7 +291,9 @@ export default function DepartmentManage() {
               return (
                 <div
                   className={`fa-department-item fa-department-item--${typeVariant}`}
-                  style={{ '--fa-department-depth': Math.max(0, item.level - 1) } as CSSProperties}
+                  ref={(element) => {
+                    element?.style.setProperty('--fa-department-depth', String(Math.max(0, item.level - 1)));
+                  }}
                 >
                   <div className="fa-department-item__name-cell">
                     <span className="fa-department-item__level-marker" aria-hidden="true" />

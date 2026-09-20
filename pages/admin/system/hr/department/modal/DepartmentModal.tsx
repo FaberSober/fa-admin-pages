@@ -3,7 +3,7 @@ import DepartmentCascade from '@features/fa-admin-pages/components/helper/Depart
 import { departmentApi as api } from '@features/fa-admin-pages/services';
 import { Col, Form, Input, Row, Select } from 'antd';
 import { get } from 'lodash';
-import { useEffect, useState } from 'react';
+import { cloneElement, isValidElement, type MouseEventHandler, type ReactElement, useEffect, useState } from 'react';
 import type { Admin } from '@/types';
 
 const serviceName = '部门';
@@ -117,8 +117,8 @@ export default function DepartmentModal({ children, parentId, title, record, fet
 
   const loading = useApiLoading([api.getUrl('save'), api.getUrl('update')]);
   return (
-    <span>
-      <span onClick={showModal}>{children}</span>
+    <>
+      {isValidElement(children) ? cloneElement(children as ReactElement<{ onClick?: MouseEventHandler }>, { onClick: showModal }) : children}
       <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={760} {...props}>
         <Form form={form} onFinish={onFinish}>
           <Row gutter={[16, 0]}>
@@ -148,6 +148,6 @@ export default function DepartmentModal({ children, parentId, title, record, fet
           </Form.Item>
         </Form>
       </DragModal>
-    </span>
+    </>
   );
 }
