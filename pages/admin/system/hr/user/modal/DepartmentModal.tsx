@@ -1,7 +1,7 @@
 import { type CommonModalProps, DragModal, type Fa, FaUtils, UserSearchSelect, useApiLoading } from '@fa/ui';
 import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import { departmentApi as api } from '@features/fa-admin-pages/services';
-import { Form, Input, Select } from 'antd';
+import { Col, Form, Input, Row, Select } from 'antd';
 import { get } from 'lodash';
 import { useEffect, useState } from 'react';
 import type { Admin } from '@/types';
@@ -119,20 +119,30 @@ export default function DepartmentModal({ children, parentId, title, record, fet
   return (
     <span>
       <span onClick={showModal}>{children}</span>
-      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={700} {...props}>
+      <DragModal title={title} open={open} onOk={() => form.submit()} confirmLoading={loading} onCancel={() => setOpen(false)} width={760} {...props}>
         <Form form={form} onFinish={onFinish}>
-          <Form.Item name="parentId" label="上级部门" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <DepartmentCascade showRoot disabledIds={disabledParentIds} />
-          </Form.Item>
-          <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemFullLayout}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="type" label="类型" rules={[{ required: true, message: '请选择部门类型' }]} {...FaUtils.formItemFullLayout}>
-            <Select placeholder="请选择部门类型" options={departmentTypeOptions} />
-          </Form.Item>
-          <Form.Item name="managerId" label="负责人" {...FaUtils.formItemFullLayout}>
-            <UserSearchSelect placeholder="请输入负责人姓名进行搜索" />
-          </Form.Item>
+          <Row gutter={[16, 0]}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="parentId" label="上级部门" rules={[{ required: true }]} {...FaUtils.formItemHalfLayout}>
+                <DepartmentCascade showRoot disabledIds={disabledParentIds} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="name" label="名称" rules={[{ required: true }]} {...FaUtils.formItemHalfLayout}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="type" label="类型" rules={[{ required: true, message: '请选择部门类型' }]} {...FaUtils.formItemHalfLayout}>
+                <Select placeholder="请选择部门类型" options={departmentTypeOptions} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="managerId" label="负责人" {...FaUtils.formItemHalfLayout}>
+                <UserSearchSelect placeholder="请输入负责人姓名进行搜索" />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="description" label="描述" {...FaUtils.formItemFullLayout}>
             <Input.TextArea />
           </Form.Item>
