@@ -1,21 +1,36 @@
-import { IdcardOutlined, LogoutOutlined, MailOutlined, MessageOutlined, PhoneOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  IdcardOutlined,
+  LogoutOutlined,
+  MailOutlined,
+  MessageOutlined,
+  PhoneOutlined,
+  SecurityScanOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import { UserAppearanceSettings } from '@features/fa-admin-pages/components/settings';
 import { fileSaveApi } from '@features/fa-admin-pages/services';
 import { Avatar, Menu, Popover } from 'antd';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import UserLayoutContext from '../../user/context/UserLayoutContext';
 import MenuLayoutContext from '../context/MenuLayoutContext';
 import './UserAvatar.scss';
 
-const UserPopoverContent = () => {
+interface UserPopoverContentProps {
+  onClose: () => void;
+  onOpenSettings: () => void;
+}
+
+const UserPopoverContent = ({ onClose, onOpenSettings }: UserPopoverContentProps) => {
   const intl = useIntl();
-  const { logout } = useContext(UserLayoutContext);
+  const { logout, user } = useContext(UserLayoutContext);
   const { addTab } = useContext(MenuLayoutContext);
-  const { user } = useContext(UserLayoutContext);
   const displayName = user.name || user.username || '-';
 
   // 头像下拉弹框-菜单点击
-  function handleHeadDropdownClick(key: any) {
+  function handleHeadDropdownClick(key: string) {
+    onClose();
     // FIX-ME: 这里打开个人中心菜单后，需要在tabBar中打开对于的标签页
     switch (key) {
       case 'base':
@@ -38,6 +53,9 @@ const UserPopoverContent = () => {
           path: '/admin/system/account/msg',
           name: intl.formatMessage({ id: 'menu.account.msg' }),
         });
+        break;
+      case 'settings':
+        onOpenSettings();
         break;
       case 'logout':
         logout();
@@ -63,12 +81,17 @@ const UserPopoverContent = () => {
         icon: <MessageOutlined />,
       },
       {
+        label: intl.formatMessage({ id: 'menu.account.settings' }),
+        key: 'settings',
+        icon: <SettingOutlined />,
+      },
+      {
         label: intl.formatMessage({ id: 'menu.account.logout' }),
         key: 'logout',
         icon: <LogoutOutlined />,
       },
     ],
-    [],
+    [intl],
   );
 
   return (
@@ -126,26 +149,34 @@ const UserPopoverContent = () => {
  */
 export default function UserAvatar() {
   const { user } = useContext(UserLayoutContext);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const displayName = user.name || user.username || '-';
+
   return (
-    <Popover
-      placement="bottom"
-      content={<UserPopoverContent />}
-      // trigger="click"
-      getPopupContainer={() => document.body}
-      styles={{
-        container: {
-          padding: 0,
-        },
-      }}
-    >
-      <div className="fa-user-avatar">
-        <Avatar size={32} src={user.img ? fileSaveApi.genLocalGetFilePreview(user.img) : undefined} alt={displayName}>
-          {displayName.slice(0, 1)}
-        </Avatar>
-        <div className="fa-user-online-badge" />
-        {/* <span style={{ marginLeft: 12 }}>{user?.name}</span> */}
-      </div>
-    </Popover>
+    <>
+      <Popover
+        placement="bottom"
+        trigger="click"
+        open={popoverOpen}
+        onOpenChange={setPopoverOpen}
+        content={<UserPopoverContent onClose={() => setPopoverOpen(false)} onOpenSettings={() => setSettingsOpen(true)} />}
+        getPopupContainer={() => document.body}
+        styles={{
+          container: {
+            padding: 0,
+          },
+        }}
+      >
+        <div className="fa-user-avatar">
+          <Avatar size={32} src={user.img ? fileSaveApi.genLocalGetFilePreview(user.img) : undefined} alt={displayName}>
+            {displayName.slice(0, 1)}
+          </Avatar>
+          <div className="fa-user-online-badge" />
+          {/* <span style={{ marginLeft: 12 }}>{user?.name}</span> */}
+        </div>
+      </Popover>
+      <UserAppearanceSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+    </>
   );
 }

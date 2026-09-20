@@ -55,7 +55,7 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   const [menuSelMenuId, setMenuSelMenuId] = useState<string>(); // 当前选中的左侧菜单menu id
   const [menuSelPath, setMenuSelPath] = useState<string[]>([]); // 当前选中的菜单ID数组（不包含顶部block菜单）
   const [collapse, setCollapse] = useLocalStorage<boolean>('MenuLayout.collapse', false); // 是否折叠左侧菜单
-  const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS || true); // 是否展示标签栏
+  const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS ?? true); // 是否展示标签栏
   const [menuContentFull, setMenuContentFull] = useLocalStorage<boolean>('MenuLayout.menuContentFull', false); // 是否网页内全屏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useSessionStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-当前浏览器会话的标签页数组
