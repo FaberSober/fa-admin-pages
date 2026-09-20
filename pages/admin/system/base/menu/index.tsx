@@ -3,6 +3,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  LockOutlined,
   MinusCircleOutlined,
   MoreOutlined,
   PlusCircleOutlined,
@@ -798,6 +799,11 @@ export default function Menu() {
                       )}
                       {item.sourceData.level === FaEnums.RbacMenuLevelEnum.BUTTON && (
                         <Tag className="fa-menu-tag fa-menu-tag--button">{FaEnums.RbacMenuLevelEnumMap[item.sourceData.level]}</Tag>
+                      )}
+                      {item.sourceData.tenantRequired && (
+                        <Tag color="gold" icon={<LockOutlined />}>
+                          租户必选
+                        </Tag>
                       )}
                     </div>
                     <div className="fa-menu-item__icon fa-flex-center">

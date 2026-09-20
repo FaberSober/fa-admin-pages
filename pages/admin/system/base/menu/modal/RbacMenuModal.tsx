@@ -83,6 +83,7 @@ export default function RbacMenuModal({
       level: get(record, 'level', FaEnums.RbacMenuLevelEnum.MENU),
       icon: get(record, 'icon'),
       status: get(record, 'status', true),
+      tenantRequired: get(record, 'tenantRequired', false),
       linkType: get(record, 'linkType', FaEnums.RbacLinkTypeEnum.INNER),
       linkUrl: get(record, 'linkUrl'),
     };
@@ -182,6 +183,9 @@ export default function RbacMenuModal({
             <Input />
           </Form.Item>
           <Form.Item name="status" label="是否启用" rules={[{ required: true }]}>
+            <BaseBoolRadio />
+          </Form.Item>
+          <Form.Item name="tenantRequired" label="租户必选权限" rules={[{ required: true }]}>
             <BaseBoolRadio />
           </Form.Item>
           {isButton ? (

@@ -2,7 +2,7 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { tenantApi as api, rbacMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
-import { Button, DatePicker, Form, Input, InputNumber, message, Spin } from 'antd';
+import { Button, DatePicker, Form, Input, InputNumber, Spin } from 'antd';
 import { get } from 'lodash';
 import type { Key } from 'react';
 import { useContext, useState } from 'react';
@@ -16,6 +16,7 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [menuTree, setMenuTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
+  const [requiredMenuIds, setRequiredMenuIds] = useState<Key[]>([]);
   const [checkedMenuIds, setCheckedMenuIds] = useState<Key[]>([]);
   const { systemConfig } = useContext(ConfigLayoutContext);
 
@@ -26,8 +27,9 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
   }
 
   async function loadTenantPermissions(tenantId: string) {
-    const res = await tenantPermissionApi.getMenuIds(tenantId);
-    setCheckedMenuIds(res.data || []);
+    const res = await tenantPermissionApi.getPermissionScope(tenantId);
+    setRequiredMenuIds(res.data?.requiredMenuIds || []);
+    setCheckedMenuIds(res.data?.optionalMenuIds || []);
   }
 
   function getInitialValues() {
@@ -51,6 +53,7 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
 
     form.resetFields();
     form.setFieldsValue(getInitialValues());
+    setRequiredMenuIds([]);
     setCheckedMenuIds([]);
     if (systemConfig.tenantEnabled) {
       setMenuTree([]);
@@ -90,22 +93,18 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
     if (record) {
       invokeUpdateTask({
         tenant: { ...record, ...tenant },
-        menuIds: checkedMenuIds.map((id) => Number(id)),
+        optionalMenuIds: checkedMenuIds.map((id) => Number(id)),
       });
       return;
     }
 
-    if (systemConfig.tenantEnabled && checkedMenuIds.length === 0) {
-      message.error('请至少选择一个租户权限点');
-      return;
-    }
     invokeInsertTask({
       tenant,
-      menuIds: checkedMenuIds.map((id) => Number(id)),
+      optionalMenuIds: checkedMenuIds.map((id) => Number(id)),
     });
   }
 
-  const tenantPermissionsUrl = tenantPermissionApi.getUrl(record?.id ? `getMenuIds/${record.id}` : 'getMenuIds');
+  const tenantPermissionsUrl = tenantPermissionApi.getUrl(record?.id ? `getPermissionScope/${record.id}` : 'getPermissionScope');
   const loading = useApiLoading([
     api.getUrl('createWithPermissions'),
     api.getUrl('updateWithPermissions'),
@@ -196,7 +195,13 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
                   </div>
                 </div>
 
-                <TenantPermissionPanel tree={menuTree} checkedMenuIds={checkedMenuIds} loading={menuLoading} onCheckedMenuIdsChange={setCheckedMenuIds} />
+                <TenantPermissionPanel
+                  tree={menuTree}
+                  requiredMenuIds={requiredMenuIds}
+                  checkedMenuIds={checkedMenuIds}
+                  loading={menuLoading}
+                  onCheckedMenuIdsChange={setCheckedMenuIds}
+                />
               </section>
             )}
           </div>

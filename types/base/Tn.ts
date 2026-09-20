@@ -30,6 +30,14 @@ namespace Tn {
   /** 租户及权限范围请求 */
   export interface TenantWithPermissionsReq {
     tenant: Tenant;
+    /** 租户可选权限 O_t，平台必选权限由后端合并 */
+    optionalMenuIds: number[];
+  }
+
+  /** 租户权限范围 M/O_t/C_t */
+  export interface TenantPermissionScope {
+    requiredMenuIds: number[];
+    optionalMenuIds: number[];
     menuIds: number[];
   }
 

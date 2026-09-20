@@ -11,6 +11,8 @@ namespace Rbac {
     parentId: string;
     /** 模块：1-web/2-app */
     scope: FaEnums.RbacMenuScopeEnum;
+    /** 租户必选权限 */
+    tenantRequired: boolean;
     /** 名称 */
     name: string;
     /** 排序 */

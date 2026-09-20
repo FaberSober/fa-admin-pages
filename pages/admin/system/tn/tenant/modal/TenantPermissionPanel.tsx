@@ -1,6 +1,6 @@
-import { AppstoreOutlined, GlobalOutlined, MobileOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, GlobalOutlined, LockOutlined, MobileOutlined, SearchOutlined } from '@ant-design/icons';
 import { type Fa, FaEnums } from '@fa/ui';
-import { Button, Checkbox, Empty, Input, Spin } from 'antd';
+import { Button, Checkbox, Empty, Input, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import type { Key as ReactKey, ReactNode } from 'react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -24,6 +24,7 @@ interface CheckState {
 
 export interface TenantPermissionPanelProps {
   tree: MenuNode[];
+  requiredMenuIds: ReactKey[];
   checkedMenuIds: ReactKey[];
   loading?: boolean;
   onCheckedMenuIdsChange: (keys: ReactKey[]) => void;
@@ -169,6 +170,7 @@ interface PermissionPageCardProps {
 
 function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: PermissionPageCardProps) {
   const state = getCheckState(sourceNode, selectedKeys);
+  const required = Boolean(sourceNode.sourceData.tenantRequired);
   const buttonNodes = getButtonChildren(node);
   const sourceButtonNodes = getButtonChildren(sourceNode);
   const sourceButtonMap = new Map(sourceButtonNodes.map((button) => [getNodeKey(button), button]));
@@ -177,8 +179,13 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: Permis
   return (
     <article className={clsx('tenant-permission-panel__page-card', buttonNodes.length === 0 && 'is-simple')}>
       <div className="tenant-permission-panel__page-header">
-        <Checkbox checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(sourceNode)}>
+        <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(sourceNode)}>
           <span className="tenant-permission-panel__page-title">{node.name}</span>
+          {required && (
+            <Tag color="gold" icon={<LockOutlined />}>
+              必选
+            </Tag>
+          )}
         </Checkbox>
         {buttonNodes.length > 0 && (
           <>
@@ -196,9 +203,17 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: Permis
         <div className="tenant-permission-panel__button-list">
           {buttonNodes.map((button) => {
             const buttonState = getCheckState(button, selectedKeys);
+            const sourceButton = sourceButtonMap.get(getNodeKey(button)) || button;
+            const buttonRequired = Boolean(sourceButton.sourceData.tenantRequired);
             return (
-              <Checkbox key={getNodeKey(button)} checked={buttonState.checked} onChange={() => onToggle(sourceButtonMap.get(getNodeKey(button)) || button)}>
+              <Checkbox
+                key={getNodeKey(button)}
+                disabled={buttonRequired}
+                checked={buttonState.checked}
+                onChange={() => onToggle(sourceButton)}
+              >
                 {button.name}
+                {buttonRequired && <LockOutlined aria-label="平台必选权限" className="fa-ml4" />}
               </Checkbox>
             );
           })}
@@ -216,12 +231,18 @@ interface PermissionGroupHeaderProps {
 
 function PermissionGroupHeader({ node, selectedKeys, onToggle }: PermissionGroupHeaderProps) {
   const state = getCheckState(node, selectedKeys);
+  const required = Boolean(node.sourceData.tenantRequired);
   const stats = getStats([node], selectedKeys);
 
   return (
     <div className="tenant-permission-panel__group-header">
-      <Checkbox checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(node)}>
+      <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(node)}>
         <span className="tenant-permission-panel__group-title">{node.name}</span>
+        {required && (
+          <Tag color="gold" icon={<LockOutlined />}>
+            必选
+          </Tag>
+        )}
       </Checkbox>
       <span className="tenant-permission-panel__group-count">
         已配置 {stats.selected}/{stats.total}
@@ -233,12 +254,22 @@ function PermissionGroupHeader({ node, selectedKeys, onToggle }: PermissionGroup
   );
 }
 
-export default function TenantPermissionPanel({ tree, checkedMenuIds, loading = false, onCheckedMenuIdsChange }: TenantPermissionPanelProps) {
+export default function TenantPermissionPanel({
+  tree,
+  requiredMenuIds,
+  checkedMenuIds,
+  loading = false,
+  onCheckedMenuIdsChange,
+}: TenantPermissionPanelProps) {
   const [activeScopeKey, setActiveScopeKey] = useState('');
   const [activeModuleKey, setActiveModuleKey] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [selectedOnly, setSelectedOnly] = useState(false);
-  const selectedKeys = useMemo(() => new Set(checkedMenuIds.map((key) => String(key))), [checkedMenuIds]);
+  const requiredKeys = useMemo(() => new Set(requiredMenuIds.map((key) => String(key))), [requiredMenuIds]);
+  const selectedKeys = useMemo(
+    () => new Set([...requiredMenuIds, ...checkedMenuIds].map((key) => String(key))),
+    [checkedMenuIds, requiredMenuIds],
+  );
 
   const scopeGroups = useMemo(() => buildScopeGroups(tree), [tree]);
   const nodeMap = useMemo(() => {
@@ -282,9 +313,9 @@ export default function TenantPermissionPanel({ tree, checkedMenuIds, loading = 
     const nextKeys = new Set(selectedKeys);
     keys.forEach((key) => {
       if (checked) nextKeys.add(key);
-      else nextKeys.delete(key);
+      else if (!requiredKeys.has(key)) nextKeys.delete(key);
     });
-    onCheckedMenuIdsChange([...normalizeSelectionKeys(tree, nextKeys)]);
+    onCheckedMenuIdsChange([...normalizeSelectionKeys(tree, nextKeys)].filter((key) => !requiredKeys.has(key)));
   }
 
   function toggleNode(node: MenuNode) {
