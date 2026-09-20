@@ -1,7 +1,4 @@
-import { useEffect } from 'react';
-import { get } from 'lodash';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Button, Drawer, Form, Input, Space, Tag, Typography } from 'antd';
+import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -9,22 +6,26 @@ import {
   clearForm,
   DictEnumApiSelector,
   type FaberTable,
+  FaFullContentModal,
+  FaHref,
   useDelete,
   useExport,
   useTableQueryParams,
-  useViewItem,
 } from '@fa/ui';
-import { type Admin, FaEnums } from '@/types';
+import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
 import { fileSaveApi, userApi } from '@features/fa-admin-pages/services';
+import { Avatar, Badge, Button, Form, Input, Space, Tag, Typography } from 'antd';
+import { get } from 'lodash';
+import { useEffect } from 'react';
+import { SearchGrid } from '@/components';
+import { type Admin, FaEnums } from '@/types';
 import UserModal from '../modal/UserModal';
-import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
-import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
-import UsersChangePwdModal from './modal/UsersChangePwdModal';
-import UserView from './cube/UserView';
 import UserAdminAccessCol from './cube/UserAdminAccessCol';
 import UserStatusCol from './cube/UserStatusCol';
-import DepartmentCascade from '@features/fa-admin-pages/components/helper/DepartmentCascade';
-import { SearchGrid } from '@/components';
+import UserView from './cube/UserView';
+import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
+import UsersChangePwdModal from './modal/UsersChangePwdModal';
+import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
 
 const serviceName = '';
 const biz = 'UserList-v3';
@@ -46,6 +47,14 @@ function UserIdentityCell({ record }: { record: Admin.UserWeb }) {
         </Typography.Text>
       </div>
     </Space>
+  );
+}
+
+function UserDetailModal({ record }: { record: Admin.UserWeb }) {
+  return (
+    <FaFullContentModal title="查看用户详情" triggerDom={<FaHref icon={<EyeOutlined />} text="查看" />} showOk={false} showCancel={false}>
+      <UserView item={record} />
+    </FaFullContentModal>
   );
 }
 
@@ -82,7 +91,6 @@ export default function UserList({ departmentId, departmentName, superMode = fal
     extraParams,
   });
   const [handleDelete] = useDelete<string>(userApi.remove, fetchPageList, serviceName);
-  const { show, hide, open, item } = useViewItem<Admin.User>(); // 查看记录
 
   useEffect(() => setExtraParams(extraParams), [departmentId, superMode]);
 
@@ -156,11 +164,12 @@ export default function UserList({ departmentId, departmentName, superMode = fal
         dataIndex: 'opr',
         render: (_, record) => (
           <Space>
+            <UserDetailModal record={record} />
             <UserModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
-        width: 120,
+        width: 180,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
@@ -186,14 +195,16 @@ export default function UserList({ departmentId, departmentName, superMode = fal
       <SearchGrid
         form={form}
         onFinish={setFormValues}
-        btns={(<>
+        btns={
+          <>
             <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
               查询
             </Button>
             <Button onClick={() => clearForm(form)}>重置</Button>
-        </>)}
+          </>
+        }
         defaultCount={4}
-        className='fa-mb12'
+        className="fa-mb12"
       >
         <Form.Item name="username" label="账户">
           <Input placeholder="请输入账户" allowClear />
@@ -231,20 +242,15 @@ export default function UserList({ departmentId, departmentName, superMode = fal
             <UsersChangePwdModal userIds={rowKeys} fetchFinish={fetchPageList} />
           </Space>
         )}
-        onRow={(r) => ({ onDoubleClick: () => show(r) })}
-        topBtns={(
+        topBtns={
           <Space>
             <UserModal addBtn title="新增用户" defaultDepartmentId={departmentId} fetchFinish={fetchPageList} />
             <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
               导出
             </Button>
           </Space>
-        )}
+        }
       />
-
-      <Drawer title="查看详情" open={open} onClose={hide} width={1000} styles={{ body: { position: 'relative' } }}>
-        {open && item && <UserView item={item} />}
-      </Drawer>
     </div>
   );
 }
