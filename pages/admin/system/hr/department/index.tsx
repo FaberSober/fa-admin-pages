@@ -1,27 +1,23 @@
 import { DeleteOutlined, EditOutlined, MinusCircleOutlined, PlusCircleOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Fa, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
+import { BaseTree, Fa, FaFlexRestLayout, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
-import type { TableProps } from 'antd';
-import { Button, Empty, Input, Popconfirm, Select, Space, Table, Tag } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Button, Input, Popconfirm, Select, Space, Tag } from 'antd';
+import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCounter } from 'react-use';
 import type { Admin } from '@/types';
 import DepartmentModal from './modal/DepartmentModal';
 import './index.scss';
 
 const serviceName = '部门';
 
-type DepartmentRow = Admin.DepartmentVo & {
-  hasChildren: boolean;
-  level: number;
-  children?: DepartmentRow[];
-};
+type DepartmentTreeNode = Fa.TreeNode<Admin.DepartmentVo, string>;
+type DepartmentTypeVariant = 'module' | 'menu' | 'button';
 
-type DepartmentDropPosition = 'before' | 'after';
-
-const departmentTypeMap: Record<string, { text: string; color: string }> = {
-  CORP: { text: '公司', color: 'blue' },
-  DEPT: { text: '部门', color: 'green' },
-  TEAM: { text: '小组', color: 'orange' },
+const departmentTypeMap: Record<string, { text: string; variant: DepartmentTypeVariant }> = {
+  CORP: { text: '公司', variant: 'module' },
+  DEPT: { text: '部门', variant: 'menu' },
+  TEAM: { text: '小组', variant: 'button' },
 };
 
 const departmentTypeOptions = Object.entries(departmentTypeMap).map(([value, type]) => ({
@@ -29,65 +25,36 @@ const departmentTypeOptions = Object.entries(departmentTypeMap).map(([value, typ
   value,
 }));
 
-function parseRows(nodes: Fa.TreeNode<Admin.DepartmentVo, string>[] = []): DepartmentRow[] {
-  return nodes.map((node) => {
-    const children = node.hasChildren ? parseRows(node.children || []) : undefined;
-    return {
-      ...node.sourceData,
-      id: node.sourceData?.id || node.id,
-      parentId: node.sourceData?.parentId || node.parentId,
-      name: node.sourceData?.name || node.name,
-      hasChildren: node.hasChildren,
-      level: node.level,
-      children,
-    };
-  });
-}
-
-function collectKeys(rows: DepartmentRow[]): React.Key[] {
-  return rows.reduce<React.Key[]>((keys, row) => {
-    keys.push(row.id);
-    if (row.children && row.children.length > 0) {
-      keys.push(...collectKeys(row.children));
-    }
-    return keys;
-  }, []);
-}
-
-function countRows(rows: DepartmentRow[]): number {
-  return rows.reduce((count, row) => count + 1 + (row.children ? countRows(row.children) : 0), 0);
+interface DepartmentDropNode {
+  key?: string | number;
+  parentId?: string | number;
 }
 
 function hasDepartmentFilters(query: Record<string, any>): boolean {
   return Boolean(String(query.name || '').trim() || query.type || query.managerId);
 }
 
-function matchesDepartment(row: DepartmentRow, query: Record<string, any>): boolean {
+function matchesDepartment(node: DepartmentTreeNode, query: Record<string, any>): boolean {
   const name = String(query.name || '')
     .trim()
     .toLowerCase();
-  if (
-    name &&
-    !String(row.name || '')
-      .toLowerCase()
-      .includes(name)
-  )
-    return false;
-  if (query.type && row.type !== query.type) return false;
-  if (query.managerId && row.managerId !== query.managerId) return false;
+  const nodeName = String(node.name || node.sourceData?.name || '').toLowerCase();
+  if (name && !nodeName.includes(name)) return false;
+  if (query.type && node.sourceData?.type !== query.type) return false;
+  if (query.managerId && node.sourceData?.managerId !== query.managerId) return false;
   return true;
 }
 
-function filterDepartmentTree(rows: DepartmentRow[], query: Record<string, any>): DepartmentRow[] {
-  if (!hasDepartmentFilters(query)) return rows;
+function filterDepartmentTree(nodes: DepartmentTreeNode[], query: Record<string, any>): DepartmentTreeNode[] {
+  if (!hasDepartmentFilters(query)) return nodes;
 
-  return rows.flatMap((row) => {
-    const children = filterDepartmentTree(row.children || [], query);
-    if (!matchesDepartment(row, query) && children.length === 0) return [];
+  return nodes.flatMap((node) => {
+    const children = filterDepartmentTree(node.children || [], query);
+    if (!matchesDepartment(node, query) && children.length === 0) return [];
 
     return [
       {
-        ...row,
+        ...node,
         children: children.length > 0 ? children : undefined,
         hasChildren: children.length > 0,
       },
@@ -95,57 +62,36 @@ function filterDepartmentTree(rows: DepartmentRow[], query: Record<string, any>)
   });
 }
 
-function countMatchingRows(rows: DepartmentRow[], query: Record<string, any>): number {
-  return rows.reduce((count, row) => count + (matchesDepartment(row, query) ? 1 : 0) + countMatchingRows(row.children || [], query), 0);
+function collectMatchingDepartmentKeys(nodes: DepartmentTreeNode[], query: Record<string, any>): string[] {
+  return nodes.flatMap((node) => [...(matchesDepartment(node, query) ? [String(node.id)] : []), ...collectMatchingDepartmentKeys(node.children || [], query)]);
 }
 
-function findDepartmentRow(rows: DepartmentRow[], id: string): DepartmentRow | undefined {
-  for (const row of rows) {
-    if (String(row.id) === id) return row;
-    const found = findDepartmentRow(row.children || [], id);
-    if (found) return found;
-  }
-  return undefined;
+function countDepartmentNodes(nodes: DepartmentTreeNode[] | undefined): number {
+  if (!nodes) return 0;
+  return nodes.reduce((total, node) => total + 1 + countDepartmentNodes(node.children), 0);
 }
 
-function moveDepartmentRow(rows: DepartmentRow[], dragId: string, dropId: string, position: DepartmentDropPosition): DepartmentRow[] {
-  let draggedRow: DepartmentRow | undefined;
-
-  function removeDraggedRow(nodes: DepartmentRow[]): DepartmentRow[] {
-    return nodes.flatMap((row) => {
-      if (String(row.id) === dragId) {
-        draggedRow = row;
-        return [];
-      }
-      if (!row.children?.length) return [row];
-      return [{ ...row, children: removeDraggedRow(row.children) }];
-    });
-  }
-
-  function insertDraggedRow(nodes: DepartmentRow[]): DepartmentRow[] {
-    return nodes.flatMap((row) => {
-      if (String(row.id) === dropId && draggedRow) {
-        return position === 'before' ? [draggedRow, row] : [row, draggedRow];
-      }
-      if (!row.children?.length) return [row];
-      return [{ ...row, children: insertDraggedRow(row.children) }];
-    });
-  }
-
-  const treeWithoutDraggedRow = removeDraggedRow(rows);
-  return draggedRow ? insertDraggedRow(treeWithoutDraggedRow) : rows;
+function countMatchingDepartmentNodes(nodes: DepartmentTreeNode[] | undefined, query: Record<string, any>): number {
+  if (!nodes) return 0;
+  return nodes.reduce((total, node) => total + (matchesDepartment(node, query) ? 1 : 0) + countMatchingDepartmentNodes(node.children, query), 0);
 }
 
-function flattenDepartmentPositions(rows: DepartmentRow[], parentId = '0'): Fa.TreePosChangeVo[] {
-  return rows.flatMap((row, index) => [{ key: String(row.id), index, pid: parentId }, ...flattenDepartmentPositions(row.children || [], String(row.id))]);
-}
-
-function getChangedDepartmentPositions(before: DepartmentRow[], after: DepartmentRow[]): Fa.TreePosChangeVo[] {
-  const oldPositions = new Map(flattenDepartmentPositions(before).map((item) => [String(item.key), item]));
-  return flattenDepartmentPositions(after).filter((item) => {
-    const oldItem = oldPositions.get(String(item.key));
-    return !oldItem || oldItem.index !== item.index || String(oldItem.pid) !== String(item.pid);
+function toDepartmentViewTree(nodes: DepartmentTreeNode[]): DepartmentTreeNode[] {
+  return nodes.map((node) => {
+    const children = node.children ? toDepartmentViewTree(node.children) : undefined;
+    return {
+      ...node,
+      id: String(node.id),
+      parentId: String(node.parentId),
+      children,
+      hasChildren: Boolean(children?.length),
+    };
   });
+}
+
+function isDepartmentDropAllowed(dragNode: DepartmentDropNode, dropNode: DepartmentDropNode, dropPosition: number): boolean {
+  if (dropPosition === 0) return false;
+  return String(dragNode.parentId ?? '0') === String(dropNode.parentId ?? '0');
 }
 
 /**
@@ -154,33 +100,38 @@ function getChangedDepartmentPositions(before: DepartmentRow[], after: Departmen
  * @date 2026-04-28 11:36:29
  */
 export default function DepartmentManage() {
+  const [current, { inc }] = useCounter(0);
   const [query, setQuery] = useState<Record<string, any>>({});
-  const [sourceTreeData, setSourceTreeData] = useState<DepartmentRow[]>([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
-  const [draggingDepartmentId, setDraggingDepartmentId] = useState<string>();
-  const [dragOverDepartment, setDragOverDepartment] = useState<{ id: string; position: DepartmentDropPosition }>();
+  const [sourceTree, setSourceTree] = useState<DepartmentTreeNode[]>();
   const [sortFeedback, setSortFeedback] = useState<'idle' | 'success' | 'error'>('idle');
+  const treeRef = useRef<{ expandKeys: (key: string) => void; collapseAll: () => void; expandAll: () => void }>(null);
 
   const hasFilters = hasDepartmentFilters(query);
-  const treeData = useMemo(() => filterDepartmentTree(sourceTreeData, query), [query, sourceTreeData]);
-  const matchingCount = hasFilters ? countMatchingRows(sourceTreeData, query) : countRows(sourceTreeData);
+  const filteredTree = useMemo(() => {
+    if (!sourceTree) return undefined;
+    return filterDepartmentTree(sourceTree, query);
+  }, [query, sourceTree]);
+  const filteredTreeData = useMemo(() => {
+    if (!filteredTree) return undefined;
+    return toDepartmentViewTree(filteredTree);
+  }, [filteredTree]);
+  const matchingKeys = useMemo(() => {
+    if (!sourceTree || !hasFilters) return [];
+    return collectMatchingDepartmentKeys(sourceTree, query);
+  }, [hasFilters, query, sourceTree]);
+  const totalCount = countDepartmentNodes(sourceTree);
+  const matchingCount = countMatchingDepartmentNodes(sourceTree, query);
 
-  const loading = useApiLoading([departmentApi.getUrl('getTree'), departmentApi.getUrl('remove')]);
+  const loadingTree = useApiLoading([departmentApi.getUrl('getTree')]);
   const sortingLoading = useApiLoading([departmentApi.getUrl('changePos')]);
 
-  const [handleDelete] = useDelete<string>(departmentApi.remove, fetchTreeData, serviceName);
-
-  useEffect(() => {
-    fetchTreeData();
-  }, []);
-
-  function fetchTreeData() {
-    departmentApi.getTree().then((res) => {
-      const rows = parseRows(res.data || []);
-      setSourceTreeData(rows);
-      setExpandedRowKeys(collectKeys(rows));
-    });
+  function refreshData() {
+    setSourceTree(undefined);
+    setSortFeedback('idle');
+    inc();
   }
+
+  const [handleDelete] = useDelete<string>(departmentApi.remove, refreshData, serviceName);
 
   function updateFilter(name: string, value: any) {
     setQuery((currentQuery) => {
@@ -193,176 +144,30 @@ export default function DepartmentManage() {
     });
   }
 
-  function expandAll() {
-    setExpandedRowKeys(collectKeys(treeData));
-  }
-
-  function collapseAll() {
-    setExpandedRowKeys([]);
-  }
-
-  function clearDragState() {
-    setDraggingDepartmentId(undefined);
-    setDragOverDepartment(undefined);
-  }
-
-  function handleDepartmentDragStart(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
-    if (hasFilters || loading || sortingLoading) {
-      event.preventDefault();
-      return;
-    }
-    const id = String(record.id);
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', id);
-    setDraggingDepartmentId(id);
-  }
-
-  function handleDepartmentDragOver(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
-    const dragId = draggingDepartmentId || event.dataTransfer.getData('text/plain');
-    const draggedRow = dragId ? findDepartmentRow(sourceTreeData, dragId) : undefined;
-    const sameParent = draggedRow && String(draggedRow.parentId || '0') === String(record.parentId || '0');
-    if (!draggedRow || dragId === String(record.id) || !sameParent || hasFilters || loading || sortingLoading) {
-      setDragOverDepartment(undefined);
-      return;
+  function handleChangePos(changeItems: Fa.TreePosChangeVo[]): Promise<Fa.Ret> {
+    if (changeItems.length === 0) {
+      return Promise.resolve({ status: Fa.RES_CODE.OK, message: '', data: null });
     }
 
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-    const bounds = event.currentTarget.getBoundingClientRect();
-    setDragOverDepartment({
-      id: String(record.id),
-      position: event.clientY < bounds.top + bounds.height / 2 ? 'before' : 'after',
-    });
-  }
-
-  function handleDepartmentDrop(event: React.DragEvent<HTMLTableRowElement>, record: DepartmentRow) {
-    event.preventDefault();
-    const dragId = draggingDepartmentId || event.dataTransfer.getData('text/plain');
-    const dropPosition = dragOverDepartment?.id === String(record.id) ? dragOverDepartment.position : undefined;
-    const draggedRow = dragId ? findDepartmentRow(sourceTreeData, dragId) : undefined;
-    const sameParent = draggedRow && String(draggedRow.parentId || '0') === String(record.parentId || '0');
-
-    clearDragState();
-    if (!dragId || !dropPosition || !draggedRow || dragId === String(record.id) || !sameParent) return;
-
-    const nextTreeData = moveDepartmentRow(sourceTreeData, dragId, String(record.id), dropPosition);
-    const changes = getChangedDepartmentPositions(sourceTreeData, nextTreeData);
-    if (changes.length === 0) return;
-
-    setSourceTreeData(nextTreeData);
     setSortFeedback('idle');
-    departmentApi
-      .changePos(changes)
+    return departmentApi
+      .changePos(changeItems)
       .then((res) => {
-        if (res.status === Fa.RES_CODE.OK) {
-          setSortFeedback('success');
-        } else {
-          setSortFeedback('error');
-        }
-        fetchTreeData();
+        setSortFeedback(res.status === Fa.RES_CODE.OK ? 'success' : 'error');
+        return res;
       })
       .catch(() => {
         setSortFeedback('error');
-        fetchTreeData();
+        return { status: 500, message: '部门排序失败', data: null };
       });
   }
 
-  function handleRefresh() {
-    setSortFeedback('idle');
-    fetchTreeData();
-  }
-
   useEffect(() => {
-    setExpandedRowKeys(collectKeys(treeData));
-  }, [treeData]);
-
-  const columns: TableProps<DepartmentRow>['columns'] = [
-    {
-      title: '部门名称',
-      dataIndex: 'name',
-      width: 260,
-      render: (value, record) => {
-        const name = value || '未命名部门';
-        const level = Math.min(Math.max(record.level, 1), 4);
-        return (
-          <div className={`fa-department-name-cell fa-department-name-cell--level-${level}`} title={name}>
-            <span className="fa-department-level-marker" aria-hidden="true" />
-            <span className="fa-department-name">{name}</span>
-          </div>
-        );
-      },
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-      width: 100,
-      render: (value) => {
-        if (!value) return <span className="fa-department-cell-placeholder">—</span>;
-        const type = departmentTypeMap[value] || { text: value, color: 'default' };
-        return <Tag color={type.color}>{type.text}</Tag>;
-      },
-    },
-    {
-      title: '负责人',
-      dataIndex: ['manager', 'name'],
-      width: 140,
-      render: (_, record) => {
-        const manager = record.manager?.name || record.managerId;
-        return manager ? <span title={manager}>{manager}</span> : <span className="fa-department-cell-placeholder">—</span>;
-      },
-    },
-    {
-      title: '排序',
-      dataIndex: 'sort',
-      width: 90,
-      render: (value) => value ?? '—',
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      ellipsis: true,
-      render: (value) => (value ? <span title={value}>{value}</span> : <span className="fa-department-cell-placeholder">—</span>),
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'crtTime',
-      width: 170,
-      render: (value) => value || '—',
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updTime',
-      width: 170,
-      render: (value) => value || '—',
-    },
-    {
-      title: '操作',
-      dataIndex: 'opr',
-      width: 240,
-      fixed: 'right',
-      render: (_, record) => (
-        <Space>
-          <DepartmentModal title="新增子部门" parentId={record.id} fetchFinish={fetchTreeData}>
-            <FaHref icon={<PlusOutlined />} text="新增子部门" />
-          </DepartmentModal>
-          <DepartmentModal title="编辑部门" record={record} fetchFinish={fetchTreeData}>
-            <FaHref icon={<EditOutlined />} text="编辑" />
-          </DepartmentModal>
-          {record.hasChildren ? (
-            <ShiroPermissionContainer>
-              <FaHref text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
-            </ShiroPermissionContainer>
-          ) : (
-            <ShiroPermissionContainer>
-              <Popconfirm title={`确认删除部门“${record.name}”？`} onConfirm={() => handleDelete(record.id)} placement="topRight">
-                <FaHref icon={<DeleteOutlined />} text="删除" color="red" />
-              </Popconfirm>
-            </ShiroPermissionContainer>
-          )}
-        </Space>
-      ),
-    },
-  ];
+    if (!hasFilters) return;
+    matchingKeys.forEach((key) => {
+      treeRef.current?.expandKeys(key);
+    });
+  }, [hasFilters, matchingKeys]);
 
   return (
     <div className="fa-full-content-p12 fa-flex-column fa-content fa-pl12 fa-pr12 fa-department-page">
@@ -392,9 +197,11 @@ export default function DepartmentManage() {
                 onChange={(value) => updateFilter('managerId', value)}
               />
             </div>
-            <span className="fa-department-toolbar__summary" aria-live="polite">
-              {hasFilters ? `命中 ${matchingCount} 项` : `共 ${matchingCount} 项`}
-            </span>
+            {sourceTree && (
+              <span className="fa-department-toolbar__summary" aria-live="polite">
+                {hasFilters ? `命中 ${matchingCount} 项` : `共 ${totalCount} 项`}
+              </span>
+            )}
             {sortingLoading && (
               <output className="fa-department-toolbar__sort-status fa-department-toolbar__sort-status--saving" aria-live="polite">
                 正在保存排序...
@@ -413,16 +220,16 @@ export default function DepartmentManage() {
           </Space>
         </div>
         <Space className="fa-department-toolbar__actions">
-          <Button icon={<ReloadOutlined />} loading={loading} disabled={sortingLoading} onClick={handleRefresh}>
+          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loadingTree} disabled={sortingLoading}>
             刷新
           </Button>
-          <Button icon={<MinusCircleOutlined />} disabled={loading || sortingLoading || treeData.length === 0} onClick={collapseAll}>
+          <Button icon={<MinusCircleOutlined />} onClick={() => treeRef.current?.collapseAll()} disabled={loadingTree || sortingLoading || !sourceTree?.length}>
             折叠
           </Button>
-          <Button icon={<PlusCircleOutlined />} disabled={loading || sortingLoading || treeData.length === 0} onClick={expandAll}>
+          <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading || !sourceTree?.length}>
             展开
           </Button>
-          <DepartmentModal title="新增部门" parentId={0} fetchFinish={fetchTreeData}>
+          <DepartmentModal title="新增部门" parentId={0} fetchFinish={refreshData}>
             <Button type="primary" icon={<PlusOutlined />} disabled={sortingLoading}>
               新增部门
             </Button>
@@ -430,38 +237,96 @@ export default function DepartmentManage() {
         </Space>
       </div>
 
-      <Table<DepartmentRow>
-        rowKey="id"
-        className="fa-department-table fa-mt12"
-        columns={columns}
-        dataSource={treeData}
-        loading={loading}
-        pagination={false}
-        size="middle"
-        sticky={{ offsetHeader: 56 }}
-        tableLayout="fixed"
-        scroll={{ x: 1280 }}
-        locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无部门数据" /> }}
-        rowClassName={(record) => {
-          const rowId = String(record.id);
-          const classNames = ['fa-department-row'];
-          if (draggingDepartmentId === rowId) classNames.push('fa-department-row--dragging');
-          if (dragOverDepartment?.id === rowId) classNames.push(`fa-department-row--drop-${dragOverDepartment.position}`);
-          return classNames.join(' ');
-        }}
-        onRow={(record) => ({
-          draggable: !hasFilters && !loading && !sortingLoading,
-          onDragStart: (event) => handleDepartmentDragStart(event, record),
-          onDragOver: (event) => handleDepartmentDragOver(event, record),
-          onDrop: (event) => handleDepartmentDrop(event, record),
-          onDragEnd: clearDragState,
-        })}
-        expandable={{
-          expandedRowKeys,
-          rowExpandable: (record) => record.hasChildren,
-          onExpandedRowsChange: (keys) => setExpandedRowKeys([...keys]),
-        }}
-      />
+      <FaFlexRestLayout className="fa-full-content fa-card fa-p0" style={{ top: 12, bottom: 12 }}>
+        <div className="fa-department-table">
+          <div className="fa-department-table-head">
+            <span>部门名称</span>
+            <span>类型</span>
+            <span>负责人</span>
+            <span>排序</span>
+            <span>描述</span>
+            <span>创建时间</span>
+            <span>更新时间</span>
+            <span>操作</span>
+          </div>
+          <BaseTree
+            ref={treeRef}
+            className="fa-department-tree"
+            serviceName="Tree"
+            ServiceModal={DepartmentModal}
+            serviceApi={{
+              ...departmentApi,
+              allTree: () => departmentApi.getTree(),
+              changePos: handleChangePos,
+            }}
+            treeData={filteredTreeData as any}
+            onGetTree={(tree) => setSourceTree(tree as DepartmentTreeNode[])}
+            bodyStyle={{ width: '100%', height: '100%', minHeight: 0 }}
+            showTips={false}
+            showTopBtn={false}
+            showOprBtn={false}
+            allowDrop={({ dragNode, dropNode, dropPosition }) =>
+              !sortingLoading && isDepartmentDropAllowed(dragNode as DepartmentDropNode, dropNode as DepartmentDropNode, dropPosition)
+            }
+            // @ts-expect-error BaseTree exposes Ant Tree's generic DataNode here.
+            titleRender={(item: DepartmentTreeNode) => {
+              const typeVariant = departmentTypeMap[item.sourceData.type]?.variant || 'menu';
+              const typeText = departmentTypeMap[item.sourceData.type]?.text || item.sourceData.type;
+              const manager = item.sourceData.manager?.name || item.sourceData.managerId;
+
+              return (
+                <div
+                  className={`fa-department-item fa-department-item--${typeVariant}`}
+                  style={{ '--fa-department-depth': Math.max(0, item.level - 1) } as CSSProperties}
+                >
+                  <div className="fa-department-item__name-cell">
+                    <span className="fa-department-item__level-marker" aria-hidden="true" />
+                    <span className="fa-department-item__name" title={item.name}>
+                      {item.name || '未命名部门'}
+                    </span>
+                  </div>
+                  <div className="fa-department-item__type">
+                    <Tag className={`fa-department-tag fa-department-tag--${typeVariant}`}>{typeText}</Tag>
+                  </div>
+                  <span className="fa-department-item__manager" title={manager || undefined}>
+                    {manager || <span className="fa-department-item__placeholder">—</span>}
+                  </span>
+                  <span className="fa-department-item__sort">{item.sourceData.sort ?? '—'}</span>
+                  <span className="fa-department-item__description" title={item.sourceData.description || undefined}>
+                    {item.sourceData.description || <span className="fa-department-item__placeholder">—</span>}
+                  </span>
+                  <span className="fa-department-item__time">{item.sourceData.crtTime || '—'}</span>
+                  <span className="fa-department-item__time">{item.sourceData.updTime || '—'}</span>
+                  <div className="fa-department-item__actions">
+                    <Space className="fa-department-inline-actions" size={2}>
+                      <DepartmentModal title="新增子部门" parentId={item.id} fetchFinish={refreshData}>
+                        <FaHref icon={<PlusOutlined />} text="新增子部门" />
+                      </DepartmentModal>
+                      <DepartmentModal title="编辑部门" record={item.sourceData} fetchFinish={refreshData}>
+                        <FaHref icon={<EditOutlined />} text="编辑" />
+                      </DepartmentModal>
+                      {item.hasChildren ? (
+                        <ShiroPermissionContainer>
+                          <FaHref text="删除" disabled tooltip="该部门包含子部门，无法删除，请先处理子部门" />
+                        </ShiroPermissionContainer>
+                      ) : (
+                        <ShiroPermissionContainer>
+                          <Popconfirm title={`确认删除部门“${item.name}”？`} onConfirm={() => handleDelete(String(item.id))} placement="topRight">
+                            <FaHref icon={<DeleteOutlined />} text="删除" color="red" />
+                          </Popconfirm>
+                        </ShiroPermissionContainer>
+                      )}
+                    </Space>
+                  </div>
+                </div>
+              );
+            }}
+            showLine={{ showLeafIcon: false }}
+            draggable={hasFilters || sortingLoading ? false : { icon: false }}
+            extraEffectArgs={[current]}
+          />
+        </div>
+      </FaFlexRestLayout>
     </div>
   );
 }
