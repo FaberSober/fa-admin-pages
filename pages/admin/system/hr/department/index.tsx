@@ -1,5 +1,14 @@
-import { DeleteOutlined, EditOutlined, MinusCircleOutlined, PlusCircleOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { BaseTree, Fa, FaFlexRestLayout, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete } from '@fa/ui';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import { BaseTree, Fa, FaFlexRestLayout, FaHref, ShiroPermissionContainer, UserSearchSelect, useApiLoading, useDelete, useExportBase } from '@fa/ui';
 import { departmentApi } from '@features/fa-admin-pages/services';
 import { Button, Input, Popconfirm, Select, Space, Tag } from 'antd';
 import type { CSSProperties } from 'react';
@@ -124,6 +133,7 @@ export default function DepartmentManage() {
 
   const loadingTree = useApiLoading([departmentApi.getUrl('getTree')]);
   const sortingLoading = useApiLoading([departmentApi.getUrl('changePos')]);
+  const [exporting, fetchExportExcel] = useExportBase(departmentApi.exportExcel, { query });
 
   function refreshData() {
     setSourceTree(undefined);
@@ -228,6 +238,9 @@ export default function DepartmentManage() {
           </Button>
           <Button icon={<PlusCircleOutlined />} onClick={() => treeRef.current?.expandAll()} disabled={loadingTree || sortingLoading || !sourceTree?.length}>
             展开
+          </Button>
+          <Button icon={<DownloadOutlined />} loading={exporting} onClick={() => fetchExportExcel()} disabled={sortingLoading}>
+            导出
           </Button>
           <DepartmentModal title="新增部门" parentId={0} fetchFinish={refreshData}>
             <Button type="primary" icon={<PlusOutlined />} disabled={sortingLoading}>
