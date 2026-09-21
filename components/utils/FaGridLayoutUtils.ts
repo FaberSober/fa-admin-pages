@@ -115,6 +115,9 @@ export function useGridLayoutConfig(
 
   const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
   const [layout, setLayout] = useState<Layout>([]);
+  const [initializing, setInitializing] = useState(true);
+  const [initializationError, setInitializationError] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const configRef = useRef<Admin.Config<LayoutItem[]>>();
   const initializingRef = useRef(true);
   const skipInitialLayoutChangeRef = useRef(false);
@@ -128,15 +131,26 @@ export function useGridLayoutConfig(
     configRef.current = nextConfig;
     setConfig(nextConfig);
     setLayout(nextLayout);
+    setInitializationError(false);
+    setSaveError(false);
+    setInitializing(false);
     initializingRef.current = false;
   }
 
-  useEffect(() => {
+  function loadInitialLayout() {
     initializingRef.current = true;
+    setInitializing(true);
+    setInitializationError(false);
+    setSaveError(false);
     skipInitialLayoutChangeRef.current = false;
     controlledLayoutRef.current = undefined;
+    pendingLayoutRef.current = undefined;
+    failedLayoutRef.current = undefined;
+    configRef.current = undefined;
+    setConfig(undefined);
 
     configApi.getOne(biz, type).then((res) => {
+      if (res.status !== Fa.RES_CODE.OK) throw new Error(res.message);
       if (res.data) {
         applyLayout(res.data.data, res.data);
         return;
@@ -144,13 +158,19 @@ export function useGridLayoutConfig(
 
       // 未找到，去查找全局是否有配置
       return configApi.getOneGlobal(biz, type).then((res1) => {
+        if (res1.status !== Fa.RES_CODE.OK) throw new Error(res1.message);
         const globalLayout = res1.data?.data;
         applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
       });
     }).catch(() => {
-      // 请求层负责错误提示；初始化失败后允许用户继续操作布局。
+      setInitializationError(true);
+      setInitializing(false);
       initializingRef.current = false;
     });
+  }
+
+  useEffect(() => {
+    loadInitialLayout();
   }, []);
 
   function submitLayout(nextLayout: Layout) {
@@ -167,14 +187,17 @@ export function useGridLayoutConfig(
 
     request
       .then((res) => {
+        if (res.status !== Fa.RES_CODE.OK) throw new Error(res.message);
         if (!currentConfig && res.data) {
           configRef.current = res.data;
           setConfig(res.data);
         }
         failedLayoutRef.current = undefined;
+        setSaveError(false);
       })
       .catch(() => {
         failedLayoutRef.current = nextLayout;
+        setSaveError(true);
       })
       .finally(() => {
         savingRef.current = false;
@@ -194,6 +217,7 @@ export function useGridLayoutConfig(
       return;
     }
     failedLayoutRef.current = undefined;
+    setSaveError(false);
     submitLayout(nextLayout);
   }
 
@@ -284,9 +308,13 @@ export function useGridLayoutConfig(
   return {
     config,
     layout,
+    initializing,
+    initializationError,
+    saveError,
     setLayout,
     loading,
     onLayoutChange,
+    retryInitialization: loadInitialLayout,
     retryLayout,
     handleAdd,
     handleDel,

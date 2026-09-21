@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as cubes from '@/cubes/homecubes';
-import { Button, FloatButton, Space } from 'antd';
+import { Alert, Button, FloatButton, Space, Spin } from 'antd';
 import { BaseDrawer, FaFlashCard, FaUtils } from '@fa/ui';
 import { EditOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import ExportAndImportBtn from '@features/fa-admin-pages/components/utils/ExportAndImportBtn';
@@ -32,7 +32,7 @@ function normalizeLegacyGlobalLayout(layout: Layout): Layout {
  */
 export default function Desktop() {
   const defaultLayout = FaGridLayoutUtils.createDefaultLayout(cubes as any, defaultCubeIds);
-  const { layout, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig } = FaGridLayoutUtils.useGridLayoutConfig(
+  const { layout, initializing, initializationError, saveError, loading, retryInitialization, retryLayout, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig } = FaGridLayoutUtils.useGridLayoutConfig(
     cubes,
     biz,
     type,
@@ -46,28 +46,38 @@ export default function Desktop() {
 
   const inIds: string[] = layout.map((i) => i.i);
 
+  if (initializing || initializationError) {
+    return (
+      <div className="fa-full-content-p12">
+        {initializing ? <Spin tip="正在加载工作台..." /> : <Alert type="error" showIcon title="工作台加载失败" description="请重试，加载成功后再进行布局调整。" action={<Button onClick={retryInitialization}>重试</Button>} />}
+      </div>
+    );
+  }
 
   return (
     <div className="fa-full-content-p12">
-      <FaGridLayout
-        layout={layout}
-        renderItem={(i) => {
-          const Component = (cubes as any)[i.i];
-          if (Component) {
-            return (
-              <FaFlashCard title={Component.title} titleRender={Component.titleRender} hideTitle={!Component.showTitle}>
-                <Component />
-              </FaFlashCard>
-            );
-          }
-          return <FaFlashCard>Component {i.i} Not Found</FaFlashCard>;
-        }}
-        onLayoutChange={onLayoutChange}
-        rowHeight={20}
-        cols={24}
-        isDraggable={editing}
-        isResizable={editing}
-      />
+      {saveError && <Alert type="error" showIcon title="工作台布局保存失败" description="当前调整尚未成功保存，请重试。" action={<Button onClick={retryLayout}>重试</Button>} style={{ marginBottom: 12 }} />}
+      <Spin spinning={loading}>
+        <FaGridLayout
+          layout={layout}
+          renderItem={(i) => {
+            const Component = (cubes as any)[i.i];
+            if (Component) {
+              return (
+                <FaFlashCard title={Component.title} titleRender={Component.titleRender} hideTitle={!Component.showTitle}>
+                  <Component />
+                </FaFlashCard>
+              );
+            }
+            return <FaFlashCard>Component {i.i} Not Found</FaFlashCard>;
+          }}
+          onLayoutChange={onLayoutChange}
+          rowHeight={20}
+          cols={24}
+          isDraggable={editing}
+          isResizable={editing}
+        />
+      </Spin>
       <div style={{ height: 12, width: '100%' }} />
 
       <BaseDrawer open={open} title="添加组件" bodyStyle={{ padding: 0 }} onClose={() => setOpen(false)}>
