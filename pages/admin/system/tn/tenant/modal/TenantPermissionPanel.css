@@ -5,14 +5,24 @@
 }
 
 .tenant-permission-panel {
+  --tenant-permission-module-color: #ffd591;
+  --tenant-permission-menu-color: #91caff;
+  --tenant-permission-button-color: #b7eb8f;
+
   display: flex;
-  height: clamp(420px, 60vh, 680px);
-  min-height: 420px;
+  height: clamp(560px, calc(100vh - 96px), 1200px);
+  min-height: 560px;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--fa-border-color);
   border-radius: var(--fa-border-radius);
   background: var(--fa-bg-color);
+}
+
+[data-theme='dark'] .tenant-permission-panel {
+  --tenant-permission-module-color: #ffd666;
+  --tenant-permission-menu-color: #69b1ff;
+  --tenant-permission-button-color: #95de64;
 }
 
 .tenant-permission-panel__toolbar {
@@ -79,6 +89,34 @@
   color: var(--fa-subtitle-color);
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.tenant-permission-panel__check-label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+}
+
+.tenant-permission-panel__level-marker {
+  display: inline-block;
+  width: 3px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--tenant-permission-menu-color);
+  opacity: 0.85;
+}
+
+.tenant-permission-panel__level-marker--module {
+  background: var(--tenant-permission-module-color);
+}
+
+.tenant-permission-panel__level-marker--button {
+  width: 2px;
+  height: 14px;
+  background: var(--tenant-permission-button-color);
+  opacity: 0.7;
 }
 
 .tenant-permission-panel__scope-tab {
@@ -203,6 +241,9 @@
 }
 
 .tenant-permission-panel__module-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--fa-text-color);
   font-size: 15px;
   font-weight: 600;
@@ -246,7 +287,6 @@
   gap: 8px;
   min-height: 28px;
   padding: 5px 8px;
-  border-left: 3px solid var(--ant-color-primary, #1677ff);
   background: var(--fa-bg-color2);
 }
 
@@ -306,6 +346,13 @@
   color: var(--fa-text-color);
   text-overflow: ellipsis;
   vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.tenant-permission-panel__button-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

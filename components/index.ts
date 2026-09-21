@@ -1,3 +1,4 @@
+export { default as PermissionPanel } from '../pages/admin/system/tn/tenant/modal/TenantPermissionPanel';
 export * from './area-cascader';
 export * from './base-card';
 export * from './cube';

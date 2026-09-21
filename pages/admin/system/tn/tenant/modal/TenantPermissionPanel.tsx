@@ -122,6 +122,16 @@ function getScopeOrder(scope: string): number {
   return Number.isFinite(numericScope) ? 99 + numericScope : 999;
 }
 
+function getLevelMarkerClass(level: FaEnums.RbacMenuLevelEnum): string {
+  if (level === FaEnums.RbacMenuLevelEnum.APP) return 'tenant-permission-panel__level-marker--module';
+  if (level === FaEnums.RbacMenuLevelEnum.BUTTON) return 'tenant-permission-panel__level-marker--button';
+  return 'tenant-permission-panel__level-marker--menu';
+}
+
+function LevelMarker({ level }: { level: FaEnums.RbacMenuLevelEnum }) {
+  return <span className={clsx('tenant-permission-panel__level-marker', getLevelMarkerClass(level))} aria-hidden="true" />;
+}
+
 function buildScopeGroups(tree: MenuNode[]): ScopeGroup[] {
   const groupMap = new Map<string, MenuNode[]>();
 
@@ -165,12 +175,13 @@ interface PermissionPageCardProps {
   node: MenuNode;
   sourceNode: MenuNode;
   selectedKeys: Set<MenuKey>;
+  requiredKeys: Set<MenuKey>;
   onToggle: (node: MenuNode) => void;
 }
 
-function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: PermissionPageCardProps) {
+function PermissionPageCard({ node, sourceNode, selectedKeys, requiredKeys, onToggle }: PermissionPageCardProps) {
   const state = getCheckState(sourceNode, selectedKeys);
-  const required = Boolean(sourceNode.sourceData.tenantRequired);
+  const required = requiredKeys.has(getNodeKey(sourceNode));
   const buttonNodes = getButtonChildren(node);
   const sourceButtonNodes = getButtonChildren(sourceNode);
   const sourceButtonMap = new Map(sourceButtonNodes.map((button) => [getNodeKey(button), button]));
@@ -180,12 +191,15 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: Permis
     <article className={clsx('tenant-permission-panel__page-card', buttonNodes.length === 0 && 'is-simple')}>
       <div className="tenant-permission-panel__page-header">
         <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(sourceNode)}>
-          <span className="tenant-permission-panel__page-title">{node.name}</span>
-          {required && (
-            <Tag color="gold" icon={<LockOutlined />}>
-              必选
-            </Tag>
-          )}
+          <span className="tenant-permission-panel__check-label">
+            <LevelMarker level={sourceNode.sourceData.level} />
+            <span className="tenant-permission-panel__page-title">{node.name}</span>
+            {required && (
+              <Tag color="gold" icon={<LockOutlined />}>
+                必选
+              </Tag>
+            )}
+          </span>
         </Checkbox>
         {buttonNodes.length > 0 && (
           <>
@@ -204,16 +218,14 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: Permis
           {buttonNodes.map((button) => {
             const buttonState = getCheckState(button, selectedKeys);
             const sourceButton = sourceButtonMap.get(getNodeKey(button)) || button;
-            const buttonRequired = Boolean(sourceButton.sourceData.tenantRequired);
+            const buttonRequired = requiredKeys.has(getNodeKey(sourceButton));
             return (
-              <Checkbox
-                key={getNodeKey(button)}
-                disabled={buttonRequired}
-                checked={buttonState.checked}
-                onChange={() => onToggle(sourceButton)}
-              >
-                {button.name}
-                {buttonRequired && <LockOutlined aria-label="平台必选权限" className="fa-ml4" />}
+              <Checkbox key={getNodeKey(button)} disabled={buttonRequired} checked={buttonState.checked} onChange={() => onToggle(sourceButton)}>
+                <span className="tenant-permission-panel__check-label">
+                  <LevelMarker level={sourceButton.sourceData.level} />
+                  <span className="tenant-permission-panel__button-title">{button.name}</span>
+                  {buttonRequired && <LockOutlined aria-label="平台必选权限" className="fa-ml4" />}
+                </span>
               </Checkbox>
             );
           })}
@@ -226,23 +238,27 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, onToggle }: Permis
 interface PermissionGroupHeaderProps {
   node: MenuNode;
   selectedKeys: Set<MenuKey>;
+  requiredKeys: Set<MenuKey>;
   onToggle: (node: MenuNode) => void;
 }
 
-function PermissionGroupHeader({ node, selectedKeys, onToggle }: PermissionGroupHeaderProps) {
+function PermissionGroupHeader({ node, selectedKeys, requiredKeys, onToggle }: PermissionGroupHeaderProps) {
   const state = getCheckState(node, selectedKeys);
-  const required = Boolean(node.sourceData.tenantRequired);
+  const required = requiredKeys.has(getNodeKey(node));
   const stats = getStats([node], selectedKeys);
 
   return (
     <div className="tenant-permission-panel__group-header">
       <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(node)}>
-        <span className="tenant-permission-panel__group-title">{node.name}</span>
-        {required && (
-          <Tag color="gold" icon={<LockOutlined />}>
-            必选
-          </Tag>
-        )}
+        <span className="tenant-permission-panel__check-label">
+          <LevelMarker level={node.sourceData.level} />
+          <span className="tenant-permission-panel__group-title">{node.name}</span>
+          {required && (
+            <Tag color="gold" icon={<LockOutlined />}>
+              必选
+            </Tag>
+          )}
+        </span>
       </Checkbox>
       <span className="tenant-permission-panel__group-count">
         已配置 {stats.selected}/{stats.total}
@@ -254,22 +270,13 @@ function PermissionGroupHeader({ node, selectedKeys, onToggle }: PermissionGroup
   );
 }
 
-export default function TenantPermissionPanel({
-  tree,
-  requiredMenuIds,
-  checkedMenuIds,
-  loading = false,
-  onCheckedMenuIdsChange,
-}: TenantPermissionPanelProps) {
+export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMenuIds, loading = false, onCheckedMenuIdsChange }: TenantPermissionPanelProps) {
   const [activeScopeKey, setActiveScopeKey] = useState('');
   const [activeModuleKey, setActiveModuleKey] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [selectedOnly, setSelectedOnly] = useState(false);
   const requiredKeys = useMemo(() => new Set(requiredMenuIds.map((key) => String(key))), [requiredMenuIds]);
-  const selectedKeys = useMemo(
-    () => new Set([...requiredMenuIds, ...checkedMenuIds].map((key) => String(key))),
-    [checkedMenuIds, requiredMenuIds],
-  );
+  const selectedKeys = useMemo(() => new Set([...requiredMenuIds, ...checkedMenuIds].map((key) => String(key))), [checkedMenuIds, requiredMenuIds]);
 
   const scopeGroups = useMemo(() => buildScopeGroups(tree), [tree]);
   const nodeMap = useMemo(() => {
@@ -339,10 +346,10 @@ export default function TenantPermissionPanel({
 
     return (
       <Fragment key={getNodeKey(node)}>
-        {isPage && <PermissionPageCard node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} onToggle={toggleNode} />}
+        {isPage && <PermissionPageCard node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />}
         {menuChildren.length > 0 && (
           <section className="tenant-permission-panel__group">
-            {!isRoot && <PermissionGroupHeader node={sourceNode} selectedKeys={selectedKeys} onToggle={toggleNode} />}
+            {!isRoot && <PermissionGroupHeader node={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />}
             <div className="tenant-permission-panel__card-grid">{menuChildren.map((child) => renderMenuNode(child))}</div>
           </section>
         )}
@@ -402,7 +409,10 @@ export default function TenantPermissionPanel({
                     aria-selected={active}
                     onClick={() => setActiveModuleKey(getNodeKey(module))}
                   >
-                    <span>{module.name}</span>
+                    <span className="tenant-permission-panel__check-label">
+                      <LevelMarker level={module.sourceData.level} />
+                      <span>{module.name}</span>
+                    </span>
                     <span className="tenant-permission-panel__module-count">{stats.selected}</span>
                   </button>
                 );
@@ -440,7 +450,10 @@ export default function TenantPermissionPanel({
             <>
               <div className="tenant-permission-panel__module-header">
                 <div>
-                  <div className="tenant-permission-panel__module-title">{activeModule.name}</div>
+                  <div className="tenant-permission-panel__module-title">
+                    <LevelMarker level={activeModule.sourceData.level} />
+                    <span>{activeModule.name}</span>
+                  </div>
                   <div className="tenant-permission-panel__module-hint">按页面配置访问权限，页面下的按钮权限可单独勾选</div>
                 </div>
                 <div className="tenant-permission-panel__module-actions">

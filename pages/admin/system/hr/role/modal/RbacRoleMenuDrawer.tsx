@@ -1,10 +1,9 @@
-import { MobileOutlined } from '@ant-design/icons';
-import { type Fa, FaUtils, treeUtils, useApiLoading } from '@fa/ui';
+import { type Fa, FaUtils, useApiLoading } from '@fa/ui';
+import { PermissionPanel } from '@features/fa-admin-pages/components';
 import { rbacMenuApi, rbacRoleMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
-import { Button, Drawer, type DrawerProps, Tree } from 'antd';
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import { FaEnums, type Rbac } from '@/types';
+import { Button, Drawer, type DrawerProps } from 'antd';
+import { cloneElement, isValidElement, type Key, type ReactElement, useState } from 'react';
+import type { Rbac } from '@/types';
 
 export interface RbacRoleMenuDrawerProps extends DrawerProps {
   record: Rbac.RbacRole;
@@ -25,16 +24,8 @@ function filterMenuTree(tree: Fa.TreeNode<Rbac.RbacMenu>[], allowedMenuIds: Set<
 export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacRoleMenuDrawerProps) {
   const [tree, setTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
   const [checkedMenuIds, setCheckedMenuIds] = useState<number[]>([]); // 选中的菜单ID
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]); // 根据选中的菜单ID，计算出的展示全选中的Tree节点ID（过滤掉半选中的节点ID）
 
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const cks = treeUtils.calCheckedKey(tree, checkedMenuIds);
-    // const diffIds = difference(checkedKeys, cks)
-    // console.log('tree', tree, 'checkedMenuIds', checkedMenuIds, 'cks', cks, 'diffIds', diffIds)
-    setCheckedKeys(cks);
-  }, [tree, checkedMenuIds]);
 
   async function refreshData() {
     const isTenantRole = record.type === 3 || Boolean(record.tenantId);
@@ -66,19 +57,28 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
     await refreshData();
   }
 
+  const triggerDom = isValidElement(children) ? (
+    cloneElement(children as ReactElement<{ onClick?: () => void }>, { onClick: () => void showModal() })
+  ) : (
+    <Button type="link" onClick={() => void showModal()}>
+      {children}
+    </Button>
+  );
+
   const loadingKeys = [rbacRoleMenuApi.getUrl('updateRoleMenu'), rbacRoleMenuApi.getUrl(`getRoleMenu/${record.id}`)];
+  loadingKeys.push(rbacMenuApi.getUrl('getTree'));
   if ((record.type === 3 || record.tenantId) && record.tenantId) {
     loadingKeys.push(tenantPermissionApi.getUrl(`getMenuIds/${record.tenantId}`));
   }
   const loading = useApiLoading(loadingKeys);
   return (
     <span>
-      <span onClick={showModal}>{children}</span>
+      {triggerDom}
       <Drawer
         title="角色权限设置"
         open={open}
         onClose={() => setOpen(false)}
-        defaultSize={600}
+        defaultSize={1200}
         resizable
         extra={
           <Button size="small" type="primary" onClick={handleSave} loading={loading}>
@@ -87,23 +87,12 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
         }
         {...props}
       >
-        <Tree
-          checkable
-          treeData={tree}
-          fieldNames={{ title: 'name', key: 'id' }}
-          checkedKeys={checkedKeys}
-          onCheck={(checked: any, e: any) => {
-            // console.log('checked', checked, 'e', e)
-            setCheckedMenuIds([...(checked || []), ...(e.halfCheckedKeys || [])]);
-          }}
-          titleRender={(node) => {
-            return (
-              <div className="fa-flex-row fa-flex-row-center">
-                {node.level === 1 && node.sourceData.scope === FaEnums.RbacMenuScopeEnum.APP && <MobileOutlined />}
-                <div>{node.name}</div>
-              </div>
-            );
-          }}
+        <PermissionPanel
+          tree={tree}
+          requiredMenuIds={[]}
+          checkedMenuIds={checkedMenuIds}
+          loading={loading}
+          onCheckedMenuIdsChange={(keys: Key[]) => setCheckedMenuIds(keys.map(Number))}
         />
       </Drawer>
     </span>
