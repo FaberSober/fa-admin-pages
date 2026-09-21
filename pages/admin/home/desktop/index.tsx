@@ -45,6 +45,7 @@ export default function Desktop() {
   const [open, setOpen] = useState(false);
 
   const inIds: string[] = layout.map((i) => i.i);
+  const availableCubeIds = new Set(allLayout.map((item) => item.i));
 
   if (initializing || initializationError) {
     return (
@@ -62,14 +63,14 @@ export default function Desktop() {
           layout={layout}
           renderItem={(i) => {
             const Component = (cubes as any)[i.i];
-            if (Component) {
+            if (Component && availableCubeIds.has(i.i)) {
               return (
                 <FaFlashCard title={Component.title} titleRender={Component.titleRender} hideTitle={!Component.showTitle}>
                   <Component />
                 </FaFlashCard>
               );
             }
-            return <FaFlashCard>Component {i.i} Not Found</FaFlashCard>;
+            return <FaFlashCard>组件 {i.i} 当前不可用</FaFlashCard>;
           }}
           onLayoutChange={onLayoutChange}
           rowHeight={20}
