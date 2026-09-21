@@ -22,13 +22,17 @@
 }
 
 .fa-cube-grid-item {
-  max-width: 200px;
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1.5px solid var(--fa-border-color, #e5e7eb);
   background-color: var(--fa-bg-color, #fff);
+  color: var(--fa-text-color, #1a1a1a);
   cursor: pointer;
-  transition: all 0.2s;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -37,6 +41,11 @@
   &:hover {
     border-color: var(--primary-color, #006be6);
     background-color: var(--fa-bg-color-hover, #f5f7ff);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ant-color-primary, var(--primary-color, #006be6));
+    outline-offset: 2px;
   }
 
   &.selected {
@@ -59,9 +68,9 @@
 }
 
 .fa-cube-grid-item-title {
+  display: block;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--fa-text-color, #1a1a1a);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -79,4 +88,10 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-cube-grid-item {
+    transition: none;
+  }
 }

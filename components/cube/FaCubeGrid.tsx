@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
-import { isNil } from 'lodash';
-import { Empty, Input, Segmented } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import { Empty, Input, Segmented } from 'antd';
+import { isNil } from 'lodash';
+import { useMemo, useState } from 'react';
 import './FaCubeGrid.scss';
 
 export interface FaCubeGridItem {
-  i: string;  // 组件唯一key
+  i: string; // 组件唯一key
 }
 
 export interface FaCubeGridProps {
@@ -45,22 +45,14 @@ export default function FaCubeGrid({ allLayout, cubes, selectedIds, onAdd, onRem
       if (filter === 'available' && selected) return false;
 
       if (!normalizedKeyword) return true;
-      return [Component.title, Component.description]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(normalizedKeyword));
+      return [Component.title, Component.description].filter(Boolean).some((value) => String(value).toLowerCase().includes(normalizedKeyword));
     });
   }, [allLayout, cubes, filter, keyword, selectedIds]);
 
   return (
     <>
       <div className="fa-cube-grid-toolbar">
-        <Input
-          allowClear
-          prefix={<SearchOutlined />}
-          placeholder="搜索组件名称或说明"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-        />
+        <Input allowClear prefix={<SearchOutlined />} placeholder="搜索组件名称或说明" value={keyword} onChange={(event) => setKeyword(event.target.value)} />
         <Segmented
           block
           value={filter}
@@ -71,7 +63,9 @@ export default function FaCubeGrid({ allLayout, cubes, selectedIds, onAdd, onRem
           ]}
           onChange={(value) => setFilter(value as CubeFilter)}
         />
-        <div className="fa-cube-grid-summary">已添加 {selectedCount} / {allLayout.length} 个组件</div>
+        <div className="fa-cube-grid-summary">
+          已添加 {selectedCount} / {allLayout.length} 个组件
+        </div>
       </div>
 
       {filteredLayout.length > 0 ? (
@@ -81,9 +75,12 @@ export default function FaCubeGrid({ allLayout, cubes, selectedIds, onAdd, onRem
             if (isNil(Component)) return null;
             const sel = selectedIds.indexOf(item.i) > -1;
             return (
-              <div
+              <button
+                type="button"
                 key={item.i}
                 className={`fa-cube-grid-item${sel ? ' selected' : ''}`}
+                aria-label={`${sel ? '移除' : '添加'}组件：${Component.title}${Component.description ? `，${Component.description}` : ''}`}
+                aria-pressed={sel}
                 onClick={() => {
                   if (sel) {
                     onRemove(item.i);
@@ -92,21 +89,26 @@ export default function FaCubeGrid({ allLayout, cubes, selectedIds, onAdd, onRem
                   }
                 }}
               >
-                {sel && <span className="fa-cube-grid-item-check">✓</span>}
-                <div className={`fa-cube-grid-item-title${sel ? ' has-check' : ''}`}>
-                  {Component.title}
-                </div>
-                {Component.description && (
-                  <div className="fa-cube-grid-item-desc">
-                    {Component.description}
-                  </div>
+                {sel && (
+                  <span className="fa-cube-grid-item-check" aria-hidden="true">
+                    ✓
+                  </span>
                 )}
-              </div>
+                <span className={`fa-cube-grid-item-title${sel ? ' has-check' : ''}`}>{Component.title}</span>
+                {Component.description && <span className="fa-cube-grid-item-desc">{Component.description}</span>}
+              </button>
             );
           })}
         </div>
       ) : (
-        <Empty className="fa-cube-grid-empty" image={Empty.PRESENTED_IMAGE_SIMPLE} description={keyword ? '没有找到匹配的组件' : '暂无可用组件'} />
+        <div className="fa-cube-grid-empty" aria-live="polite">
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              keyword.trim() ? '没有找到匹配的组件' : filter === 'added' ? '暂无已添加组件' : filter === 'available' ? '暂无未添加组件' : '暂无可用组件'
+            }
+          />
+        </div>
       )}
     </>
   );
