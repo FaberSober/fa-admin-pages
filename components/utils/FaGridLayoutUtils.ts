@@ -26,6 +26,8 @@ export interface CubeItem {
   h: number;
 }
 
+export type FaGridLayoutSaveStatus = 'saved' | 'saving' | 'error';
+
 /**
  * 解析homecubes类似组件输出全部布局配置
  * @param cubes
@@ -112,7 +114,7 @@ export function useGridLayoutConfig(cubes: any, biz: string, type: string, defau
   const [initializing, setInitializing] = useState(true);
   const [initializationError, setInitializationError] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [saveStatus, setSaveStatus] = useState<FaGridLayoutSaveStatus>('saved');
   const configRef = useRef<Admin.Config<LayoutItem[]>>();
   const initializingRef = useRef(true);
   const skipInitialLayoutChangeRef = useRef(false);
