@@ -58,7 +58,7 @@ export default function Analysis() {
           <Button onClick={() => onLayoutChange([])}>清空</Button>
           <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
           <Button onClick={handleClearAllUserConfig} danger>清空全部用户缓存</Button>
-          <ExportAndImportBtn filename="分析页" layout={FaUtils.tryFormatJson(JSON.stringify(layout))} onUpload={(v) => onLayoutChange(JSON.parse(v))} />
+          <ExportAndImportBtn filename="分析页" layout={FaUtils.tryFormatJson(JSON.stringify(layout))} allowedIds={Object.keys(cubes)} onUpload={onLayoutChange} />
         </Space>
         <FaCubeGrid
           allLayout={allLayout}
