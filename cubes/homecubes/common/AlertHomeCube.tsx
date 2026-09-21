@@ -16,7 +16,7 @@ export function AlertHomeCube() {
   }, [])
 
   const refreshData = () => {
-    alertApi.list({ query: {}, sorter: 'ID DESC' }).then(res => {
+    alertApi.list({ query: { deal: false }, sorter: 'ID DESC' }).then(res => {
       setAllAlerts(res.data);
     })
   }
@@ -25,6 +25,7 @@ export function AlertHomeCube() {
     <div className="fa-full-content">
       <FaScrollList
         list={allAlerts}
+        interval={1500}
         renderItem={(item, index, seq) => {
           return (
             <AlertModal
