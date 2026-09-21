@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { telemetry } from './index';
+import { telemetry } from './bootstrap';
 
 interface Props {
   children: ReactNode;

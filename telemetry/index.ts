@@ -1,8 +1,6 @@
-import { TelemetryClient } from './client';
-
-export const telemetry = new TelemetryClient();
-
+export { initializeTelemetry, telemetry } from './bootstrap';
 export { TelemetryErrorBoundary } from './error-boundary';
+export { TelemetryPageTracker, TelemetryProvider } from './provider';
 
 export type {
   TelemetryBasePayload,
