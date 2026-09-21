@@ -1,4 +1,4 @@
-import { FaUtils, useApiLoading } from '@fa/ui';
+import { Fa, FaUtils, useApiLoading } from '@fa/ui';
 import MenuLayoutContext from '@features/fa-admin-pages/layout/menu/context/MenuLayoutContext';
 import { configApi } from '@features/fa-admin-pages/services';
 import { Modal } from 'antd';
@@ -133,29 +133,29 @@ export function useGridLayoutConfig(
   const pendingLayoutRef = useRef<Layout | undefined>(undefined);
   const failedLayoutRef = useRef<Layout | undefined>(undefined);
 
+  function applyLayout(nextLayout: Layout, nextConfig?: Admin.Config<LayoutItem[]>) {
+    skipInitialLayoutChangeRef.current = nextLayout.length > 0;
+    configRef.current = nextConfig;
+    setConfig(nextConfig);
+    setLayout(nextLayout);
+    initializingRef.current = false;
+  }
+
   useEffect(() => {
     initializingRef.current = true;
     skipInitialLayoutChangeRef.current = false;
     controlledLayoutRef.current = undefined;
 
-    const applyInitialLayout = (nextLayout: Layout, nextConfig?: Admin.Config<LayoutItem[]>) => {
-      skipInitialLayoutChangeRef.current = nextLayout.length > 0;
-      configRef.current = nextConfig;
-      setConfig(nextConfig);
-      setLayout(nextLayout);
-      initializingRef.current = false;
-    };
-
     configApi.getOne(biz, type).then((res) => {
       if (res.data) {
-        applyInitialLayout(res.data.data, res.data);
+        applyLayout(res.data.data, res.data);
         return;
       }
 
       // 未找到，去查找全局是否有配置
       return configApi.getOneGlobal(biz, type).then((res1) => {
         const globalLayout = res1.data?.data;
-        applyInitialLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+        applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
       });
     }).catch(() => {
       // 请求层负责错误提示；初始化失败后允许用户继续操作布局。
@@ -268,7 +268,25 @@ export function useGridLayoutConfig(
         const params = {
           query: { biz, type },
         };
-        return configApi.removeByQuery(params).then((res) => FaUtils.showResponse(res, '清空全部用户缓存'));
+        return configApi.removeByQuery(params).then((res) => {
+          FaUtils.showResponse(res, '清空全部用户缓存');
+          if (res.status !== Fa.RES_CODE.OK) return;
+
+          initializingRef.current = true;
+          skipInitialLayoutChangeRef.current = false;
+          controlledLayoutRef.current = undefined;
+          pendingLayoutRef.current = undefined;
+          failedLayoutRef.current = undefined;
+          configRef.current = undefined;
+          setConfig(undefined);
+
+          return configApi.getOneGlobal(biz, type).then((globalRes) => {
+            const globalLayout = globalRes.data?.data;
+            applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+          }).catch(() => {
+            applyLayout(defaultLayout);
+          });
+        });
       },
     });
   }
