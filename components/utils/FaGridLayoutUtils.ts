@@ -4,7 +4,7 @@ import { configApi } from '@features/fa-admin-pages/services';
 import { Modal } from 'antd';
 import { each, isEqual } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
-import type { Layout, LayoutItem } from 'react-grid-layout';
+import { collides, type Layout, type LayoutItem } from 'react-grid-layout';
 import type { Admin } from '@/types';
 
 /**
@@ -66,45 +66,35 @@ export function useAllLayout(cubes: CubeItem[]): { allLayout: LayoutItem[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|number) {
+export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|number): Layout {
   const Component = (cubes as any)[addId];
+  if (
+    !Component ||
+    typeof Component.displayName !== 'string' ||
+    !Number.isInteger(Component.w) ||
+    !Number.isInteger(Component.h) ||
+    Component.w <= 0 ||
+    Component.w > 24 ||
+    Component.h <= 0
+  ) {
+    return layout;
+  }
 
-  let x = 0;
-  let y = 0;
-
-  // 循环layout找到摆放位置
-  each(layout, (l) => {
-    const tryX = l.x + l.w;
-
-    // 已经循环到下一行了，需要从这一行的起始x=0处进行比对
-    if (l.y > y) {
-      x = 0;
-      y = l.y;
+  // ponytail: first-fit scan is O(rows * cols * layout.length), sufficient for the small workbench layout.
+  for (let y = 0; ; y += 1) {
+    for (let x = 0; x + Component.w <= 24; x += 1) {
+      const candidate = {
+        i: Component.displayName,
+        w: Component.w,
+        h: Component.h,
+        x,
+        y,
+      };
+      if (!layout.some((item) => collides(item, candidate))) {
+        return [...layout, Object.assign(candidate, { id: FaUtils.uuid() })];
+      }
     }
-
-    if (tryX + Component.w > 24) {
-      // 本行已经摆放不下了，需要摆放到下一行
-      x = 0;
-      y = l.y + l.h; // y的下一行位置
-      return;
-    }
-
-    // 本行可以摆的下
-    x = tryX;
-    y = l.y;
-  });
-
-  return [
-    ...layout,
-    {
-      id: FaUtils.uuid(),
-      i: Component.displayName,
-      w: Component.w,
-      h: Component.h,
-      x: x,
-      y: y,
-    },
-  ];
+  }
 }
 
 /** 按组件声明的尺寸生成默认布局。 */
