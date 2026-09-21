@@ -113,6 +113,12 @@ export default function EchartsLine({ title, subTitle, dataX, dataY, unit, style
   }, [themeDark, restOption]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
 
     // @ts-ignore

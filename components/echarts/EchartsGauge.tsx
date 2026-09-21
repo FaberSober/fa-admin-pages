@@ -159,6 +159,12 @@ export default function EchartsGauge({ min, max, value, unit, restOption, style 
   }, [themeDark]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
 
     // @ts-ignore

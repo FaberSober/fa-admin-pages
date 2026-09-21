@@ -88,6 +88,12 @@ export default function EchartsPie({ title, subTitle, data, dataTitle, style, pi
   }, [themeDark]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
 
     chartRef.current!.setOption({

@@ -106,6 +106,12 @@ export default function EchartsBar({ title, subTitle, data, dataTitle, unit, bar
   }, [themeDark, options]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
 
     // @ts-ignore

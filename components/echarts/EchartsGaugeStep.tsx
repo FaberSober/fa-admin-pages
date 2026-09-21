@@ -118,6 +118,12 @@ export default function EchartsGaugeStep({ min, max, value, unit, restOption, st
   }, [themeDark]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
 
     // @ts-ignore

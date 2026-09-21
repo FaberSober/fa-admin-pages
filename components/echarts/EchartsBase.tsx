@@ -49,6 +49,12 @@ export default function EchartsBase({ option, style, dark }: EchartsBaseProps) {
   }, [themeDark]);
 
   useEffect(() => {
+    return () => {
+      chartRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!ready) return;
     if (option === undefined) return;
 
