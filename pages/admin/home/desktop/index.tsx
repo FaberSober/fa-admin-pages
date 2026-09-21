@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import * as cubes from '@/cubes/homecubes';
-import { Alert, Button, FloatButton, Space, Spin } from 'antd';
-import { BaseDrawer, FaFlashCard, FaUtils } from '@fa/ui';
 import { EditOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
-import ExportAndImportBtn from '@features/fa-admin-pages/components/utils/ExportAndImportBtn';
+import { BaseDrawer, FaFlashCard, FaUtils } from '@fa/ui';
+import FaCubeGrid from '@features/fa-admin-pages/components/cube/FaCubeGrid';
 import { FaGridLayout } from '@features/fa-admin-pages/components/grid/FaGridLayout';
 import { FaGridLayoutUtils } from '@features/fa-admin-pages/components/utils';
-import FaCubeGrid from '@features/fa-admin-pages/components/cube/FaCubeGrid';
+import ExportAndImportBtn from '@features/fa-admin-pages/components/utils/ExportAndImportBtn';
+import { Alert, Button, Divider, FloatButton, Space, Spin } from 'antd';
+import { useState } from 'react';
 import type { Layout } from 'react-grid-layout';
+import * as cubes from '@/cubes/homecubes';
 
 const biz = 'HOME_LAYOUT';
 const type = 'LAYOUT';
@@ -19,8 +19,7 @@ function normalizeLegacyGlobalLayout(layout: Layout): Layout {
   const notice = layout.find((item) => item.i === 'AdminNoticeCube');
   const alert = layout.find((item) => item.i === 'AlertHomeCube');
 
-  const isLegacyDefault =
-    banner?.x === 0 && banner.w === 16 && notice?.x === 0 && notice.w === 8 && alert?.x === 8 && alert.w === 8;
+  const isLegacyDefault = banner?.x === 0 && banner.w === 16 && notice?.x === 0 && notice.w === 8 && alert?.x === 8 && alert.w === 8;
 
   return isLegacyDefault ? layout.map((item) => ({ ...item, x: (item.x * 3) / 2, w: (item.w * 3) / 2 })) : layout;
 }
@@ -32,13 +31,22 @@ function normalizeLegacyGlobalLayout(layout: Layout): Layout {
  */
 export default function Desktop() {
   const defaultLayout = FaGridLayoutUtils.createDefaultLayout(cubes as any, defaultCubeIds);
-  const { layout, initializing, initializationError, saveError, loading, retryInitialization, retryLayout, onLayoutChange, handleAdd, handleDel, handleSaveCurAsDefault, handleClearAllUserConfig } = FaGridLayoutUtils.useGridLayoutConfig(
-    cubes,
-    biz,
-    type,
-    defaultLayout,
-    normalizeLegacyGlobalLayout,
-  );
+  const {
+    layout,
+    initializing,
+    initializationError,
+    saveError,
+    saveStatus,
+    loading,
+    retryInitialization,
+    retryLayout,
+    onLayoutChange,
+    handleAdd,
+    handleDel,
+    handleClearLayout,
+    handleSaveCurAsDefault,
+    handleClearAllUserConfig,
+  } = FaGridLayoutUtils.useGridLayoutConfig(cubes, biz, type, defaultLayout, normalizeLegacyGlobalLayout);
 
   const { allLayout } = FaGridLayoutUtils.useAllLayout(cubes as any);
   const [editing, setEditing] = useState(false);
@@ -50,14 +58,33 @@ export default function Desktop() {
   if (initializing || initializationError) {
     return (
       <div className="fa-full-content-p12">
-        {initializing ? <Spin tip="正在加载工作台..." /> : <Alert type="error" showIcon title="工作台加载失败" description="请重试，加载成功后再进行布局调整。" action={<Button onClick={retryInitialization}>重试</Button>} />}
+        {initializing ? (
+          <Spin tip="正在加载工作台..." />
+        ) : (
+          <Alert
+            type="error"
+            showIcon
+            title="工作台加载失败"
+            description="请重试，加载成功后再进行布局调整。"
+            action={<Button onClick={retryInitialization}>重试</Button>}
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className="fa-full-content-p12">
-      {saveError && <Alert type="error" showIcon title="工作台布局保存失败" description="当前调整尚未成功保存，请重试。" action={<Button onClick={retryLayout}>重试</Button>} style={{ marginBottom: 12 }} />}
+      {saveError && !open && (
+        <Alert
+          type="error"
+          showIcon
+          title="工作台布局保存失败"
+          description="当前调整尚未成功保存，请重试。"
+          action={<Button onClick={retryLayout}>重试</Button>}
+          style={{ marginBottom: 12 }}
+        />
+      )}
       <Spin spinning={loading}>
         <FaGridLayout
           layout={layout}
@@ -82,19 +109,46 @@ export default function Desktop() {
       <div style={{ height: 12, width: '100%' }} />
 
       <BaseDrawer open={open} title="添加组件" bodyStyle={{ padding: 0 }} onClose={() => setOpen(false)}>
-        <Space className="fa-p12" wrap>
-          <Button onClick={() => onLayoutChange([])}>清空</Button>
-          <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
-          <Button onClick={handleClearAllUserConfig} danger>清空全部用户缓存</Button>
-          <ExportAndImportBtn filename="工作台" layout={FaUtils.tryFormatJson(JSON.stringify(layout))} allowedIds={Object.keys(cubes)} onUpload={onLayoutChange} />
+        <Space direction="vertical" size="small" className="fa-p12">
+          <Space wrap>
+            <Button onClick={handleClearLayout} danger>
+              清空当前布局
+            </Button>
+            <Button onClick={handleSaveCurAsDefault}>保存当前为默认</Button>
+          </Space>
+          <Divider orientation="left" plain style={{ margin: '4px 0' }}>
+            高级操作
+          </Divider>
+          <Space wrap>
+            <ExportAndImportBtn
+              filename="工作台"
+              layout={FaUtils.tryFormatJson(JSON.stringify(layout))}
+              allowedIds={Object.keys(cubes)}
+              onUpload={onLayoutChange}
+            />
+            <Button onClick={handleClearAllUserConfig} danger>
+              清空全部用户缓存
+            </Button>
+          </Space>
         </Space>
-        <FaCubeGrid
-          allLayout={allLayout}
-          cubes={cubes as any}
-          selectedIds={inIds}
-          onAdd={handleAdd}
-          onRemove={handleDel}
-        />
+        <FaCubeGrid allLayout={allLayout} cubes={cubes as any} selectedIds={inIds} onAdd={handleAdd} onRemove={handleDel} />
+        <div className="fa-p12" aria-live="polite">
+          {saveStatus === 'saving' && <Alert type="info" showIcon message="保存中..." />}
+          {saveStatus === 'error' && (
+            <Alert
+              type="error"
+              showIcon
+              message="保存失败"
+              description="当前布局未成功保存，请重试。"
+              action={
+                <Button size="small" type="link" onClick={retryLayout}>
+                  重试
+                </Button>
+              }
+            />
+          )}
+          {saveStatus === 'saved' && <Alert type="success" showIcon message="已保存" />}
+        </div>
       </BaseDrawer>
 
       <FloatButton.Group shape="square">

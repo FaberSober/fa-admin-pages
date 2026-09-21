@@ -66,7 +66,7 @@ export function useAllLayout(cubes: CubeItem[]): { allLayout: LayoutItem[] } {
   return { allLayout };
 }
 
-export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string|number): Layout {
+export function calAddLayout(cubes: CubeItem[], layout: Layout, addId: string | number): Layout {
   const Component = (cubes as any)[addId];
   if (
     !Component ||
@@ -104,20 +104,15 @@ export function createDefaultLayout(cubes: CubeItem[], ids: Array<string | numbe
   }, []);
 }
 
-export function useGridLayoutConfig(
-  cubes: any,
-  biz: string,
-  type: string,
-  defaultLayout: LayoutItem[],
-  normalizeGlobalLayout?: (layout: Layout) => Layout,
-) {
-  const loading = useApiLoading([ configApi.getUrl('save'), configApi.getUrl('update')]);
+export function useGridLayoutConfig(cubes: any, biz: string, type: string, defaultLayout: LayoutItem[], normalizeGlobalLayout?: (layout: Layout) => Layout) {
+  const loading = useApiLoading([configApi.getUrl('save'), configApi.getUrl('update')]);
 
   const [config, setConfig] = useState<Admin.Config<LayoutItem[]>>();
   const [layout, setLayout] = useState<Layout>([]);
   const [initializing, setInitializing] = useState(true);
   const [initializationError, setInitializationError] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const configRef = useRef<Admin.Config<LayoutItem[]>>();
   const initializingRef = useRef(true);
   const skipInitialLayoutChangeRef = useRef(false);
@@ -133,6 +128,7 @@ export function useGridLayoutConfig(
     setLayout(nextLayout);
     setInitializationError(false);
     setSaveError(false);
+    setSaveStatus('saved');
     setInitializing(false);
     initializingRef.current = false;
   }
@@ -142,6 +138,7 @@ export function useGridLayoutConfig(
     setInitializing(true);
     setInitializationError(false);
     setSaveError(false);
+    setSaveStatus('saved');
     skipInitialLayoutChangeRef.current = false;
     controlledLayoutRef.current = undefined;
     pendingLayoutRef.current = undefined;
@@ -149,24 +146,27 @@ export function useGridLayoutConfig(
     configRef.current = undefined;
     setConfig(undefined);
 
-    configApi.getOne(biz, type).then((res) => {
-      if (res.status !== Fa.RES_CODE.OK) throw new Error(res.message);
-      if (res.data) {
-        applyLayout(res.data.data, res.data);
-        return;
-      }
+    configApi
+      .getOne(biz, type)
+      .then((res) => {
+        if (res.status !== Fa.RES_CODE.OK) throw new Error(res.message);
+        if (res.data) {
+          applyLayout(res.data.data, res.data);
+          return;
+        }
 
-      // 未找到，去查找全局是否有配置
-      return configApi.getOneGlobal(biz, type).then((res1) => {
-        if (res1.status !== Fa.RES_CODE.OK) throw new Error(res1.message);
-        const globalLayout = res1.data?.data;
-        applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+        // 未找到，去查找全局是否有配置
+        return configApi.getOneGlobal(biz, type).then((res1) => {
+          if (res1.status !== Fa.RES_CODE.OK) throw new Error(res1.message);
+          const globalLayout = res1.data?.data;
+          applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+        });
+      })
+      .catch(() => {
+        setInitializationError(true);
+        setInitializing(false);
+        initializingRef.current = false;
       });
-    }).catch(() => {
-      setInitializationError(true);
-      setInitializing(false);
-      initializingRef.current = false;
-    });
   }
 
   useEffect(() => {
@@ -175,15 +175,14 @@ export function useGridLayoutConfig(
 
   function submitLayout(nextLayout: Layout) {
     savingRef.current = true;
+    setSaveStatus('saving');
     const currentConfig = configRef.current;
     const params = {
       biz,
       type,
       data: nextLayout,
     };
-    const request = currentConfig
-      ? configApi.update(currentConfig.id, { id: currentConfig.id, ...params })
-      : configApi.save(params);
+    const request = currentConfig ? configApi.update(currentConfig.id, { id: currentConfig.id, ...params }) : configApi.save(params);
 
     request
       .then((res) => {
@@ -194,10 +193,12 @@ export function useGridLayoutConfig(
         }
         failedLayoutRef.current = undefined;
         setSaveError(false);
+        setSaveStatus('saved');
       })
       .catch(() => {
         failedLayoutRef.current = nextLayout;
         setSaveError(true);
+        setSaveStatus('error');
       })
       .finally(() => {
         savingRef.current = false;
@@ -250,7 +251,7 @@ export function useGridLayoutConfig(
    * 添加item到布局中
    * @param id
    */
-  function handleAdd(id: string|number) {
+  function handleAdd(id: string | number) {
     const newLayout = calAddLayout(cubes, layout, id);
     setLayout(newLayout);
   }
@@ -259,10 +260,23 @@ export function useGridLayoutConfig(
     setLayout(layout.filter((i) => i.i !== id));
   }
 
+  function handleClearLayout() {
+    Modal.confirm({
+      title: '确认清空当前布局？',
+      content: '当前页面的全部组件将被移除并立即保存，不影响其他页面。',
+      okText: '确认清空',
+      okButtonProps: { danger: true },
+      cancelText: '取消',
+      onOk: () => onLayoutChange([]),
+    });
+  }
+
   function handleSaveCurAsDefault() {
     Modal.confirm({
       title: '确认',
       content: '确认保存当前为默认配置，全局生效？',
+      okText: '保存为默认',
+      cancelText: '取消',
       onOk: () => {
         const params = {
           biz,
@@ -276,8 +290,11 @@ export function useGridLayoutConfig(
 
   function handleClearAllUserConfig() {
     Modal.confirm({
-      title: '确认',
-      content: '确认清空全部用户缓存？',
+      title: '确认清空全部用户缓存？',
+      content: '此操作会删除当前页面的全部用户布局缓存，并恢复全局或默认布局。',
+      okText: '确认清空',
+      okButtonProps: { danger: true },
+      cancelText: '取消',
       onOk: () => {
         const params = {
           query: { biz, type },
@@ -294,12 +311,15 @@ export function useGridLayoutConfig(
           configRef.current = undefined;
           setConfig(undefined);
 
-          return configApi.getOneGlobal(biz, type).then((globalRes) => {
-            const globalLayout = globalRes.data?.data;
-            applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
-          }).catch(() => {
-            applyLayout(defaultLayout);
-          });
+          return configApi
+            .getOneGlobal(biz, type)
+            .then((globalRes) => {
+              const globalLayout = globalRes.data?.data;
+              applyLayout(globalLayout ? (normalizeGlobalLayout?.(globalLayout) ?? globalLayout) : defaultLayout);
+            })
+            .catch(() => {
+              applyLayout(defaultLayout);
+            });
         });
       },
     });
@@ -311,6 +331,7 @@ export function useGridLayoutConfig(
     initializing,
     initializationError,
     saveError,
+    saveStatus,
     setLayout,
     loading,
     onLayoutChange,
@@ -318,6 +339,7 @@ export function useGridLayoutConfig(
     retryLayout,
     handleAdd,
     handleDel,
+    handleClearLayout,
     handleSaveCurAsDefault,
     handleClearAllUserConfig,
   };
