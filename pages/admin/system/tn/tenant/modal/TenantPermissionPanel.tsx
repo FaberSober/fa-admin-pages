@@ -1,6 +1,6 @@
 import { AppstoreOutlined, GlobalOutlined, LockOutlined, MobileOutlined, SearchOutlined } from '@ant-design/icons';
 import { type Fa, FaEnums } from '@fa/ui';
-import { Button, Checkbox, Empty, Input, Spin, Tag } from 'antd';
+import { Button, Checkbox, Empty, Input, Select, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import type { Key as ReactKey, ReactNode } from 'react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -9,6 +9,13 @@ import './TenantPermissionPanel.css';
 
 type MenuNode = Fa.TreeNode<Rbac.RbacMenu>;
 type MenuKey = string;
+type SelectionFilter = 'all' | 'selected' | 'unselected';
+
+const SELECTION_FILTER_OPTIONS: { value: SelectionFilter; label: string }[] = [
+  { value: 'all', label: '全部功能' },
+  { value: 'selected', label: '仅看已选' },
+  { value: 'unselected', label: '仅看未选' },
+];
 
 interface ScopeGroup {
   key: string;
@@ -152,18 +159,19 @@ function buildScopeGroups(tree: MenuNode[]): ScopeGroup[] {
     }));
 }
 
-function filterMenuNode(node: MenuNode, keyword: string, selectedOnly: boolean, selectedKeys: Set<MenuKey>): MenuNode | undefined {
+function filterMenuNode(node: MenuNode, keyword: string, selectionFilter: SelectionFilter, selectedKeys: Set<MenuKey>): MenuNode | undefined {
   const normalizedKeyword = keyword.trim().toLowerCase();
   const nodeMatches = !normalizedKeyword || node.name.toLowerCase().includes(normalizedKeyword);
   const visibleChildren = getChildren(node)
-    .map((child) => filterMenuNode(child, normalizedKeyword, selectedOnly, selectedKeys))
+    .map((child) => filterMenuNode(child, normalizedKeyword, selectionFilter, selectedKeys))
     .filter((child): child is MenuNode => Boolean(child));
   const nodeSelected = selectedKeys.has(getNodeKey(node));
+  const nodeMatchesSelection = selectionFilter === 'all' || (selectionFilter === 'selected' ? nodeSelected : !nodeSelected);
 
-  if (selectedOnly && !nodeSelected && visibleChildren.length === 0) return undefined;
+  if (!nodeMatchesSelection && visibleChildren.length === 0) return undefined;
   if (normalizedKeyword && !nodeMatches && visibleChildren.length === 0) return undefined;
-  if (!normalizedKeyword && !selectedOnly) return node;
-  if (nodeMatches && !selectedOnly) return node;
+  if (!normalizedKeyword && selectionFilter === 'all') return node;
+  if (nodeMatches && selectionFilter === 'all') return node;
 
   return {
     ...node,
@@ -185,7 +193,7 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, requiredKeys, onTo
   const buttonNodes = getButtonChildren(node);
   const sourceButtonNodes = getButtonChildren(sourceNode);
   const sourceButtonMap = new Map(sourceButtonNodes.map((button) => [getNodeKey(button), button]));
-  const buttonStats = getStats(sourceButtonNodes, selectedKeys);
+  const buttonStats = getStats(buttonNodes, selectedKeys);
 
   return (
     <article className={clsx('tenant-permission-panel__page-card', buttonNodes.length === 0 && 'is-simple')}>
@@ -237,19 +245,20 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, requiredKeys, onTo
 
 interface PermissionGroupHeaderProps {
   node: MenuNode;
+  sourceNode: MenuNode;
   selectedKeys: Set<MenuKey>;
   requiredKeys: Set<MenuKey>;
   onToggle: (node: MenuNode) => void;
 }
 
-function PermissionGroupHeader({ node, selectedKeys, requiredKeys, onToggle }: PermissionGroupHeaderProps) {
-  const state = getCheckState(node, selectedKeys);
-  const required = requiredKeys.has(getNodeKey(node));
+function PermissionGroupHeader({ node, sourceNode, selectedKeys, requiredKeys, onToggle }: PermissionGroupHeaderProps) {
+  const state = getCheckState(sourceNode, selectedKeys);
+  const required = requiredKeys.has(getNodeKey(sourceNode));
   const stats = getStats([node], selectedKeys);
 
   return (
     <div className="tenant-permission-panel__group-header">
-      <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(node)}>
+      <Checkbox disabled={required} checked={state.checked} indeterminate={state.indeterminate} onChange={() => onToggle(sourceNode)}>
         <span className="tenant-permission-panel__check-label">
           <LevelMarker level={node.sourceData.level} />
           <span className="tenant-permission-panel__group-title">{node.name}</span>
@@ -274,11 +283,10 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
   const [activeScopeKey, setActiveScopeKey] = useState('');
   const [activeModuleKey, setActiveModuleKey] = useState('');
   const [searchValue, setSearchValue] = useState('');
-  const [selectedOnly, setSelectedOnly] = useState(false);
+  const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>('all');
   const requiredKeys = useMemo(() => new Set(requiredMenuIds.map((key) => String(key))), [requiredMenuIds]);
   const selectedKeys = useMemo(() => new Set([...requiredMenuIds, ...checkedMenuIds].map((key) => String(key))), [checkedMenuIds, requiredMenuIds]);
 
-  const scopeGroups = useMemo(() => buildScopeGroups(tree), [tree]);
   const nodeMap = useMemo(() => {
     const map = new Map<MenuKey, MenuNode>();
     tree.flatMap(getAllNodes).forEach((node) => {
@@ -286,6 +294,11 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
     });
     return map;
   }, [tree]);
+  const filteredTree = useMemo(
+    () => tree.map((node) => filterMenuNode(node, searchValue, selectionFilter, selectedKeys)).filter((node): node is MenuNode => Boolean(node)),
+    [searchValue, selectedKeys, selectionFilter, tree],
+  );
+  const scopeGroups = useMemo(() => buildScopeGroups(filteredTree), [filteredTree]);
 
   useEffect(() => {
     if (scopeGroups.length === 0) {
@@ -307,12 +320,13 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
   }, [activeModuleKey, activeScope]);
 
   const activeModule = activeScope?.modules.find((module) => getNodeKey(module) === activeModuleKey);
-  const visibleModule = activeModule ? filterMenuNode(activeModule, searchValue, selectedOnly, selectedKeys) : undefined;
-  const globalStats = getStats(tree, selectedKeys);
-  const activeScopeStats = activeScope ? getStats(activeScope.modules, selectedKeys) : { total: 0, selected: 0 };
+  const activeModuleSource = activeModule ? nodeMap.get(getNodeKey(activeModule)) || activeModule : undefined;
+  const activeScopeSourceModules = activeScope?.modules.map((module) => nodeMap.get(getNodeKey(module)) || module) || [];
+  const globalStats = getStats(filteredTree, selectedKeys);
+  const activeScopeStats = activeScope ? getStats(activeScopeSourceModules, selectedKeys) : { total: 0, selected: 0 };
   const activeModuleStats = activeModule ? getStats([activeModule], selectedKeys) : { total: 0, selected: 0 };
-  const activeScopeKeys = activeScope ? getNodesKeys(activeScope.modules) : [];
-  const activeModuleKeys = activeModule ? getAllKeys(activeModule) : [];
+  const activeScopeKeys = getNodesKeys(activeScopeSourceModules);
+  const activeModuleKeys = activeModuleSource ? getAllKeys(activeModuleSource) : [];
   const scopeAllSelected = activeScopeKeys.length > 0 && activeScopeKeys.every((key) => selectedKeys.has(key));
   const moduleAllSelected = activeModuleKeys.length > 0 && activeModuleKeys.every((key) => selectedKeys.has(key));
 
@@ -349,7 +363,9 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
         {isPage && <PermissionPageCard node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />}
         {menuChildren.length > 0 && (
           <section className="tenant-permission-panel__group">
-            {!isRoot && <PermissionGroupHeader node={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />}
+            {!isRoot && (
+              <PermissionGroupHeader node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />
+            )}
             <div className="tenant-permission-panel__card-grid">{menuChildren.map((child) => renderMenuNode(child))}</div>
           </section>
         )}
@@ -366,6 +382,34 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
             <span className="tenant-permission-panel__summary-count">
               已选 {globalStats.selected} / {globalStats.total} 项
             </span>
+          </div>
+
+          <div className="tenant-permission-panel__filter-row">
+            <Input
+              allowClear
+              value={searchValue}
+              prefix={<SearchOutlined />}
+              placeholder="搜索菜单或权限按钮"
+              onChange={(event) => setSearchValue(event.target.value)}
+            />
+            <Select<SelectionFilter>
+              aria-label="权限筛选"
+              value={selectionFilter}
+              options={SELECTION_FILTER_OPTIONS}
+              onChange={setSelectionFilter}
+              style={{ width: 120 }}
+            />
+            <div className="tenant-permission-panel__filter-actions">
+              <span className="tenant-permission-panel__current-count">
+                当前终端已配置 {activeScopeStats.selected}/{activeScopeStats.total}
+              </span>
+              <Button type="link" size="small" disabled={!activeScope} onClick={toggleScope}>
+                {scopeAllSelected ? '取消全选' : '全选当前终端'}
+              </Button>
+              <Button type="link" danger size="small" disabled={!activeScopeStats.selected} onClick={() => updateKeys(activeScopeKeys, false)}>
+                清空当前终端
+              </Button>
+            </div>
           </div>
 
           <div className="tenant-permission-panel__scope-row">
@@ -419,34 +463,10 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
               })}
             </div>
           </div>
-
-          <div className="tenant-permission-panel__filter-row">
-            <Input
-              allowClear
-              value={searchValue}
-              prefix={<SearchOutlined />}
-              placeholder="搜索菜单或权限按钮"
-              onChange={(event) => setSearchValue(event.target.value)}
-            />
-            <Checkbox checked={selectedOnly} onChange={(event) => setSelectedOnly(event.target.checked)}>
-              仅看已选
-            </Checkbox>
-            <div className="tenant-permission-panel__filter-actions">
-              <span className="tenant-permission-panel__current-count">
-                当前终端已配置 {activeScopeStats.selected}/{activeScopeStats.total}
-              </span>
-              <Button type="link" size="small" disabled={!activeScope} onClick={toggleScope}>
-                {scopeAllSelected ? '取消全选' : '全选当前终端'}
-              </Button>
-              <Button type="link" danger size="small" disabled={!activeScopeStats.selected} onClick={() => updateKeys(activeScopeKeys, false)}>
-                清空当前终端
-              </Button>
-            </div>
-          </div>
         </div>
 
         <div className="tenant-permission-panel__content">
-          {activeModule && visibleModule ? (
+          {activeModule ? (
             <>
               <div className="tenant-permission-panel__module-header">
                 <div>
@@ -465,7 +485,7 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
                   </Button>
                 </div>
               </div>
-              <div className="tenant-permission-panel__card-grid tenant-permission-panel__card-grid--root">{renderMenuNode(visibleModule, true)}</div>
+              <div className="tenant-permission-panel__card-grid tenant-permission-panel__card-grid--root">{renderMenuNode(activeModule, true)}</div>
             </>
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={tree.length === 0 ? '暂未配置可用菜单' : '没有匹配的权限'} />

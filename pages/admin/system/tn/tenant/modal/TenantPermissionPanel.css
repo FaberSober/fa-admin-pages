@@ -190,6 +190,7 @@
   align-items: center;
   gap: 12px;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .tenant-permission-panel__filter-row > .ant-input-affix-wrapper {
