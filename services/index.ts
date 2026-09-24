@@ -19,6 +19,7 @@ export { default as licenseApi } from './base/admin/license';
 export { default as logApiApi } from './base/admin/logApi';
 export { default as logLoginApi } from './base/admin/logLogin';
 export { default as onlineUserApi } from './base/admin/onlineUser';
+export { default as remoteClientApi } from './base/admin/remoteClient';
 export { default as telemetryIssueApi } from './base/telemetry/issue';
 export { default as telemetryAppApi } from './base/telemetry/app';
 export { default as telemetryErrorEventApi } from './base/telemetry/errorEvent';
