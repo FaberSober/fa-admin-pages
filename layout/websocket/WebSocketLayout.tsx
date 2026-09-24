@@ -44,7 +44,7 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
             // 更新 Zustand Store 中的状态
             useWsStore.setState(state => ({ // 使用静态方法来避免触发本组件渲染
                 latestMessageObj: ret,
-                messageHistory: state.messageHistory.concat(latestMessage),
+                messageHistory: state.messageHistory.concat(latestMessage).slice(-500),
             }));
 
             // 保持通过 use-bus 分发事件的逻辑

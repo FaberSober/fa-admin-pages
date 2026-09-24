@@ -18,6 +18,17 @@ namespace RemoteClient {
     connectedAt: number;
     lastSeenAt: number;
   }
+
+  export interface LogEvent {
+    action: 'started' | 'stopped' | 'ended' | 'entry' | 'error';
+    clientId?: string;
+    sessionId?: string;
+    level?: 'DEBUG' | 'LOG' | 'INFO' | 'WARN' | 'ERROR';
+    source?: 'console' | 'runtime';
+    message?: string;
+    timestamp?: number;
+    reason?: string;
+  }
 }
 
 export default RemoteClient;

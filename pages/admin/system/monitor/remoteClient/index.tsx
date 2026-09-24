@@ -5,11 +5,13 @@ import { remoteClientApi } from '@features/fa-admin-pages/services';
 import type { RemoteClient } from '@features/fa-admin-pages/types';
 import { Alert, Button, Space, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import RemoteLogViewer from './components/RemoteLogViewer';
 
 const formatTime = (value: number | null | undefined) => (value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-');
 
 export default function RemoteClientList() {
+  const [selectedClient, setSelectedClient] = useState<RemoteClient.Client>();
   const loadPage = useCallback((params: Fa.BasePageProps) => remoteClientApi.page(params), []);
   const { handleTableChange, fetchPageList, loading, list, paginationProps } = useTableQueryParams<RemoteClient.Client>(loadPage, {}, '在线客户端');
   useAutoRefresh(5, fetchPageList);
@@ -25,6 +27,19 @@ export default function RemoteClientList() {
     { ...BaseTableUtils.genSimpleSorterColumn('设备', 'deviceModel', 150, false), ellipsis: true, render: (value: string | null) => value || '-' },
     { ...BaseTableUtils.genTimeSorterColumn('连接时间', 'connectedAt', 180, false), render: formatTime },
     { ...BaseTableUtils.genTimeSorterColumn('最近心跳', 'lastSeenAt', 180, false), render: formatTime },
+    {
+      title: '操作',
+      dataIndex: 'opr',
+      width: 110,
+      fixed: 'right',
+      tcRequired: true,
+      tcType: 'menu',
+      render: (_, record) => (
+        <Button type="link" size="small" onClick={() => setSelectedClient(record)}>
+          实时日志
+        </Button>
+      ),
+    },
   ];
 
   return (
@@ -54,6 +69,7 @@ export default function RemoteClientList() {
         showComplexQuery={false}
         showBatchDelBtn={false}
       />
+      {selectedClient && <RemoteLogViewer client={selectedClient} onClose={() => setSelectedClient(undefined)} />}
     </div>
   );
 }
