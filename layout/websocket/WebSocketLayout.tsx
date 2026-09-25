@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useInterval, useWebSocket } from 'ahooks';
 import { ReadyState } from 'ahooks/lib/useWebSocket';
-import { Fa, FaUtils, getToken } from '@fa/ui';
+import { Fa, FaUtils, getClientInstanceId, getToken } from '@fa/ui';
 import { dispatch } from 'use-bus';
 import { useWsStore } from './stores/useWsStore';
 
@@ -33,6 +33,21 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
         // 首次挂载时尝试连接（如果你希望自动连接）
         connect();
     }, [sendMessage, connect, disconnect, setHandlers]);
+
+    useEffect(() => {
+        if (readyState !== ReadyState.Open) return;
+        sendMessage(JSON.stringify({
+            type: 'RemoteClientRegister',
+            data: {
+                clientType: 'WEB',
+                clientInstanceId: getClientInstanceId(),
+                runtime: 'BROWSER',
+                appName: document.title || 'FA Admin',
+                release: String(window.FaVersionName || 'unknown'),
+                platform: navigator.platform || undefined,
+            },
+        }));
+    }, [readyState, sendMessage]);
 
     // 4. 监听消息变化和解析逻辑 (Hooks 监听)
     useEffect(() => {
