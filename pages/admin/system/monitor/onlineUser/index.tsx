@@ -1,76 +1,188 @@
-import { useCallback, useState } from 'react';
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Alert, Button, Form, Input, Modal, Select, Space, Tag } from 'antd';
-import { BaseBizTable, BaseTableUtils, type Fa, type FaberTable, FaUtils, ShiroPermissionContainer, useApiLoading, useTableQueryParams } from '@fa/ui';
-import dayjs from 'dayjs';
+import {
+  BaseBizTable,
+  BaseDrawer,
+  BaseTableUtils,
+  type Fa,
+  type FaberTable,
+  FaUtils,
+  ShiroPermissionContainer,
+  useApiLoading,
+  useTableQueryParams,
+} from '@fa/ui';
 import { onlineUserApi } from '@features/fa-admin-pages/services';
 import type { OnlineUser } from '@features/fa-admin-pages/types';
+import { Alert, Button, Empty, Form, Input, Modal, Space, Table, type TableColumnsType, Tag } from 'antd';
+import dayjs from 'dayjs';
+import { useCallback, useRef, useState } from 'react';
 
+const formatTime = (value: number | string | null | undefined) => {
+  if (value == null || value === '') return '-';
+  const timestamp = Number(value);
+  return Number.isFinite(timestamp) ? dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss') : '-';
+};
 const kickPermission = '/admin/system/monitor/onlineUser:kickout';
-const formatTime = (value: number | null) => (value == null ? '未知（已有会话）' : dayjs(value).format('YYYY-MM-DD HH:mm:ss'));
+const clientTypeLabels: Record<OnlineUser.PresenceDevice['clientType'], string> = {
+  WEB: 'Web',
+  MOBILE: 'APP',
+  DESKTOP: '桌面端',
+};
 
 export default function OnlineUserList() {
   const [form] = Form.useForm();
-  const [stats, setStats] = useState<OnlineUser.Stats>();
-  const kicking = useApiLoading(onlineUserApi.getUrl('kickout'));
-  const loadPage = useCallback(async (params: Fa.BasePageProps) => {
-    const [page, summary] = await Promise.all([onlineUserApi.page(params), onlineUserApi.stats()]);
-    setStats(summary.data);
-    return page;
-  }, []);
-  const { setFormValues, handleTableChange, fetchPageList, loading, list, paginationProps } =
-    useTableQueryParams<OnlineUser.Session>(loadPage, {}, '在线会话');
+  const [selectedUser, setSelectedUser] = useState<OnlineUser.PresenceSummary>();
+  const [devices, setDevices] = useState<OnlineUser.PresenceDevice[]>([]);
+  const [devicesLoading, setDevicesLoading] = useState(false);
+  const [devicesError, setDevicesError] = useState(false);
+  const kicking = useApiLoading(onlineUserApi.getUrl('kickoutUser'));
+  const deviceRequestId = useRef(0);
+  const loadPage = useCallback((params: Fa.BasePageProps) => onlineUserApi.presencePage(params), []);
+  const { setFormValues, handleTableChange, fetchPageList, loading, list, paginationProps } = useTableQueryParams<OnlineUser.PresenceSummary>(
+    loadPage,
+    {},
+    '在线用户',
+  );
 
-  function confirmKickout(record: OnlineUser.Session, allSessions: boolean) {
+  async function loadDevices(userId: string) {
+    const requestId = ++deviceRequestId.current;
+    setDevices([]);
+    setDevicesLoading(true);
+    setDevicesError(false);
+    try {
+      const res = await onlineUserApi.presenceDevices(userId);
+      if (requestId === deviceRequestId.current) setDevices(res.data ?? []);
+    } catch {
+      if (requestId === deviceRequestId.current) setDevicesError(true);
+    } finally {
+      if (requestId === deviceRequestId.current) setDevicesLoading(false);
+    }
+  }
+
+  function openDevices(record: OnlineUser.PresenceSummary) {
+    setSelectedUser(record);
+    void loadDevices(record.userId);
+  }
+
+  function closeDevices() {
+    deviceRequestId.current += 1;
+    setSelectedUser(undefined);
+    setDevices([]);
+    setDevicesError(false);
+    setDevicesLoading(false);
+  }
+
+  function confirmKickout(record: OnlineUser.PresenceSummary) {
     Modal.confirm({
-      title: allSessions ? '下线该用户全部后台会话？' : '强制下线此会话？',
+      title: '下线该用户全部后台 Web 会话？',
       content: (
         <div>
-          <p>目标用户：{record.name}（{record.username}）</p>
-          <p>{allSessions ? '该用户所有后台登录会话将失效。' : '所有共享此会话的浏览器将一起失效。'}</p>
-          <p>对方下次请求时返回登录页，仍可重新登录。</p>
+          <p>
+            目标用户：{record.name || record.username}（{record.username}）
+          </p>
+          <p>该用户的后台 Web 登录会话将失效；APP 和桌面端不受影响。</p>
+          <p>Web 会话在下次请求时返回登录页，相关在线状态会在连接关闭或心跳超时后更新。</p>
         </div>
       ),
       okText: '确认下线',
       cancelText: '取消',
       okButtonProps: { danger: true },
       onOk: async () => {
-        const res = await onlineUserApi.kickout(record.id, allSessions);
-        FaUtils.showResponse(res, '强制下线');
+        const res = await onlineUserApi.kickoutUser(record.userId);
+        FaUtils.showResponse(res, '全部后台下线');
         fetchPageList();
       },
     });
   }
 
-  function genColumns(): FaberTable.ColumnsProp<OnlineUser.Session>[] {
-    // 后端固定按最近访问时间倒序，列不启用服务端尚未支持的排序。
+  const deviceColumns: TableColumnsType<OnlineUser.PresenceDevice> = [
+    {
+      title: '客户端',
+      dataIndex: 'clientType',
+      width: 90,
+      render: (value: OnlineUser.PresenceDevice['clientType']) => <Tag>{clientTypeLabels[value] || value}</Tag>,
+    },
+    {
+      title: '应用',
+      width: 180,
+      render: (_, record) => (record.appName ? `${record.appName}${record.appCode ? `（${record.appCode}）` : ''}` : record.appCode || '-'),
+    },
+    { title: '版本', dataIndex: 'release', width: 100, render: (value: string | null) => value || '-' },
+    { title: '环境', dataIndex: 'environment', width: 110, render: (value: string | null) => value || '-' },
+    {
+      title: '平台 / 操作系统',
+      width: 180,
+      render: (_, record) => [record.platform, [record.osName, record.osVersion].filter(Boolean).join(' ')].filter(Boolean).join(' / ') || '-',
+    },
+    { title: '设备型号', dataIndex: 'deviceModel', width: 140, ellipsis: true, render: (value: string | null) => value || '-' },
+    { title: '连接时间', dataIndex: 'connectedAt', width: 170, render: formatTime },
+    { title: '最近心跳', dataIndex: 'lastSeenAt', width: 170, render: formatTime },
+  ];
+
+  function genColumns(): FaberTable.ColumnsProp<OnlineUser.PresenceSummary> {
     return [
-      { ...BaseTableUtils.genSimpleSorterColumn('账号', 'username', 150, false), render: (_, record) => (
-        <Space>{record.username}{record.current && <Tag color="blue">当前会话</Tag>}</Space>
-      ) },
-      BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 110, false),
-      { ...BaseTableUtils.genSimpleSorterColumn('来源', 'source', 90, false), render: () => '后台 Web' },
-      { ...BaseTableUtils.genBoolSorterColumn('状态', 'active', 110, false), render: (value: boolean) => (
-        <Tag color={value ? 'green' : 'default'}>{value ? '近期活跃' : '暂未活跃'}</Tag>
-      ) },
-      { ...BaseTableUtils.genTimeSorterColumn('登录时间', 'loginTime', 180, false), render: formatTime },
-      { ...BaseTableUtils.genTimeSorterColumn('最近访问时间', 'lastAccessTime', 180, false), render: formatTime },
-      { ...BaseTableUtils.genSimpleSorterColumn('最近访问 IP', 'ip', 145, false), render: (value: string | null) => value || '-' },
-      { ...BaseTableUtils.genSimpleSorterColumn('最近浏览器', 'browser', 120, false), ellipsis: true, render: (value: string | null) => value || '-' },
-      { ...BaseTableUtils.genSimpleSorterColumn('最近操作系统', 'os', 125, false), ellipsis: true, render: (value: string | null) => value || '-' },
-      { ...BaseTableUtils.genTimeSorterColumn('到期时间', 'expiresAt', 180, false), render: (value: number | null) => value == null ? '永不过期' : formatTime(value) },
-      { title: '操作', dataIndex: 'opr', width: 230, fixed: 'right', tcRequired: true, tcType: 'menu', render: (_, record) => (
-        <ShiroPermissionContainer permission={kickPermission}>
+      { ...BaseTableUtils.genSimpleSorterColumn('账号', 'username', 160, false), render: (value: string) => value || '-' },
+      { ...BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 130, false), render: (value: string | null) => value || '-' },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('Web 在线', 'webCount', 110, false),
+        render: (value: number | string) => <Tag color={Number(value) > 0 ? 'green' : 'default'}>{Number(value) || 0}</Tag>,
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('APP 在线', 'appCount', 110, false),
+        render: (value: number | string) => <Tag color={Number(value) > 0 ? 'green' : 'default'}>{Number(value) || 0}</Tag>,
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('桌面端在线', 'desktopCount', 120, false),
+        render: (value: number | string) => <Tag color={Number(value) > 0 ? 'green' : 'default'}>{Number(value) || 0}</Tag>,
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('设备总数', 'deviceCount', 120, false),
+        render: (value: number | string) => Number(value) || 0,
+      },
+      { ...BaseTableUtils.genTimeSorterColumn('最近心跳', 'lastSeenAt', 180, false), render: formatTime },
+      {
+        title: '操作',
+        dataIndex: 'opr',
+        width: 150,
+        fixed: 'right',
+        tcRequired: true,
+        tcType: 'menu',
+        render: (_, record) => (
           <Space>
-            <Button size="small" type="link" danger disabled={record.current || kicking} onClick={() => confirmKickout(record, false)}>
-              强制下线
-            </Button>
-            <Button size="small" type="link" danger disabled={record.currentUser || kicking} onClick={() => confirmKickout(record, true)}>
-              全部后台下线
-            </Button>
+            <BaseDrawer
+              title={`${record.name || record.username}（${record.username}）的在线设备`}
+              triggerDom={
+                <Button type="link" size="small" onClick={() => openDevices(record)}>
+                  全部设备
+                </Button>
+              }
+              size={1200}
+              onClose={closeDevices}
+            >
+              {devicesError ? (
+                <Empty description="设备明细加载失败">
+                  <Button onClick={() => void loadDevices(record.userId)}>重试</Button>
+                </Empty>
+              ) : (
+                <Table<OnlineUser.PresenceDevice>
+                  size="small"
+                  rowKey={(device, index) => `${device.clientType}-${device.connectedAt}-${device.lastSeenAt}-${index}`}
+                  columns={deviceColumns}
+                  dataSource={devices}
+                  loading={devicesLoading && selectedUser?.userId === record.userId}
+                  pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 台设备` }}
+                  scroll={{ x: 1080 }}
+                  locale={{ emptyText: devicesLoading ? '加载中' : '暂无在线设备' }}
+                />
+              )}
+            </BaseDrawer>
+            <ShiroPermissionContainer permission={kickPermission}>
+              <Button type="link" size="small" danger disabled={kicking} onClick={() => confirmKickout(record)}>
+                全部后台下线
+              </Button>
+            </ShiroPermissionContainer>
           </Space>
-        </ShiroPermissionContainer>
-      ) },
+        ),
+      },
     ];
   }
 
@@ -78,38 +190,42 @@ export default function OnlineUserList() {
     <div className="fa-full-content-p12 fa-flex-column fa-content">
       <div className="fa-flex-row-center fa-p8" style={{ gap: 24, flexWrap: 'wrap' }}>
         <div className="fa-h3">在线用户</div>
-        <Space size="large" wrap>
-          <span>有效会话 <strong>{stats?.sessionCount ?? '-'}</strong></span>
-          <span>在线用户 <strong>{stats?.userCount ?? '-'}</strong></span>
-          <span>近期活跃用户 <strong>{stats?.activeUserCount ?? '-'}</strong></span>
+        <Space>
+          <span>
+            在线用户 <strong>{paginationProps.total ?? '-'}</strong>
+          </span>
+          <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchPageList}>
+            刷新
+          </Button>
         </Space>
       </div>
-      <Alert type="info" showIcon title="仅展示后台有效登录会话，关闭浏览器不会立即下线。" description={
-        `最近 ${stats ? stats.activeWindowSeconds / 60 : 5} 分钟有认证请求视为活跃，状态可能有短暂延迟。共享会话按一条展示，下线会影响所有共享浏览器。旧会话会在下次请求时纳入统计。`
-      } />
-      <Form form={form} layout="inline" onFinish={({ active, ...rest }) => setFormValues({
-        ...rest, active: active == null ? undefined : active === 'active',
-      })} className="fa-p8" style={{ rowGap: 8 }}>
+      <Alert
+        type="info"
+        showIcon
+        title="在线状态按客户端 WebSocket 心跳统计，同一用户的多平台设备汇总为一行。"
+        description="设备按客户端实例去重；旧客户端在兼容期内可能按连接计数。超过 60 秒未收到心跳或连接关闭后，在线状态会更新。"
+      />
+      <Form form={form} layout="inline" onFinish={(values) => setFormValues(values)} className="fa-p8" style={{ rowGap: 8 }}>
         <Form.Item name="keyword" label="用户">
           <Input placeholder="账号 / 姓名" allowClear maxLength={100} />
         </Form.Item>
-        <Form.Item name="source" label="来源">
-          <Select placeholder="全部来源" allowClear style={{ width: 120 }} options={[{ value: 'web', label: '后台 Web' }]} />
-        </Form.Item>
-        <Form.Item name="active" label="状态">
-          <Select placeholder="全部状态" allowClear style={{ width: 130 }} options={[
-            { value: 'active', label: '近期活跃' }, { value: 'idle', label: '暂未活跃' },
-          ]} />
-        </Form.Item>
         <Space>
-          <Button htmlType="submit" icon={<SearchOutlined />} loading={loading}>查询</Button>
-          <Button onClick={() => { form.resetFields(); setFormValues({}); }}>重置</Button>
-          <Button icon={<ReloadOutlined />} loading={loading} onClick={fetchPageList}>刷新</Button>
+          <Button htmlType="submit" icon={<SearchOutlined />} loading={loading}>
+            查询
+          </Button>
+          <Button
+            onClick={() => {
+              form.resetFields();
+              setFormValues({});
+            }}
+          >
+            重置
+          </Button>
         </Space>
       </Form>
-      <BaseBizTable<OnlineUser.Session>
+      <BaseBizTable<OnlineUser.PresenceSummary>
         biz="base_online_user_v1"
-        rowKey="id"
+        rowKey="userId"
         columns={genColumns()}
         loading={loading}
         dataSource={list}
