@@ -1,5 +1,5 @@
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
+import { BaseBoolRadio, type CommonModalProps, Fa, FaFullContentModal, FaHref, FaUtils, UploadImgLocal, useApiLoading } from '@fa/ui';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { tenantApi as api, rbacMenuApi, tenantPermissionApi } from '@features/fa-admin-pages/services';
 import { Button, DatePicker, Form, Input, InputNumber, Spin } from 'antd';
@@ -37,6 +37,7 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
       code: get(record, 'code'),
       name: get(record, 'name'),
       shortName: get(record, 'shortName'),
+      icon: get(record, 'icon'),
       status: get(record, 'status', true),
       expireTime: FaUtils.getInitialKeyTimeValue(record, 'expireTime'),
       contactName: get(record, 'contactName'),
@@ -158,6 +159,9 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
                 </Form.Item>
                 <Form.Item name="shortName" label="租户简称" {...FaUtils.formItemHalfLayout}>
                   <Input placeholder="请输入租户简称" maxLength={255} />
+                </Form.Item>
+                <Form.Item name="icon" label="租户图标" {...FaUtils.formItemHalfLayout}>
+                  <UploadImgLocal />
                 </Form.Item>
                 <Form.Item name="status" label="状态" rules={[{ required: true }]} {...FaUtils.formItemHalfLayout}>
                   <BaseBoolRadio />

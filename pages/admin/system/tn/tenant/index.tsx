@@ -1,5 +1,5 @@
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { AuthDelBtn, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, type FaberTable, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseBoolSelector, BaseTableUtils, clearForm, type FaberTable, TableImage, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { tenantApi } from '@features/fa-admin-pages/services';
 import { Button, Form, Input, Space } from 'antd';
 import type { Tn } from '@/types';
@@ -21,6 +21,11 @@ export default function TenantList() {
   function genColumns() {
     const { sorter } = queryParams;
     return [
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('图标', 'icon', 80, sorter),
+        align: 'center',
+        render: (icon: string | null | undefined) => (icon ? <TableImage imgFileId={icon} /> : null),
+      },
       BaseTableUtils.genSimpleSorterColumn('租户编码', 'code', 160, sorter),
       BaseTableUtils.genSimpleSorterColumn('租户名称', 'name', 180, sorter),
       BaseTableUtils.genSimpleSorterColumn('租户简称', 'shortName', 140, sorter),
