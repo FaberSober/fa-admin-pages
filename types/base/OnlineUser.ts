@@ -11,6 +11,17 @@ namespace OnlineUser {
     lastSeenAt: number | string;
   }
 
+  /** 按账号汇总的有效后台 Web 登录会话。 */
+  export interface SessionUserSummary {
+    userId: string;
+    username: string;
+    name: string | null;
+    sessionCount: number | string;
+    activeSessionCount: number | string;
+    lastAccessTime: number | string;
+    currentUser: boolean;
+  }
+
   /** 在线设备展示信息；服务端不会返回设备实例 ID 或连接 ID。 */
   export interface PresenceDevice {
     clientType: 'WEB' | 'MOBILE' | 'DESKTOP';
@@ -33,12 +44,14 @@ namespace OnlineUser {
     username: string;
     name: string;
     source: 'web';
-    loginTime: number | null;
-    lastAccessTime: number;
+    loginTime: number | string | null;
+    lastAccessTime: number | string;
     ip: string | null;
     browser: string;
     os: string;
-    expiresAt: number | null;
+    clientType: string | null;
+    clientInstanceId: string | null;
+    expiresAt: number | string | null;
     active: boolean;
     current: boolean;
     currentUser: boolean;

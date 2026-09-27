@@ -12,9 +12,10 @@ import {
 } from '@fa/ui';
 import { onlineUserApi } from '@features/fa-admin-pages/services';
 import type { OnlineUser } from '@features/fa-admin-pages/types';
-import { Alert, Button, Empty, Form, Input, Modal, Space, Table, type TableColumnsType, Tag } from 'antd';
+import { Alert, Button, Empty, Form, Input, Modal, Space, Table, type TableColumnsType, Tabs, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useRef, useState } from 'react';
+import OnlineUserSessionList from './components/OnlineUserSessionList';
 
 const formatTime = (value: number | string | null | undefined) => {
   if (value == null || value === '') return '-';
@@ -29,6 +30,20 @@ const clientTypeLabels: Record<OnlineUser.PresenceDevice['clientType'], string> 
 };
 
 export default function OnlineUserList() {
+  const [activeTab, setActiveTab] = useState('devices');
+  return (
+    <div className="fa-full-content-p12 fa-flex-column fa-tabs fa-content">
+      <Tabs className="fa-flex-1" activeKey={activeTab} onChange={setActiveTab} items={onlineUserTabs} />
+    </div>
+  );
+}
+
+const onlineUserTabs = [
+  { key: 'devices', label: '在线设备', children: <OnlineUserPresenceList /> },
+  { key: 'sessions', label: '后台登录会话', children: <OnlineUserSessionList /> },
+];
+
+function OnlineUserPresenceList() {
   const [form] = Form.useForm();
   const [selectedUser, setSelectedUser] = useState<OnlineUser.PresenceSummary>();
   const [devices, setDevices] = useState<OnlineUser.PresenceDevice[]>([]);
@@ -187,7 +202,7 @@ export default function OnlineUserList() {
   }
 
   return (
-    <div className="fa-full-content-p12 fa-flex-column fa-content">
+    <div className="fa-full fa-flex-column fa-content">
       <div className="fa-flex-row-center fa-p8" style={{ gap: 24, flexWrap: 'wrap' }}>
         <div className="fa-h3">在线用户</div>
         <Space>

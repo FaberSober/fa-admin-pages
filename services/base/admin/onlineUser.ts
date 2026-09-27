@@ -5,6 +5,10 @@ import { GATE_APP } from '@/configs';
 class OnlineUserApi extends BaseZeroApi {
   page = (params: Fa.BasePageProps): Promise<Fa.Ret<Fa.Page<OnlineUser.Session>>> => this.post('page', params);
 
+  sessionUserPage = (params: Fa.BasePageProps): Promise<Fa.Ret<Fa.Page<OnlineUser.SessionUserSummary>>> => this.post('session/user/page', params);
+
+  userSessions = (userId: string): Promise<Fa.Ret<OnlineUser.Session[]>> => this.get(`session/user/${encodeURIComponent(userId)}`);
+
   presencePage = (params: Fa.BasePageProps): Promise<Fa.Ret<Fa.Page<OnlineUser.PresenceSummary>>> => this.post('presence/page', params);
 
   presenceDevices = (userId: string): Promise<Fa.Ret<OnlineUser.PresenceDevice[]>> => this.get(`presence/${encodeURIComponent(userId)}/devices`);
