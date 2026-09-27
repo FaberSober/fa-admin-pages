@@ -15,6 +15,9 @@ class Msg extends BaseApi<Admin.Msg, string> {
   /** 消息数量统计 */
   countMine = (): Promise<Fa.Ret<{ unreadCount: number }>> => this.get(`countMine`);
 
+  /** 所有可访问租户的未读数量统计 */
+  countMineByTenant = (): Promise<Fa.Ret<Admin.MsgTenantStatistic>> => this.get(`countMineByTenant`);
+
   /** 全部已读 */
   readAll = (): Promise<Fa.Ret<{ unreadCount: number }>> => this.get(`readAll`);
 }

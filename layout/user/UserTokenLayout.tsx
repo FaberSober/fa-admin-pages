@@ -20,6 +20,8 @@ export default function UserTokenLayout({ children }: Fa.BaseChildProps) {
   const [tenants, setTenants] = useState<Tn.TenantUser[]>([]);
   const [selectedTenant, setSelectedTenant] = useState<Tn.TenantUser>();
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [tenantUnreadCounts, setTenantUnreadCounts] = useState<Record<string, number>>({});
+  const [totalTenantUnreadCount, setTotalTenantUnreadCount] = useState<number>(0);
 
   const search = useQs();
 
@@ -40,18 +42,21 @@ export default function UserTokenLayout({ children }: Fa.BaseChildProps) {
     userApi.getLoginUser().then((res) => setUser(res.data)).catch(() => {});
   }
 
-  function refreshTenants() {
+  function refreshTenants(): Promise<void> {
     if (!systemConfig.tenantEnabled) {
       clearTnTenantId();
       setTenants([]);
       setSelectedTenant(undefined);
-      return;
+      return Promise.resolve();
     }
 
-    tenantUserApi.myTenants().then((res) => {
+    return tenantUserApi.myTenants().then((res) => {
       const list = res.data || [];
       const cachedTenantId = getTnTenantId();
-      const currentTenant = list.find((i) => i.tenantId === cachedTenantId) || list[0];
+      const defaultTenant = list.find((i) => i.isDefault);
+      const currentTenant = list.find((i) => i.tenantId === cachedTenantId)
+        || defaultTenant
+        || list[0];
 
       setTenants(list);
       setSelectedTenant(currentTenant);
@@ -60,16 +65,16 @@ export default function UserTokenLayout({ children }: Fa.BaseChildProps) {
       }
     }).catch(() => {
       clearTnTenantId();
-      tenantUserApi.myTenants().then((res) => {
+      return tenantUserApi.myTenants().then((res) => {
         const list = res.data || [];
-        const currentTenant = list[0];
+        const currentTenant = list.find((i) => i.isDefault) || list[0];
 
         setTenants(list);
         setSelectedTenant(currentTenant);
         if (currentTenant) {
           setTnTenantId(currentTenant.tenantId);
         }
-      });
+      }).catch(() => {});
     });
   }
 
@@ -98,6 +103,21 @@ export default function UserTokenLayout({ children }: Fa.BaseChildProps) {
 
   function refreshUnreadCount() {
     msgApi.countMine().then((res) => setUnreadCount(res.data.unreadCount)).catch(() => {});
+    refreshTenantUnreadCounts();
+  }
+
+  function refreshTenantUnreadCounts(): Promise<boolean> {
+    if (!systemConfig.tenantEnabled) {
+      setTenantUnreadCounts({});
+      setTotalTenantUnreadCount(0);
+      return Promise.resolve(true);
+    }
+
+    return msgApi.countMineByTenant().then((res) => {
+      setTenantUnreadCounts(res.data.tenantUnreadCounts || {});
+      setTotalTenantUnreadCount(res.data.totalUnreadCount || 0);
+      return true;
+    }).catch(() => false);
   }
 
   if (user === undefined) return <PageLoading />;
@@ -113,6 +133,9 @@ export default function UserTokenLayout({ children }: Fa.BaseChildProps) {
     logout,
     unreadCount,
     refreshUnreadCount,
+    tenantUnreadCounts,
+    totalTenantUnreadCount,
+    refreshTenantUnreadCounts,
   };
 
   return <UserLayoutContext.Provider value={contextValue}>{children}</UserLayoutContext.Provider>;

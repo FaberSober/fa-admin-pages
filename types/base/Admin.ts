@@ -552,6 +552,8 @@ namespace Admin {
     toUserName: string;
     /** 接收用户ID  */
     toUserId: string;
+    /** 所属租户ID */
+    tenantId?: string;
     /** 消息内容  */
     content: string;
     /** 是否已读  */
@@ -566,6 +568,12 @@ namespace Admin {
     type: FaEnums.MsgTypeEnum;
     /** 业务JSON数据 */
     buzzContent: string;
+  }
+
+  /** 各租户未读消息统计 */
+  export interface MsgTenantStatistic {
+    tenantUnreadCounts: Record<string, number>;
+    totalUnreadCount: number;
   }
 
   // -------------------------------------------- 系统-URL请求日志 --------------------------------------------

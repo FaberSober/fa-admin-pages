@@ -49,6 +49,8 @@ namespace Tn {
     tenantId: string;
     /** 租户名称 */
     tenantName: string;
+    /** 租户图标文件ID */
+    tenantIcon?: string;
     /** 用户ID */
     userId: string;
     /** 用户名称 */
@@ -59,6 +61,10 @@ namespace Tn {
     status: boolean;
     /** 排序 */
     sort: number;
+    /** 是否默认租户 */
+    isDefault?: boolean;
+    /** 是否平台超级管理员的合成租户项 */
+    isSuperAdmin?: boolean;
     /** 描述 */
     description: string;
   }
