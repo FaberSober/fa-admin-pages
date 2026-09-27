@@ -28,7 +28,7 @@ export default function UserAppearanceSettings({ open, onClose }: UserAppearance
     <Drawer
       title={intl.formatMessage({ id: 'menu.account.settings' })}
       placement="right"
-      width={320}
+      size={320}
       open={open}
       onClose={onClose}
       footer={

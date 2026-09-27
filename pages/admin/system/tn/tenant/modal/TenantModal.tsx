@@ -139,7 +139,7 @@ export default function TenantModal({ children, title, record, fetchFinish, addB
       }}
       onCancel={() => setOpen(false)}
     >
-      <Spin spinning={submitLoading} tip={record ? '正在保存租户' : '正在创建租户'} wrapperClassName="tenant-form-loading" style={{ minHeight: '100%' }}>
+      <Spin spinning={submitLoading} description={record ? '正在保存租户' : '正在创建租户'} wrapperClassName="tenant-form-loading" style={{ minHeight: '100%' }}>
         <Form form={form} onFinish={onFinish} className="tenant-form" {...FaUtils.formItemFullLayout}>
           <div className="tenant-form-shell">
             <section className="tenant-form-section fa-card">

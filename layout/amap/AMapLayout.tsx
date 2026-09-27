@@ -2,7 +2,8 @@ import React, { useContext, useEffect } from 'react';
 import type { Fa } from '@fa/ui';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 
-const VITE_APP_AMAP_KEY = import.meta.env.VITE_APP_AMAP_KEY;
+const AMAP_KEY = import.meta.env.VITE_APP_AMAP_KEY?.trim();
+const HAS_AMAP_KEY = Boolean(AMAP_KEY && !/^x+$/i.test(AMAP_KEY));
 const AMAP_SCRIPT_ID = 'fa-amap-jsapi';
 const AMAP_LOAD_TIMEOUT = 10_000;
 
@@ -13,8 +14,7 @@ function loadAMap() {
     return;
   }
 
-  if (!VITE_APP_AMAP_KEY) {
-    console.warn('高德地图API Key为空，跳过高德地图API加载。');
+  if (!HAS_AMAP_KEY) {
     return;
   }
 
@@ -41,7 +41,7 @@ function loadAMap() {
   script.id = AMAP_SCRIPT_ID;
   script.type = 'text/javascript';
   script.async = true;
-  script.src = `https://webapi.amap.com/maps?callback=${callbackName}&v=2.0&key=${VITE_APP_AMAP_KEY}`;
+  script.src = `https://webapi.amap.com/maps?callback=${callbackName}&v=2.0&key=${AMAP_KEY}`;
   script.onerror = (err) => {
     window.clearTimeout(timer);
     amapLoading = false;
@@ -66,6 +66,11 @@ export default function AMapLayout({ children }: Fa.BaseChildProps) {
     }
 
     if (document.getElementById(AMAP_SCRIPT_ID)) {
+      return;
+    }
+
+    if (!HAS_AMAP_KEY) {
+      console.info('高德地图API Key未配置，跳过高德地图API加载。');
       return;
     }
 

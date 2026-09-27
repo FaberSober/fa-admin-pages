@@ -70,16 +70,6 @@
   }
 }
 
-.tenant-select-static-list {
-  padding: 2px;
-}
-
-.tenant-select-static-item {
-  margin-bottom: 4px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
 .tenant-select-list :has(> .tenant-select-row.is-selected) {
   background-color: var(--fa-bg-color2) !important;
 }

@@ -58,7 +58,7 @@ export default function Desktop() {
     return (
       <div className="fa-full-content-p12">
         {initializing ? (
-          <Spin tip="正在加载工作台..." />
+          <Spin description="正在加载工作台..." />
         ) : (
           <Alert
             type="error"

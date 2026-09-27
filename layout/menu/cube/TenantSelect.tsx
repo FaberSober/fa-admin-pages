@@ -1,6 +1,6 @@
 import { ApartmentOutlined, ArrowDownOutlined, HolderOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
 import { FaSortList } from '@fa/ui';
-import { fileSaveApi, tenantUserApi } from '@features/fa-admin-pages/services';
+import { fileSaveApi, tenantApi, tenantUserApi } from '@features/fa-admin-pages/services';
 import type { Tn } from '@features/fa-admin-pages/types';
 import { Avatar, Badge, Button, message, Popover, Tag, Tooltip } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
@@ -29,7 +29,7 @@ export default function TenantSelect() {
   const defaultTenantId = orderedTenants[0]?.tenantId;
 
   async function saveTenantOrder(nextTenants: Tn.TenantUser[]) {
-    if (saving || isSuperAdmin) return;
+    if (saving) return;
 
     const previousTenants = orderedTenants;
     const sortedTenants = nextTenants.map((tenant, index) => ({
@@ -40,7 +40,10 @@ export default function TenantSelect() {
     setOrderedTenants(sortedTenants);
     setSaving(true);
     try {
-      const response = await tenantUserApi.saveMyTenantOrder(sortedTenants.map((tenant) => tenant.tenantId));
+      const tenantIds = sortedTenants.map((tenant) => tenant.tenantId);
+      const response = isSuperAdmin
+        ? await tenantApi.savePanelOrder(tenantIds)
+        : await tenantUserApi.saveMyTenantOrder(tenantIds);
       if (response.status !== 200) {
         throw new Error(response.message || '保存租户排序失败');
       }
@@ -99,7 +102,6 @@ export default function TenantSelect() {
             <span className="tenant-select-row-tags">
               {isSelected && <Tag color="blue">当前</Tag>}
               {tenant.isAdmin && <Tag>管理员</Tag>}
-              {tenant.tenantId === defaultTenantId && <Tag color="gold">默认</Tag>}
             </span>
           </span>
           {unreadCount > 0 && <Badge count={unreadCount} overflowCount={99} />}
@@ -127,27 +129,17 @@ export default function TenantSelect() {
       </div>
 
       <div className={`tenant-select-list${saving ? ' is-saving' : ''}`}>
-        {isSuperAdmin ? (
-          <div className="tenant-select-static-list">
-            {orderedTenants.map((tenant) => (
-              <div className="tenant-select-static-item" key={tenant.tenantId}>
-                {renderTenantRow(tenant)}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <FaSortList
-            list={orderedTenants}
-            rowKey="tenantId"
-            renderItem={(tenant: Tn.TenantUser) => renderTenantRow(tenant)}
-            onSortEnd={(nextTenants: Tn.TenantUser[]) => void saveTenantOrder(nextTenants)}
-            itemStyle={{ marginBottom: 4, borderRadius: 10, overflow: 'hidden' }}
-            containerStyle={{ padding: 2 }}
-            vertical
-            handle
-            handleNode={<HolderOutlined />}
-          />
-        )}
+        <FaSortList
+          list={orderedTenants}
+          rowKey="tenantId"
+          renderItem={(tenant: Tn.TenantUser) => renderTenantRow(tenant)}
+          onSortEnd={(nextTenants: Tn.TenantUser[]) => void saveTenantOrder(nextTenants)}
+          itemStyle={{ marginBottom: 4, borderRadius: 10, overflow: 'hidden' }}
+          containerStyle={{ padding: 2 }}
+          vertical
+          handle
+          handleNode={<HolderOutlined />}
+        />
       </div>
 
       {unreadLoadFailed && (

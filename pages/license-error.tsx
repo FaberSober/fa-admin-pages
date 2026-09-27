@@ -155,7 +155,7 @@ export default function LicenseErrorPage() {
 
       {loading && <Spin size="small" />}
 
-      {machineId && recoveryLoading && <Spin size="small" tip="正在校验恢复入口" />}
+      {machineId && recoveryLoading && <Spin size="small" description="正在校验恢复入口" />}
 
       {machineId && !recoveryLoading && recovery && !recovery.matched && (
         <Alert
