@@ -24,6 +24,7 @@ function filterMenuTree(tree: Fa.TreeNode<Rbac.RbacMenu>[], allowedMenuIds: Set<
 export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacRoleMenuDrawerProps) {
   const [tree, setTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
   const [checkedMenuIds, setCheckedMenuIds] = useState<number[]>([]); // 选中的菜单ID
+  const [allowedMenuIds, setAllowedMenuIds] = useState<Set<string>>();
 
   const [open, setOpen] = useState(false);
 
@@ -35,6 +36,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
       isTenantRole && record.tenantId ? tenantPermissionApi.getMenuIds(record.tenantId) : Promise.resolve(null),
     ]);
     const allowedMenuIds = tenantPermissionRes?.data ? new Set(tenantPermissionRes.data.map(String)) : undefined;
+    setAllowedMenuIds(allowedMenuIds);
     setTree(allowedMenuIds ? filterMenuTree(menuRes.data || [], allowedMenuIds) : menuRes.data || []);
     const roleMenuIds = roleMenuRes.data?.checkedMenuIds || [];
     setCheckedMenuIds(allowedMenuIds ? roleMenuIds.filter((id) => allowedMenuIds.has(String(id))) : roleMenuIds);
@@ -91,6 +93,7 @@ export default function RbacRoleMenuDrawer({ children, record, ...props }: RbacR
           tree={tree}
           requiredMenuIds={[]}
           checkedMenuIds={checkedMenuIds}
+          selectableMenuIds={allowedMenuIds ? [...allowedMenuIds] : undefined}
           loading={loading}
           onCheckedMenuIdsChange={(keys: Key[]) => setCheckedMenuIds(keys.map(Number))}
         />

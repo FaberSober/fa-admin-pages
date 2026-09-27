@@ -33,6 +33,7 @@ export interface TenantPermissionPanelProps {
   tree: MenuNode[];
   requiredMenuIds: ReactKey[];
   checkedMenuIds: ReactKey[];
+  selectableMenuIds?: ReactKey[];
   loading?: boolean;
   onCheckedMenuIdsChange: (keys: ReactKey[]) => void;
 }
@@ -65,8 +66,22 @@ function getNodesKeys(nodes: MenuNode[]): MenuKey[] {
   return nodes.flatMap(getAllKeys);
 }
 
-function getCheckState(node: MenuNode, selectedKeys: Set<MenuKey>): CheckState {
+function getSelectableKeys(keys: MenuKey[], selectableKeys?: Set<MenuKey>): MenuKey[] {
+  return selectableKeys ? keys.filter((key) => selectableKeys.has(key)) : keys;
+}
+
+function getCheckState(node: MenuNode, selectedKeys: Set<MenuKey>, selectableKeys?: Set<MenuKey>): CheckState {
   const allKeys = getAllKeys(node);
+  if (selectableKeys) {
+    const availableKeys = getSelectableKeys(allKeys, selectableKeys);
+    if (availableKeys.length === 0) return { checked: false, indeterminate: false };
+    const selectedCount = availableKeys.filter((key) => selectedKeys.has(key)).length;
+    return {
+      checked: selectedCount === availableKeys.length,
+      indeterminate: selectedCount > 0 && selectedCount < availableKeys.length,
+    };
+  }
+
   const childKeys = allKeys.slice(1);
 
   if (childKeys.length === 0) {
@@ -85,24 +100,26 @@ function getCheckState(node: MenuNode, selectedKeys: Set<MenuKey>): CheckState {
   };
 }
 
-function getStats(nodes: MenuNode[], selectedKeys: Set<MenuKey>) {
-  const allKeys = getNodesKeys(nodes);
+function getStats(nodes: MenuNode[], selectedKeys: Set<MenuKey>, selectableKeys?: Set<MenuKey>) {
+  const allKeys = getSelectableKeys(getNodesKeys(nodes), selectableKeys);
   return {
     total: allKeys.length,
     selected: allKeys.filter((key) => selectedKeys.has(key)).length,
   };
 }
 
-function normalizeSelectionKeys(tree: MenuNode[], keys: Set<MenuKey>): Set<MenuKey> {
-  const normalized = new Set(keys);
+function normalizeSelectionKeys(tree: MenuNode[], keys: Set<MenuKey>, selectableKeys?: Set<MenuKey>): Set<MenuKey> {
+  const normalized = new Set(getSelectableKeys([...keys], selectableKeys));
 
   function normalizeNode(node: MenuNode): boolean {
+    const nodeKey = getNodeKey(node);
     const children = getChildren(node);
-    if (children.length === 0) return normalized.has(getNodeKey(node));
+    if (children.length === 0) return normalized.has(nodeKey);
 
     const hasSelectedDescendant = children.some(normalizeNode);
-    if (hasSelectedDescendant) normalized.add(getNodeKey(node));
-    else normalized.delete(getNodeKey(node));
+    if (selectableKeys && !selectableKeys.has(nodeKey)) normalized.delete(nodeKey);
+    else if (hasSelectedDescendant) normalized.add(nodeKey);
+    else normalized.delete(nodeKey);
     return hasSelectedDescendant;
   }
 
@@ -159,13 +176,20 @@ function buildScopeGroups(tree: MenuNode[]): ScopeGroup[] {
     }));
 }
 
-function filterMenuNode(node: MenuNode, keyword: string, selectionFilter: SelectionFilter, selectedKeys: Set<MenuKey>): MenuNode | undefined {
+function filterMenuNode(
+  node: MenuNode,
+  keyword: string,
+  selectionFilter: SelectionFilter,
+  selectedKeys: Set<MenuKey>,
+  selectableKeys?: Set<MenuKey>,
+): MenuNode | undefined {
   const normalizedKeyword = keyword.trim().toLowerCase();
   const nodeMatches = !normalizedKeyword || node.name.toLowerCase().includes(normalizedKeyword);
   const visibleChildren = getChildren(node)
-    .map((child) => filterMenuNode(child, normalizedKeyword, selectionFilter, selectedKeys))
+    .map((child) => filterMenuNode(child, normalizedKeyword, selectionFilter, selectedKeys, selectableKeys))
     .filter((child): child is MenuNode => Boolean(child));
-  const nodeSelected = selectedKeys.has(getNodeKey(node));
+  const nodeSelected =
+    selectedKeys.has(getNodeKey(node)) || Boolean(selectableKeys && getCheckState(node, selectedKeys, selectableKeys).checked);
   const nodeMatchesSelection = selectionFilter === 'all' || (selectionFilter === 'selected' ? nodeSelected : !nodeSelected);
 
   if (!nodeMatchesSelection && visibleChildren.length === 0) return undefined;
@@ -183,17 +207,18 @@ interface PermissionPageCardProps {
   node: MenuNode;
   sourceNode: MenuNode;
   selectedKeys: Set<MenuKey>;
+  selectableKeys?: Set<MenuKey>;
   requiredKeys: Set<MenuKey>;
   onToggle: (node: MenuNode) => void;
 }
 
-function PermissionPageCard({ node, sourceNode, selectedKeys, requiredKeys, onToggle }: PermissionPageCardProps) {
-  const state = getCheckState(sourceNode, selectedKeys);
+function PermissionPageCard({ node, sourceNode, selectedKeys, selectableKeys, requiredKeys, onToggle }: PermissionPageCardProps) {
+  const state = getCheckState(sourceNode, selectedKeys, selectableKeys);
   const required = requiredKeys.has(getNodeKey(sourceNode));
   const buttonNodes = getButtonChildren(node);
   const sourceButtonNodes = getButtonChildren(sourceNode);
   const sourceButtonMap = new Map(sourceButtonNodes.map((button) => [getNodeKey(button), button]));
-  const buttonStats = getStats(buttonNodes, selectedKeys);
+  const buttonStats = getStats(buttonNodes, selectedKeys, selectableKeys);
 
   return (
     <article className={clsx('tenant-permission-panel__page-card', buttonNodes.length === 0 && 'is-simple')}>
@@ -224,7 +249,7 @@ function PermissionPageCard({ node, sourceNode, selectedKeys, requiredKeys, onTo
       {buttonNodes.length > 0 && (
         <div className="tenant-permission-panel__button-list">
           {buttonNodes.map((button) => {
-            const buttonState = getCheckState(button, selectedKeys);
+            const buttonState = getCheckState(button, selectedKeys, selectableKeys);
             const sourceButton = sourceButtonMap.get(getNodeKey(button)) || button;
             const buttonRequired = requiredKeys.has(getNodeKey(sourceButton));
             return (
@@ -247,14 +272,15 @@ interface PermissionGroupHeaderProps {
   node: MenuNode;
   sourceNode: MenuNode;
   selectedKeys: Set<MenuKey>;
+  selectableKeys?: Set<MenuKey>;
   requiredKeys: Set<MenuKey>;
   onToggle: (node: MenuNode) => void;
 }
 
-function PermissionGroupHeader({ node, sourceNode, selectedKeys, requiredKeys, onToggle }: PermissionGroupHeaderProps) {
-  const state = getCheckState(sourceNode, selectedKeys);
+function PermissionGroupHeader({ node, sourceNode, selectedKeys, selectableKeys, requiredKeys, onToggle }: PermissionGroupHeaderProps) {
+  const state = getCheckState(sourceNode, selectedKeys, selectableKeys);
   const required = requiredKeys.has(getNodeKey(sourceNode));
-  const stats = getStats([node], selectedKeys);
+  const stats = getStats([node], selectedKeys, selectableKeys);
 
   return (
     <div className="tenant-permission-panel__group-header">
@@ -279,13 +305,24 @@ function PermissionGroupHeader({ node, sourceNode, selectedKeys, requiredKeys, o
   );
 }
 
-export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMenuIds, loading = false, onCheckedMenuIdsChange }: TenantPermissionPanelProps) {
+export default function TenantPermissionPanel({
+  tree,
+  requiredMenuIds,
+  checkedMenuIds,
+  selectableMenuIds,
+  loading = false,
+  onCheckedMenuIdsChange,
+}: TenantPermissionPanelProps) {
   const [activeScopeKey, setActiveScopeKey] = useState('');
   const [activeModuleKey, setActiveModuleKey] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>('all');
   const requiredKeys = useMemo(() => new Set(requiredMenuIds.map((key) => String(key))), [requiredMenuIds]);
   const selectedKeys = useMemo(() => new Set([...requiredMenuIds, ...checkedMenuIds].map((key) => String(key))), [checkedMenuIds, requiredMenuIds]);
+  const selectableKeys = useMemo(
+    () => (selectableMenuIds ? new Set(selectableMenuIds.map((key) => String(key))) : undefined),
+    [selectableMenuIds],
+  );
 
   const nodeMap = useMemo(() => {
     const map = new Map<MenuKey, MenuNode>();
@@ -295,8 +332,11 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
     return map;
   }, [tree]);
   const filteredTree = useMemo(
-    () => tree.map((node) => filterMenuNode(node, searchValue, selectionFilter, selectedKeys)).filter((node): node is MenuNode => Boolean(node)),
-    [searchValue, selectedKeys, selectionFilter, tree],
+    () =>
+      tree
+        .map((node) => filterMenuNode(node, searchValue, selectionFilter, selectedKeys, selectableKeys))
+        .filter((node): node is MenuNode => Boolean(node)),
+    [searchValue, selectableKeys, selectedKeys, selectionFilter, tree],
   );
   const scopeGroups = useMemo(() => buildScopeGroups(filteredTree), [filteredTree]);
 
@@ -322,25 +362,25 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
   const activeModule = activeScope?.modules.find((module) => getNodeKey(module) === activeModuleKey);
   const activeModuleSource = activeModule ? nodeMap.get(getNodeKey(activeModule)) || activeModule : undefined;
   const activeScopeSourceModules = activeScope?.modules.map((module) => nodeMap.get(getNodeKey(module)) || module) || [];
-  const globalStats = getStats(filteredTree, selectedKeys);
-  const activeScopeStats = activeScope ? getStats(activeScopeSourceModules, selectedKeys) : { total: 0, selected: 0 };
-  const activeModuleStats = activeModule ? getStats([activeModule], selectedKeys) : { total: 0, selected: 0 };
-  const activeScopeKeys = getNodesKeys(activeScopeSourceModules);
-  const activeModuleKeys = activeModuleSource ? getAllKeys(activeModuleSource) : [];
+  const globalStats = getStats(filteredTree, selectedKeys, selectableKeys);
+  const activeScopeStats = activeScope ? getStats(activeScopeSourceModules, selectedKeys, selectableKeys) : { total: 0, selected: 0 };
+  const activeModuleStats = activeModule ? getStats([activeModule], selectedKeys, selectableKeys) : { total: 0, selected: 0 };
+  const activeScopeKeys = getSelectableKeys(getNodesKeys(activeScopeSourceModules), selectableKeys);
+  const activeModuleKeys = activeModuleSource ? getSelectableKeys(getAllKeys(activeModuleSource), selectableKeys) : [];
   const scopeAllSelected = activeScopeKeys.length > 0 && activeScopeKeys.every((key) => selectedKeys.has(key));
   const moduleAllSelected = activeModuleKeys.length > 0 && activeModuleKeys.every((key) => selectedKeys.has(key));
 
   function updateKeys(keys: MenuKey[], checked: boolean) {
     const nextKeys = new Set(selectedKeys);
-    keys.forEach((key) => {
+    getSelectableKeys(keys, selectableKeys).forEach((key) => {
       if (checked) nextKeys.add(key);
       else if (!requiredKeys.has(key)) nextKeys.delete(key);
     });
-    onCheckedMenuIdsChange([...normalizeSelectionKeys(tree, nextKeys)].filter((key) => !requiredKeys.has(key)));
+    onCheckedMenuIdsChange([...normalizeSelectionKeys(tree, nextKeys, selectableKeys)].filter((key) => !requiredKeys.has(key)));
   }
 
   function toggleNode(node: MenuNode) {
-    const state = getCheckState(node, selectedKeys);
+    const state = getCheckState(node, selectedKeys, selectableKeys);
     updateKeys(getAllKeys(node), !state.checked);
   }
 
@@ -360,11 +400,27 @@ export default function TenantPermissionPanel({ tree, requiredMenuIds, checkedMe
 
     return (
       <Fragment key={getNodeKey(node)}>
-        {isPage && <PermissionPageCard node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />}
+        {isPage && (
+          <PermissionPageCard
+            node={node}
+            sourceNode={sourceNode}
+            selectedKeys={selectedKeys}
+            selectableKeys={selectableKeys}
+            requiredKeys={requiredKeys}
+            onToggle={toggleNode}
+          />
+        )}
         {menuChildren.length > 0 && (
           <section className="tenant-permission-panel__group">
             {!isRoot && (
-              <PermissionGroupHeader node={node} sourceNode={sourceNode} selectedKeys={selectedKeys} requiredKeys={requiredKeys} onToggle={toggleNode} />
+              <PermissionGroupHeader
+                node={node}
+                sourceNode={sourceNode}
+                selectedKeys={selectedKeys}
+                selectableKeys={selectableKeys}
+                requiredKeys={requiredKeys}
+                onToggle={toggleNode}
+              />
             )}
             <div className="tenant-permission-panel__card-grid">{menuChildren.map((child) => renderMenuNode(child))}</div>
           </section>

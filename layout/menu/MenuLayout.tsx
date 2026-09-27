@@ -46,6 +46,8 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
 
   // 将tree平铺的menu list
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);
+  // 精确的权限菜单集合，不包含为导航树补出的父级结构节点
+  const [permissionMenuList, setPermissionMenuList] = useState<Rbac.RbacMenu[]>([]);
   // 完整的menu tree
   const [menuFullTree, setMenuFullTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
   // 当前选中block下的menu tree
@@ -83,7 +85,7 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   }, [curTab?.key, locationTab]);
 
 
-  const [hasPermission] = useRoutePermission(menuList, openTabs || []);
+  const [hasPermission] = useRoutePermission(permissionMenuList, openTabs || []);
 
   useEffect(() => {
     const tabs = openTabs || [];
@@ -94,31 +96,32 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   }, [openTabs, setOpenTabs]);
 
   useEffect(() => {
-    rbacUserRoleApi.getMyMenusTree().then((res) => {
-      setMenuFullTree(res.data);
-      const menuArr = flatTreeList(res.data);
+    Promise.all([rbacUserRoleApi.getMyMenusTree(), rbacUserRoleApi.getMyMenus()]).then(([treeRes, menuRes]) => {
+      setMenuFullTree(treeRes.data);
+      const menuArr = flatTreeList(treeRes.data);
       setMenuList(menuArr);
+      setPermissionMenuList(menuRes.data || []);
 
       // 刷新或直接进入自定义页面时，选中当前会话中与地址匹配的 Tab。
       // 仅匹配 sessionStorage 内已打开的标签，不恢复旧 localStorage 中的历史标签。
       const currentPathTab = find(openTabs || [], (item) => item.path === location.pathname);
       if (currentPathTab) {
         const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuArr) as Rbac.RbacMenu | undefined;
-        syncOpenMenuById(currentPathTab.linkMenuId || nearestMenu?.id, res.data, { navigate: false, openTab: false });
+        syncOpenMenuById(currentPathTab.linkMenuId || nearestMenu?.id, treeRes.data, { navigate: false, openTab: false });
         setCurTab(currentPathTab);
         return;
       }
 
       // 初始化选中的菜单
-      const menu = find(menuArr, (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
+      const menu = find(menuRes.data || [], (i) => i.linkUrl === location.pathname) as Rbac.RbacMenu;
       if (menu) {
         // 找到菜单
-        syncOpenMenuById(menu.id, res.data);
+        syncOpenMenuById(menu.id, treeRes.data);
       } else {
         const nearestMenu = FaRouteUtils.matchNearestPathMenu(location.pathname, menuArr) as Rbac.RbacMenu | undefined;
         // 未找到精确菜单时，仅同步至所属菜单。自定义 Tab 不再从 localStorage 自动恢复，
         // 避免旧项目页、标注页在新会话中被重新打开。
-        syncOpenMenuById(nearestMenu?.id, res.data, { navigate: false, openTab: false });
+        syncOpenMenuById(nearestMenu?.id, treeRes.data, { navigate: false, openTab: false });
       }
     });
   }, []);
@@ -276,7 +279,7 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   };
 
   const faUiContextValue: FaUiContextProps = {
-    permissions: menuList.map((m) => m.linkUrl),
+    permissions: permissionMenuList.map((m) => m.linkUrl),
   };
 
   const width = collapse ? 'calc(100% - 44px)' : 'calc(100% - 200px)';
