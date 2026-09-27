@@ -8,7 +8,11 @@ import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import RemoteLogViewer from './components/RemoteLogViewer';
 
-const formatTime = (value: number | null | undefined) => (value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-');
+const formatTime = (value: number | string | null | undefined) => {
+  if (value == null || value === '') return '-';
+  const timestamp = Number(value);
+  return Number.isFinite(timestamp) ? dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss') : '-';
+};
 
 export default function RemoteClientList() {
   const [selectedClient, setSelectedClient] = useState<RemoteClient.Client>();

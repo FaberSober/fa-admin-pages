@@ -15,8 +15,8 @@ namespace RemoteClient {
     userId: string | null;
     username: string | null;
     name: string | null;
-    connectedAt: number;
-    lastSeenAt: number;
+    connectedAt: number | string;
+    lastSeenAt: number | string;
   }
 
   export interface LogEvent {
