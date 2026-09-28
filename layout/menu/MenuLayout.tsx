@@ -79,10 +79,10 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
 
   // 浏览器前进/后退或直接通过 URL 导航时，同步 Tab 高亮状态。
   useEffect(() => {
-    if (locationTab && locationTab.key !== curTab?.key) {
+    if (locationTab && (locationTab.key !== curTab?.key || locationTab.path !== curTab.path || locationTab.name !== curTab.name)) {
       setCurTab(locationTab);
     }
-  }, [curTab?.key, locationTab]);
+  }, [curTab?.key, curTab?.name, curTab?.path, locationTab]);
 
 
   const [hasPermission] = useRoutePermission(permissionMenuList, openTabs || []);
