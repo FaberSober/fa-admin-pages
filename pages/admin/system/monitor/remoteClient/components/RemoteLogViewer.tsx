@@ -9,6 +9,7 @@ import useBus from 'use-bus';
 
 const MAX_VISIBLE_LOGS = 500;
 const LOG_LEVELS = ['DEBUG', 'LOG', 'INFO', 'WARN', 'ERROR'] as const;
+const SOURCE_LOCATION_SUFFIX = /\s+at\s+[^\s]+:\d+(?::\d+)?$/;
 
 interface LogLine {
   id: number;
@@ -34,13 +35,25 @@ const levelColor: Record<LogLine['level'], string> = {
 };
 
 function parseHttpLog(message: string): LogLine['http'] {
-  try {
-    const args = JSON.parse(message) as unknown;
-    if (!Array.isArray(args) || args.length !== 1 || typeof args[0] !== 'string') return undefined;
+  let text: string | undefined;
+  for (const candidate of [message, message.replace(SOURCE_LOCATION_SUFFIX, '')]) {
+    try {
+      const args = JSON.parse(candidate) as unknown;
+      if (Array.isArray(args) && args.length === 1 && typeof args[0] === 'string') {
+        text = args[0].replace(SOURCE_LOCATION_SUFFIX, '');
+        break;
+      }
+    } catch {
+      // Some runtimes append the source location outside the serialized Console arguments.
+    }
+  }
 
-    const match = args[0].match(/^\[FaMobile HTTP #(\d+)\] (request|response|failure) 1\/1 (.+)$/);
-    if (!match) return undefined;
-    return { title: `HTTP #${match[1]} · ${match[2]}`, data: JSON.parse(match[3]) };
+  text ??= message.startsWith('[FaMobile HTTP #') ? message.replace(SOURCE_LOCATION_SUFFIX, '') : undefined;
+  const match = text?.match(/^\[FaMobile HTTP #(\d+)\] (request|response|failure) 1\/1 (.+)$/);
+  if (!match) return undefined;
+  try {
+    const data = JSON.parse(match[3]) as unknown;
+    return data !== null && typeof data === 'object' && !Array.isArray(data) ? { title: `HTTP #${match[1]} · ${match[2]}`, data } : undefined;
   } catch {
     return undefined;
   }
