@@ -61,7 +61,7 @@ function TelemetryIssueListContent() {
       {
         title: '操作',
         dataIndex: 'menu',
-        width: 220,
+        width: 240,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',

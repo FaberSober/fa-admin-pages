@@ -21,7 +21,7 @@ function TelemetryErrorEventListContent() {
     { ...BaseTableUtils.genSimpleSorterColumn('客户端', 'clientType', 110, sorter), render: (_, record) => telemetryLabel(clientTypes, record.clientType) },
     BaseTableUtils.genSimpleSorterColumn('Issue ID', 'issueId', 90, sorter),
     BaseTableUtils.genSimpleSorterColumn('异常类型', 'errorType', 140, sorter),
-    BaseTableUtils.genSimpleSorterColumn('消息', 'message', 320, sorter),
+    BaseTableUtils.genEllipsisSorterColumn('消息', 'message', 320, sorter),
     { ...BaseTableUtils.genSimpleSorterColumn('环境', 'environment', 110, sorter), render: (_, record) => telemetryLabel(environments, record.environment) },
     BaseTableUtils.genSimpleSorterColumn('版本', 'release', 130, sorter),
     BaseTableUtils.genSimpleSorterColumn('用户', 'userId', 120, sorter),
