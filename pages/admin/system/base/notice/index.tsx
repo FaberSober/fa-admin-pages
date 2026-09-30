@@ -1,4 +1,5 @@
-import React from 'react';
+import { useContext } from 'react';
+import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import {
@@ -24,6 +25,7 @@ const biz = 'base_notice.v1';
 
 export default function NoticeList() {
   const [form] = Form.useForm();
+  const { systemConfig } = useContext(ConfigLayoutContext);
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Admin.Notice>(noticeApi.page, { sorter: { field: 'crtTime', order: 'descend' } }, serviceName);
@@ -37,6 +39,12 @@ export default function NoticeList() {
     return [
       // BaseTableUtils.genSimpleSorterColumn('ID', 'id', 70, sorter),
       BaseTableUtils.genSimpleSorterColumn('标题', 'title', undefined, sorter),
+      ...(systemConfig.tenantEnabled ? [{
+        title: '租户ID',
+        dataIndex: 'tenantId',
+        width: 180,
+        render: (value: string | null | undefined) => value || '未分配（历史公告）',
+      }] : []),
       // BaseTableUtils.genSimpleSorterColumn('内容', 'content', undefined, sorter),
       BaseTableUtils.genBoolSorterColumn('有效', 'status', 70, sorter),
       BaseTableUtils.genBoolSorterColumn('强提醒', 'strongNotice', 90, sorter),
