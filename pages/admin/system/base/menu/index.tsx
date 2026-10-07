@@ -883,7 +883,7 @@ export default function Menu() {
         title="导入菜单 JSON"
         open={importModalOpen}
         width={960}
-        destroyOnClose
+        destroyOnHidden
         confirmLoading={importLoading}
         okText="确认覆盖更新"
         cancelText="取消"

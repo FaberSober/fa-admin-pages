@@ -473,7 +473,7 @@ export default function CalendarMaintenance() {
         okText="确认发布"
         onOk={publishExternalImport}
         onCancel={() => setExternalPreviewModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Alert
           type="warning"
@@ -583,7 +583,7 @@ export default function CalendarMaintenance() {
         confirmLoading={saving}
         onOk={() => void saveCalendar()}
         onCancel={() => setCalendarModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={calendarForm} layout="vertical">
           <Form.Item name="calendarCode" label="日历编码" rules={[{ required: true, whitespace: true, max: 32 }]}>
@@ -615,7 +615,7 @@ export default function CalendarMaintenance() {
         confirmLoading={saving}
         onOk={() => void saveDay()}
         onCancel={() => setDayModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={dayForm} layout="vertical">
           <Alert type="info" showIcon message="当前日历只维护例外日期" description="请根据需要选择日期类型；普通日期无需录入。" style={{ marginBottom: 16 }} />
@@ -656,7 +656,7 @@ export default function CalendarMaintenance() {
         confirmLoading={previewLoading}
         okText="预览差异"
         onCancel={() => setImportModalOpen(false)}
-        destroyOnClose
+        destroyOnHidden
       >
         <Alert
           type="info"
