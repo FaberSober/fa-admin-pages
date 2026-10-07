@@ -1,6 +1,6 @@
 import { SITE_INFO } from '@/configs';
 import { FieldNumberOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Captcha, LoginMode, setLoginMode, setToken, useApiLoading, useQs } from '@fa/ui';
+import { Captcha, clearTnTenantId, LoginMode, setLoginMode, setToken, useApiLoading, useQs } from '@fa/ui';
 import { ConfigLayoutContext } from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
 import { authApi } from '@features/fa-admin-pages/services';
 import { telemetry } from '@features/fa-admin-pages/telemetry';
@@ -17,10 +17,13 @@ export default function LoginForm() {
   const search: any = useQs();
 
   const [code, setCode] = useState('');
+  const loginCaptchaEnabled = systemConfig.safeCaptchaOn
+    && import.meta.env.VITE_APP_LOGIN_CAPTCHA_ENABLED !== 'false';
 
   async function onFinish(fieldsValue: any) {
     try {
       const res = await authApi.login(fieldsValue.username, fieldsValue.password);
+      clearTnTenantId();
       telemetry.track('auth.login.success', { eventType: 'LOGIN', result: 'SUCCESS' });
       setToken(res.data.tokenValue);
       setLoginMode(LoginMode.LOCAL);
@@ -53,7 +56,7 @@ export default function LoginForm() {
       <Form.Item name="password" label="密码" required={false} rules={[{ required: true, message: '请输入密码' }]}>
         <Input.Password size="large" prefix={<LockOutlined />} type="password" placeholder="请输入密码" />
       </Form.Item>
-      {systemConfig.safeCaptchaOn && (
+      {loginCaptchaEnabled && (
         <Form.Item name="captcha" label="验证码" required={false} rules={[{ required: true, message: '请输入验证码' }, { validator: validateCaptcha }]}>
           <Space.Compact style={{width: '100%'}}>
             <Input size="large" prefix={<FieldNumberOutlined />} placeholder="请输入验证码" />

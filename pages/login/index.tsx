@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { fileSaveApi } from '@fa/ui';
 import ConfigLayoutContext from '@features/fa-admin-pages/layout/config/context/ConfigLayoutContext';
+import SystemLogo from '@features/fa-admin-pages/components/icons/SystemLogo';
 import VantaLayout from '@features/fa-admin-pages/layout/effect/VantaLayout';
 import LoginCuteLayout from './layout/LoginCuteLayout';
 import LoginForm from './cube/LoginForm';
@@ -23,7 +23,7 @@ export default function Login() {
       <LoginCuteLayout>
         <div className="fa-login-cute-main">
           <div className="fa-login-cute-main-top">
-            <img src={fileSaveApi.genLocalGetFile(systemConfig.logoWithText)} alt={systemConfig.title} style={{ height: '100%' }} />
+            <SystemLogo fileId={systemConfig.logoWithText} alt={systemConfig.title} style={{ height: '100%' }} />
           </div>
 
           <LoginForm />
@@ -38,7 +38,7 @@ export default function Login() {
     <VantaLayout>
       <div className="fa-login-cute-main">
         <div className="fa-login-cute-main-top">
-          <img src={fileSaveApi.genLocalGetFile(systemConfig.logoWithText)} alt={systemConfig.title} style={{ height: '100%' }} />
+          <SystemLogo fileId={systemConfig.logoWithText} alt={systemConfig.title} style={{ height: '100%' }} />
         </div>
 
         <LoginForm />

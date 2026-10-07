@@ -32,7 +32,7 @@ type MenuFilterStatus = 'all' | 'enabled' | 'disabled';
 type MenuFilterLevel = 'all' | FaEnums.RbacMenuLevelEnum;
 type MenuFilterTenantRequired = 'all' | 'required' | 'optional';
 type MenuBatchAction = 'enable' | 'disable' | 'tenant-required' | 'tenant-optional' | 'move' | 'delete';
-type MenuContextAction = 'select-descendants' | 'unselect-descendants' | 'clear-selection';
+type MenuContextAction = 'select-descendants' | 'unselect-descendants' | 'clear-selection' | 'copy-id' | 'copy-name' | 'copy-url' | 'copy-json';
 
 interface MenuFilters {
   keyword: string;
@@ -500,7 +500,24 @@ export default function Menu() {
       setCheckedMenuKeys([]);
       return;
     }
-    if (!node || hasFilters) return;
+    if (!node) return;
+    if (action === 'copy-id') {
+      FaUtils.handleClipboard(node.sourceData.id, '菜单 ID');
+      return;
+    }
+    if (action === 'copy-name') {
+      FaUtils.handleClipboard(node.sourceData.name, '菜单名称');
+      return;
+    }
+    if (action === 'copy-url') {
+      FaUtils.handleClipboard(node.sourceData.linkUrl, '菜单 URL');
+      return;
+    }
+    if (action === 'copy-json') {
+      FaUtils.handleClipboard(JSON.stringify(node.sourceData, null, 2), '菜单 JSON');
+      return;
+    }
+    if (hasFilters) return;
 
     const subtreeIds = new Set<string>();
     collectMenuNodeIds(node, subtreeIds);
@@ -1016,6 +1033,11 @@ export default function Menu() {
                       },
                       { type: 'divider' },
                       { key: 'clear-selection', label: '清空全部选择', disabled: checkedMenuKeys.length === 0 },
+                      { type: 'divider' },
+                      { key: 'copy-id', label: '复制 ID', disabled: !contextNode?.sourceData.id },
+                      { key: 'copy-name', label: '复制名称', disabled: !contextNode?.sourceData.name },
+                      { key: 'copy-url', label: '复制 URL', disabled: !contextNode?.sourceData.linkUrl },
+                      { key: 'copy-json', label: '复制整项 JSON', disabled: !contextNode },
                     ],
                     onClick: ({ key, domEvent }) => {
                       domEvent.stopPropagation();

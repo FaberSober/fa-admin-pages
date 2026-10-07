@@ -1,6 +1,7 @@
 import React, { type CSSProperties, useContext, useEffect, useRef } from 'react';
 import { trim } from 'lodash';
 import { type Fa, fileSaveApi } from '@fa/ui';
+import { DEFAULT_LOGIN_BACKGROUND_URL } from '@features/fa-admin-pages/constants/staticAssets';
 import styles from './VantaLayout.module.scss';
 import ConfigLayoutContext from '../config/context/ConfigLayoutContext';
 // import * as THREE from 'three';
@@ -37,9 +38,14 @@ export default function VantaLayout({ children }: Fa.BaseChildProps) {
     // };
   }, [systemConfig]);
 
+  const configuredBgUrl = trim(systemConfig.loginBg) ? fileSaveApi.genLocalGetFile(systemConfig.loginBg) : '';
   const bgStyle: CSSProperties = {
-    background: systemConfig.loginBg ? `url(${fileSaveApi.genLocalGetFile(systemConfig.loginBg)}) no-repeat` : 'url(/file/image/bg/login.png) no-repeat',
-    backgroundSize: '100% 100%',
+    backgroundImage: configuredBgUrl
+      ? `url(${configuredBgUrl}), url(${DEFAULT_LOGIN_BACKGROUND_URL})`
+      : `url(${DEFAULT_LOGIN_BACKGROUND_URL})`,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: configuredBgUrl ? 'cover, cover' : 'cover',
   };
   // console.log(bgStyle)
 
