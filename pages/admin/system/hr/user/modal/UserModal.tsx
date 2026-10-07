@@ -9,7 +9,7 @@ import { Alert, Button, Form, Input, message, Switch } from 'antd';
 import { get } from 'lodash';
 import { useContext, useRef, useState } from 'react';
 import useBus from 'use-bus';
-import type { Admin } from '@/types';
+import { type Admin, FaEnums } from '@/types';
 import './UserModal.css';
 
 const serviceName = '';
@@ -31,21 +31,22 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
 
   function getInitialValues(initialDepartmentId = defaultDepartmentId) {
     const isSuperAdmin = get(record, 'superAdmin', false) === true;
+    const isNewUser = record === undefined;
 
     return {
       name: get(record, 'name'),
       username: get(record, 'username'),
       tel: get(record, 'tel'),
       email: get(record, 'email'),
-      password: get(record, 'password'),
+      password: isNewUser ? '888888' : get(record, 'password'),
       departmentId: get(record, 'departmentId', initialDepartmentId),
       sex: get(record, 'sex'),
       status: isSuperAdmin ? true : get(record, 'status', true),
-      adminEnabled: get(record, 'adminEnabled', false),
+      adminEnabled: get(record, 'adminEnabled', isNewUser),
       description: get(record, 'description'),
       post: get(record, 'post'),
       img: get(record, 'img'),
-      workStatus: get(record, 'workStatus'),
+      workStatus: isNewUser ? FaEnums.UserWorkStatusEnum.ON_JOB : get(record, 'workStatus'),
       roleIds: [],
     };
   }
