@@ -19,6 +19,13 @@ export default function LoginForm() {
   const [code, setCode] = useState('');
   const loginCaptchaEnabled = systemConfig.safeCaptchaOn
     && import.meta.env.VITE_APP_LOGIN_CAPTCHA_ENABLED !== 'false';
+  const initialValues = import.meta.env.DEV
+    ? {
+        username: import.meta.env.VITE_APP_TEST_LOGIN_USERNAME,
+        password: import.meta.env.VITE_APP_TEST_LOGIN_PASSWORD,
+        remember: true,
+      }
+    : { remember: true };
 
   async function onFinish(fieldsValue: any) {
     try {
@@ -46,7 +53,7 @@ export default function LoginForm() {
 
   const loading = useApiLoading([authApi.getUrl('login')]);
   return (
-    <Form form={form} onFinish={onFinish} layout="vertical" autoComplete="off" initialValues={{ remember: true }}>
+    <Form form={form} onFinish={onFinish} layout="vertical" autoComplete="off" initialValues={initialValues}>
       <Helmet title={`登录 | ${systemConfig.title}`} />
 
       <Form.Item name="username" label="账号" required={false} rules={[{ required: true, message: '请输入账号' }]}>
