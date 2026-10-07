@@ -66,12 +66,12 @@ export default function FaWorkbenchConfigDrawer({
       </Space>
       <FaCubeGrid allLayout={allLayout} cubes={cubes} selectedIds={selectedIds} onAdd={onAdd} onRemove={onRemove} />
       <div className="fa-p12" aria-live="polite">
-        {saveStatus === 'saving' && <Alert type="info" showIcon message="保存中..." />}
+        {saveStatus === 'saving' && <Alert type="info" showIcon title="保存中..." />}
         {saveStatus === 'error' && (
           <Alert
             type="error"
             showIcon
-            message="保存失败"
+            title="保存失败"
             description="当前布局未成功保存，请重试。"
             action={
               <Button size="small" type="link" onClick={retryLayout}>
@@ -80,7 +80,7 @@ export default function FaWorkbenchConfigDrawer({
             }
           />
         )}
-        {saveStatus === 'saved' && <Alert type="success" showIcon message="已保存" />}
+        {saveStatus === 'saved' && <Alert type="success" showIcon title="已保存" />}
       </div>
     </BaseDrawer>
   );

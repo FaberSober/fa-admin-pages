@@ -334,7 +334,7 @@ function MenuRowActions({ item, scope, onRefresh, onDelete, descendantCount }: M
             <Alert
               type="warning"
               showIcon
-              message={`该菜单包含 ${descendantCount} 个下级节点`}
+              title={`该菜单包含 ${descendantCount} 个下级节点`}
               description="删除后将级联删除所有下级菜单和权限按钮，且不可恢复。"
             />
           </Space>
@@ -569,7 +569,7 @@ export default function Menu() {
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <span>确认删除选中的 {topLevelSelectedMenuNodes.length} 个菜单？</span>
           {cascadedCount > 0 && (
-            <Alert type="warning" showIcon message={`已自动合并 ${cascadedCount} 个下级节点`} description="删除上级菜单会级联删除其下级菜单和权限按钮。" />
+            <Alert type="warning" showIcon title={`已自动合并 ${cascadedCount} 个下级节点`} description="删除上级菜单会级联删除其下级菜单和权限按钮。" />
           )}
           <span>删除后不可恢复。</span>
         </Space>
@@ -912,7 +912,7 @@ export default function Menu() {
             <Alert
               type={importPreview.conflictCount > 0 ? 'error' : 'info'}
               showIcon
-              message={`${importFileName}：共 ${importPreview.total} 个源菜单`}
+              title={`${importFileName}：共 ${importPreview.total} 个源菜单`}
               description={
                 importPreview.conflictCount > 0
                   ? '存在冲突，无法提交。请修正 JSON 或选择正确的目标 scope 后重新预览。'
@@ -1095,7 +1095,7 @@ export default function Menu() {
         onCancel={() => setMoveModalOpen(false)}
       >
         <Space direction="vertical" size={12} style={{ width: '100%' }}>
-          <Alert type="info" showIcon message="选中菜单将移动到目标父级的末尾，原有层级关系会保持不变。" />
+          <Alert type="info" showIcon title="选中菜单将移动到目标父级的末尾，原有层级关系会保持不变。" />
           <RbacMenuCascader
             style={{ width: '100%' }}
             scope={scope}

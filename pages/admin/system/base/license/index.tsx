@@ -119,9 +119,9 @@ export default function LicenseManagement() {
             </Space>
 
             {!usable && (
-              <Alert className="fa-mb12" type="warning" showIcon message="系统授权已失效" description="请重新校验在线授权，或上传有效的离线 License。" />
+              <Alert className="fa-mb12" type="warning" showIcon title="系统授权已失效" description="请重新校验在线授权，或上传有效的离线 License。" />
             )}
-            {license.status === 'GRACE' && <Alert className="fa-mb12" type="info" showIcon message="当前处于授权宽限期，请尽快完成在线重新校验。" />}
+            {license.status === 'GRACE' && <Alert className="fa-mb12" type="info" showIcon title="当前处于授权宽限期，请尽快完成在线重新校验。" />}
 
             <Descriptions bordered column={2} size="small">
               <Descriptions.Item label="License ID">{display(license.licenseId)}</Descriptions.Item>
@@ -143,7 +143,7 @@ export default function LicenseManagement() {
       </Card>
 
       <Card title="导入离线 License">
-        <Alert className="fa-mb12" type="info" showIcon message="仅支持 .lic 文件，大小不超过 64 KB。文件会直接提交进行授权校验。" />
+        <Alert className="fa-mb12" type="info" showIcon title="仅支持 .lic 文件，大小不超过 64 KB。文件会直接提交进行授权校验。" />
         <Space wrap>
           <Upload key={file?.name || 'license-upload'} accept=".lic" maxCount={1} showUploadList={false} disabled={importing} beforeUpload={handleBeforeUpload}>
             <Button icon={<UploadOutlined />} disabled={importing}>

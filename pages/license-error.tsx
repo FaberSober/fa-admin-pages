@@ -162,7 +162,7 @@ export default function LicenseErrorPage() {
           type="warning"
           showIcon
           style={{ width: 'min(760px, 100%)' }}
-          message="授权恢复入口校验失败"
+          title="授权恢复入口校验失败"
           description="当前 URL 中的机器码与本服务器不匹配，暂不开放恢复操作。"
         />
       )}
@@ -178,7 +178,7 @@ export default function LicenseErrorPage() {
           </Descriptions>
 
           {recovery.mode === 'ONLINE' && (
-            <Alert type="info" showIcon message="当前为在线授权模式" description="在线模式不支持上传离线 License，请配置 FA_LICENSE_KEY 后重新启动服务。" />
+            <Alert type="info" showIcon title="当前为在线授权模式" description="在线模式不支持上传离线 License，请配置 FA_LICENSE_KEY 后重新启动服务。" />
           )}
 
           {recovery.mode === 'OFFLINE' && recovery.uploadAllowed && (
@@ -187,7 +187,7 @@ export default function LicenseErrorPage() {
                 className="fa-mb12"
                 type="warning"
                 showIcon
-                message="已开放离线授权恢复"
+                title="已开放离线授权恢复"
                 description="仅支持当前服务器的有效 .lic 授权文件，上传后会替换现有离线授权文件。"
               />
               <Space wrap>
@@ -212,7 +212,7 @@ export default function LicenseErrorPage() {
           )}
 
           {recovery.mode === 'OFFLINE' && !recovery.uploadAllowed && (
-            <Alert type="info" showIcon message="当前不允许执行匿名恢复" description="请登录超级管理员后进行授权操作，或确认当前授权状态。" />
+            <Alert type="info" showIcon title="当前不允许执行匿名恢复" description="请登录超级管理员后进行授权操作，或确认当前授权状态。" />
           )}
         </Card>
       )}

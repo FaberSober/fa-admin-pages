@@ -210,7 +210,7 @@ export default function UserModal({ children, title, record, fetchFinish, addBtn
               </div>
             </div>
 
-            {rolesLoading && <Alert className="user-form-loading-hint" type="info" showIcon message="正在加载角色权限，完成后才能提交表单" />}
+            {rolesLoading && <Alert className="user-form-loading-hint" type="info" showIcon title="正在加载角色权限，完成后才能提交表单" />}
 
             <div className="user-form-grid">
               <Form.Item name="username" label="账户" rules={[{ required: true }]} {...FaUtils.formItemHalfLayout}>

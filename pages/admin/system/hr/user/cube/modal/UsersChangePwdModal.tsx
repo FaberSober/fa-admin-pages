@@ -83,7 +83,7 @@ export default function UsersChangePwdModal({ children, userIds, fetchFinish, ..
         <Alert
           type="warning"
           showIcon
-          message={`将重置 ${userIds.length} 位用户的登录密码，操作成功后立即生效。`}
+          title={`将重置 ${userIds.length} 位用户的登录密码，操作成功后立即生效。`}
           style={{ marginBottom: 16 }}
         />
         <Form form={form} onFinish={onFinish}>

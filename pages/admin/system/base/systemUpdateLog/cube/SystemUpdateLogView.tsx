@@ -43,7 +43,7 @@ export default function SystemUpdateLogView({ record }: SystemUpdateLogViewProps
     return <Skeleton active paragraph={{ rows: 12 }} />;
   }
   if (loadFailed || !detail) {
-    return <Alert type="error" showIcon message="版本日志详情加载失败" />;
+    return <Alert type="error" showIcon title="版本日志详情加载失败" />;
   }
 
   return (
@@ -94,7 +94,7 @@ export default function SystemUpdateLogView({ record }: SystemUpdateLogViewProps
           <Alert
             type="error"
             showIcon
-            message="SQL执行失败"
+            title="SQL执行失败"
             description={
               <pre className="fa-break-word" style={{ maxHeight: '40vh', overflow: 'auto', margin: 0 }}>
                 {detail.errorMsg}

@@ -461,7 +461,7 @@ export default function CalendarMaintenance() {
         className="calendarMaintenanceImportHint"
         type="info"
         showIcon
-        message="维护提示"
+        title="维护提示"
         description="日历只维护覆盖默认规则的例外日期；未录入日期由日历类型按工作日/周末规则推导。日期事实不支持删除，需要撤销时请修正为关闭日期；修改历史日期不会自动覆盖已生成的业务数据，请按需重建。"
       />
 
@@ -478,7 +478,7 @@ export default function CalendarMaintenance() {
         <Alert
           type="warning"
           showIcon
-          message="请确认数据来源后发布"
+          title="请确认数据来源后发布"
           description="系统将按配置的数据源生成年度日历例外日期；确认后将一次性幂等更新本次数据。"
         />
         <Table
@@ -618,7 +618,7 @@ export default function CalendarMaintenance() {
         destroyOnHidden
       >
         <Form form={dayForm} layout="vertical">
-          <Alert type="info" showIcon message="当前日历只维护例外日期" description="请根据需要选择日期类型；普通日期无需录入。" style={{ marginBottom: 16 }} />
+          <Alert type="info" showIcon title="当前日历只维护例外日期" description="请根据需要选择日期类型；普通日期无需录入。" style={{ marginBottom: 16 }} />
           <Form.Item name="calendarDate" label="日期" rules={[{ required: true }]}>
             <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
           </Form.Item>
@@ -661,7 +661,7 @@ export default function CalendarMaintenance() {
         <Alert
           type="info"
           showIcon
-          message="只导入例外日期数组 JSON"
+          title="只导入例外日期数组 JSON"
           description="请按当前日历配置选择对应的例外类型；普通日期无需导入，预览确认后才会发布。"
         />
         <Form form={importForm} layout="vertical" style={{ marginTop: 16 }}>

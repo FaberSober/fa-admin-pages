@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { ConfigProvider, theme } from 'antd';
+import { App as AntdApp, ConfigProvider, theme } from 'antd';
 
 // antd国际化配置
 import zhCN from 'antd/es/locale/zh_CN';
@@ -89,9 +89,11 @@ export default function LangLayout({ children }: Fa.BaseChildProps) {
         }}
         // getPopupContainer={(trigger) => (trigger ? trigger.parentElement as HTMLElement : document.body)}
       >
-        <IntlProvider messages={handleMessages(locale)} locale={locale.split('_')[0]}>
-          {children}
-        </IntlProvider>
+        <AntdApp>
+          <IntlProvider messages={handleMessages(locale)} locale={locale.split('_')[0]}>
+            {children}
+          </IntlProvider>
+        </AntdApp>
       </ConfigProvider>
     </LangContext.Provider>
   );

@@ -99,7 +99,7 @@ export default function UserImportModal({ departmentId, superMode = false, scope
           </Typography.Paragraph>
         </Card>
 
-        {!preview && <Alert type="info" showIcon message="上传文件后点击“预览校验”，确认无错误后才能提交导入。" />}
+        {!preview && <Alert type="info" showIcon title="上传文件后点击“预览校验”，确认无错误后才能提交导入。" />}
 
         {preview && (
           <Card size="small" title="2. 预览结果">
@@ -115,7 +115,7 @@ export default function UserImportModal({ departmentId, superMode = false, scope
               className="fa-mt12"
               type={preview.errorCount > 0 ? 'error' : 'success'}
               showIcon
-              message={preview.errorCount > 0 ? '存在校验错误，请修正文件后重新上传预览。' : '校验通过，可以确认导入。'}
+              title={preview.errorCount > 0 ? '存在校验错误，请修正文件后重新上传预览。' : '校验通过，可以确认导入。'}
             />
 
             {preview.errors.length > 0 && (
