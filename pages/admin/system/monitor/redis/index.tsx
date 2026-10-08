@@ -456,7 +456,7 @@ export default function Redis() {
                     <div className="redis-monitor-tree-leaf">
                       <div className="redis-monitor-tree-main">
                         <span className="redis-monitor-tree-key">{node.title}</span>
-                        <Tag bordered={false} color={TYPE_COLORS[item.type] || 'default'}>
+                        <Tag variant="filled" color={TYPE_COLORS[item.type] || 'default'}>
                           {item.type}
                         </Tag>
                       </div>

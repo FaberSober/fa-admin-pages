@@ -61,7 +61,7 @@ export default function AMapLayout({ children }: Fa.BaseChildProps) {
 
   useEffect(() => {
     if (systemConfig.offline) {
-      console.warn('offline mode 离线模式不加载高德地图API，无法使用高德地图，请注意。');
+      console.info('offline mode 离线模式不加载高德地图API，无法使用高德地图，请注意。');
       return;
     }
 
