@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
-import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { useBlocker, useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useLocalStorage, useSessionStorage } from 'react-use';
 import { type Fa, FaEnums, FaFlexRestLayout, FaUiContext, type FaUiContextProps, findTreePath, flatTreeList } from '@fa/ui';
@@ -13,6 +13,7 @@ import * as FaRouteUtils from '../../components/utils/FaRouteUtils';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
 import TabContentCache from './TabContentCache';
 import { createTabLeaveGuards } from './tabLeaveGuards';
+import { routeLeaveKeys } from './routeLeavePolicy';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import UserLayoutContext from '../user/context/UserLayoutContext';
 import './MenuLayout.scss';
@@ -82,6 +83,25 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   }, [currentRouteKey, location.pathname, openTabs]);
   // 自定义详情路由没有独立菜单 Tab 时，必须使用当前路由作为内容缓存键，不能回退到上一个菜单 Tab。
   const activeTabKey = locationTab?.key ?? currentRouteKey;
+  const cachedRoutes = useRef(new Map<string, string>());
+  useEffect(() => {
+    cachedRoutes.current.set(activeTabKey, currentRouteKey);
+  }, [activeTabKey, currentRouteKey]);
+
+  const routeBlocker = useBlocker(({ currentLocation, nextLocation }) => {
+    const registeredKeys = tabLeaveGuards.keys();
+    const keys = routeLeaveKeys(currentLocation, nextLocation, openTabs || [], activeTabKey, registeredKeys, cachedRoutes.current);
+    return keys.some(key => registeredKeys.includes(key));
+  });
+  useEffect(() => {
+    if (routeBlocker.state !== 'blocked') return;
+    let active = true;
+    const keys = routeLeaveKeys(location, routeBlocker.location, openTabs || [], activeTabKey, tabLeaveGuards.keys(), cachedRoutes.current);
+    void tabLeaveGuards.run(keys, () => { if (active) routeBlocker.proceed(); })
+      .then(allowed => { if (active && !allowed) routeBlocker.reset(); })
+      .catch(() => { if (active) routeBlocker.reset(); });
+    return () => { active = false; };
+  }, [routeBlocker, tabLeaveGuards]);
 
   // 浏览器前进/后退或直接通过 URL 导航时，同步 Tab 高亮状态。
   useEffect(() => {
