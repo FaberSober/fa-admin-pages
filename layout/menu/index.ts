@@ -4,3 +4,5 @@ import MenuLayoutContext, { type MenuLayoutContextProps } from './context/MenuLa
 
 export { MenuLayout, MenuLayoutContext, MenuContainer };
 export type { MenuLayoutContextProps };
+
+export { TabLeaveContext } from './context/TabLeaveContext';

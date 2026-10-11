@@ -1,3 +1,4 @@
+import { TabLeaveContext } from './context/TabLeaveContext';
 import { PageLoading } from '@fa/ui';
 import { TabErrorBoundary } from '@features/fa-admin-pages/components/exception';
 import { type ReactNode, Suspense, useEffect, useMemo, useState } from 'react';
@@ -129,7 +130,7 @@ export default function TabContentCache({ activeKey, currentPathname, currentRou
           >
             <Suspense fallback={<PageLoading />}>
               <TabErrorBoundary key={`${tabKey}-${reloadKeys[tabKey] ?? 0}`} onReload={() => onReload(tabKey)}>
-                {content}
+                <TabLeaveContext.Provider value={tabKey}>{content}</TabLeaveContext.Provider>
               </TabErrorBoundary>
             </Suspense>
           </div>

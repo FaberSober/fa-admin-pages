@@ -36,6 +36,8 @@ export interface MenuLayoutContextProps {
   setCurTab: (v: OpenTabsItem | undefined) => void;
   setOpenTabs: (v: OpenTabsItem[]) => void;
   addTab: (tab: OpenTabsItem) => void; // 添加新的tab
+  closeTabs?: (keys: string[]) => void;
+  registerTabLeaveGuard?: (key: string, guard: () => Promise<boolean>) => () => void;
   removeTab: (key: string) => void; // 添加新的tab
   selTab: (key: string) => void; // 选中tab
   reloadKey: number; // 当前tab的reload版本号，用于强制重新mount页面

@@ -13,37 +13,10 @@ export interface OpenTabsMenuProps {
  * @date 2026-03-03 16:01:06
  */
 export default function OpenTabsMenu({ targetTabKey }: OpenTabsMenuProps) {
-  const { openTabs, curTab, setOpenTabs, selTab, reloadTab } = useContext(MenuLayoutContext);
+  const { openTabs, closeTabs, reloadTab } = useContext(MenuLayoutContext);
 
   function remove(tabKey: string) {
-    const index = findIndex(openTabs, (i) => i.key === tabKey);
-    if (index === -1) return;
-
-    let lastIndex = -1;
-    openTabs.forEach((item, i) => {
-      if (item.key === tabKey) {
-        lastIndex = i - 1;
-      }
-    });
-    const newPanes = openTabs.filter((item) => item.key !== tabKey);
-
-    let newActiveKey = curTab?.key;
-    if (newPanes.length && newPanes.length > 0 && newActiveKey === tabKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-      selTab(newActiveKey);
-    } else if (newActiveKey === undefined) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-      selTab(newActiveKey);
-    }
-    setOpenTabs(newPanes);
+    closeTabs?.([tabKey]);
   }
 
   function closeOthers(tabKey: string) {
@@ -51,7 +24,7 @@ export default function OpenTabsMenu({ targetTabKey }: OpenTabsMenuProps) {
     if (index === -1) return;
 
     const newPanes = openTabs.filter((item) => item.key === tabKey);
-    setOpenTabs(newPanes);
+    closeTabs?.(openTabs.filter(item => !newPanes.some(tab => tab.key === item.key)).map(item => item.key));
   }
 
   function closeLeft(tabKey: string) {
@@ -60,7 +33,7 @@ export default function OpenTabsMenu({ targetTabKey }: OpenTabsMenuProps) {
 
     const newPanes = [...openTabs];
     newPanes.splice(0, index);
-    setOpenTabs(newPanes);
+    closeTabs?.(openTabs.filter(item => !newPanes.some(tab => tab.key === item.key)).map(item => item.key));
   }
 
   function closeRight(tabKey: string) {
@@ -69,7 +42,7 @@ export default function OpenTabsMenu({ targetTabKey }: OpenTabsMenuProps) {
 
     const newPanes = [...openTabs];
     newPanes.splice(index + 1, newPanes.length - index - 1);
-    setOpenTabs(newPanes);
+    closeTabs?.(openTabs.filter(item => !newPanes.some(tab => tab.key === item.key)).map(item => item.key));
   }
 
   function reload() {
@@ -95,38 +68,6 @@ export default function OpenTabsMenu({ targetTabKey }: OpenTabsMenuProps) {
 }
 
 export function useTabOperations() {
-  const { openTabs, curTab, setOpenTabs, selTab } = useContext(MenuLayoutContext);
-
-  function remove(tabKey: string) {
-    const index = findIndex(openTabs, (i) => i.key === tabKey);
-    if (index === -1) return;
-
-    let lastIndex = -1;
-    openTabs.forEach((item, i) => {
-      if (item.key === tabKey) {
-        lastIndex = i - 1;
-      }
-    });
-    const newPanes = openTabs.filter((item) => item.key !== tabKey);
-
-    let newActiveKey = curTab?.key;
-    if (newPanes.length && newPanes.length > 0 && newActiveKey === tabKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-      selTab(newActiveKey);
-    } else if (newActiveKey === undefined) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-      selTab(newActiveKey);
-    }
-    setOpenTabs(newPanes);
-  }
-
-  return { remove };
+  const { closeTabs } = useContext(MenuLayoutContext);
+  return { remove: (tabKey: string) => closeTabs?.([tabKey]) };
 }

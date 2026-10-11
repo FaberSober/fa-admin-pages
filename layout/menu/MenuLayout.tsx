@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
@@ -12,6 +12,7 @@ import useRoutePermission from '../../hooks/useRoutePermission';
 import * as FaRouteUtils from '../../components/utils/FaRouteUtils';
 import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } from './context/MenuLayoutContext';
 import TabContentCache from './TabContentCache';
+import { createTabLeaveGuards } from './tabLeaveGuards';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import UserLayoutContext from '../user/context/UserLayoutContext';
 import './MenuLayout.scss';
@@ -61,7 +62,12 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   const [menuContentFull, setMenuContentFull] = useLocalStorage<boolean>('MenuLayout.menuContentFull', false); // 是否网页内全屏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
   const [openTabs, setOpenTabs] = useSessionStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-当前浏览器会话的标签页数组
+  const tabLeaveGuards = useMemo(() => createTabLeaveGuards(), []);
+  const tabsRef = useRef(openTabs);
+  tabsRef.current = openTabs;
+  const currentTabRef = useRef<OpenTabsItem>();
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
+  currentTabRef.current = curTab;
   const [tabReloadKeys, setTabReloadKeys] = useState<Record<string, number>>({}); // 每个tab的reload版本号
 
   const [breadcrumbs, setBreadcrumbs] = useState<{title:string}[]>([])
@@ -211,6 +217,23 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
     }
   }
 
+  function closeTabs(keys: string[]) {
+    void tabLeaveGuards.run(keys, () => {
+      const currentTabs = tabsRef.current || [];
+      const remaining = currentTabs.filter(tab => !keys.includes(tab.key));
+      const selected = currentTabRef.current;
+      if (selected && keys.includes(selected.key)) {
+        const index = currentTabs.findIndex(tab => tab.key === selected.key);
+        const previous = currentTabs.slice(0, index).reverse().find(tab => !keys.includes(tab.key));
+        const next = previous ?? remaining[0];
+        setCurTab(next);
+        if (next) syncOpenMenuById(next.key, menuFullTree);
+        else navigate(SITE_INFO.HOME_LINK);
+      }
+      setOpenTabs(remaining);
+    });
+  }
+
   const contextValue: MenuLayoutContextProps = {
     menuFullTree,
     menuList,
@@ -261,20 +284,21 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
         syncOpenMenuById(newTab.linkMenuId, menuFullTree, { navigate: false, openTab: false });
       }
     },
-    removeTab: (tabKey: string) => {
-      // console.log('close tab', tabKey)
-      setOpenTabs((openTabs || []).filter((i) => i.key !== tabKey));
-    },
+    closeTabs,
+    registerTabLeaveGuard: tabLeaveGuards.register,
+    removeTab: (tabKey: string) => closeTabs([tabKey]),
     selTab: (tabKey: string) => {
       // console.log('selTab')
       syncOpenMenuById(tabKey, menuFullTree);
     },
     reloadKey: tabReloadKeys[activeTabKey] ?? 0,
     reloadTab: (tabKey: string) => {
-      setTabReloadKeys((prev) => ({
-        ...prev,
-        [tabKey]: (prev[tabKey] ?? 0) + 1,
-      }));
+      void tabLeaveGuards.run([tabKey], () => {
+        setTabReloadKeys((prev) => ({
+          ...prev,
+          [tabKey]: (prev[tabKey] ?? 0) + 1,
+        }));
+      });
     },
   };
 
