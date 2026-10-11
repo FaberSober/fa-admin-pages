@@ -25,7 +25,7 @@ export default function FilePreviewModal({
   onOpenChange,
   onCancel,
   title = '查看文件',
-  width = 1000,
+  width = '90vw',
   bodyStyle,
   previewStyle,
   ...modalProps
@@ -59,7 +59,9 @@ export default function FilePreviewModal({
         title={title}
         open={open}
         width={width}
-        bodyStyle={{ height: 600, padding: 0, ...bodyStyle }}
+        centered={modalProps.centered ?? false}
+        style={{ top: '5vh', paddingBottom: 0, ...modalProps.style }}
+        bodyStyle={{ height: 'calc(90vh - 140px)', padding: 0, ...bodyStyle }}
         onCancel={(event) => {
           updateOpen(false);
           onCancel?.(event);
