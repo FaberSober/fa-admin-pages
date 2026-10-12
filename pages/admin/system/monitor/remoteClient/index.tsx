@@ -20,7 +20,7 @@ export default function RemoteClientList() {
   const { queryParams, handleTableChange, fetchPageList, fetchPageListSilently, loading, list, paginationProps } = useTableQueryParams<RemoteClient.Client>(
     loadPage,
     { sorter: { field: 'connectedAt', order: 'descend' } },
-    '在线客户端',
+    '在线调试',
   );
   useAutoRefresh(5, () => {
     if (!loading) fetchPageListSilently();
@@ -55,7 +55,7 @@ export default function RemoteClientList() {
   return (
     <div className="fa-full-content-p12 fa-flex-column fa-content">
       <div className="fa-flex-row-center fa-p8" style={{ gap: 24, flexWrap: 'wrap' }}>
-        <div className="fa-h3">在线客户端</div>
+        <div className="fa-h3">在线调试</div>
         <Space>
           <span>
             在线连接 <strong>{paginationProps.total ?? '-'}</strong>

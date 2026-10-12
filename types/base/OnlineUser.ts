@@ -1,5 +1,5 @@
 namespace OnlineUser {
-  /** 按用户聚合的当前在线客户端数量。 */
+  /** 按用户聚合的当前在线调试数量。 */
   export interface PresenceSummary {
     userId: string;
     username: string;
