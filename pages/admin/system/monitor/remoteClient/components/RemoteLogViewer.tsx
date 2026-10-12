@@ -1,11 +1,10 @@
 import { FaFullContentModal, FaJsonView } from '@fa/ui';
-import { sendMessage, useWsStore } from '@features/fa-admin-pages/layout/websocket';
 import type { RemoteClient } from '@features/fa-admin-pages/types';
-import { ReadyState } from 'ahooks/lib/useWebSocket';
 import { Button, Input, Select, Space, Switch, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import useBus from 'use-bus';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ClientHeartbeatChart from './ClientHeartbeatChart';
+import useRemoteLogCapture from './useRemoteLogCapture';
 
 const MAX_VISIBLE_LOGS = 500;
 const LOG_LEVELS = ['DEBUG', 'LOG', 'INFO', 'WARN', 'ERROR'] as const;
@@ -15,7 +14,7 @@ interface LogLine {
   id: number;
   timestamp: number;
   level: NonNullable<RemoteClient.LogEvent['level']>;
-  source: NonNullable<RemoteClient.LogEvent['source']>;
+  source: NonNullable<RemoteClient.LogEvent['source']> | 'system';
   message: string;
   http?: { title: string; data: unknown };
   showHttpJson?: boolean;
@@ -60,17 +59,11 @@ function parseHttpLog(message: string): LogLine['http'] {
 }
 
 export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProps) {
-  const readyState = useWsStore((state) => state.readyState);
-  const socketReady = readyState === ReadyState.Open;
-  const [phase, setPhase] = useState<'idle' | 'starting' | 'active' | 'stopping'>('idle');
-  const [notice, setNotice] = useState('');
   const [logs, setLogs] = useState<LogLine[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<LogLine['level'][]>([]);
   const [searchText, setSearchText] = useState('');
   const [autoScroll, setAutoScroll] = useState(true);
   const [showHttpJson, setShowHttpJson] = useState(true);
-  const sessionIdRef = useRef<string | undefined>(undefined);
-  const requestSentRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sequenceRef = useRef(0);
   const filteredLogs = useMemo(() => {
@@ -78,24 +71,14 @@ export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProp
     return logs.filter((line) => {
       if (selectedLevels.length && !selectedLevels.includes(line.level)) return false;
       if (!keyword) return true;
-      const source = line.source === 'runtime' ? '运行时' : 'Console';
+      const source = line.source === 'system' ? '连接' : line.source === 'runtime' ? '运行时' : 'Console';
       return `${line.level} ${source} ${line.http?.title ?? ''} ${line.message}`.toLowerCase().includes(keyword);
     });
   }, [logs, searchText, selectedLevels]);
 
-  useBus(
-    ['@@ws/RECEIVE/RemoteLog'],
-    ({ payload }) => {
-      if (!payload || typeof payload !== 'object') return;
-      const event = payload as RemoteClient.LogEvent;
-      if (event.clientId && event.clientId !== client.id) return;
-
-      if (event.action === 'started' && event.sessionId) {
-        sessionIdRef.current = event.sessionId;
-        requestSentRef.current = true;
-        setPhase('active');
-        setNotice('采集已开启');
-      } else if (event.action === 'entry' && event.sessionId === sessionIdRef.current && event.level && event.message !== undefined) {
+  const onEntry = useCallback(
+    (event: RemoteClient.LogEvent) => {
+      if (event.level && event.message !== undefined) {
         const http = parseHttpLog(event.message);
         const line: LogLine = {
           id: ++sequenceRef.current,
@@ -107,75 +90,40 @@ export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProp
           showHttpJson: http ? showHttpJson : undefined,
         };
         setLogs((previous) => [...previous, line].slice(-MAX_VISIBLE_LOGS));
-      } else if (event.action === 'stopped' && (!event.sessionId || event.sessionId === sessionIdRef.current)) {
-        requestSentRef.current = false;
-        sessionIdRef.current = undefined;
-        setPhase('idle');
-        setNotice('采集已停止');
-      } else if (event.action === 'ended' && event.sessionId === sessionIdRef.current) {
-        requestSentRef.current = false;
-        sessionIdRef.current = undefined;
-        setPhase('idle');
-        setNotice(event.reason === 'timeout' ? '采集已超时结束' : '客户端连接已结束');
-      } else if (event.action === 'error') {
-        requestSentRef.current = false;
-        sessionIdRef.current = undefined;
-        setPhase('idle');
-        setNotice(event.message || '无法开启远程采集');
       }
     },
-    [client.id, showHttpJson],
+    [showHttpJson],
   );
 
-  useEffect(
-    () => () => {
-      if (requestSentRef.current && useWsStore.getState().readyState === ReadyState.Open) {
-        sendMessage({ type: 'RemoteLog', data: { action: 'stop', sessionId: sessionIdRef.current } });
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (!socketReady && requestSentRef.current) {
-      requestSentRef.current = false;
-      sessionIdRef.current = undefined;
-      setPhase('idle');
-      setNotice('管理端 WebSocket 已断开，采集已结束');
-    }
-  }, [socketReady]);
+  const onMarker = useCallback((message: string) => {
+    const line: LogLine = { id: ++sequenceRef.current, timestamp: Date.now(), level: 'INFO', source: 'system', message };
+    setLogs((previous) => [...previous, line].slice(-MAX_VISIBLE_LOGS));
+  }, []);
+  const capture = useRemoteLogCapture(client, onEntry, onMarker);
+  const { phase, wanted, notice, socketReady } = capture;
 
   useEffect(() => {
     if (autoScroll && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [filteredLogs, autoScroll, showHttpJson]);
 
   const startCapture = () => {
-    if (!socketReady) return;
-    requestSentRef.current = true;
-    setPhase('starting');
-    setNotice('正在开启采集…');
     setLogs([]);
-    sendMessage({ type: 'RemoteLog', data: { action: 'start', clientId: client.id } });
-  };
-
-  const stopCapture = () => {
-    if (!requestSentRef.current || !socketReady) return;
-    setPhase('stopping');
-    setNotice('正在停止采集…');
-    sendMessage({ type: 'RemoteLog', data: { action: 'stop', sessionId: sessionIdRef.current } });
+    capture.startCapture();
   };
 
   const close = () => {
-    if (requestSentRef.current && socketReady) {
-      sendMessage({ type: 'RemoteLog', data: { action: 'stop', sessionId: sessionIdRef.current } });
-    }
-    requestSentRef.current = false;
+    capture.stopCapture();
     onClose();
   };
 
   return (
     <FaFullContentModal
-      title={`实时日志 · ${client.appName || client.clientType} · ${client.username || '-'}`}
+      title={
+        <Space size={20} wrap>
+          <span>{`实时日志 · ${client.appName || client.clientType} · ${client.username || '-'}`}</span>
+          <ClientHeartbeatChart samples={capture.samples} state={capture.state} now={capture.now} lastSeenAt={capture.lastSeenAt} socketReady={socketReady} />
+        </Space>
+      }
       open
       showOk={false}
       showCancel={false}
@@ -184,7 +132,7 @@ export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProp
       <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <Space wrap style={{ flex: '0 0 auto' }}>
           <output aria-atomic="true">
-            {phase === 'active' ? '采集中' : phase === 'starting' ? '正在连接' : phase === 'stopping' ? '正在停止' : '未采集'}
+            {phase === 'active' ? '采集中' : phase === 'starting' ? '正在连接' : phase === 'waiting' ? '等待恢复' : '未采集'}
             {notice ? ` · ${notice}` : ''}
           </output>
           <Space size={4}>
@@ -192,9 +140,9 @@ export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProp
             <Switch
               size="small"
               aria-label="远程日志采集"
-              checked={phase === 'active' || phase === 'starting'}
-              disabled={!socketReady || phase === 'starting' || phase === 'stopping'}
-              onChange={(checked) => (checked ? startCapture() : stopCapture())}
+              checked={wanted}
+              disabled={!socketReady && !wanted}
+              onChange={(checked) => (checked ? startCapture() : capture.stopCapture())}
             />
           </Space>
           <Space size={4}>
@@ -254,7 +202,7 @@ export default function RemoteLogViewer({ client, onClose }: RemoteLogViewerProp
               >
                 <Typography.Text type="secondary">{dayjs(line.timestamp).format('HH:mm:ss.SSS')}</Typography.Text>
                 <Tag color={levelColor[line.level]}>{line.level}</Tag>
-                <Typography.Text type="secondary">{line.source === 'runtime' ? '运行时' : 'Console'}</Typography.Text>
+                <Typography.Text type="secondary">{line.source === 'system' ? '连接' : line.source === 'runtime' ? '运行时' : 'Console'}</Typography.Text>
                 {line.http ? (
                   <div style={{ minWidth: 0 }}>
                     <Space size={6}>

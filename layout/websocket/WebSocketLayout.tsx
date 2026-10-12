@@ -1,5 +1,5 @@
 // WebSocketBridge.tsx (新增文件)
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useInterval, useWebSocket } from 'ahooks';
 import { ReadyState } from 'ahooks/lib/useWebSocket';
 import { Fa, FaUtils, getClientInstanceId, getToken } from '@fa/ui';
@@ -12,6 +12,7 @@ import { useWsStore } from './stores/useWsStore';
 export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
     // 1. 获取 Zustand 的设置方法
     const setHandlers = useWsStore(state => state.setHandlers);
+    const heartbeatSentAtRef = useRef(0);
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
@@ -21,7 +22,10 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
         {
             manual: true,
             // 实时更新 Zustand 中的 readyState
-            onOpen: () => useWsStore.setState({ readyState: ReadyState.Open }),
+            onOpen: () => {
+                heartbeatSentAtRef.current = 0;
+                useWsStore.setState({ readyState: ReadyState.Open });
+            },
             onClose: () => useWsStore.setState({ readyState: ReadyState.Closed }),
             // ... 其他 Ahooks 配置
         }
@@ -55,6 +59,8 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
 
         try {
             const ret = FaUtils.tryParseJson(latestMessage.data, {});
+            // 只有 ping 回执确认双向可达，业务推送不能替代回执。
+            if (!ret.type && ret.code === 0) heartbeatSentAtRef.current = 0;
 
             // 更新 Zustand Store 中的状态
             useWsStore.setState(state => ({ // 使用静态方法来避免触发本组件渲染
@@ -75,12 +81,22 @@ export default function WebSocketLayout({ children }: Fa.BaseChildProps) {
     useInterval(() => {
         if (readyState === ReadyState.Closed) {
             connect();
+            return;
         }
+        if (readyState !== ReadyState.Open) return;
+        // 半开连接可能一直保持 Open；缺失回执时主动关闭，由下一轮重连。
+        if (heartbeatSentAtRef.current && Date.now() - heartbeatSentAtRef.current >= 20000) {
+            disconnect();
+            return;
+        }
+        if (heartbeatSentAtRef.current) return;
         // 发送心跳包
         try {
             sendMessage('ping');
+            heartbeatSentAtRef.current = Date.now();
         } catch (e) {
             console.log('Heartbeat error: ', e);
+            disconnect();
         }
     }, 10000);
 

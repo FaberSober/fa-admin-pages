@@ -2,6 +2,7 @@ namespace RemoteClient {
   /** 时间为 Unix 毫秒；客户端类别遵循 Telemetry 的通用类别。 */
   export interface Client {
     id: string;
+    clientInstanceId: string | null;
     clientType: 'WEB' | 'DESKTOP' | 'MOBILE' | 'OTHER';
     runtime: string | null;
     appCode: string | null;
@@ -20,7 +21,8 @@ namespace RemoteClient {
   }
 
   export interface LogEvent {
-    action: 'started' | 'stopped' | 'ended' | 'entry' | 'error';
+    action: 'starting' | 'started' | 'stopped' | 'ended' | 'entry' | 'error';
+    requestId?: string;
     clientId?: string;
     sessionId?: string;
     level?: 'DEBUG' | 'LOG' | 'INFO' | 'WARN' | 'ERROR';
@@ -28,6 +30,21 @@ namespace RemoteClient {
     message?: string;
     timestamp?: number;
     reason?: string;
+    expiresAt?: number;
+    serverTime?: number;
+  }
+
+  export type ConnectionState = 'online' | 'delayed' | 'offline' | 'unknown';
+
+  export interface StatusEvent {
+    action: 'status' | 'error';
+    watchId: string;
+    state: ConnectionState;
+    clientId?: string;
+    lastSeenAt?: number;
+    connectedAt?: number;
+    serverTime: number;
+    message?: string;
   }
 }
 

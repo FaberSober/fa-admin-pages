@@ -17,20 +17,26 @@ const formatTime = (value: number | string | null | undefined) => {
 export default function RemoteClientList() {
   const [selectedClient, setSelectedClient] = useState<RemoteClient.Client>();
   const loadPage = useCallback((params: Fa.BasePageProps) => remoteClientApi.page(params), []);
-  const { handleTableChange, fetchPageList, loading, list, paginationProps } = useTableQueryParams<RemoteClient.Client>(loadPage, {}, '在线客户端');
-  useAutoRefresh(5, fetchPageList);
+  const { queryParams, handleTableChange, fetchPageList, fetchPageListSilently, loading, list, paginationProps } = useTableQueryParams<RemoteClient.Client>(
+    loadPage,
+    { sorter: { field: 'connectedAt', order: 'descend' } },
+    '在线客户端',
+  );
+  useAutoRefresh(5, () => {
+    if (!loading) fetchPageListSilently();
+  });
 
   const columns: FaberTable.ColumnsProp<RemoteClient.Client> = [
-    { ...BaseTableUtils.genSimpleSorterColumn('账号', 'username', 140, false), render: (_, record) => record.username || '-' },
-    { ...BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 120, false), render: (_, record) => record.name || '-' },
-    { ...BaseTableUtils.genSimpleSorterColumn('类别', 'clientType', 100, false), render: (value: string) => <Tag>{value}</Tag> },
-    { ...BaseTableUtils.genSimpleSorterColumn('应用', 'appName', 150, false), render: (value: string | null) => value || '-' },
+    { ...BaseTableUtils.genSimpleSorterColumn('账号', 'username', 140, queryParams.sorter), render: (_, record) => record.username || '-' },
+    { ...BaseTableUtils.genSimpleSorterColumn('姓名', 'name', 120, queryParams.sorter), render: (_, record) => record.name || '-' },
+    { ...BaseTableUtils.genSimpleSorterColumn('类别', 'clientType', 100, queryParams.sorter), render: (value: string) => <Tag>{value}</Tag> },
+    { ...BaseTableUtils.genSimpleSorterColumn('应用', 'appName', 150, queryParams.sorter), render: (value: string | null) => value || '-' },
     { ...BaseTableUtils.genSimpleSorterColumn('版本', 'release', 100, false), render: (value: string | null) => value || '-' },
     { ...BaseTableUtils.genSimpleSorterColumn('运行时', 'runtime', 110, false), render: (value: string | null) => value || '-' },
     { ...BaseTableUtils.genSimpleSorterColumn('平台', 'platform', 100, false), render: (value: string | null) => value || '-' },
     { ...BaseTableUtils.genSimpleSorterColumn('设备', 'deviceModel', 150, false), ellipsis: true, render: (value: string | null) => value || '-' },
-    { ...BaseTableUtils.genTimeSorterColumn('连接时间', 'connectedAt', 180, false), render: formatTime },
-    { ...BaseTableUtils.genTimeSorterColumn('最近心跳', 'lastSeenAt', 180, false), render: formatTime },
+    { ...BaseTableUtils.genTimeSorterColumn('连接时间', 'connectedAt', 180, queryParams.sorter), render: formatTime },
+    { ...BaseTableUtils.genTimeSorterColumn('最近心跳', 'lastSeenAt', 180, queryParams.sorter), render: formatTime },
     {
       title: '操作',
       dataIndex: 'opr',
@@ -59,7 +65,7 @@ export default function RemoteClientList() {
           </Button>
         </Space>
       </div>
-      <Alert type="info" showIcon title="仅显示已登录且仍有 WebSocket 心跳的客户端；App 进入后台或断开连接后会离线。" />
+      <Alert type="info" showIcon title="仅显示已登录且仍有 WebSocket 心跳的客户端；App 进入后台或断开连接后会离线。页面每 5 秒自动刷新一次。" />
       <BaseBizTable<RemoteClient.Client>
         biz="base_remote_client_v1"
         rowKey="id"
