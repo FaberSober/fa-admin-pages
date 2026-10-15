@@ -89,7 +89,7 @@ export default function LangLayout({ children }: Fa.BaseChildProps) {
         }}
         // getPopupContainer={(trigger) => (trigger ? trigger.parentElement as HTMLElement : document.body)}
       >
-        <AntdApp>
+        <AntdApp style={{ height: '100%' }}>
           <IntlProvider messages={handleMessages(locale)} locale={locale.split('_')[0]}>
             {children}
           </IntlProvider>
