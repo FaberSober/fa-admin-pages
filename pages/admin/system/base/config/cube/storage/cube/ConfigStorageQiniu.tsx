@@ -3,7 +3,7 @@ import { SaveOutlined } from '@ant-design/icons';
 import { FaUtils, useApiLoading } from '@fa/ui';
 import { FaFormColSpace } from '@features/fa-admin-pages/components';
 import { configSysApi } from '@features/fa-admin-pages/services';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Radio } from 'antd';
 import { useEffect, useState } from 'react';
 
 /**
@@ -19,31 +19,44 @@ export default function ConfigStorageQiniu() {
       setConfigSys(res.data);
       form.setFieldsValue({
         ...res.data.data,
+        qiniuAccessType: res.data.data.qiniuAccessType ?? 'PUBLIC',
       });
     });
   }, []);
 
-  function onFinish(v: any) {
+  function onFinish(v: Partial<Admin.ConfigSysConfig>) {
     if (configSys === undefined) return;
 
     const params = {
       id: configSys.id,
       data: { ...configSys.data, ...v },
     };
-    configSysApi.update(configSys.id, params).then((res) => FaUtils.showResponse(res, '更新配置'));
+    configSysApi.update(configSys.id, params).then((res) => {
+      setConfigSys(res.data);
+      FaUtils.showResponse(res, '更新配置');
+    });
   }
 
   function handleReset() {
     if (configSys === undefined) return;
     form.setFieldsValue({
       ...configSys.data,
+      qiniuAccessType: configSys.data.qiniuAccessType ?? 'PUBLIC',
     });
   }
 
   const loading = useApiLoading([configSysApi.getUrl('update')]);
   return (
     <div className="fa-p12">
-      <Form form={form} onFinish={onFinish} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
+      <Form form={form} onFinish={onFinish} initialValues={{ qiniuAccessType: 'PUBLIC' }} layout="horizontal" style={{ width: 700 }} labelCol={{ span: 4 }}>
+        <Form.Item
+          name="qiniuAccessType"
+          label="访问类型"
+          rules={[{ required: true, message: '请选择访问类型' }]}
+          extra="需与七牛云 Bucket 的访问权限保持一致；此设置不会修改云端空间权限。"
+        >
+          <Radio.Group options={[{ label: '公开', value: 'PUBLIC' }, { label: '私有', value: 'PRIVATE' }]} />
+        </Form.Item>
         <Form.Item name="qiniuAk" label="access-key" rules={[{ required: true }]} extra="从qiniu控制台Access Keys进行创建获取">
           <Input />
         </Form.Item>

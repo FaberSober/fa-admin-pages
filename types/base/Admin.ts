@@ -94,6 +94,8 @@ namespace Admin {
     qiniuBucketName: string;
     qiniuDomain: string;
     qiniuBasePath: string;
+    /** 七牛空间访问类型；旧配置缺省为公开 */
+    qiniuAccessType?: 'PUBLIC' | 'PRIVATE' | null;
     /** ------------------------- [存储]End -------------------------  */
     /** [安全]是否开启验证码 */
     safeCaptchaOn: boolean;
