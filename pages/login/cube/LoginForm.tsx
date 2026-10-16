@@ -17,7 +17,6 @@ export default function LoginForm() {
   const search: any = useQs();
 
   const [code, setCode] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const loginCaptchaEnabled = systemConfig.safeCaptchaOn
     && import.meta.env.VITE_APP_LOGIN_CAPTCHA_ENABLED !== 'false';
   const initialValues = import.meta.env.DEV
@@ -29,8 +28,6 @@ export default function LoginForm() {
     : { remember: true };
 
   async function onFinish(fieldsValue: any) {
-    if (submitting) return;
-    setSubmitting(true);
     try {
       const res = await authApi.login(fieldsValue.username, fieldsValue.password);
       clearTnTenantId();
@@ -41,8 +38,6 @@ export default function LoginForm() {
     } catch (error) {
       telemetry.track('auth.login.failed', { eventType: 'LOGIN', result: 'FAIL' });
       throw error;
-    } finally {
-      setSubmitting(false);
     }
   }
 
@@ -88,7 +83,7 @@ export default function LoginForm() {
         </a>
       </div>
 
-      <Button size="large" block loading={loading || submitting} type="primary" htmlType="submit">
+      <Button size="large" block loading={loading} type="primary" htmlType="submit">
         登录
       </Button>
     </Form>
