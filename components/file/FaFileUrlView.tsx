@@ -27,5 +27,5 @@ export default function FaFileUrlView({ url, filename, waterMark = true, style }
     previewUrl.searchParams.set('watermarkTxt', user.name + '/' + user.username);
   }
   const kkUrl = `${systemConfig.kkFileViewUrl.replace(/\/$/, '')}/onlinePreview?url=${encodeURIComponent(FaCipher.encryptByBase64(previewUrl.toString()))}`;
-  return <iframe src={kkUrl} className="fa-full fa-iframe" style={{ border: 'none', ...style }} />;
+  return <iframe title={filename} referrerPolicy="no-referrer" src={kkUrl} className="fa-full fa-iframe" style={{ border: 'none', ...style }} />;
 }

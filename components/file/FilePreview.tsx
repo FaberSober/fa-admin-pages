@@ -5,7 +5,7 @@ import { fileSaveApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { Button, Empty, Image } from 'antd';
 import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useContext, useEffect, useState } from 'react';
-import FaFileUrlView from './FaFileUrlView';
+import FaFileView from './FaFileView';
 
 const ReactPdfView = lazy(() => import('../pdf/ReactPdfView'));
 const FileViewerDocument = lazy(() => import('./FileViewerDocument'));
@@ -310,7 +310,7 @@ function FileViewerFallback({ resource, watermark }: { resource: FilePreviewReso
     );
   }
 
-  return <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
+  return <FaFileView fileId={resource.file.id} waterMark={watermark} />;
 }
 
 function FileViewerViewer({ resource, watermark }: { resource: FilePreviewResource; watermark: boolean }) {
@@ -347,7 +347,7 @@ function FilePreviewContent({ resource, watermark, download }: { resource: FileP
   } else if (resource.kind === 'fileViewer') {
     content = <FileViewerViewer resource={resource} watermark={watermark} />;
   } else {
-    content = <FaFileUrlView url={resource.absoluteFileUrl} filename={resource.file.originalFilename} waterMark={watermark} />;
+    content = <FaFileView fileId={resource.file.id} waterMark={watermark} />;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { BaseApi, type Fa } from '@fa/ui';
+import { BaseApi, type Fa, fileSaveApi as sharedFileSaveApi } from '@fa/ui';
 import type { AxiosRequestConfig } from 'axios';
 import { trim } from 'lodash';
 import { GATE_APP } from '@/configs';
@@ -7,6 +7,8 @@ import type { Admin } from '@/types';
 const serviceModule = 'fileSave';
 
 class FileSaveApi extends BaseApi<Admin.FileSave, string> {
+  getPreviewResource = sharedFileSaveApi.getPreviewResource;
+
   getById = (id: string, config?: AxiosRequestConfig): Promise<Fa.Ret<Admin.FileSave>> => this.get(`getById/${id}`, undefined, config);
 
   uploadFile = (file: any, callback?: (progressEvent: any) => void): Promise<Fa.Ret<Admin.FileSave>> =>
