@@ -36,7 +36,7 @@ function TelemetryStatEventListContent() {
   ];
 
   return <div className="fa-full-content-p12 fa-flex-column fa-content">
-    <Form form={form} layout="inline" onFinish={setFormValues} className="fa-mtb12" style={{ rowGap: 12, columnGap: 8 }}>
+    <Form form={form} layout="inline" onFinish={setFormValues} className="fa-m12" style={{ rowGap: 12, columnGap: 8 }}>
       <Form.Item name="appId" label="应用"><TelemetryAppSelect /></Form.Item>
       <Form.Item name="clientType" label="客户端"><Select allowClear style={{ width: 120 }} options={clientTypes} /></Form.Item>
       <Form.Item name="environment" label="环境"><Select allowClear placeholder="全部环境" style={{ width: 140 }} options={environments} /></Form.Item>

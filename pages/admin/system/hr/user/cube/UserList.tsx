@@ -1,4 +1,4 @@
-import { DownloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EyeOutlined, SearchOutlined, TeamOutlined } from '@ant-design/icons';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -27,6 +27,7 @@ import UserView from './cube/UserView';
 import UsersChangeDeptModal from './modal/UsersChangeDeptModal';
 import UsersChangePwdModal from './modal/UsersChangePwdModal';
 import UsersChangeRoleModal from './modal/UsersChangeRoleModal';
+import './UserList.css';
 
 const serviceName = '';
 const biz = 'UserList-v3';
@@ -180,80 +181,86 @@ export default function UserList({ departmentId, departmentName, superMode = fal
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-p12 fa-bg-white">
-      <div className="fa-flex-row-center fa-border-b fa-mb12" style={{ gap: 12, paddingBottom: 12 }}>
-        <div className="fa-flex-column" style={{ gap: 4 }}>
-          <Typography.Title level={4} style={{ margin: 0 }}>
-            用户管理
-          </Typography.Title>
-          <Typography.Text type="secondary">
-            当前范围：{scopeDescription} · {scopeHint}
-          </Typography.Text>
+    <div className="fa-full fa-flex-column fa-islands-content">
+      <header className="fa-islands-toolbar">
+        <div className="fa-islands-heading">
+          <span className="fa-islands-heading-icon">
+            <TeamOutlined />
+          </span>
+          <div className="fa-islands-heading-text">
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              用户管理
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              当前范围：{scopeDescription} · {scopeHint}
+            </Typography.Text>
+          </div>
+          <Tag color={superMode ? 'gold' : departmentId ? 'blue' : 'default'}>{superMode ? '超级用户' : departmentId ? '部门范围' : '全部部门'}</Tag>
         </div>
-        <div className="fa-flex-1" />
-        <Tag color={superMode ? 'gold' : departmentId ? 'blue' : 'default'}>{superMode ? '超级用户' : departmentId ? '部门范围' : '全部部门'}</Tag>
-      </div>
 
-      <SearchGrid
-        form={form}
-        onFinish={setFormValues}
-        btns={
-          <>
-            <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
-              查询
-            </Button>
-            <Button onClick={() => clearForm(form)}>重置</Button>
-          </>
-        }
-        defaultCount={4}
-        className="fa-mb12"
-      >
-        <Form.Item name="username" label="账户">
-          <Input placeholder="请输入账户" allowClear />
-        </Form.Item>
-        <Form.Item name="name" label="姓名">
-          <Input placeholder="请输入员工姓名" allowClear />
-        </Form.Item>
-        <Form.Item name="tel" label="手机号">
-          <Input placeholder="请输入手机号" allowClear />
-        </Form.Item>
-        <Form.Item name="workStatus" label="工作状态">
-          <DictEnumApiSelector enumName="UserWorkStatusEnum" />
-        </Form.Item>
-      </SearchGrid>
+        <SearchGrid
+          form={form}
+          onFinish={setFormValues}
+          btns={
+            <>
+              <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
+                查询
+              </Button>
+              <Button onClick={() => clearForm(form)}>重置</Button>
+            </>
+          }
+          defaultCount={4}
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))' }}
+        >
+          <Form.Item name="username" label="账户">
+            <Input placeholder="请输入账户" allowClear />
+          </Form.Item>
+          <Form.Item name="name" label="姓名">
+            <Input placeholder="请输入员工姓名" allowClear />
+          </Form.Item>
+          <Form.Item name="tel" label="手机号">
+            <Input placeholder="请输入手机号" allowClear />
+          </Form.Item>
+          <Form.Item name="workStatus" label="工作状态">
+            <DictEnumApiSelector enumName="UserWorkStatusEnum" />
+          </Form.Item>
+        </SearchGrid>
+      </header>
 
-      <BaseBizTable
-        biz={biz}
-        columns={genColumns()}
-        pagination={paginationProps}
-        loading={loading}
-        dataSource={list}
-        rowKey={(item) => item.id}
-        onChange={handleTableChange}
-        refreshList={() => fetchPageList()}
-        batchDelete={(ids) => userApi.removeBatchByIds(ids)}
-        showComplexQuery
-        showTableColConfigBtn
-        showBatchDelBtn={false}
-        onSceneChange={(v) => setSceneId(v)}
-        onConditionChange={(cL) => setConditionList(cL)}
-        renderCheckBtns={(rowKeys) => (
-          <Space>
-            <UsersChangeDeptModal userIds={rowKeys} fetchFinish={fetchPageList} />
-            <UsersChangeRoleModal userIds={rowKeys} fetchFinish={fetchPageList} />
-            <UsersChangePwdModal userIds={rowKeys} fetchFinish={fetchPageList} />
-          </Space>
-        )}
-        topBtns={
-          <Space>
-            <UserModal addBtn title="新增用户" defaultDepartmentId={departmentId} fetchFinish={fetchPageList} />
-            <UserImportModal departmentId={departmentId} superMode={superMode} scopeDescription={scopeDescription} fetchFinish={fetchPageList} />
-            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
-              导出
-            </Button>
-          </Space>
-        }
-      />
+      <section className="fa-islands-table fa-user-list-table" aria-label="用户列表">
+        <BaseBizTable
+          biz={biz}
+          columns={genColumns()}
+          pagination={paginationProps}
+          loading={loading}
+          dataSource={list}
+          rowKey={(item) => item.id}
+          onChange={handleTableChange}
+          refreshList={() => fetchPageList()}
+          batchDelete={(ids) => userApi.removeBatchByIds(ids)}
+          showComplexQuery
+          showTableColConfigBtn
+          showBatchDelBtn={false}
+          onSceneChange={(v) => setSceneId(v)}
+          onConditionChange={(cL) => setConditionList(cL)}
+          renderCheckBtns={(rowKeys) => (
+            <Space>
+              <UsersChangeDeptModal userIds={rowKeys} fetchFinish={fetchPageList} />
+              <UsersChangeRoleModal userIds={rowKeys} fetchFinish={fetchPageList} />
+              <UsersChangePwdModal userIds={rowKeys} fetchFinish={fetchPageList} />
+            </Space>
+          )}
+          topBtns={
+            <Space>
+              <UserModal addBtn title="新增用户" defaultDepartmentId={departmentId} fetchFinish={fetchPageList} />
+              <UserImportModal departmentId={departmentId} superMode={superMode} scopeDescription={scopeDescription} fetchFinish={fetchPageList} />
+              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
+                导出
+              </Button>
+            </Space>
+          }
+        />
+      </section>
     </div>
   );
 }

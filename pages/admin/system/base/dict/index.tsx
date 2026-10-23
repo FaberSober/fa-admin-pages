@@ -1,8 +1,8 @@
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { BaseTree, Fa, FaEnums, FaFlexRestLayout, FaLabel, useApiLoading } from '@fa/ui';
+import { BookOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { BaseTree, Fa, FaEnums, FaFlexRestLayout, useApiLoading } from '@fa/ui';
 import { dictApi } from '@features/fa-admin-pages/services';
 import { Admin } from "@features/fa-admin-pages/types";
-import { Button, Input, Splitter, Tooltip } from 'antd';
+import { Button, Input, Splitter, Tag, Tooltip, Typography } from 'antd';
 import { useState } from 'react';
 import { dispatch } from 'use-bus';
 import DictDataList from "./cube/DictDataList";
@@ -65,68 +65,69 @@ export default function DictManage() {
   const loading = useApiLoading([dictApi.getUrl('update')])
   return (
     <div className="fa-full-content-p12">
-      <Splitter>
+      <Splitter className="fa-islands-layout">
         {/* 左侧面板 */}
         <Splitter.Panel defaultSize={260} min={240} max="50%" collapsible>
-          <BaseTree
-            // showRoot
-            showOprBtn
-            onSelect={onTreeSelect}
-            onAfterDelItem={onAfterDelItem}
-            // 自定义配置
-            serviceName="字典分组"
-            ServiceModal={DictModal}
-            serviceApi={dictApi}
-            onAfterEditItem={r => {
-              if (viewRecord && r.id === viewRecord.id) {
-                setViewRecord({ ...r })
-              }
-            }}
-          />
+          <aside className="fa-islands-sidebar" aria-label="字典分组导航">
+            <BaseTree
+              // showRoot
+              showOprBtn
+              onSelect={onTreeSelect}
+              onAfterDelItem={onAfterDelItem}
+              // 自定义配置
+              serviceName="字典分组"
+              ServiceModal={DictModal}
+              serviceApi={dictApi}
+              onAfterEditItem={r => {
+                if (viewRecord && r.id === viewRecord.id) {
+                  setViewRecord({ ...r })
+                }
+              }}
+            />
+          </aside>
         </Splitter.Panel>
 
         {/* 右侧面板 */}
         <Splitter.Panel>
-          <div className="fa-flex-column fa-full fa-relative">
+          <div className="fa-flex-column fa-full fa-islands-main">
             {viewRecord ? (
-              <div className="fa-flex-column fa-full fa-p12">
-                <div className="fa-flex-row-center">
-                  <FaLabel
-                    // title={`${viewRecord?.name} / ${viewRecord?.code}${viewRecord?.description ? ` / ${viewRecord?.description}` : ''}`}
-                    title={(
-                      <div className="fa-flex-row-center">
-                        <Tooltip
-                          title={TYPE_TIPS[viewRecord.type]}
-                        >
-                          <span>{FaEnums.DictTypeEnumMap[viewRecord.type]}</span>
-                          <InfoCircleOutlined className="fa-mr8" />
-                        </Tooltip>
-                        {<div>{viewRecord.name}</div>}
-                        {<div> / {viewRecord.code}</div>}
-                        {viewRecord.description && <div> / {viewRecord.description}</div>}
+              <div className="fa-flex-column fa-full fa-islands-content">
+                <header className="fa-islands-toolbar">
+                  <div className="fa-islands-heading">
+                    <span className="fa-islands-heading-icon">
+                      <BookOutlined />
+                    </span>
+                    <div className="fa-islands-heading-text">
+                      <div className="fa-h3">{viewRecord.name}</div>
+                      <Typography.Text type="secondary">
+                        {viewRecord.code}{viewRecord.description && ` / ${viewRecord.description}`}
+                      </Typography.Text>
+                    </div>
+                    <Tooltip title={TYPE_TIPS[viewRecord.type]}>
+                      <Tag icon={<InfoCircleOutlined />}>{FaEnums.DictTypeEnumMap[viewRecord.type]}</Tag>
+                    </Tooltip>
+                  </div>
+                </header>
+
+                <section className="fa-islands-table fa-p12" aria-label="字典内容">
+                  <FaFlexRestLayout className="fa-flex-column">
+                    {viewRecord.type === FaEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
+                    {viewRecord.type === FaEnums.DictTypeEnum.TEXT && (
+                      <div>
+                        <div className="fa-flex-row-center fa-mb12">
+                          <div style={{width: 100}} className="fa-text-right">字典值：</div>
+                          <Input style={{width: 300}} value={viewRecord.value} onChange={e => setViewRecord({...viewRecord, value: e.target.value})}/>
+                        </div>
+                        <div className="fa-flex-row-center">
+                          <div style={{width: 100}}></div>
+                          <Button type="primary" onClick={() => handleUpdate()} loading={loading}>提交</Button>
+                        </div>
                       </div>
                     )}
-                    className="fa-mb12"
-                  />
-                </div>
-
-                <FaFlexRestLayout>
-                  {viewRecord.type === FaEnums.DictTypeEnum.OPTIONS && <DictOptionsEdit dict={viewRecord} onChange={(v) => setViewRecord(v)} onRefresh={refreshData} />}
-                  {viewRecord.type === FaEnums.DictTypeEnum.TEXT && (
-                    <div>
-                      <div className="fa-flex-row-center fa-mb12">
-                        <div style={{width: 100}} className="fa-text-right">字典值：</div>
-                        <Input style={{width: 300}} value={viewRecord.value} onChange={e => setViewRecord({...viewRecord, value: e.target.value})}/>
-                      </div>
-                      <div className="fa-flex-row-center">
-                        <div style={{width: 100}}></div>
-                        <Button type="primary" onClick={() => handleUpdate()} loading={loading}>提交</Button>
-                      </div>
-                    </div>
-                  )}
-                  {viewRecord.type === FaEnums.DictTypeEnum.LINK_OPTIONS && <DictDataOptions dictId={viewRecord.id} />}
-                  {viewRecord.type === FaEnums.DictTypeEnum.LINK_TREE && <DictDataTree dictId={viewRecord.id} />}
-                </FaFlexRestLayout>
+                    {viewRecord.type === FaEnums.DictTypeEnum.LINK_OPTIONS && <DictDataOptions dictId={viewRecord.id} />}
+                    {viewRecord.type === FaEnums.DictTypeEnum.LINK_TREE && <DictDataTree dictId={viewRecord.id} />}
+                  </FaFlexRestLayout>
+                </section>
               </div>
             ) : (
               <DictDataList />

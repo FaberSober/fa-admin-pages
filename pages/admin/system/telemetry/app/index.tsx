@@ -35,7 +35,7 @@ export default function TelemetryAppPage() {
     ];
   }
 
-  return <div className="fa-content fa-full fa-flex-column">
+  return <div className="fa-full-content-p12 fa-flex-column fa-content">
     <div className="fa-flex-row-center fa-p8" style={{ flexWrap: 'wrap', gap: 12 }}>
       <div className="fa-h3">应用管理</div>
       <Form form={form} layout="inline" onFinish={({ enabled, ...values }) => setFormValues({ ...values, enabled: enabled === undefined ? undefined : enabled === 'true' })}>

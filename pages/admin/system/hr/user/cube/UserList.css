@@ -1,0 +1,5 @@
+.fa-user-list-table > div > .fa-full-content > .fa-flex-row-center {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--fa-border-color);
+}

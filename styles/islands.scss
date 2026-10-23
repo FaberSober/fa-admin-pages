@@ -1,0 +1,130 @@
+// 公共 islands 布局，通过 src/globals.scss 统一加载。
+// Splitter 使用 fa-islands-layout；左栏使用 fa-islands-sidebar；右栏使用 fa-islands-main。
+// fa-full fa-flex-column fa-islands-content 用于纵向排列工具栏和表格，也可独立使用。
+// 工具栏使用 fa-islands-toolbar，表格容器使用 fa-islands-table。
+// 固定侧栏的网格布局使用 fa-islands-grid；--fa-islands-sidebar-width 设置侧栏宽度。
+// 独立面板使用 fa-islands-panel；--fa-islands-radius 可调整面板圆角。
+.fa-islands-grid {
+  display: grid;
+  grid-template-columns: var(--fa-islands-sidebar-width, 240px) minmax(0, 1fr);
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+  color: var(--fa-text-color);
+  background: var(--fa-bg-grey);
+}
+
+.fa-islands-layout {
+  > .ant-splitter-panel {
+    overflow: hidden;
+  }
+
+  > .ant-splitter-bar {
+    opacity: 0;
+    transition: opacity .15s ease;
+
+    &:hover,
+    &:active,
+    &:focus-within {
+      opacity: 1;
+    }
+  }
+}
+
+.fa-islands-panel,
+.fa-islands-sidebar,
+.fa-islands-toolbar,
+.fa-islands-table {
+  background: var(--fa-bg-color);
+  border: 1px solid var(--fa-border-color);
+  border-radius: var(--fa-islands-radius, 10px);
+}
+
+.fa-islands-sidebar {
+  height: 100%;
+  margin-right: 6px;
+  overflow: hidden;
+}
+
+.fa-islands-main,
+.fa-islands-content,
+.fa-islands-table {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fa-islands-main {
+  padding-left: 6px;
+}
+
+.fa-islands-content {
+  gap: 12px;
+}
+
+.fa-islands-toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.fa-islands-heading {
+  display: flex;
+  min-width: 0;
+  gap: 10px;
+  align-items: center;
+
+  > .ant-tag {
+    flex: none;
+    margin: 0;
+  }
+}
+
+.fa-islands-heading-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 19px;
+  background: color-mix(in srgb, var(--primary-color) 10%, var(--fa-bg-color));
+  border-radius: 10px;
+}
+
+.fa-islands-heading-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fa-islands-table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.fa-islands-query {
+  gap: 8px;
+
+  .ant-form-item {
+    margin: 0;
+  }
+}
+
+.fa-islands-query-name {
+  width: 220px;
+}
+
+@media (max-width: 720px) {
+  .fa-islands-query .ant-form-item {
+    width: 100%;
+  }
+}

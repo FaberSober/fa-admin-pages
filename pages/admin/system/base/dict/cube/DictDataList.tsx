@@ -1,6 +1,5 @@
-import React from 'react';
-import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
+import { BookOutlined, DownloadOutlined, ReloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space, Typography } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, FaberTable, useDelete, useDeleteByQuery, useExport, useTableQueryParams } from '@fa/ui';
 import { CommonExcelUploadModal } from "@/components";
 import { dictDataApi as api } from '@/services';
@@ -69,42 +68,52 @@ export default function DictDataList() {
   }
 
   return (
-    <div className="fa-full-content fa-flex-column fa-bg-white">
-      <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: 8 }}>
-        <div className="fa-h3">{serviceName}</div>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Form form={form} layout="inline" onFinish={setFormValues}>
-            <Form.Item name="_search" label="搜索">
-              <Input placeholder="请输入搜索内容" allowClear />
-            </Form.Item>
-
-            <Space>
-              <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
-              <Button onClick={() => clearForm(form)}>重置</Button>
-              <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
-              <CommonExcelUploadModal fetchFinish={fetchPageList} apiDownloadTplExcel={api.exportTplExcel} apiImportExcel={api.importExcel} type={biz}>
-                <Button icon={<UploadOutlined />}>上传</Button>
-              </CommonExcelUploadModal>
-            </Space>
-          </Form>
+    <div className="fa-full fa-flex-column fa-islands-content">
+      <header className="fa-islands-toolbar">
+        <div className="fa-islands-heading">
+          <span className="fa-islands-heading-icon">
+            <BookOutlined />
+          </span>
+          <div className="fa-islands-heading-text">
+            <div className="fa-h3">{serviceName}</div>
+            <Typography.Text type="secondary">管理字典键值、默认项及生效状态</Typography.Text>
+          </div>
         </div>
-      </div>
+        <Form form={form} layout="inline" onFinish={setFormValues} className="fa-islands-query fa-flex-row-center">
+          <Form.Item name="_search" className="fa-islands-query-name">
+            <Input prefix={<SearchOutlined />} placeholder="搜索字典内容" aria-label="搜索字典内容" allowClear />
+          </Form.Item>
 
-      <BaseBizTable
-        rowKey="id"
-        biz={biz}
-        columns={genColumns()}
-        pagination={paginationProps}
-        loading={loading}
-        dataSource={list}
-        onChange={handleTableChange}
-        refreshList={() => fetchPageList()}
-        batchDelete={(ids) => api.removeBatchByIds(ids)}
-        onSceneChange={(v) => setSceneId(v)}
-        onConditionChange={(cL) => setConditionList(cL)}
-        showDeleteByQuery
-        onDeleteByQuery={deleteByQuery}
-      />
+          <Space wrap>
+            <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>查询</Button>
+            <Button icon={<ReloadOutlined />} onClick={() => clearForm(form)}>重置</Button>
+          </Space>
+          <Space wrap style={{ marginInlineStart: 'auto' }}>
+            <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>导出</Button>
+            <CommonExcelUploadModal fetchFinish={fetchPageList} apiDownloadTplExcel={api.exportTplExcel} apiImportExcel={api.importExcel} type={biz}>
+              <Button icon={<UploadOutlined />}>上传</Button>
+            </CommonExcelUploadModal>
+          </Space>
+        </Form>
+      </header>
+
+      <section className="fa-islands-table" aria-label="字典值列表">
+        <BaseBizTable
+          rowKey="id"
+          biz={biz}
+          columns={genColumns()}
+          pagination={paginationProps}
+          loading={loading}
+          dataSource={list}
+          onChange={handleTableChange}
+          refreshList={() => fetchPageList()}
+          batchDelete={(ids) => api.removeBatchByIds(ids)}
+          onSceneChange={(v) => setSceneId(v)}
+          onConditionChange={(cL) => setConditionList(cL)}
+          showDeleteByQuery
+          onDeleteByQuery={deleteByQuery}
+        />
+      </section>
     </div>
   );
 }

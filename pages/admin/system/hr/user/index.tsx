@@ -30,33 +30,35 @@ export default function UserDepartmentManage() {
 
   return (
     <div className="fa-full-content-p12">
-      <Splitter>
+      <Splitter className="fa-islands-layout">
         {/* 左侧面板 */}
         <Splitter.Panel defaultSize={260} min={240} max="50%" collapsible>
-          <BaseTree
-            // showRoot
-            rootName="全部"
-            showOprBtn
-            onSelect={onTreeSelect}
-            onAfterDelItem={onAfterDelItem}
-            // 自定义配置
-            serviceName="部门"
-            ServiceModal={DepartmentModal}
-            serviceApi={departmentApi}
-            extraContextMenus={[
-              {
-                key: 'add-user',
-                icon: <PlusOutlined />,
-                title: '新增用户',
-                onMenuClick: handleAddUser,
-              },
-            ]}
-          />
+          <aside className="fa-islands-sidebar" aria-label="部门导航">
+            <BaseTree
+              // showRoot
+              rootName="全部"
+              showOprBtn
+              onSelect={onTreeSelect}
+              onAfterDelItem={onAfterDelItem}
+              // 自定义配置
+              serviceName="部门"
+              ServiceModal={DepartmentModal}
+              serviceApi={departmentApi}
+              extraContextMenus={[
+                {
+                  key: 'add-user',
+                  icon: <PlusOutlined />,
+                  title: '新增用户',
+                  onMenuClick: handleAddUser,
+                },
+              ]}
+            />
+          </aside>
         </Splitter.Panel>
 
         {/* 右侧面板 */}
         <Splitter.Panel>
-          <div className="fa-flex-column fa-full fa-relative">
+          <div className="fa-flex-column fa-full fa-islands-main">
             <UserList departmentId={viewRecord?.id} departmentName={viewRecord?.name} />
           </div>
         </Splitter.Panel>
