@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { DashboardOutlined } from '@ant-design/icons';
 import { useInterval } from 'ahooks';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { systemApi } from '@features/fa-admin-pages/services';
-import EchartsGaugeStep from '@features/fa-admin-pages/components/echarts/EchartsGaugeStep';
+import MonitorCard from '../MonitorCard';
+import ResourceGauge from './ResourceGauge';
 
 // export type SystemCpuProps = {}
 
@@ -19,28 +21,27 @@ export function SystemCpu() {
     systemApi.server().then((res) => setData(res.data));
   }
 
-  let value = 0;
-  if (data && data.cpuInfo) {
-    value = data.cpuInfo.used;
-  }
+  const value = data?.cpuInfo?.used;
 
   return (
-    <div className="fa-full fa-p12">
-      <EchartsGaugeStep
-        min={0}
-        max={100}
-        value={value}
-        unit="%"
-        // style={{width: 500, height: 300}}
-      />
-    </div>
+    <MonitorCard title="CPU" icon={<DashboardOutlined />} extra="5 秒刷新">
+      <ResourceGauge label="CPU" value={value} />
+      <div className="monitor-resource-footer">
+        <span>
+          处理器<b>{data?.cpuInfo ? `${data.cpuInfo.cpuNum} 核心` : '—'}</b>
+        </span>
+        <span>
+          空闲率<b>{data?.cpuInfo ? `${Number(data.cpuInfo.free.toFixed(2))}%` : '—'}</b>
+        </span>
+      </div>
+    </MonitorCard>
   );
 }
 
 SystemCpu.displayName = 'SystemCpu'; // 必须与方法名称一致
 SystemCpu.title = 'CPU';
 SystemCpu.description = 'CPU运行状态指标图';
-SystemCpu.showTitle = true; // 是否展示Card的Title
+SystemCpu.showTitle = false; // 组件内统一展示标题
 SystemCpu.permission = ''; // 需要的权限
 SystemCpu.w = 6; // 宽度-max=24
 SystemCpu.h = 12; // 高度

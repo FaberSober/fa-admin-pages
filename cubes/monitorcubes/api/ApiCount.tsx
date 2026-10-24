@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ApiOutlined, ClockCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { logApiApi, jobLogApi } from '@features/fa-admin-pages/services';
 import dayjs from 'dayjs';
 import { FaUtils } from '@fa/ui';
 import { useInterval } from 'ahooks';
-import NumBlock from '@features/fa-admin-pages/components/base-card/NumBlock';
+import MonitorCard from '../MonitorCard';
 
 export type ApiCountProps = {};
 
@@ -56,18 +57,47 @@ export function ApiCount() {
   useInterval(refresh, 60 * 1000);
 
   return (
-    <div className="fa-full fa-p12">
-      <NumBlock title="今日API访问数" value={apiCount} valueStyle={{ color: '#33DE7F' }} unitStyle={{ color: '#33DE7F' }} />
-      <NumBlock title="今日API异常数" value={apiErrorCount} valueStyle={{ color: '#ED5F62' }} unitStyle={{ color: '#ED5F62' }} style={{ marginTop: 12 }} />
-      <NumBlock title="定时任务异常数" value={jobApiErrorCount} valueStyle={{ color: '#ED5F62' }} unitStyle={{ color: '#ED5F62' }} style={{ marginTop: 12 }} />
-    </div>
+    <MonitorCard title="API 统计" icon={<ApiOutlined />} extra="今日">
+      <div className="monitor-api">
+        <div className="monitor-api-total">
+          <span className="monitor-api-total-label">API 访问总数</span>
+          <strong>
+            {apiCount.toLocaleString()}
+            <small>次</small>
+          </strong>
+          <span className="monitor-api-total-caption">
+            <ClockCircleOutlined />
+            每分钟自动更新
+          </span>
+          <ApiOutlined className="monitor-api-watermark" aria-hidden="true" />
+        </div>
+        <div className="monitor-api-metrics">
+          <div className={`monitor-api-metric${apiErrorCount > 0 ? ' is-error' : ''}`}>
+            <div className="monitor-api-metric-label">
+              <WarningOutlined />
+              API 异常
+            </div>
+            <strong>{apiErrorCount.toLocaleString()}</strong>
+            <span className="monitor-api-metric-status">{apiErrorCount > 0 ? '需关注' : '无异常'}</span>
+          </div>
+          <div className={`monitor-api-metric${jobApiErrorCount > 0 ? ' is-error' : ''}`}>
+            <div className="monitor-api-metric-label">
+              <ClockCircleOutlined />
+              定时任务异常
+            </div>
+            <strong>{jobApiErrorCount.toLocaleString()}</strong>
+            <span className="monitor-api-metric-status">{jobApiErrorCount > 0 ? '需关注' : '无异常'}</span>
+          </div>
+        </div>
+      </div>
+    </MonitorCard>
   );
 }
 
 ApiCount.displayName = 'ApiCount'; // 必须与方法名称一致
 ApiCount.title = 'API统计';
 ApiCount.description = 'API访问数量统计';
-ApiCount.showTitle = true; // 是否展示Card的Title
+ApiCount.showTitle = false; // 组件内统一展示标题
 ApiCount.permission = ''; // 需要的权限
 ApiCount.w = 6; // 宽度-max=24
 ApiCount.h = 12; // 高度

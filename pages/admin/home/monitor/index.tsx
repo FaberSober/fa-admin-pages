@@ -53,7 +53,7 @@ export default function Monitor() {
           const Component = (cubes as any)[i.i];
           if (Component) {
             return (
-              <FaFlashCard title={Component.title} titleRender={Component.titleRender} hideTitle={!Component.showTitle}>
+              <FaFlashCard title={Component.title} titleRender={Component.titleRender} hideTitle={!Component.showTitle} style={{ borderRadius: 12 }}>
                 <Component />
               </FaFlashCard>
             );
