@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Menu, useContextMenu } from 'react-contexify';
 import 'react-contexify/ReactContexify.css';
-import { FaFullscreenBtn } from '@fa/ui';
 import MenuLayoutContext, { type OpenTabsItem } from '../context/MenuLayoutContext';
 import './OpenTabs.scss';
-import { AppstoreOutlined, CloseOutlined, FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, CloseOutlined, FullscreenExitOutlined, FullscreenOutlined, HomeOutlined, ReloadOutlined } from '@ant-design/icons';
 import OpenTabsMenu, { useTabOperations } from './OpenTabsMenu';
 import { Popover } from 'antd';
 import FaIconPro from '@features/fa-admin-pages/components/icons/FaIconPro';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { reorderOpenTabs } from '../tabPolicy';
 
 /**
  * 可排序的Tab项组件
@@ -62,12 +62,12 @@ function SortableTabItem({ item, isActive, onClick, onClose, onContextMenu }: {
       }}>
         {item.icon ? <FaIconPro className='fa-tab-menu-item-icon' icon={item.icon as string} fontSize={16} /> : null}
         <span>{item.name}</span>
-        <div className='fa-tab-menu-item-close' onClick={(e) => {
+        {item.closeable !== false && !item.pinned && <div className='fa-tab-menu-item-close' onClick={(e) => {
           e.stopPropagation();
           onClose(e);
         }}>
           <CloseOutlined style={{ fontSize: '.775rem' }} />
-        </div>
+        </div>}
       </div>
       {/* 左右装饰 */}
       <svg className='fa-tab-menu-item-left-cornor' width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,6 +89,8 @@ export default function OpenTabs() {
   const tabsRef = useRef<HTMLDivElement>(null);
   const [contextTabKey, setContextTabKey] = React.useState<string>('');
   const { remove } = useTabOperations();
+  const pinnedTabs = openTabs.filter((item) => item.pinned);
+  const sortableTabs = openTabs.filter((item) => !item.pinned);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -105,11 +107,8 @@ export default function OpenTabs() {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = openTabs.findIndex((item) => item.key === active.id);
-      const newIndex = openTabs.findIndex((item) => item.key === over.id);
-
-      const newOpenTabs = arrayMove(openTabs, oldIndex, newIndex);
-      setOpenTabs(newOpenTabs);
+      const next = reorderOpenTabs(openTabs, String(active.id), String(over.id));
+      if (next !== openTabs) setOpenTabs(next);
     }
   }
 
@@ -148,15 +147,33 @@ export default function OpenTabs() {
   // console.log('openTabs', openTabs, 'curTab', curTab)
   return (
     <div className="fa-menu-open-tabs fa-border-b">
+      {pinnedTabs.length > 0 && (
+        <div className="fa-menu-pinned-tabs">
+          {pinnedTabs.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className={`fa-tab-menu-item${item.key === curTab?.key ? ' active' : ''}`}
+              aria-current={item.key === curTab?.key ? 'page' : undefined}
+              title={`${item.name}（固定）`}
+              onClick={() => selTab(item.key)}
+              onContextMenu={(event) => { event.stopPropagation(); handleContextMenu(event, item); }}
+            >
+              {item.icon ? <FaIconPro className="fa-tab-menu-item-icon" icon={item.icon as string} fontSize={16} /> : <HomeOutlined className="fa-tab-menu-item-icon" />}
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div ref={tabsRef} className='fa-flex-1 fa-full-h fa-menu-top' style={{paddingTop: 3}} onWheel={handleWheel}>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={openTabs.map(item => item.key)} strategy={horizontalListSortingStrategy}>
+          <SortableContext items={sortableTabs.map(item => item.key)} strategy={horizontalListSortingStrategy}>
             <div className='fa-tab-menu-item-container'>
-              {openTabs.map((item) => {
+              {sortableTabs.map((item) => {
                 const isActive = item.key === curTab?.key;
                 return (
                   <SortableTabItem

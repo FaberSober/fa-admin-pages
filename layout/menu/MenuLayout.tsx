@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Empty } from 'antd';
 import { find, isNil } from 'lodash';
 import { useBlocker, useLocation, useNavigate, useOutlet } from 'react-router-dom';
@@ -14,6 +14,7 @@ import MenuLayoutContext, { type MenuLayoutContextProps, type OpenTabsItem } fro
 import TabContentCache from './TabContentCache';
 import { createTabLeaveGuards } from './tabLeaveGuards';
 import { routeLeaveKeys } from './routeLeavePolicy';
+import { getCloseableTabKeys, normalizeOpenTabs } from './tabPolicy';
 import { ConfigLayoutContext } from '../config/context/ConfigLayoutContext';
 import UserLayoutContext from '../user/context/UserLayoutContext';
 import './MenuLayout.scss';
@@ -50,6 +51,10 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   const [menuList, setMenuList] = useState<Rbac.RbacMenu[]>([]);
   // 精确的权限菜单集合，不包含为导航树补出的父级结构节点
   const [permissionMenuList, setPermissionMenuList] = useState<Rbac.RbacMenu[]>([]);
+  const homeTab = useMemo<OpenTabsItem | undefined>(() => {
+    const menu = permissionMenuList.find((item) => item.linkUrl === SITE_INFO.HOME_LINK);
+    return menu ? { key: menu.id, path: menu.linkUrl, name: menu.name, icon: menu.icon, closeable: false, pinned: true } : undefined;
+  }, [permissionMenuList]);
   // 完整的menu tree
   const [menuFullTree, setMenuFullTree] = useState<Fa.TreeNode<Rbac.RbacMenu>[]>([]);
   // 当前选中block下的menu tree
@@ -62,10 +67,16 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   const [showTabs, setShowTabs] = useLocalStorage<boolean>('MenuLayout.showTabs', SITE_INFO.SHOW_TABS ?? true); // 是否展示标签栏
   const [menuContentFull, setMenuContentFull] = useLocalStorage<boolean>('MenuLayout.menuContentFull', false); // 是否网页内全屏
   const [openSideMenuKeys, setOpenSideMenuKeys] = useState<string[]>([]); // 受控-左侧菜单打开的menu id数组
-  const [openTabs, setOpenTabs] = useSessionStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 受控-当前浏览器会话的标签页数组
+  const [sessionTabs, setSessionTabs] = useSessionStorage<OpenTabsItem[]>(openTabsCacheKey, []); // 当前浏览器会话的标签页数组
+  const openTabs = useMemo(() => normalizeOpenTabs(sessionTabs || [], homeTab), [homeTab, sessionTabs]);
   const tabLeaveGuards = useMemo(() => createTabLeaveGuards(), []);
   const tabsRef = useRef(openTabs);
   tabsRef.current = openTabs;
+  const setOpenTabs = useCallback((value: SetStateAction<OpenTabsItem[]>) => {
+    const next = normalizeOpenTabs(typeof value === 'function' ? value(tabsRef.current) : value, homeTab);
+    tabsRef.current = next;
+    setSessionTabs(next);
+  }, [homeTab, setSessionTabs]);
   const currentTabRef = useRef<OpenTabsItem>();
   const [curTab, setCurTab] = useState<OpenTabsItem>(); // 受控-当前选中的tab
   currentTabRef.current = curTab;
@@ -114,12 +125,10 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   const [hasPermission] = useRoutePermission(permissionMenuList, openTabs || []);
 
   useEffect(() => {
-    const tabs = openTabs || [];
-    const uniqTabs = tabs.filter((tab, index) => tabs.findIndex((i) => i.key === tab.key) === index);
-    if (uniqTabs.length !== tabs.length) {
-      setOpenTabs(uniqTabs);
+    if (openTabs !== sessionTabs) {
+      setSessionTabs(openTabs);
     }
-  }, [openTabs, setOpenTabs]);
+  }, [openTabs, sessionTabs, setSessionTabs]);
 
   useEffect(() => {
     Promise.all([rbacUserRoleApi.getMyMenusTree(), rbacUserRoleApi.getMyMenus()]).then(([treeRes, menuRes]) => {
@@ -159,7 +168,8 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
       path: menu.linkUrl,
       name: menu.name,
       icon: menu.icon,
-      closeable: true,
+      closeable: menu.linkUrl !== SITE_INFO.HOME_LINK,
+      pinned: menu.linkUrl === SITE_INFO.HOME_LINK,
     };
   }
 
@@ -238,13 +248,16 @@ export default function MenuLayout({ renderHeaderExtra, renderContentExtra }: Me
   }
 
   function closeTabs(keys: string[]) {
-    void tabLeaveGuards.run(keys, () => {
+    const closeableKeys = getCloseableTabKeys(tabsRef.current || [], keys);
+    if (!closeableKeys.length) return;
+    void tabLeaveGuards.run(closeableKeys, () => {
       const currentTabs = tabsRef.current || [];
-      const remaining = currentTabs.filter(tab => !keys.includes(tab.key));
+      const closing = getCloseableTabKeys(currentTabs, closeableKeys);
+      const remaining = currentTabs.filter(tab => !closing.includes(tab.key));
       const selected = currentTabRef.current;
-      if (selected && keys.includes(selected.key)) {
+      if (selected && closing.includes(selected.key)) {
         const index = currentTabs.findIndex(tab => tab.key === selected.key);
-        const previous = currentTabs.slice(0, index).reverse().find(tab => !keys.includes(tab.key));
+        const previous = currentTabs.slice(0, index).reverse().find(tab => !closing.includes(tab.key));
         const next = previous ?? remaining[0];
         setCurTab(next);
         if (next) syncOpenMenuById(next.key, menuFullTree);

@@ -1,4 +1,4 @@
-import React, { type CSSProperties, type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode, useLayoutEffect, useState } from 'react';
 import { type LayoutItem, type GridLayoutProps, ReactGridLayout, useContainerWidth, verticalCompactor, Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -21,13 +21,23 @@ export interface FaGridLayoutProps extends Omit<GridLayoutProps, 'children' | 'l
  * @date 2023/1/8 20:42
  */
 export function FaGridLayout({ layout, renderItem, itemDivStyle, width: outWidth, gridConfig, isDraggable, isResizable, dragConfig, resizeConfig, rowHeight = 20, cols = 24, containerStyle, ...props }: FaGridLayoutProps) {
-  const { width, containerRef, mounted } = useContainerWidth();
+  const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
+  const [lastVisibleWidth, setLastVisibleWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    // 缓存 Tab 隐藏后会测得 0，保留上一次可见宽度，避免恢复时从 0 动画展开。
+    if (mounted && width > 0) {
+      setLastVisibleWidth(width);
+    }
+  }, [mounted, width]);
+
+  const gridWidth = width > 0 ? width : lastVisibleWidth;
 
   return (
     <div ref={containerRef as any} style={containerStyle}>
-      {mounted && (
+      {mounted && gridWidth > 0 && (
         <ReactGridLayout
-          width={width}
+          width={gridWidth}
           layout={layout}
           compactor={verticalCompactor}
           gridConfig={{

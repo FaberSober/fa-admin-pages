@@ -25,6 +25,47 @@
   flex-direction: row;
   align-items: center;
   height: 37px;
+
+  > .fa-menu-top { min-width: 0; }
+  > .fa-menu-tab-right-btn { flex-shrink: 0; }
+}
+
+.fa-menu-open-tabs .fa-menu-pinned-tabs {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 4px;
+  height: 100%;
+  padding: 3px 8px 0;
+
+  &::after {
+    position: absolute;
+    top: 9px;
+    right: 0;
+    bottom: 8px;
+    width: 1px;
+    background: var(--fa-border-color);
+    content: '';
+  }
+
+  .fa-tab-menu-item {
+    gap: 2px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--fa-text-color-light100);
+    font-family: inherit;
+
+    &:hover { background: var(--fa-bg-color-hover); color: var(--fa-text-color); }
+    &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: -3px; }
+    &.active {
+      border-bottom-color: var(--primary-color);
+      background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+      color: var(--primary-color);
+    }
+  }
 }
 
 .fa-menu-open-tabs .ant-tabs {

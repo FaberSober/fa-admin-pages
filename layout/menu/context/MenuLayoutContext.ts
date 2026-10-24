@@ -8,6 +8,7 @@ export interface OpenTabsItem {
   name: string; // 名称
   type?: 'iframe' | 'inner'; // 打开页面类型，默认为inner
   closeable?: boolean; // 是否可以关闭
+  pinned?: boolean; // 固定在标签栏左侧，不参与关闭和拖动排序
   icon?: string | ReactNode; // 图标标识
   linkMenuId?: string; // 对应需要打开的菜单ID
   linkCurrentMenu?: boolean; // TODO 打开tab时是否关联当前菜单，默认设置为true，功能需要开发
