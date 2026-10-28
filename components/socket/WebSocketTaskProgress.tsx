@@ -1,5 +1,4 @@
 import type { Fa } from '@/types';
-import { FaUtils } from '@fa/ui';
 import { sendMessage } from '@features/fa-admin-pages/layout/websocket';
 import { Progress, type ProgressProps } from 'antd';
 import { useEffect } from 'react';
@@ -18,7 +17,7 @@ export default function WebSocketTaskProgress({ task, onTaskChange, ...props }: 
   useEffect(() => {
     if (task === undefined) return;
     sendMessage({ type: 'WebSocketTaskDemo', data: { taskId: task.taskId } }); // 发送socket绑定任务ID
-  }, [task]);
+  }, [task?.taskId]);
 
   useBus(
     ['@@ws/RECEIVE/WebSocketTaskDemo'],
@@ -32,9 +31,12 @@ export default function WebSocketTaskProgress({ task, onTaskChange, ...props }: 
   );
 
   function getPer() {
-    if (task === undefined || task.total <= 0) return 0;
-    return FaUtils.tryToFixed((task.cur / task.total) * 100, 0);
+    if (task === undefined) return 0;
+    if (task.status === 'COMPLETED') return 100;
+    if (task.total <= 0) return 0;
+    return Math.min(task.status === 'RUNNING' ? 99 : 100, Math.max(0, Math.round((task.cur / task.total) * 100)));
   }
 
-  return <Progress percent={getPer()} {...props} />;
+  const status = task.status === 'COMPLETED' ? 'success' : task.status === 'FAILED' ? 'exception' : props.status;
+  return <Progress {...props} percent={getPer()} status={status} />;
 }
