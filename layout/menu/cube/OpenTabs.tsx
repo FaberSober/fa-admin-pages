@@ -55,7 +55,15 @@ function SortableTabItem({ item, isActive, onClick, onClose, onContextMenu }: {
       {...attributes}
       {...listeners}
     >
-      <div className='fa-tab-menu-item-bg'></div>
+      <div className='fa-tab-menu-item-bg'>
+        {/* 圆弧向主体内重叠 2px，避免缩放时出现像素接缝。 */}
+        <svg className='fa-tab-menu-item-left-cornor' width="9" height="7" viewBox="0 0 9 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 7A7 7 0 0 0 7 0H9V7Z" fill="var(--fa-tab-active-bg-color)"></path>
+        </svg>
+        <svg className='fa-tab-menu-item-right-cornor' width="9" height="7" viewBox="0 0 9 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 0A7 7 0 0 0 9 7H0V0Z" fill="var(--fa-tab-active-bg-color)"></path>
+        </svg>
+      </div>
       <div className="fa-tab-menu-item-main" onContextMenu={(e) => {
         e.stopPropagation();
         onContextMenu(e);
@@ -69,13 +77,6 @@ function SortableTabItem({ item, isActive, onClick, onClose, onContextMenu }: {
           <CloseOutlined style={{ fontSize: '.775rem' }} />
         </div>}
       </div>
-      {/* 左右装饰 */}
-      <svg className='fa-tab-menu-item-left-cornor' width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path data-v-2540ea20="" d="M 0 7 A 7 7 0 0 0 7 0 L 7 7 Z" fill="#006be626"></path>
-      </svg>
-      <svg className='fa-tab-menu-item-right-cornor' width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 0A7 7 0 0 0 7 7L0 7Z" fill="#006be626"></path>
-      </svg>
     </div>
   );
 }

@@ -139,6 +139,9 @@
 }
 
 .fa-tab-menu-item {
+  --fa-tab-active-bg-color: #006be6;
+  --fa-tab-active-bg-opacity: 0.15;
+
   padding: 0 .25rem;
   border-radius: 4px;
   cursor: pointer;
@@ -152,20 +155,23 @@
 
   &.active {
     // background-color: var(--primary-color-light200);
-    background-color: #006be626;
     color: var(--primary-color);
     border-radius: 7px 7px 0 0;
+
+    // 主体和圆弧合并后统一透明度，避免重叠处颜色加深。
+    .fa-tab-menu-item-bg {
+      display: block;
+      bottom: 0;
+      background-color: var(--fa-tab-active-bg-color);
+      border-radius: inherit;
+      opacity: var(--fa-tab-active-bg-opacity);
+    }
 
     .fa-tab-menu-item-left-cornor, .fa-tab-menu-item-right-cornor {
       // display: block;
       opacity: 1;
     }
 
-    &:hover {
-      .fa-tab-menu-item-bg {
-        display: none;
-      }
-    }
   }
 
   &:hover {
@@ -274,7 +280,8 @@
 [data-theme=dark] {
   .fa-tab-menu-item {
     &.active {
-      background-color: #2a2d2f;
+      --fa-tab-active-bg-color: #2a2d2f;
+      --fa-tab-active-bg-opacity: 1;
       color: #fff;
     }
   }
