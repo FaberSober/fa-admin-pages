@@ -2,7 +2,7 @@ import type { Admin } from '@/types';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { type CommonModalProps, CronModal, DragModal, FaHref, FaUtils, useApiLoading } from '@fa/ui';
 import { jobApi as api } from '@features/fa-admin-pages/services';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Switch } from 'antd';
 import { find, get } from 'lodash';
 import { useState } from 'react';
 
@@ -53,6 +53,7 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
       cron: get(record, 'cron', '0 * * * * ?'),
       clazzPath: get(record, 'clazzPath'),
       jobDesc: get(record, 'jobDesc'),
+      detailLogEnabled: get(record, 'detailLogEnabled', false),
     };
   }
 
@@ -105,6 +106,9 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
           </Form.Item>
           <Form.Item name="jobDesc" label="任务描述" {...FaUtils.formItemFullLayout}>
             <Input.TextArea maxLength={255} />
+          </Form.Item>
+          <Form.Item name="detailLogEnabled" label="记录详细日志" valuePropName="checked" extra="从下一次执行生效，记录任务开始、结束、异常及已接入的业务步骤。" {...FaUtils.formItemFullLayout}>
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" />
           </Form.Item>
         </Form>
       </DragModal>

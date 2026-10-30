@@ -523,6 +523,8 @@ namespace Admin {
     clazzPath: string;
     /** 任务描述  */
     jobDesc: string;
+    /** 从下一次执行起记录文件日志 */
+    detailLogEnabled?: boolean;
   }
 
   /** BASE-系统定时任务-执行日志 */
@@ -537,10 +539,21 @@ namespace Admin {
     duration: number;
     /** 错误日志 */
     errMsg?: string;
+    /** 本次执行日志的相对路径 */
+    logPath?: string;
     /** 创建时间 */
     beginTime?: string;
     /** 创建时间 */
     endTime?: string;
+  }
+
+  export interface JobLogRead {
+    content: string;
+    nextOffset: string;
+    status: FaEnums.JobLogStatusEnum;
+    hasMore: boolean;
+    available: boolean;
+    message?: string;
   }
 
   // -------------------------------------------- 系统-消息 --------------------------------------------

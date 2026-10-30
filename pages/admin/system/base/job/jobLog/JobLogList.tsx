@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobLogApi } from '@features/fa-admin-pages/services';
+import JobLogDetailDrawer from './JobLogDetailDrawer';
 
 const serviceName = '系统定时任务-执行日志';
 const biz = 'base_job_log';
@@ -43,10 +44,11 @@ export default function JobLogList({ jobId }: JobLogListProps) {
         dataIndex: 'opr',
         render: (_, record) => (
           <Space>
+            <JobLogDetailDrawer record={record} />
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
-        width: 80,
+        width: 180,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
