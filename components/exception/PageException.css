@@ -1,0 +1,120 @@
+.fa-page-exception {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 40px 24px;
+  overflow: auto;
+  color: var(--page-exception-text);
+}
+
+.fa-page-exception-content {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.fa-page-exception-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 112px;
+  margin-bottom: 24px;
+  color: var(--page-exception-code);
+  font-size: 112px;
+  font-weight: 650;
+  line-height: 1;
+  user-select: none;
+}
+
+.fa-page-exception-digit {
+  /* 按字号校正数字与圆形的视觉中心，保留 404 的对齐方式。 */
+  transform: translateY(-0.06em);
+}
+
+.fa-page-exception-accent {
+  color: var(--page-exception-primary);
+}
+
+.fa-page-exception-symbol {
+  position: relative;
+  display: grid;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--page-exception-primary-border);
+  border-radius: 50%;
+  background: var(--page-exception-primary-bg);
+  color: var(--page-exception-primary);
+  font-size: 38px;
+  place-items: center;
+}
+
+.fa-page-exception-symbol::before {
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed var(--page-exception-primary-border);
+  border-radius: 50%;
+  content: '';
+}
+
+.fa-page-exception-compass {
+  transform: rotate(-12deg);
+}
+
+.fa-page-exception-caption {
+  margin-bottom: 12px;
+  color: var(--page-exception-muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+  line-height: 20px;
+}
+
+.fa-page-exception-title {
+  margin: 0;
+  color: var(--page-exception-text);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.fa-page-exception-description {
+  margin: 14px 0 28px;
+  color: var(--page-exception-muted);
+  font-size: 14px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.fa-page-exception-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .fa-page-exception {
+    padding: 28px 20px;
+  }
+
+  .fa-page-exception-visual {
+    gap: 10px;
+    min-height: 88px;
+    font-size: 88px;
+  }
+
+  .fa-page-exception-symbol {
+    width: 68px;
+    height: 68px;
+    font-size: 30px;
+  }
+
+  .fa-page-exception-title {
+    font-size: 23px;
+  }
+}
