@@ -1,5 +1,5 @@
 import { EditOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
-import { FaFlashCard } from '@fa/ui';
+import { FaFlashCard, PageLoading } from '@fa/ui';
 import FaWorkbenchConfigDrawer from '@features/fa-admin-pages/components/cube/FaWorkbenchConfigDrawer';
 import { FaGridLayout } from '@features/fa-admin-pages/components/grid/FaGridLayout';
 import { FaGridLayoutUtils } from '@features/fa-admin-pages/components/utils';
@@ -58,7 +58,7 @@ export default function Desktop() {
     return (
       <div className="fa-full-content-p12">
         {initializing ? (
-          <Spin description="正在加载工作台..." />
+          <PageLoading tip="正在加载工作台..." />
         ) : (
           <Alert
             type="error"
