@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Space } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { useEffect, useState } from 'react';
+import { CopyOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, Space, theme, Typography } from 'antd';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { useLocation } from 'react-router-dom';
 import type { Admin } from '@/types';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import JobLogDetailDrawer from './JobLogDetailDrawer';
@@ -15,6 +16,9 @@ export interface JobLogListProps {
 
 export default function JobLogList({ jobId }: JobLogListProps) {
   const [form] = Form.useForm();
+  const [errorRecord, setErrorRecord] = useState<Admin.JobLog | null>(null);
+  const { pathname, search } = useLocation();
+  const { token } = theme.useToken();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Admin.JobLog>(jobLogApi.page, { extraParams: { jobId } }, serviceName);
@@ -25,6 +29,10 @@ export default function JobLogList({ jobId }: JobLogListProps) {
   useEffect(() => {
     setExtraParams({ jobId });
   }, [jobId]);
+
+  useEffect(() => {
+    setErrorRecord(null);
+  }, [jobId, pathname, search]);
 
   /** 生成表格字段List */
   function genColumns() {
@@ -38,17 +46,34 @@ export default function JobLogList({ jobId }: JobLogListProps) {
         ...BaseTableUtils.genSimpleSorterColumn('执行结果', 'status', 100, sorter),
         render: (_, record) => <span>{FaEnums.JOB_LOG_STATUS_MAP[record.status]}</span>,
       },
-      BaseTableUtils.genSimpleSorterColumn('错误日志', 'errMsg', undefined, sorter),
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('错误日志', 'errMsg', 360, sorter),
+        ellipsis: { showTitle: false },
+        render: (_, record) => record.errMsg?.trim() ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <div style={{
+              flex: 1, minWidth: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'anywhere',
+            }}>
+              {record.errMsg}
+            </div>
+            <Button type="link" size="small" style={{ flexShrink: 0 }}
+              aria-label={`查看执行记录 #${record.id} 的错误日志`} onClick={() => setErrorRecord(record)}>
+              详情
+            </Button>
+          </div>
+        ) : <Typography.Text type="secondary">—</Typography.Text>,
+      },
       {
         title: '操作',
         dataIndex: 'opr',
         render: (_, record) => (
-          <Space>
+          <Space size={4} style={{ whiteSpace: 'nowrap' }}>
             <JobLogDetailDrawer record={record} />
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),
-        width: 180,
+        width: 200,
         fixed: 'right',
         tcRequired: true,
         tcType: 'menu',
@@ -92,6 +117,18 @@ export default function JobLogList({ jobId }: JobLogListProps) {
         onSceneChange={(v) => setSceneId(v)}
         onConditionChange={(cL) => setConditionList(cL)}
       />
+
+      <Modal title={`错误日志 #${errorRecord?.id ?? ''}`} open={errorRecord !== null} width={960}
+        destroyOnHidden onCancel={() => setErrorRecord(null)}
+        footer={[
+          <Button key="copy" icon={<CopyOutlined />} onClick={() => FaUtils.copyToClipboard(errorRecord?.errMsg || '', '错误日志')}>
+            复制错误日志
+          </Button>,
+          <Button key="close" onClick={() => setErrorRecord(null)}>关闭</Button>,
+        ]}>
+        <Input.TextArea readOnly spellCheck={false} aria-label="错误日志内容" value={errorRecord?.errMsg || ''}
+          style={{ height: 'min(60vh, 560px)', resize: 'none', fontFamily: token.fontFamilyCode, overflowWrap: 'anywhere' }} />
+      </Modal>
     </div>
   );
 }
