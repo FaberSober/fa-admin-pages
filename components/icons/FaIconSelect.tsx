@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { trim } from 'lodash';
-import { addCollection, Icon } from '@iconify/react';
-
-type MdiIconCollection = {
-  aliases?: Record<string, unknown>;
-  icons: Record<string, unknown>;
-};
+import { Icon } from '@iconify/react/offline';
+import { loadMdiIcons } from './mdi';
 
 export interface FaIconSelectProps {
   search?: string;
@@ -23,15 +19,18 @@ const PAGE_SIZE = 36;
 export default function FaIconSelect({ value, search, onChange }: FaIconSelectProps) {
   const [page, setPage] = useState(1);
   const [iconList, setIconList] = useState<string[]>();
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     let active = true;
 
-    void import('@iconify-json/mdi/icons.json').then(({ default: collection }) => {
-      const mdiCollection = collection as MdiIconCollection;
-      addCollection(mdiCollection as Parameters<typeof addCollection>[0]);
+    void loadMdiIcons().then((icons) => {
       if (!active) return;
-      setIconList([...Object.keys(mdiCollection.icons), ...Object.keys(mdiCollection.aliases ?? {})].sort());
+      setIconList(icons);
+    }).catch((error) => {
+      if (!active) return;
+      console.error('本地图标加载失败', error);
+      setLoadError(true);
     });
 
     return () => {
@@ -56,6 +55,7 @@ export default function FaIconSelect({ value, search, onChange }: FaIconSelectPr
   const totalPages = Math.max(1, Math.ceil(filteredList.length / PAGE_SIZE));
   const pageList = filteredList.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  if (loadError) return <div className="fa-p12">图标加载失败，请重新打开重试</div>;
   if (!iconList) return <div className="fa-p12">图标加载中...</div>;
 
   return (
