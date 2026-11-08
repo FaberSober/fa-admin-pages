@@ -1,5 +1,5 @@
-import { useContext, useId, useLayoutEffect, useRef, useState } from 'react';
-import { FaResizeHorizontal, ThemeLayoutContext } from '@fa/ui';
+import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
 import { Alert, Button, Form, Input, InputNumber, Popover, Select, Space, Tooltip, Typography, message, theme } from 'antd';
 import {
@@ -30,24 +30,26 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import './job-flow-preview.scss';
+import { jobApi } from '@features/fa-admin-pages/services';
+import { getFlowTaskOptions } from './jobFlowTasks';
 import useJobFlowAlignment from './useJobFlowAlignment';
 import JobFlowAlignmentGuides from './JobFlowAlignmentGuides';
 import JobFlowJsonPanel from './JobFlowJsonPanel';
-import { layoutFlow, validateFlow, type FlowNode } from './flowDefinition';
+import { layoutFlow, parseFlowDefinition, validateFlow, type FlowNode } from './flowDefinition';
 
 // 以验收截图中约 128px 宽的默认 150px 节点作为 100% 显示基准。
 const BASE_ZOOM = 0.85;
 
 const demoJobs = [
-  { value: 1, label: '示例：数据准备' },
-  { value: 2, label: '示例：生成报表' },
-  { value: 3, label: '示例：发送通知' },
+  { value: 'demo.DataPrepare', label: '示例：数据准备', name: '示例：数据准备' },
+  { value: 'demo.GenerateReport', label: '示例：生成报表', name: '示例：生成报表' },
+  { value: 'demo.SendNotice', label: '示例：发送通知', name: '示例：发送通知' },
 ];
-type TaskNode = Node<{ label: string; jobId: number }>;
+type TaskNode = Node<{ label: string; clazzPath: string }>;
 const initialNodes: TaskNode[] = demoJobs.map((job, index) => ({
   id: `demo-${job.value}`,
   position: { x: 100, y: 40 + index * 150 },
-  data: { label: job.label, jobId: job.value },
+  data: { label: job.label, clazzPath: job.value },
 }));
 const initialEdges = [
   { id: 'demo-edge-1', source: 'demo-1', target: 'demo-2' },
@@ -57,13 +59,18 @@ const initialEdges = [
 /** 独立的页面原型，不提交配置或触发真实任务。 */
 export default function JobFlowPreview() {
   return (
-    <ReactFlowProvider>
-      <JobFlowEditor />
-    </ReactFlowProvider>
+    <Space>
+      <ReactFlowProvider>
+        <JobFlowEditor demo={false} />
+      </ReactFlowProvider>
+      <ReactFlowProvider>
+        <JobFlowEditor demo />
+      </ReactFlowProvider>
+    </Space>
   );
 }
 
-function JobFlowEditor() {
+function JobFlowEditor({ demo }: { demo: boolean }) {
   const { themeDark } = useContext(ThemeLayoutContext);
   const { token } = theme.useToken();
   const anchorRef = useRef<HTMLSpanElement>(null);
@@ -80,17 +87,39 @@ function JobFlowEditor() {
   const [showTests, setShowTests] = useState(false);
   const [zoom, setZoom] = useState(BASE_ZOOM);
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('示例串行任务流');
+  const [name, setName] = useState(demo ? '示例串行任务流' : '新建任务流');
   const [concurrency, setConcurrency] = useState(2);
-  const [jobId, setJobId] = useState(1);
-  const [nodes, setNodes] = useNodesState<TaskNode>(initialNodes);
+  const [clazzPath, setClazzPath] = useState<string | undefined>(demo ? 'demo.DataPrepare' : undefined);
+  const [nodes, setNodes] = useNodesState<TaskNode>(demo ? initialNodes : []);
   const alignment = useJobFlowAlignment<TaskNode>(setNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(demo ? initialEdges : []);
   const [json, setJson] = useState<string>();
   const [saved, setSaved] = useState<string>();
+  const [configuredJobs, setConfiguredJobs] = useState<ReturnType<typeof getFlowTaskOptions>>([]);
+  const [taskError, setTaskError] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const tasksLoading = useApiLoading([jobApi.getUrl('getAllJobs')]);
+  const jobs = demo ? demoJobs : configuredJobs;
+  useEffect(() => {
+    if (!open || demo) return;
+    let cancelled = false;
+    setTaskError(false);
+    setConfiguredJobs([]);
+    jobApi
+      .getAllJobs()
+      .then((res) => {
+        if (!cancelled) setConfiguredJobs(getFlowTaskOptions(res.data));
+      })
+      .catch(() => {
+        if (!cancelled) setTaskError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, demo, refresh]);
   const sequence = useRef(0);
   const [feedback, contextHolder] = message.useMessage();
-  const flowNodes = (): FlowNode[] => nodes.map((node) => ({ id: node.id, jobId: node.data.jobId, name: node.data.label, position: node.position }));
+  const flowNodes = (): FlowNode[] => nodes.map((node) => ({ id: node.id, clazzPath: node.data.clazzPath, name: node.data.label, position: node.position }));
 
   function connect(connection: Connection) {
     const edge = { ...connection, id: `edge-${++sequence.current}` };
@@ -108,17 +137,26 @@ function JobFlowEditor() {
       feedback.warning(error ?? '请输入流程名称');
       return;
     }
-    return JSON.stringify(
+    const source = JSON.stringify(
       { schemaVersion: 1, name: name.trim(), maxConcurrency: concurrency, nodes: flowNodes(), edges: edges.map(({ source, target }) => ({ source, target })) },
       null,
       2,
     );
+    try {
+      parseFlowDefinition(
+        source,
+        jobs.map((job) => job.value),
+      );
+      return source;
+    } catch (error) {
+      feedback.warning(error instanceof Error ? error.message : '流程定义无效');
+    }
   }
 
   return (
     <>
       {contextHolder}
-      <Button onClick={() => setOpen(true)}>流程编排预览</Button>
+      <Button onClick={() => setOpen(true)}>{demo ? '流程编排预览' : '新建任务流'}</Button>
       <span ref={anchorRef} style={{ display: 'none' }} />
       {open &&
         mountNode &&
@@ -142,7 +180,7 @@ function JobFlowEditor() {
                 <strong className="job-flow-toolbar-name" title={name}>
                   {name}
                 </strong>
-                <span className="job-flow-toolbar-status">模拟编排</span>
+                <span className="job-flow-toolbar-status">{demo ? '模拟编排' : '注册任务 · 未发布'}</span>
                 <span className="job-flow-toolbar-summary">
                   {nodes.length} 个节点 · {edges.length} 条依赖
                 </span>
@@ -161,20 +199,41 @@ function JobFlowEditor() {
                   />
                 </Tooltip>
                 <Popover
-                  title="添加普通任务节点"
+                  title="添加注册任务节点"
                   trigger="click"
                   content={
-                    <Space orientation="vertical">
-                      {' '}
-                      <Select aria-label="选择普通任务" value={jobId} options={demoJobs} onChange={setJobId} style={{ width: 180 }} />
+                    <Space orientation="vertical" style={{ width: 320, maxWidth: '80vw' }}>
+                      {!demo && (
+                        <>
+                          <Typography.Text type="secondary">
+                            直接选择后台注册的 Java 任务类，无需在定时任务列表另建记录；同一任务类可添加为多个独立节点。
+                          </Typography.Text>
+                          <Button loading={tasksLoading} onClick={() => setRefresh((value) => value + 1)}>
+                            刷新任务列表
+                          </Button>
+                          {taskError && <Alert type="error" title="任务加载失败，请刷新重试" />}
+                          {!tasksLoading && !taskError && jobs.length === 0 && <Alert type="info" title="暂无已注册任务类，请确认后台任务注册配置后刷新" />}
+                        </>
+                      )}
+                      <Select
+                        aria-label="选择普通任务"
+                        value={clazzPath}
+                        options={jobs}
+                        showSearch
+                        optionFilterProp="label"
+                        loading={tasksLoading}
+                        placeholder="选择已注册的任务类"
+                        onChange={setClazzPath}
+                        style={{ width: '100%' }}
+                      />
                       <Button
                         icon={<PlusOutlined />}
-                        disabled={nodes.length >= 100}
+                        disabled={nodes.length >= 100 || tasksLoading || !jobs.some((job) => job.value === clazzPath)}
                         onClick={() => {
-                          const job = demoJobs.find((item) => item.value === jobId)!;
+                          const job = jobs.find((item) => item.value === clazzPath)!;
                           setNodes((current) => [
                             ...current,
-                            { id: `node-${crypto.randomUUID()}`, position: { x: 360, y: 40 }, data: { label: job.label, jobId } },
+                            { id: `node-${crypto.randomUUID()}`, position: { x: 360, y: 40 }, data: { label: job.name, clazzPath: job.value } },
                           ]);
                         }}
                       >
@@ -244,12 +303,12 @@ function JobFlowEditor() {
               <JobFlowJsonPanel
                 key={json}
                 source={json}
-                allowedJobIds={demoJobs.map((job) => job.value)}
+                allowedClazzPaths={jobs.map((job) => job.value)}
                 onClose={() => setJson(undefined)}
                 onApply={(value) => {
                   setName(value.name);
                   setConcurrency(value.maxConcurrency);
-                  setNodes(value.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, jobId: node.jobId } })));
+                  setNodes(value.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, clazzPath: node.clazzPath } })));
                   setEdges(value.edges.map((edge) => ({ ...edge, id: `edge-${++sequence.current}` })));
                   setJson(undefined);
                   feedback.success('已应用到当前画布，尚未保存到服务器');
@@ -339,6 +398,11 @@ function JobFlowEditor() {
                 deleteKeyCode={['Backspace', 'Delete']}
               >
                 <Background />
+                {!demo && nodes.length === 0 && (
+                  <Panel position="top-center" style={{ marginTop: 80 }}>
+                    <Alert type="info" showIcon title="从右上角“＋”选择已注册的任务类开始编排" description="当前仅编辑页面草稿，不会保存到服务器或执行任务。" />
+                  </Panel>
+                )}
                 <JobFlowAlignmentGuides guides={alignment.guides} />
                 <Panel position="bottom-left" className="job-flow-viewport-tools">
                   <Controls orientation="horizontal" fitViewOptions={{ padding: 0.3 }} />
@@ -406,7 +470,12 @@ function JobFlowEditor() {
                   >
                     <Space orientation="vertical" size={12} style={{ padding: 12 }}>
                       <Typography.Text strong>测试与操作说明</Typography.Text>
-                      <Alert type="info" showIcon title="模拟任务 · 仅页面预览" description="草稿只保留在当前页面，刷新后丢失；不会保存到服务器或执行任务。" />
+                      <Alert
+                        type="info"
+                        showIcon
+                        title={demo ? '模拟任务 · 仅页面预览' : '真实任务编排 · 尚未发布'}
+                        description="草稿只保留在当前页面，刷新后丢失；不会保存到服务器或执行任务。"
+                      />
                       <Space orientation="vertical" style={{ width: '100%' }}>
                         <Button
                           type="primary"
@@ -427,7 +496,11 @@ function JobFlowEditor() {
                             setName(value.name);
                             setConcurrency(value.maxConcurrency);
                             setNodes(
-                              value.nodes.map((node: FlowNode) => ({ id: node.id, position: node.position, data: { label: node.name, jobId: node.jobId } })),
+                              value.nodes.map((node: FlowNode) => ({
+                                id: node.id,
+                                position: node.position,
+                                data: { label: node.name, clazzPath: node.clazzPath },
+                              })),
                             );
                             setEdges(value.edges.map((edge: Connection, index: number) => ({ ...edge, id: `restored-${index}` })));
                           }}
@@ -452,7 +525,9 @@ function JobFlowEditor() {
                       <Typography.Text type="secondary">
                         从节点底部拖向下一节点顶部建立依赖；选中节点或连线后按 Delete / Backspace 删除。可重复添加同一任务。
                       </Typography.Text>
-                      <Typography.Text type="secondary">普通任务暂停仅停止独立 Cron，不阻止未来流程调用；跨流程与独立调度不保证互斥。</Typography.Text>
+                      <Typography.Text type="secondary">
+                        流程节点直接引用任务类，不要求创建独立任务配置；若同一任务类另有 Cron 配置，跨流程与独立调度不保证互斥。
+                      </Typography.Text>
                     </Space>
                   </Panel>
                 )}

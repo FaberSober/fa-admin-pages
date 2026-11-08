@@ -8,12 +8,12 @@ import { parseFlowDefinition, type FlowDefinition } from './flowDefinition';
 /** 画布内 JSON 面板，沿用编排属性面板的悬浮布局。 */
 export default function JobFlowJsonPanel({
   source,
-  allowedJobIds,
+  allowedClazzPaths,
   onApply,
   onClose,
 }: {
   source: string;
-  allowedJobIds: readonly number[];
+  allowedClazzPaths: readonly string[];
   onApply: (definition: FlowDefinition) => void;
   onClose: () => void;
 }) {
@@ -21,11 +21,11 @@ export default function JobFlowJsonPanel({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const validation = useMemo(() => {
     try {
-      return { definition: parseFlowDefinition(draft, allowedJobIds) };
+      return { definition: parseFlowDefinition(draft, allowedClazzPaths) };
     } catch (error) {
       return { error: error instanceof Error ? error.message : '流程定义无效' };
     }
-  }, [draft, allowedJobIds]);
+  }, [draft, allowedClazzPaths]);
   const panelId = useId();
   const [expanded, setExpanded] = useState(false);
   const { token } = theme.useToken();
@@ -58,7 +58,7 @@ export default function JobFlowJsonPanel({
         </header>
         <div className="job-flow-json-body">
           <Space style={{ justifyContent: 'space-between' }}>
-            <Typography.Text type="secondary">仅修改当前页面，示例任务 ID 不可用于真实调度。切换模式保留修改，关闭面板丢弃未应用修改。</Typography.Text>
+            <Typography.Text type="secondary">仅修改当前页面，本阶段不接入真实调度。切换模式保留修改，关闭面板丢弃未应用修改。</Typography.Text>
             <Segmented<'view' | 'edit'>
               aria-label="JSON 查看或编辑"
               value={mode}

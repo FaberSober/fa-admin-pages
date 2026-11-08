@@ -1,6 +1,6 @@
 export interface FlowNode {
   id: string;
-  jobId: number;
+  clazzPath: string;
   name: string;
   position: { x: number; y: number };
 }
@@ -65,7 +65,7 @@ export interface FlowDefinition {
 }
 
 /** 从不可信 JSON 生成可回填的数据，只保留当前版本支持的字段。 */
-export function parseFlowDefinition(source: string, allowedJobIds: readonly number[]): FlowDefinition {
+export function parseFlowDefinition(source: string, allowedClazzPaths: readonly string[]): FlowDefinition {
   if (new TextEncoder().encode(source).length > 256 * 1024) throw new Error('流程定义不能超过 256KB');
   let input: unknown;
   try {
@@ -91,14 +91,14 @@ export function parseFlowDefinition(source: string, allowedJobIds: readonly numb
   const nodes = data.nodes.map((value): FlowNode => {
     const node = object(value);
     const id = text(node.id, '节点 ID');
-    if (typeof node.jobId !== 'number' || !Number.isSafeInteger(node.jobId) || !allowedJobIds.includes(node.jobId))
-      throw new Error(`节点 ${id} 引用了不可用的普通任务`);
+    if (typeof node.clazzPath !== 'string' || !allowedClazzPaths.includes(node.clazzPath))
+      throw new Error(`节点 ${id} 须引用已注册的任务类（clazzPath），不支持任务记录 ID`);
     const position = object(node.position);
     const coordinate = (value: unknown): number => {
       if (typeof value !== 'number' || !Number.isFinite(value) || Math.abs(value) > 1000000) throw new Error('节点坐标须为绝对值不超过 1000000 的有限数字');
       return value;
     };
-    return { id, jobId: node.jobId, name: text(node.name, '节点名称'), position: { x: coordinate(position.x), y: coordinate(position.y) } };
+    return { id, clazzPath: node.clazzPath, name: text(node.name, '节点名称'), position: { x: coordinate(position.x), y: coordinate(position.y) } };
   });
   const edges = data.edges.map((value): FlowEdge => {
     const edge = object(value);
