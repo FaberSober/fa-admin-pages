@@ -514,7 +514,7 @@ namespace Admin {
     id: number; flowLogId: number; nodeId: string; clazzPath: string; nodeName: string; attempt: number;
     jobLogId?: number; status: number; beginTime?: string; endTime?: string; reason?: string; crtTime?: string; updTime?: string;
   }
-  export interface JobFlowRun { log: JobLog; nodes: JobFlowNodeRun[] }
+  export interface JobFlowRun { log: JobLog; nodes: JobFlowNodeRun[]; definition: Record<string, unknown> }
 
   export interface JobFlowPreflight {
     jobId: number;
@@ -529,6 +529,8 @@ namespace Admin {
   export interface Job extends Fa.BaseDelEntity {
     jobType?: number;
     flowDefinition?: string;
+    /** 服务端维护的当前流程定义版本 */
+    readonly currentDefinitionVersionId?: number | null;
     /**  */
     id: number;
     /** 任务名称  */
@@ -565,7 +567,7 @@ namespace Admin {
 
   /** BASE-系统定时任务-执行日志 */
   export interface JobLog {
-    jobType?: number; triggerSource?: number; flowSnapshot?: string; clazzPath?: string; jobName?: string;
+    jobType?: number; triggerSource?: number; definitionVersionId?: number | null; clazzPath?: string; jobName?: string;
     /** ID */
     id: number;
     /** 任务ID */

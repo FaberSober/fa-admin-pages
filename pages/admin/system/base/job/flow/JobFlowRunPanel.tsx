@@ -74,7 +74,7 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
         </header>
         <div className="job-flow-json-body" style={{ overflow: 'auto' }}>
           <Select aria-label="选择流程运行记录" value={selected} options={options} onChange={setSelected} placeholder="暂无运行记录" />
-          <Typography.Text type="secondary">当前阶段按依赖串行执行；运行配置使用启动时快照。</Typography.Text>
+          <Typography.Text type="secondary">当前阶段按依赖串行执行；运行配置使用启动时关联的历史版本。</Typography.Text>
           {failed && <Alert type="error" title="读取失败，自动刷新已暂停" description="请点击刷新重试。" />}
           <Spin spinning={loading && !run}>
             {run && (
@@ -116,8 +116,8 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                   ))}
                 </div>
                 <details>
-                  <summary>本轮配置快照</summary>
-                  <FaJsonView data={run.log.flowSnapshot} defaultExpandDepth={2} />
+                  <summary>本轮定义版本 #{run.log.definitionVersionId}</summary>
+                  <FaJsonView data={run.definition} defaultExpandDepth={2} />
                 </details>
               </Space>
             )}
