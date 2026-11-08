@@ -41,7 +41,8 @@ export default function JobModal({ children, title, record, fetchFinish, addBtn,
       ...fieldsValue,
     };
     if (record) {
-      invokeUpdateTask({ ...record, ...values });
+      // 仅提交可编辑配置，避免回传打开弹窗时的执行统计快照。
+      invokeUpdateTask({ id: record.id, ...values });
     } else {
       invokeInsertTask({ ...values });
     }

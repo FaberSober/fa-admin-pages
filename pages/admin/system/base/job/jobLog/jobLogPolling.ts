@@ -17,7 +17,7 @@ export function appendVisibleLog(previous: string, content: string) {
 }
 
 export function isLogReadComplete(chunk: Admin.JobLogRead) {
-  return !chunk.available || ((chunk.status === 2 || chunk.status === 9) && !chunk.hasMore);
+  return !chunk.available || ((chunk.status === 2 || chunk.status === 8 || chunk.status === 9) && !chunk.hasMore);
 }
 
 /** 单个顺序请求链；结束后补齐 EOF，销毁后忽略迟到响应。 */

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { CopyOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, Space, theme, Typography } from 'antd';
-import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaEnums, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
+import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
 import { useLocation } from 'react-router-dom';
 import type { Admin } from '@/types';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import JobLogDetailDrawer from './JobLogDetailDrawer';
+import JobExecutionStatus from '../JobExecutionStatus';
+import { formatJobDuration, formatJobTotalDuration } from '../jobStatistics';
 
 const serviceName = '系统定时任务-执行日志';
 const biz = 'base_job_log';
@@ -39,12 +41,26 @@ export default function JobLogList({ jobId }: JobLogListProps) {
     const { sorter } = queryParams;
     return [
       BaseTableUtils.genIdColumn('ID', 'id', 70, sorter),
-      BaseTableUtils.genSimpleSorterColumn('执行时长', 'duration', 100, sorter),
-      BaseTableUtils.genTimeSorterColumn('开始时间', 'beginTime', 180, sorter),
-      BaseTableUtils.genTimeSorterColumn('结束时间', 'endTime', 180, sorter),
       {
-        ...BaseTableUtils.genSimpleSorterColumn('执行结果', 'status', 100, sorter),
-        render: (_, record) => <span>{FaEnums.JOB_LOG_STATUS_MAP[record.status]}</span>,
+        ...BaseTableUtils.genSimpleSorterColumn('总耗时', 'durationMs', 125, sorter),
+        render: (_, record) => formatJobTotalDuration(record.durationMs, record.status, record.trackingVersion),
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('触发耗时', 'dispatchDurationMs', 125, sorter),
+        render: (val) => formatJobDuration(val),
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('历史耗时（秒）', 'duration', 130, sorter, false),
+        render: (val, record) => (record.trackingVersion == null || record.trackingVersion === 0) ? val ?? '—' : '—',
+      },
+      BaseTableUtils.genTimeSorterColumn('开始时间', 'beginTime', 180, sorter),
+      {
+        ...BaseTableUtils.genTimeSorterColumn('结束时间', 'endTime', 180, sorter),
+        render: (val, record) => record.trackingVersion === 2 ? '—' : FaUtils.getDateFullStr(val) || '—',
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('执行结果', 'status', 160, sorter),
+        render: (_, record) => <JobExecutionStatus status={record.status} trackingVersion={record.trackingVersion} legacyDuration={record.duration} />,
       },
       {
         ...BaseTableUtils.genSimpleSorterColumn('错误日志', 'errMsg', 360, sorter),

@@ -525,6 +525,24 @@ namespace Admin {
     jobDesc: string;
     /** 从下一次执行起记录文件日志 */
     detailLogEnabled?: boolean;
+    /** 最近一轮的执行记录，以下执行信息由服务端维护 */
+    readonly lastJobLogId?: number | null;
+    readonly lastExecuteTime?: string | null;
+    readonly lastEndTime?: string | null;
+    readonly lastStatus?: FaEnums.JobLogStatusEnum | null;
+    readonly lastDurationMs?: string | null;
+    readonly lastDispatchDurationMs?: string | null;
+    /** 0：历史旧口径；1：完整跟踪；2：未完整跟踪 */
+    readonly lastTrackingVersion?: number | null;
+    /** 已知历史记录初始化后持续累计，Long 按字符串传输 */
+    readonly executeCount?: string | null;
+    readonly successCount?: string | null;
+    readonly failCount?: string | null;
+    /** 仅包含新口径、完整跟踪且已结束的样本 */
+    readonly totalDurationMs?: string | null;
+    readonly durationSampleCount?: string | null;
+    readonly statsSince?: string | null;
+    readonly avgDurationMs?: string | null;
   }
 
   /** BASE-系统定时任务-执行日志 */
@@ -545,6 +563,13 @@ namespace Admin {
     beginTime?: string;
     /** 创建时间 */
     endTime?: string;
+    /** 主流程返回时间，未必代表异步业务完成 */
+    dispatchEndTime?: string | null;
+    dispatchDurationMs?: string | null;
+    /** 完整跟踪的整轮毫秒耗时，原 duration 仍为秒 */
+    durationMs?: string | null;
+    /** 0：历史旧口径；1：完整跟踪；2：未完整跟踪 */
+    trackingVersion?: number | null;
   }
 
   export interface JobLogRead {

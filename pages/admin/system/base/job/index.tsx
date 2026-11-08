@@ -1,6 +1,5 @@
-import React from 'react';
 import { DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import { Badge, Button, Form, Input, Popconfirm, Space } from 'antd';
+import { Badge, Button, Form, Input, Popconfirm, Space, Tooltip } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -17,6 +16,8 @@ import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobModal from './modal/JobModal';
 import JobLogList from "./jobLog/JobLogList";
+import JobExecutionStatus from './JobExecutionStatus';
+import { formatJobAverage, formatJobCount, formatJobDuration, formatJobTotalDuration } from './jobStatistics';
 
 const serviceName = '定时任务';
 const biz = 'base_job';
@@ -65,8 +66,48 @@ export default function JobList() {
       },
       BaseTableUtils.genSimpleSorterColumn('cron表达式', 'cron', 120, sorter),
       {
-        ...BaseTableUtils.genSimpleSorterColumn('状态', 'status', 80, sorter),
-        render: (val) => (val ? <Badge status="processing" text="运作中" /> : <Badge status="default" text="暂停" />),
+        ...BaseTableUtils.genSimpleSorterColumn('调度状态', 'status', 90, sorter),
+        render: (val) => (val ? <Badge status="processing" text="已启用" /> : <Badge status="default" text="已暂停" />),
+      },
+      {
+        ...BaseTableUtils.genTimeSorterColumn('最近开始时间', 'lastExecuteTime', 180, sorter),
+        render: (val) => FaUtils.getDateFullStr(val) || '—',
+      },
+      {
+        ...BaseTableUtils.genTimeSorterColumn('最近结束时间', 'lastEndTime', 180, sorter),
+        render: (val, record) => record.lastTrackingVersion === 2 ? '—' : FaUtils.getDateFullStr(val) || '—',
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('最近执行结果', 'lastStatus', 160, sorter),
+        render: (_, record) => <JobExecutionStatus status={record.lastStatus} trackingVersion={record.lastTrackingVersion} />,
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('最近总耗时', 'lastDurationMs', 125, sorter),
+        render: (_, record) => (
+          <Tooltip title={`总耗时包含排队及全部关联子任务；触发耗时：${formatJobDuration(record.lastDispatchDurationMs)}`}>
+            <span>{formatJobTotalDuration(record.lastDurationMs, record.lastStatus, record.lastTrackingVersion)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('累计执行次数', 'executeCount', 120, sorter),
+        render: (_, record) => (
+          <Tooltip title={`成功：${formatJobCount(record.successCount)}；失败：${formatJobCount(record.failCount)}。以升级时保留的历史记录初始化，旧成功结果可能仅代表入口返回。`}>
+            <span>{formatJobCount(record.executeCount)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('失败次数', 'failCount', 110, sorter),
+        render: (val) => formatJobCount(val),
+      },
+      {
+        ...BaseTableUtils.genSimpleSorterColumn('平均总耗时', 'avgDurationMs', 125, false, true, true),
+        render: (_, record) => (
+          <Tooltip title={`耗时统计起始时间：${FaUtils.getDateFullStr(record.statsSince) || '尚未开始统计'}；参与平均的执行次数：${formatJobCount(record.durationSampleCount)}。仅统计已确认结束的执行，成功和失败均包含；历史记录、尚未结束及无法确认完成的执行不参与平均。`}>
+            <span>{formatJobAverage(record.avgDurationMs, record.durationSampleCount)}</span>
+          </Tooltip>
+        ),
       },
       BaseTableUtils.genSimpleSorterColumn('任务执行方法', 'clazzPath', 400, sorter),
       BaseTableUtils.genSimpleSorterColumn('任务描述', 'jobDesc', undefined, sorter),

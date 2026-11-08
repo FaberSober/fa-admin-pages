@@ -1,11 +1,12 @@
 import { DownloadOutlined, FileTextOutlined, ReloadOutlined } from '@ant-design/icons';
-import { BaseDrawer, FaEnums, useApiLoading } from '@fa/ui';
+import { BaseDrawer, useApiLoading } from '@fa/ui';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
-import { Alert, Button, Space, Spin, Tag, theme, Tooltip, Typography } from 'antd';
+import { Alert, Button, Space, Spin, theme, Tooltip, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { appendVisibleLog, isLogReadComplete, startJobLogPolling } from './jobLogPolling';
+import JobExecutionStatus from '../JobExecutionStatus';
 
 export default function JobLogDetailDrawer({ record }: { record: Admin.JobLog }) {
   const [open, setOpen] = useState(false);
@@ -76,9 +77,7 @@ function JobLogContent({ record }: { record: Admin.JobLog }) {
   return (
     <div className="fa-flex-column" style={{ height: '100%', gap: 12 }}>
       <Space wrap>
-        <Tag color={status === FaEnums.JobLogStatusEnum.DOING ? 'processing' : status === FaEnums.JobLogStatusEnum.DONE ? 'success' : 'error'}>
-          {FaEnums.JOB_LOG_STATUS_MAP[status]}
-        </Tag>
+        <JobExecutionStatus status={status} trackingVersion={record.trackingVersion} legacyDuration={record.duration} />
         <Typography.Text type="secondary">{polling ? '自动刷新中' : '自动刷新已停止'}</Typography.Text>
         <Button size="small" onClick={() => setFollowing((value) => !value)}>{following ? '暂停跟随' : '继续跟随'}</Button>
         <Button size="small" icon={<ReloadOutlined />} onClick={() => setReloadKey((value) => value + 1)}>重新加载</Button>
