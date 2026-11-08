@@ -1,0 +1,135 @@
+.job-flow-editor {
+  z-index: 999;
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--fa-bg-color);
+  &--fullscreen { position: fixed; inset: 0; }
+}
+
+.job-flow-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 5px 6px;
+  border: 1px solid var(--fa-border-color);
+  border-radius: 10px;
+  background: var(--fa-bg-color);
+  color: var(--fa-text-color);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--fa-text-color) 5%, transparent);
+
+  .ant-btn { height: 30px; padding-inline: 9px; border-radius: 6px; font-size: 12px; font-weight: 500; box-shadow: none; }
+  .ant-btn-text:not(:disabled) { color: var(--fa-text-color-light100); }
+  .ant-btn-text:hover:not(:disabled) { color: var(--fa-text-color); background: var(--fa-bg-grey); }
+  .ant-btn:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+}
+.job-flow-toolbar-context { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.job-flow-toolbar-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
+.job-flow-toolbar-divider { flex-shrink: 0; width: 1px; height: 18px; background: var(--fa-border-color); }
+.job-flow-toolbar-status {
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; padding: 3px 8px; border-radius: 999px;
+  background: var(--ant-color-primary-bg); color: var(--ant-color-primary); font-size: 11px; line-height: 16px; white-space: nowrap;
+  &::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+}
+.job-flow-toolbar-summary { color: var(--fa-text-color-light100); font-size: 12px; white-space: nowrap; }
+.job-flow-toolbar-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
+@container (max-width: 800px) { .job-flow-toolbar-summary { display: none; } }
+@container (max-width: 600px) {
+  .job-flow-toolbar { gap: 8px; overflow-x: auto; scrollbar-width: thin; }
+  .job-flow-toolbar-context { min-width: 180px; }
+}
+
+.job-flow-viewport-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  color: var(--fa-text-color);
+  background: var(--fa-bg-color);
+  border: 1px solid var(--fa-border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--fa-text-color) 10%, transparent);
+
+  .react-flow__controls { position: static; margin: 0; box-shadow: none; }
+  .react-flow__controls-button {
+    color: var(--fa-text-color);
+    background: var(--fa-bg-color);
+    border-color: var(--fa-border-color);
+    &:hover { background: var(--fa-bg-grey); }
+  }
+  .ant-btn[aria-pressed='true'] {
+    color: var(--ant-color-primary);
+    border-color: var(--ant-color-primary);
+    background: var(--ant-color-primary-bg);
+  }
+}
+
+.job-flow-config-panel {
+  position: absolute;
+  top: 54px;
+  right: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
+  z-index: 4;
+}
+.job-flow-config-heading { display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
+.job-flow-config-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; }
+
+.job-flow-json-panel {
+  position: absolute;
+  top: 54px;
+  right: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
+  z-index: 4;
+  &--expanded { top: 12px; left: 12px; z-index: 6; }
+}
+.job-flow-json-frame {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 6px;
+  background: var(--fa-bg-color);
+}
+.job-flow-json-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--fa-border-color);
+  background: color-mix(in srgb, var(--ant-color-primary) 5%, var(--fa-bg-color));
+}
+.job-flow-json-icon { display: inline-flex; padding: 4px; border-radius: 4px; color: #fff; background: #635bff; }
+.job-flow-json-body { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; padding: 12px; overflow: hidden; }
+.job-flow-json-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  .fa-json-view { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
+  .fa-json-view-body { flex: 1; min-height: 0; max-height: none !important; }
+}
+.job-flow-json-footer { display: flex; justify-content: flex-end; flex-shrink: 0; padding: 12px; border-top: 1px solid var(--fa-border-color); }
+
+.job-flow-alignment-guides {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  line { stroke: var(--primary-color); stroke-width: 1; stroke-dasharray: 4 4; }
+}
