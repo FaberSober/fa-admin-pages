@@ -174,7 +174,7 @@ function JobFlowEditor() {
                           const job = demoJobs.find((item) => item.value === jobId)!;
                           setNodes((current) => [
                             ...current,
-                            { id: `node-${++sequence.current}`, position: { x: 360, y: 40 }, data: { label: job.label, jobId } },
+                            { id: `node-${crypto.randomUUID()}`, position: { x: 360, y: 40 }, data: { label: job.label, jobId } },
                           ]);
                         }}
                       >
@@ -240,7 +240,22 @@ function JobFlowEditor() {
               </div>
             </section>
 
-            {json !== undefined && <JobFlowJsonPanel source={json} onClose={() => setJson(undefined)} />}
+            {json !== undefined && (
+              <JobFlowJsonPanel
+                key={json}
+                source={json}
+                allowedJobIds={demoJobs.map((job) => job.value)}
+                onClose={() => setJson(undefined)}
+                onApply={(value) => {
+                  setName(value.name);
+                  setConcurrency(value.maxConcurrency);
+                  setNodes(value.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, jobId: node.jobId } })));
+                  setEdges(value.edges.map((edge) => ({ ...edge, id: `edge-${++sequence.current}` })));
+                  setJson(undefined);
+                  feedback.success('已应用到当前画布，尚未保存到服务器');
+                }}
+              />
+            )}
             {showConfig && (
               <div className="job-flow-config-panel">
                 <FaResizeHorizontal domId={configPanelId} position="left" minWidth={420} maxWidth={800} />

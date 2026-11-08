@@ -5,7 +5,10 @@ export interface FlowNode {
   position: { x: number; y: number };
 }
 
-export interface FlowEdge { source: string; target: string }
+export interface FlowEdge {
+  source: string;
+  target: string;
+}
 
 /** 页面原型约束；正式保存时仍需服务端独立校验。 */
 export function validateFlow(nodes: FlowNode[], edges: FlowEdge[]): string | undefined {
@@ -51,4 +54,57 @@ export function layoutFlow(nodes: FlowNode[], edges: FlowEdge[]): FlowNode[] {
     rows.set(level, row + 1);
     return { ...node, position: { x: row * 240 + 40, y: level * 150 + 40 } };
   });
+}
+
+export interface FlowDefinition {
+  schemaVersion: 1;
+  name: string;
+  maxConcurrency: number;
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+}
+
+/** 从不可信 JSON 生成可回填的数据，只保留当前版本支持的字段。 */
+export function parseFlowDefinition(source: string, allowedJobIds: readonly number[]): FlowDefinition {
+  if (new TextEncoder().encode(source).length > 256 * 1024) throw new Error('流程定义不能超过 256KB');
+  let input: unknown;
+  try {
+    input = JSON.parse(source);
+  } catch {
+    throw new Error('JSON 格式无效，请检查语法');
+  }
+  const object = (value: unknown): Record<string, unknown> => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('流程定义、节点及连线必须为对象');
+    return value as Record<string, unknown>;
+  };
+  const text = (value: unknown, label: string): string => {
+    if (typeof value !== 'string' || !value.trim() || value.length > 100) throw new Error(`${label}须为 1–100 字符的非空文本`);
+    return value;
+  };
+  const data = object(input);
+  if (data.schemaVersion !== 1) throw new Error('仅支持 schemaVersion=1 的流程定义');
+  const name = text(data.name, '流程名称').trim();
+  if (typeof data.maxConcurrency !== 'number' || !Number.isInteger(data.maxConcurrency) || data.maxConcurrency < 1 || data.maxConcurrency > 20)
+    throw new Error('并发上限须为 1–20 的整数');
+  if (!Array.isArray(data.nodes) || !Array.isArray(data.edges)) throw new Error('nodes 和 edges 必须为数组');
+  if (data.nodes.length > 100 || data.edges.length > 500) throw new Error('最多支持 100 个节点、500 条连线');
+  const nodes = data.nodes.map((value): FlowNode => {
+    const node = object(value);
+    const id = text(node.id, '节点 ID');
+    if (typeof node.jobId !== 'number' || !Number.isSafeInteger(node.jobId) || !allowedJobIds.includes(node.jobId))
+      throw new Error(`节点 ${id} 引用了不可用的普通任务`);
+    const position = object(node.position);
+    const coordinate = (value: unknown): number => {
+      if (typeof value !== 'number' || !Number.isFinite(value) || Math.abs(value) > 1000000) throw new Error('节点坐标须为绝对值不超过 1000000 的有限数字');
+      return value;
+    };
+    return { id, jobId: node.jobId, name: text(node.name, '节点名称'), position: { x: coordinate(position.x), y: coordinate(position.y) } };
+  });
+  const edges = data.edges.map((value): FlowEdge => {
+    const edge = object(value);
+    return { source: text(edge.source, '连线起点'), target: text(edge.target, '连线终点') };
+  });
+  const error = validateFlow(nodes, edges);
+  if (error) throw new Error(error);
+  return { schemaVersion: 1, name, maxConcurrency: data.maxConcurrency, nodes, edges };
 }

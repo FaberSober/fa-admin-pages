@@ -1,10 +1,31 @@
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { CloseOutlined, CodeOutlined, CompressOutlined, ExpandOutlined } from '@ant-design/icons';
-import { Button, Space, Typography, theme } from 'antd';
-import { FaJsonView, FaResizeHorizontal } from '@fa/ui';
+import { Alert, Button, Segmented, Space, Typography, theme } from 'antd';
+import { FaJsonEdit, FaJsonView, FaResizeHorizontal } from '@fa/ui';
 
-/** 画布内只读快照面板，沿用编排属性面板的悬浮布局。 */
-export default function JobFlowJsonPanel({ source, onClose }: { source: string; onClose: () => void }) {
+import { parseFlowDefinition, type FlowDefinition } from './flowDefinition';
+
+/** 画布内 JSON 面板，沿用编排属性面板的悬浮布局。 */
+export default function JobFlowJsonPanel({
+  source,
+  allowedJobIds,
+  onApply,
+  onClose,
+}: {
+  source: string;
+  allowedJobIds: readonly number[];
+  onApply: (definition: FlowDefinition) => void;
+  onClose: () => void;
+}) {
+  const [draft, setDraft] = useState(source);
+  const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const validation = useMemo(() => {
+    try {
+      return { definition: parseFlowDefinition(draft, allowedJobIds) };
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : '流程定义无效' };
+    }
+  }, [draft, allowedJobIds]);
   const panelId = useId();
   const [expanded, setExpanded] = useState(false);
   const { token } = theme.useToken();
@@ -22,7 +43,7 @@ export default function JobFlowJsonPanel({ source, onClose }: { source: string; 
             <span className="job-flow-json-icon">
               <CodeOutlined />
             </span>
-            <Typography.Text strong>查看编排 JSON</Typography.Text>
+            <Typography.Text strong>{mode === 'edit' ? '编辑编排 JSON' : '查看编排 JSON'}</Typography.Text>
           </Space>
           <Space size={4}>
             <Button
@@ -36,13 +57,40 @@ export default function JobFlowJsonPanel({ source, onClose }: { source: string; 
           </Space>
         </header>
         <div className="job-flow-json-body">
-          <Typography.Text type="secondary">当前为只读查看。示例任务 ID 不可用于真实调度；修改画布后请重新打开以查看最新定义。</Typography.Text>
+          <Space style={{ justifyContent: 'space-between' }}>
+            <Typography.Text type="secondary">仅修改当前页面，示例任务 ID 不可用于真实调度。切换模式保留修改，关闭面板丢弃未应用修改。</Typography.Text>
+            <Segmented<'view' | 'edit'>
+              aria-label="JSON 查看或编辑"
+              value={mode}
+              options={[
+                { label: '查看', value: 'view' },
+                { label: '编辑', value: 'edit' },
+              ]}
+              onChange={setMode}
+            />
+          </Space>
+          {validation.error && <Alert type="error" showIcon title={validation.error} />}
           <div className="job-flow-json-content">
-            <FaJsonView data={source} defaultExpandDepth={2} />
+            {mode === 'edit' ? (
+              <FaJsonEdit value={draft} onChange={setDraft} defaultMode="text" defaultExpandDepth={2} />
+            ) : (
+              <FaJsonView data={draft} defaultExpandDepth={2} />
+            )}
           </div>
         </div>
         <footer className="job-flow-json-footer">
           <Button onClick={onClose}>关闭</Button>
+          {mode === 'edit' && (
+            <Button
+              type="primary"
+              disabled={!validation.definition}
+              onClick={() => {
+                if (validation.definition) onApply(validation.definition);
+              }}
+            >
+              应用到画布
+            </Button>
+          )}
         </footer>
       </section>
     </div>
