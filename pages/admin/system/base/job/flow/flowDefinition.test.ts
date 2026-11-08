@@ -42,14 +42,14 @@ describe('流程页面 DAG 校验', () => {
       ),
     ).toBeTruthy();
   });
-  it('按最长前驱链布局，保留独立入口', () => {
+  it('按最长前驱链从左向右布局，独立入口纵向排列', () => {
     const result = layoutFlow(nodes, [
       { source: 'a', target: 'c' },
       { source: 'b', target: 'c' },
     ]);
-    expect(result[0].position.y).toBe(result[1].position.y);
-    expect(result[0].position.x).not.toBe(result[1].position.x);
-    expect(result[2].position.y).toBeGreaterThan(result[0].position.y);
+    expect(result[0].position.x).toBe(result[1].position.x);
+    expect(result[0].position.y).not.toBe(result[1].position.y);
+    expect(result[2].position.x).toBeGreaterThan(result[0].position.x);
   });
 });
 

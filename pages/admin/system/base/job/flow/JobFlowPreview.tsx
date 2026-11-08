@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
-import { Alert, Button, Form, Input, InputNumber, Popover, Select, Space, Tooltip, Typography, message, theme } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Popover, Popconfirm, Select, Space, Switch, Tooltip, Typography, message, theme } from 'antd';
 import {
   Background,
   Controls,
@@ -30,6 +30,8 @@ import {
   SaveOutlined,
   SettingOutlined,
   SafetyCertificateOutlined,
+  PlayCircleOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import './job-flow-preview.scss';
 import type { Admin } from '@/types';
@@ -39,6 +41,7 @@ import useJobFlowAlignment from './useJobFlowAlignment';
 import JobFlowAlignmentGuides from './JobFlowAlignmentGuides';
 import JobFlowJsonPanel from './JobFlowJsonPanel';
 import JobFlowPreflightPanel from './JobFlowPreflightPanel';
+import JobFlowRunPanel from './JobFlowRunPanel';
 import JobFlowTaskNode from './JobFlowTaskNode';
 import { getFlowEntryIds, layoutFlow, parseFlowDefinition, validateFlow, type FlowNode } from './flowDefinition';
 
@@ -54,7 +57,7 @@ const demoJobs = [
 type TaskNode = Node<{ label: string; clazzPath: string }>;
 const initialNodes: TaskNode[] = demoJobs.map((job, index) => ({
   id: `demo-${job.value}`,
-  position: { x: 100, y: 40 + index * 150 },
+  position: { x: 100 + index * 240, y: 80 },
   data: { label: job.label, clazzPath: job.value },
 }));
 const initialEdges = [
@@ -86,6 +89,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
   const configPanelId = useId();
   const [configWidth, setConfigWidth] = useState(420);
+  const [showRun, setShowRun] = useState(false);
+  const [runLogId, setRunLogId] = useState<number>();
   const [showPreflight, setShowPreflight] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -100,8 +105,10 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const [open, setOpen] = useState(false);
   const loadedRecord = useRef(false);
   const [persistedId, setPersistedId] = useState<number | undefined>(record?.id);
+  const running = useApiLoading(persistedId ? [jobApi.getUrl(`runFlow/${persistedId}`)] : []);
   const saving = useApiLoading([jobApi.getUrl('save'), jobApi.getUrl('update')]);
   const [name, setName] = useState(demo ? '示例串行任务流' : '新建任务流');
+  const [detailLogEnabled, setDetailLogEnabled] = useState(record?.detailLogEnabled ?? false);
   const [concurrency, setConcurrency] = useState(2);
   const [clazzPath, setClazzPath] = useState<string | undefined>(demo ? 'demo.DataPrepare' : undefined);
   const [nodes, setNodes] = useNodesState<TaskNode>(demo ? initialNodes : []);
@@ -133,6 +140,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
             options.map((job) => job.value),
           );
           setName(detail.data.jobName);
+          setDetailLogEnabled(detail.data.detailLogEnabled ?? false);
           setConcurrency(definition.maxConcurrency);
           setNodes(definition.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, clazzPath: node.clazzPath } })));
           setEdges(definition.edges.map((edge, index) => ({ ...edge, id: `loaded-${index}` })));
@@ -184,13 +192,13 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   async function saveFlow() {
     const source = definition();
     if (!source) return;
-    const values = { jobName: name.trim(), jobType: 1, flowDefinition: source, status: false, cron: '0 * * * * ?', clazzPath: '' };
+    const values = { detailLogEnabled, jobName: name.trim(), jobType: 1, flowDefinition: source, status: false, cron: '0 * * * * ?', clazzPath: '' };
     if (persistedId) await jobApi.update(persistedId, { id: persistedId, ...values });
     else {
       const res = await jobApi.save(values);
       setPersistedId(res.data.id);
     }
-    feedback.success('流程定义已保存，执行与调度尚未接入');
+    feedback.success('流程定义已保存，可手动串行执行；Cron 尚未接入');
     fetchFinish?.();
   }
 
@@ -243,6 +251,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                     onClick={() => {
                       setJson(undefined);
                       setShowPreflight(false);
+                      setShowRun(false);
                       setShowConfig((value) => !value);
                     }}
                   />
@@ -320,12 +329,51 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       if (value) {
                         setShowConfig(false);
                         setShowPreflight(false);
+                        setShowRun(false);
                         setJson(value);
                       }
                     }}
                   />
                 </Tooltip>
                 <span className="job-flow-toolbar-divider" aria-hidden="true" />
+                {!demo && (
+                  <>
+                    <Popconfirm
+                      title="执行服务器已保存的流程？"
+                      description="将实际调用全部可执行任务，可能产生业务数据；画布未保存修改不参与本轮。本阶段串行执行。"
+                      disabled={!persistedId || running}
+                      onConfirm={async () => {
+                        if (!persistedId) return;
+                        const response = await jobApi.runFlow(persistedId);
+                        setRunLogId(response.data.log.id);
+                        setJson(undefined);
+                        setShowConfig(false);
+                        setShowPreflight(false);
+                        setShowRun(true);
+                        fetchFinish?.();
+                      }}
+                    >
+                      <Button type="text" disabled={!persistedId} loading={running} icon={<PlayCircleOutlined />}>
+                        执行
+                      </Button>
+                    </Popconfirm>
+                    <Tooltip title="流程运行记录">
+                      <Button
+                        type="text"
+                        disabled={!persistedId}
+                        icon={<HistoryOutlined />}
+                        aria-label="流程运行记录"
+                        onClick={() => {
+                          setRunLogId(undefined);
+                          setJson(undefined);
+                          setShowConfig(false);
+                          setShowPreflight(false);
+                          setShowRun((value) => !value);
+                        }}
+                      />
+                    </Tooltip>
+                  </>
+                )}
                 {!demo && (
                   <Tooltip title="检查服务器已保存定义；不执行任务">
                     <Button
@@ -336,6 +384,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       onClick={() => {
                         setJson(undefined);
                         setShowConfig(false);
+                        setShowRun(false);
                         setShowPreflight((value) => !value);
                       }}
                     >
@@ -379,6 +428,9 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
               </div>
             </section>
 
+            {showRun && persistedId && (
+              <JobFlowRunPanel key={runLogId ?? 'history'} jobId={persistedId} initialLogId={runLogId} onClose={() => setShowRun(false)} />
+            )}
             {showPreflight && persistedId && (
               <JobFlowPreflightPanel
                 jobId={persistedId}
@@ -476,6 +528,19 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         style={{ width: '100%' }}
                       />
                     </Form.Item>
+                    <Form.Item
+                      label="记录详细日志"
+                      htmlFor={`${configPanelId}-detail-log`}
+                      extra="保存后对下一轮生效，为流程及节点记录详细日志；运行中的日志配置保持启动时快照。"
+                    >
+                      <Switch
+                        id={`${configPanelId}-detail-log`}
+                        checked={detailLogEnabled}
+                        onChange={setDetailLogEnabled}
+                        checkedChildren="开启"
+                        unCheckedChildren="关闭"
+                      />
+                    </Form.Item>
                   </Form>
                 </aside>
               </div>
@@ -514,7 +579,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       type="info"
                       showIcon
                       title="从右上角“＋”选择已注册的任务类开始编排"
-                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。执行与调度尚未接入。"
+                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可从顶部手动串行执行，Cron 尚未接入。"
                     />
                   </Panel>
                 )}
@@ -589,7 +654,11 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         type="info"
                         showIcon
                         title={demo ? '模拟任务 · 仅页面预览' : '真实任务编排 · 尚未发布'}
-                        description="草稿只保留在当前页面，刷新后丢失；暂存只保留在当前页面；使用顶部“保存”可存入服务器。执行与调度尚未接入。"
+                        description={
+                          demo
+                            ? '示例仅用于页面预览，不保存到服务器或执行任务；刷新后草稿丢失。'
+                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动串行执行。Cron 尚未接入。'
+                        }
                       />
                       <Space orientation="vertical" style={{ width: '100%' }}>
                         <Button
@@ -628,18 +697,19 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                             if (value) {
                               setShowConfig(false);
                               setShowPreflight(false);
+                              setShowRun(false);
                               setJson(value);
                             }
                           }}
                         >
                           校验并预览 JSON
                         </Button>
-                        <Button disabled title="尚未接入服务端流程执行">
-                          立即执行（待接入）
+                        <Button disabled title="真实执行请使用顶部带确认的执行入口">
+                          请从顶部执行
                         </Button>
                       </Space>
                       <Typography.Text type="secondary">
-                        从节点底部拖向下一节点顶部建立依赖；选中节点或连线后按 Delete / Backspace 删除。可重复添加同一任务。
+                        从节点右侧拖向下一节点左侧建立依赖；选中节点或连线后按 Delete / Backspace 删除。可重复添加同一任务。
                       </Typography.Text>
                       <Typography.Text type="secondary">
                         流程节点直接引用任务类，不要求创建独立任务配置；若同一任务类另有 Cron 配置，跨流程与独立调度不保证互斥。

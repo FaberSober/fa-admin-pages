@@ -41,7 +41,7 @@ export function validateFlow(nodes: FlowNode[], edges: FlowEdge[]): string | und
   return visited === nodes.length ? undefined : '流程存在循环依赖，请删除形成环路的连线';
 }
 
-/** 按依赖层级布局，保留同层节点的稳定顺序。调用前应通过 DAG 校验。 */
+/** 按依赖层级从左向右布局，同层节点纵向排列并保留稳定顺序。调用前应通过 DAG 校验。 */
 export function layoutFlow(nodes: FlowNode[], edges: FlowEdge[]): FlowNode[] {
   const levels = new Map(nodes.map((node) => [node.id, 0]));
   for (let round = 0; round < nodes.length; round++) {
@@ -52,7 +52,7 @@ export function layoutFlow(nodes: FlowNode[], edges: FlowEdge[]): FlowNode[] {
     const level = levels.get(node.id)!;
     const row = rows.get(level) ?? 0;
     rows.set(level, row + 1);
-    return { ...node, position: { x: row * 240 + 40, y: level * 150 + 40 } };
+    return { ...node, position: { x: level * 240 + 40, y: row * 150 + 40 } };
   });
 }
 

@@ -510,6 +510,12 @@ namespace Admin {
 
   // -------------------------------------------- 系统-系统定时任务 --------------------------------------------
   /** 系统定时任务 */
+  export interface JobFlowNodeRun {
+    id: number; flowLogId: number; nodeId: string; clazzPath: string; nodeName: string; attempt: number;
+    jobLogId?: number; status: number; beginTime?: string; endTime?: string; reason?: string; crtTime?: string; updTime?: string;
+  }
+  export interface JobFlowRun { log: JobLog; nodes: JobFlowNodeRun[] }
+
   export interface JobFlowPreflight {
     jobId: number;
     jobName: string;
@@ -559,6 +565,7 @@ namespace Admin {
 
   /** BASE-系统定时任务-执行日志 */
   export interface JobLog {
+    jobType?: number; triggerSource?: number; flowSnapshot?: string; clazzPath?: string; jobName?: string;
     /** ID */
     id: number;
     /** 任务ID */

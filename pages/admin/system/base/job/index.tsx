@@ -134,8 +134,8 @@ export default function JobList() {
           record.jobType === 1 ? (
             <Space>
               <JobFlowPreview record={record} fetchFinish={fetchPageList} />
-              <Tooltip title="流程执行与调度尚未接入">
-                <span>未接入执行</span>
+              <Tooltip title="已支持手动串行执行，Cron 尚未接入">
+                <span>手动串行</span>
               </Tooltip>
               <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
             </Space>

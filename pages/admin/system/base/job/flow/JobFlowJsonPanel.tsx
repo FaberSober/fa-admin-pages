@@ -59,7 +59,7 @@ export default function JobFlowJsonPanel({
         </header>
         <div className="job-flow-json-body">
           <Space style={{ justifyContent: 'space-between' }}>
-            <Typography.Text type="secondary">仅修改当前页面，本阶段不接入真实调度。切换模式保留修改，关闭面板丢弃未应用修改。</Typography.Text>
+            <Typography.Text type="secondary">应用只修改当前画布；实际执行前需保存。切换模式保留修改，关闭面板丢弃未应用修改。</Typography.Text>
             <Segmented<'view' | 'edit'>
               aria-label="JSON 查看或编辑"
               value={mode}

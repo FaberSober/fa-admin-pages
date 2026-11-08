@@ -16,7 +16,7 @@ export default function JobFlowTaskNode({ data, selected }: NodeProps<JobFlowTas
         boxShadow: selected ? `0 0 0 1px ${token.colorPrimary}` : undefined,
       }}
     >
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Left} />
       {data.isEntry && (
         <span
           className="job-flow-entry-badge"
@@ -28,7 +28,7 @@ export default function JobFlowTaskNode({ data, selected }: NodeProps<JobFlowTas
         </span>
       )}
       <div title={data.clazzPath}>{data.label}</div>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Right} />
     </div>
   );
 }

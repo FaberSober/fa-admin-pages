@@ -8,18 +8,25 @@ import { useLocation } from 'react-router-dom';
 import { appendVisibleLog, isLogReadComplete, startJobLogPolling } from './jobLogPolling';
 import JobExecutionStatus from '../JobExecutionStatus';
 
-export default function JobLogDetailDrawer({ record }: { record: Admin.JobLog }) {
-  const [open, setOpen] = useState(false);
+export default function JobLogDetailDrawer({ record, defaultOpen = false }: { record: Admin.JobLog; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   const { pathname, search } = useLocation();
+  const previousLocation = useRef(`${pathname}${search}`);
 
   useEffect(() => {
-    setOpen(false);
+    const next = `${pathname}${search}`;
+    if (previousLocation.current !== next) setOpen(false);
+    previousLocation.current = next;
   }, [pathname, search]);
 
   return (
     <>
       <Tooltip title={!record.logPath ? '本次执行未记录详细日志' : undefined}>
-        <span><Button type="link" size="small" disabled={!record.logPath} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>查看日志</Button></span>
+        <span>
+          <Button type="link" size="small" disabled={!record.logPath} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>
+            查看日志
+          </Button>
+        </span>
       </Tooltip>
       <BaseDrawer title={`执行日志 #${record.id}`} size={1000} open={open} onClose={() => setOpen(false)}>
         <JobLogContent key={record.id} record={record} />
@@ -79,21 +86,48 @@ function JobLogContent({ record }: { record: Admin.JobLog }) {
       <Space wrap>
         <JobExecutionStatus status={status} trackingVersion={record.trackingVersion} legacyDuration={record.duration} />
         <Typography.Text type="secondary">{polling ? '自动刷新中' : '自动刷新已停止'}</Typography.Text>
-        <Button size="small" onClick={() => setFollowing((value) => !value)}>{following ? '暂停跟随' : '继续跟随'}</Button>
-        <Button size="small" icon={<ReloadOutlined />} onClick={() => setReloadKey((value) => value + 1)}>重新加载</Button>
-        <Button size="small" icon={<DownloadOutlined />} disabled={!available} loading={downloading}
-          onClick={() => void jobLogApi.downloadLog(record.id).catch(() => undefined)}>下载日志</Button>
+        <Button size="small" onClick={() => setFollowing((value) => !value)}>
+          {following ? '暂停跟随' : '继续跟随'}
+        </Button>
+        <Button size="small" icon={<ReloadOutlined />} onClick={() => setReloadKey((value) => value + 1)}>
+          重新加载
+        </Button>
+        <Button
+          size="small"
+          icon={<DownloadOutlined />}
+          disabled={!available}
+          loading={downloading}
+          onClick={() => void jobLogApi.downloadLog(record.id).catch(() => undefined)}
+        >
+          下载日志
+        </Button>
       </Space>
       {notice && <Alert type="info" showIcon title={notice} />}
       {error && <Alert type="error" showIcon title={error} />}
       {trimmed && <Alert type="warning" showIcon title="当前仅展示最近约 200 万字符，请下载日志查看完整内容。" />}
       {!loaded && <Spin aria-label="正在读取日志" />}
-      <textarea ref={scrollRef} readOnly spellCheck={false} aria-label="本次执行日志" style={{
-        flex: 1, minHeight: 0, overflow: 'auto', margin: 0, padding: 12,
-        color: token.colorText, background: token.colorFillAlter, borderRadius: token.borderRadius,
-        border: `1px solid ${token.colorBorder}`, resize: 'none',
-        fontFamily: token.fontFamilyCode, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
-      }} value={content || (loaded && available && !error ? '暂无日志输出' : '')} />
+      <textarea
+        ref={scrollRef}
+        readOnly
+        spellCheck={false}
+        aria-label="本次执行日志"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'auto',
+          margin: 0,
+          padding: 12,
+          color: token.colorText,
+          background: token.colorFillAlter,
+          borderRadius: token.borderRadius,
+          border: `1px solid ${token.colorBorder}`,
+          resize: 'none',
+          fontFamily: token.fontFamilyCode,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+        value={content || (loaded && available && !error ? '暂无日志输出' : '')}
+      />
     </div>
   );
 }
