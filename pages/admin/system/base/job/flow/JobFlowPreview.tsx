@@ -6,6 +6,7 @@ import {
   Background,
   Controls,
   MiniMap,
+  MarkerType,
   Panel,
   ReactFlow,
   ReactFlowProvider,
@@ -28,6 +29,7 @@ import {
   PlusOutlined,
   SaveOutlined,
   SettingOutlined,
+  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import './job-flow-preview.scss';
 import type { Admin } from '@/types';
@@ -36,10 +38,13 @@ import { getFlowTaskOptions } from './jobFlowTasks';
 import useJobFlowAlignment from './useJobFlowAlignment';
 import JobFlowAlignmentGuides from './JobFlowAlignmentGuides';
 import JobFlowJsonPanel from './JobFlowJsonPanel';
-import { layoutFlow, parseFlowDefinition, validateFlow, type FlowNode } from './flowDefinition';
+import JobFlowPreflightPanel from './JobFlowPreflightPanel';
+import JobFlowTaskNode from './JobFlowTaskNode';
+import { getFlowEntryIds, layoutFlow, parseFlowDefinition, validateFlow, type FlowNode } from './flowDefinition';
 
 // 以验收截图中约 128px 宽的默认 150px 节点作为 100% 显示基准。
 const BASE_ZOOM = 0.85;
+const nodeTypes = { flowTask: JobFlowTaskNode };
 
 const demoJobs = [
   { value: 'demo.DataPrepare', label: '示例：数据准备', name: '示例：数据准备' },
@@ -53,8 +58,8 @@ const initialNodes: TaskNode[] = demoJobs.map((job, index) => ({
   data: { label: job.label, clazzPath: job.value },
 }));
 const initialEdges = [
-  { id: 'demo-edge-1', source: 'demo-1', target: 'demo-2' },
-  { id: 'demo-edge-2', source: 'demo-2', target: 'demo-3' },
+  { id: 'demo-edge-1', source: 'demo-demo.DataPrepare', target: 'demo-demo.GenerateReport' },
+  { id: 'demo-edge-2', source: 'demo-demo.GenerateReport', target: 'demo-demo.SendNotice' },
 ];
 
 /** 独立的页面原型，不提交配置或触发真实任务。 */
@@ -76,9 +81,12 @@ export default function JobFlowPreview({ record, fetchFinish }: { record?: Admin
 function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: Admin.Job; fetchFinish?: () => void }) {
   const { themeDark } = useContext(ThemeLayoutContext);
   const { token } = theme.useToken();
+  const editorRef = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLSpanElement>(null);
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
   const configPanelId = useId();
+  const [configWidth, setConfigWidth] = useState(420);
+  const [showPreflight, setShowPreflight] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   useLayoutEffect(() => {
@@ -99,6 +107,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const [nodes, setNodes] = useNodesState<TaskNode>(demo ? initialNodes : []);
   const alignment = useJobFlowAlignment<TaskNode>(setNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(demo ? initialEdges : []);
+  const entryIds = getFlowEntryIds(nodes, edges);
+  const displayNodes = nodes.map((node) => ({ ...node, type: 'flowTask', data: { ...node.data, isEntry: entryIds.has(node.id) } }));
   const [json, setJson] = useState<string>();
   const [saved, setSaved] = useState<string>();
   const [configuredJobs, setConfiguredJobs] = useState<ReturnType<typeof getFlowTaskOptions>>([]);
@@ -199,7 +209,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
       {open &&
         mountNode &&
         createPortal(
-          <div className={`job-flow-editor fa-full-content ${fullscreen ? 'job-flow-editor--fullscreen' : ''}`}>
+          <div ref={editorRef} className={`job-flow-editor fa-full-content ${fullscreen ? 'job-flow-editor--fullscreen' : ''}`}>
             <section className="job-flow-toolbar" aria-label="任务流编排工具栏">
               <div className="job-flow-toolbar-context">
                 <Tooltip title="返回任务列表">
@@ -232,6 +242,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                     aria-pressed={showConfig}
                     onClick={() => {
                       setJson(undefined);
+                      setShowPreflight(false);
                       setShowConfig((value) => !value);
                     }}
                   />
@@ -308,12 +319,30 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       const value = definition();
                       if (value) {
                         setShowConfig(false);
+                        setShowPreflight(false);
                         setJson(value);
                       }
                     }}
                   />
                 </Tooltip>
                 <span className="job-flow-toolbar-divider" aria-hidden="true" />
+                {!demo && (
+                  <Tooltip title="检查服务器已保存定义；不执行任务">
+                    <Button
+                      type="text"
+                      disabled={!persistedId}
+                      icon={<SafetyCertificateOutlined />}
+                      aria-label="运行前检查"
+                      onClick={() => {
+                        setJson(undefined);
+                        setShowConfig(false);
+                        setShowPreflight((value) => !value);
+                      }}
+                    >
+                      预检
+                    </Button>
+                  </Tooltip>
+                )}
                 {!demo && (
                   <Button
                     type="primary"
@@ -350,6 +379,31 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
               </div>
             </section>
 
+            {showPreflight && persistedId && (
+              <JobFlowPreflightPanel
+                jobId={persistedId}
+                selectedNodeId={nodes.find((node) => node.selected)?.id}
+                onClose={() => setShowPreflight(false)}
+                onLocateNode={(id, panelWidth) => {
+                  const instance = flowInstance.current;
+                  const node = instance?.getNode(id);
+                  const area = editorRef.current?.getBoundingClientRect();
+                  if (!instance || !node || !area) {
+                    feedback.info('该节点已不在当前画布，请保存后重新预检');
+                    return;
+                  }
+                  setNodes((current) => current.map((item) => ({ ...item, selected: item.id === id })));
+                  setEdges((current) => current.map((edge) => ({ ...edge, selected: false })));
+                  const { zoom } = instance.getViewport();
+                  const x = node.position.x + (node.measured?.width ?? 150) / 2;
+                  const y = node.position.y + (node.measured?.height ?? 40) / 2;
+                  void instance.setViewport(
+                    { x: Math.max(0, area.width - panelWidth - 36) / 2 - x * zoom, y: area.height / 2 - y * zoom, zoom },
+                    { duration: 300 },
+                  );
+                }}
+              />
+            )}
             {json !== undefined && (
               <JobFlowJsonPanel
                 key={json}
@@ -368,12 +422,12 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
             )}
             {showConfig && (
               <div className="job-flow-config-panel">
-                <FaResizeHorizontal domId={configPanelId} position="left" minWidth={420} maxWidth={800} />
+                <FaResizeHorizontal domId={configPanelId} position="left" minWidth={360} maxWidth={800} onWidthChange={setConfigWidth} />
                 <aside
                   id={configPanelId}
                   aria-label="流程配置面板"
                   style={{
-                    width: 420,
+                    width: configWidth,
                     maxWidth: '100%',
                     height: '100%',
                     boxSizing: 'border-box',
@@ -429,7 +483,12 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
             <div style={{ position: 'absolute', inset: 0 }}>
               <ReactFlow
                 colorMode={themeDark ? 'dark' : 'light'}
-                nodes={nodes}
+                nodes={displayNodes}
+                nodeTypes={nodeTypes}
+                defaultEdgeOptions={{
+                  markerEnd: { type: MarkerType.ArrowClosed, color: token.colorTextSecondary },
+                  style: { stroke: token.colorTextSecondary },
+                }}
                 edges={edges}
                 onNodesChange={alignment.onNodesChange}
                 onNodeDragStart={alignment.onDragStart}
@@ -568,6 +627,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                             const value = definition();
                             if (value) {
                               setShowConfig(false);
+                              setShowPreflight(false);
                               setJson(value);
                             }
                           }}

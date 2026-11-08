@@ -6,6 +6,8 @@ import type { Admin } from '@/types';
 const serviceModule = 'job';
 
 class Job extends BaseApi<Admin.Job, number> {
+  /** 只读检查已保存的流程定义，不执行任务。 */
+  preflightFlow = (id: number): Promise<Fa.Ret<Admin.JobFlowPreflight>> => this.get(`preflightFlow/${id}`);
   /** 获取唯一实体 */
   runOneTime = (id: number): Promise<Fa.Ret> => this.get(`runOneTime/${id}`);
 

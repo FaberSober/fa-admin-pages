@@ -27,16 +27,17 @@ export default function JobFlowJsonPanel({
     }
   }, [draft, allowedClazzPaths]);
   const panelId = useId();
+  const [width, setWidth] = useState(480);
   const [expanded, setExpanded] = useState(false);
   const { token } = theme.useToken();
   return (
     <div className={`job-flow-json-panel ${expanded ? 'job-flow-json-panel--expanded' : ''}`}>
-      {!expanded && <FaResizeHorizontal domId={panelId} position="left" minWidth={420} maxWidth={1000} />}
+      {!expanded && <FaResizeHorizontal domId={panelId} position="left" minWidth={360} maxWidth={800} onWidthChange={setWidth} />}
       <section
         id={panelId}
         aria-label="查看流程定义 JSON"
         className="job-flow-json-frame"
-        style={{ width: expanded ? '100%' : 720, borderColor: token.colorBorderSecondary, boxShadow: token.boxShadowSecondary }}
+        style={{ width: expanded ? '100%' : width, borderColor: token.colorBorderSecondary, boxShadow: token.boxShadowSecondary }}
       >
         <header className="job-flow-json-header">
           <Space>

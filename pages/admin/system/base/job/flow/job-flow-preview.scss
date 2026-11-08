@@ -138,3 +138,100 @@
   .fa-json-edit { display: flex; flex-direction: column; height: 100%; min-height: 0; }
   .fa-json-edit-body { flex: 1; min-height: 0; max-height: none !important; }
 }
+
+.job-flow-task-node {
+  position: relative;
+  width: 150px;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.job-flow-entry-badge {
+  position: absolute;
+  top: -22px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 5px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.job-flow-preflight-summary {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--fa-border-color);
+}
+.job-flow-preflight-status { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
+.job-flow-preflight-success { color: var(--ant-color-success); margin-right: 4px; }
+.job-flow-preflight-note { display: flex; align-items: center; gap: 8px; color: var(--fa-text-color-light100); }
+.job-flow-preflight-metrics {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+  > div { display: flex; align-items: baseline; gap: 6px; }
+  strong { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.4; }
+  span { color: var(--fa-text-color-light100); font-size: 11px; }
+}
+.job-flow-preflight-repeat.ant-btn { align-self: flex-start; height: 24px; padding-inline: 0; color: var(--ant-color-warning-text); font-size: 12px; }
+.job-flow-preflight-content {
+  flex: 1; min-height: 0; overflow: auto;
+  > .ant-spin-container { padding: 14px 16px; }
+}
+.job-flow-preflight-layer { margin-bottom: 18px; &:last-child { margin-bottom: 0; } }
+.job-flow-preflight-layer-heading {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px;
+  > span:first-child { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  > span:last-child { color: var(--fa-text-color-light100); font-variant-numeric: tabular-nums; }
+  small { color: var(--ant-color-success-text); font-size: 11px; font-weight: 400; }
+}
+.job-flow-preflight-layer-index { color: var(--fa-text-color-light100); font-size: 11px; font-variant-numeric: tabular-nums; }
+.job-flow-preflight-tasks { border: 1px solid var(--fa-border-color); border-radius: 8px; overflow: hidden; }
+.job-flow-preflight-task {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px;
+  & + & { border-top: 1px solid var(--fa-border-color); }
+}
+.job-flow-preflight-task-number {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 26px; height: 26px;
+  border-radius: 6px; background: var(--fa-bg-grey); color: var(--fa-text-color-light100); font-size: 11px; font-variant-numeric: tabular-nums;
+}
+.job-flow-preflight-task-main { flex: 1; min-width: 0; }
+.job-flow-preflight-task-title { display: flex; align-items: baseline; gap: 8px; strong { font-size: 13px; overflow-wrap: anywhere; } small { color: var(--ant-color-success-text); font-size: 11px; } }
+.job-flow-preflight-class { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; color: var(--fa-text-color-light100); font-family: monospace; font-size: 11px; }
+.job-flow-preflight-predecessors { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 8px; font-size: 11px; color: var(--fa-text-color-light100); }
+.job-flow-preflight-predecessor { padding: 1px 5px; border-radius: 4px; background: var(--fa-bg-grey); color: var(--fa-text-color); max-width: 100%; overflow-wrap: anywhere; }
+
+
+button.job-flow-preflight-class {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  &:hover { color: var(--ant-color-primary); }
+  &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-radius: 2px; }
+}
+
+.job-flow-preflight-task--locatable {
+  cursor: pointer;
+  transition: background-color 120ms ease;
+  &:hover { background: var(--fa-bg-grey); }
+  &.is-selected { background: var(--ant-color-primary-bg); box-shadow: inset 3px 0 var(--ant-color-primary); }
+}
+.job-flow-preflight-locate {
+  padding: 0; border: 0; border-radius: 2px; background: transparent; color: inherit; text-align: left;
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; overflow-wrap: anywhere;
+  &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+}

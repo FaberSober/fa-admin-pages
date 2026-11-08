@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { layoutFlow, validateFlow, type FlowNode } from './flowDefinition';
+import { getFlowEntryIds, layoutFlow, validateFlow, type FlowNode } from './flowDefinition';
 const nodes: FlowNode[] = ['a', 'b', 'c'].map((id) => ({ id, clazzPath: 'com.example.Job', name: id, position: { x: 0, y: 0 } }));
 describe('流程页面 DAG 校验', () => {
   it('允许多入口汇合和重复任务引用', () => {
@@ -51,4 +51,16 @@ describe('流程页面 DAG 校验', () => {
     expect(result[0].position.x).not.toBe(result[1].position.x);
     expect(result[2].position.y).toBeGreaterThan(result[0].position.y);
   });
+});
+
+it('入口由入边决定，支持多入口、孤立节点和连线删除', () => {
+  expect([
+    ...getFlowEntryIds(nodes, [
+      { source: 'a', target: 'c' },
+      { source: 'b', target: 'c' },
+    ]),
+  ]).toEqual(['a', 'b']);
+  expect([...getFlowEntryIds(nodes, [{ source: 'a', target: 'b' }])]).toEqual(['a', 'c']);
+  expect([...getFlowEntryIds(nodes, [])]).toEqual(['a', 'b', 'c']);
+  expect([...getFlowEntryIds([], [])]).toEqual([]);
 });

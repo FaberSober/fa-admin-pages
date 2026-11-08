@@ -108,3 +108,9 @@ export function parseFlowDefinition(source: string, allowedClazzPaths: readonly 
   if (error) throw new Error(error);
   return { schemaVersion: 1, name, maxConcurrency: data.maxConcurrency, nodes, edges };
 }
+
+/** 入口由依赖决定，不以画布位置或任务类判断；孤立节点也是入口。 */
+export function getFlowEntryIds(nodes: readonly Pick<FlowNode, 'id'>[], edges: readonly FlowEdge[]): Set<string> {
+  const targets = new Set(edges.map((edge) => edge.target));
+  return new Set(nodes.filter((node) => !targets.has(node.id)).map((node) => node.id));
+}

@@ -510,6 +510,16 @@ namespace Admin {
 
   // -------------------------------------------- 系统-系统定时任务 --------------------------------------------
   /** 系统定时任务 */
+  export interface JobFlowPreflight {
+    jobId: number;
+    jobName: string;
+    maxConcurrency: number;
+    nodeCount: number;
+    edgeCount: number;
+    layers: { id: string; name: string; clazzPath: string; predecessors: string[] }[][];
+    repeatedClasses: string[];
+  }
+
   export interface Job extends Fa.BaseDelEntity {
     jobType?: number;
     flowDefinition?: string;
