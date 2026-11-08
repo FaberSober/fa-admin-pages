@@ -30,6 +30,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import './job-flow-preview.scss';
+import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import { getFlowTaskOptions } from './jobFlowTasks';
 import useJobFlowAlignment from './useJobFlowAlignment';
@@ -57,20 +58,22 @@ const initialEdges = [
 ];
 
 /** 独立的页面原型，不提交配置或触发真实任务。 */
-export default function JobFlowPreview() {
+export default function JobFlowPreview({ record, fetchFinish }: { record?: Admin.Job; fetchFinish?: () => void }) {
   return (
     <Space>
       <ReactFlowProvider>
-        <JobFlowEditor demo={false} />
+        <JobFlowEditor demo={false} record={record} fetchFinish={fetchFinish} />
       </ReactFlowProvider>
-      <ReactFlowProvider>
-        <JobFlowEditor demo />
-      </ReactFlowProvider>
+      {!record && (
+        <ReactFlowProvider>
+          <JobFlowEditor demo />
+        </ReactFlowProvider>
+      )}
     </Space>
   );
 }
 
-function JobFlowEditor({ demo }: { demo: boolean }) {
+function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: Admin.Job; fetchFinish?: () => void }) {
   const { themeDark } = useContext(ThemeLayoutContext);
   const { token } = theme.useToken();
   const anchorRef = useRef<HTMLSpanElement>(null);
@@ -87,6 +90,9 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
   const [showTests, setShowTests] = useState(false);
   const [zoom, setZoom] = useState(BASE_ZOOM);
   const [open, setOpen] = useState(false);
+  const loadedRecord = useRef(false);
+  const [persistedId, setPersistedId] = useState<number | undefined>(record?.id);
+  const saving = useApiLoading([jobApi.getUrl('save'), jobApi.getUrl('update')]);
   const [name, setName] = useState(demo ? '示例串行任务流' : '新建任务流');
   const [concurrency, setConcurrency] = useState(2);
   const [clazzPath, setClazzPath] = useState<string | undefined>(demo ? 'demo.DataPrepare' : undefined);
@@ -105,10 +111,22 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
     let cancelled = false;
     setTaskError(false);
     setConfiguredJobs([]);
-    jobApi
-      .getAllJobs()
-      .then((res) => {
-        if (!cancelled) setConfiguredJobs(getFlowTaskOptions(res.data));
+    Promise.all([jobApi.getAllJobs(), record ? jobApi.getById(record.id) : Promise.resolve(undefined)])
+      .then(([res, detail]) => {
+        if (cancelled) return;
+        const options = getFlowTaskOptions(res.data);
+        setConfiguredJobs(options);
+        if (detail && !loadedRecord.current) {
+          loadedRecord.current = true;
+          const definition = parseFlowDefinition(
+            detail.data.flowDefinition ?? '',
+            options.map((job) => job.value),
+          );
+          setName(detail.data.jobName);
+          setConcurrency(definition.maxConcurrency);
+          setNodes(definition.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, clazzPath: node.clazzPath } })));
+          setEdges(definition.edges.map((edge, index) => ({ ...edge, id: `loaded-${index}` })));
+        }
       })
       .catch(() => {
         if (!cancelled) setTaskError(true);
@@ -116,7 +134,7 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
     return () => {
       cancelled = true;
     };
-  }, [open, demo, refresh]);
+  }, [open, demo, refresh, record, setNodes, setEdges]);
   const sequence = useRef(0);
   const [feedback, contextHolder] = message.useMessage();
   const flowNodes = (): FlowNode[] => nodes.map((node) => ({ id: node.id, clazzPath: node.data.clazzPath, name: node.data.label, position: node.position }));
@@ -153,10 +171,30 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
     }
   }
 
+  async function saveFlow() {
+    const source = definition();
+    if (!source) return;
+    const values = { jobName: name.trim(), jobType: 1, flowDefinition: source, status: false, cron: '0 * * * * ?', clazzPath: '' };
+    if (persistedId) await jobApi.update(persistedId, { id: persistedId, ...values });
+    else {
+      const res = await jobApi.save(values);
+      setPersistedId(res.data.id);
+    }
+    feedback.success('流程定义已保存，执行与调度尚未接入');
+    fetchFinish?.();
+  }
+
   return (
     <>
       {contextHolder}
-      <Button onClick={() => setOpen(true)}>{demo ? '流程编排预览' : '新建任务流'}</Button>
+      <Button
+        onClick={() => {
+          loadedRecord.current = false;
+          setOpen(true);
+        }}
+      >
+        {demo ? '流程编排预览' : record ? '编排' : '新建任务流'}
+      </Button>
       <span ref={anchorRef} style={{ display: 'none' }} />
       {open &&
         mountNode &&
@@ -180,7 +218,7 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
                 <strong className="job-flow-toolbar-name" title={name}>
                   {name}
                 </strong>
-                <span className="job-flow-toolbar-status">{demo ? '模拟编排' : '注册任务 · 未发布'}</span>
+                <span className="job-flow-toolbar-status">{demo ? '模拟编排' : persistedId ? '流程定义 · 已建档' : '注册任务 · 未保存'}</span>
                 <span className="job-flow-toolbar-summary">
                   {nodes.length} 个节点 · {edges.length} 条依赖
                 </span>
@@ -276,6 +314,19 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
                   />
                 </Tooltip>
                 <span className="job-flow-toolbar-divider" aria-hidden="true" />
+                {!demo && (
+                  <Button
+                    type="primary"
+                    loading={saving}
+                    disabled={taskError || tasksLoading}
+                    icon={<SaveOutlined />}
+                    onClick={() => {
+                      saveFlow().catch(() => {});
+                    }}
+                  >
+                    保存
+                  </Button>
+                )}
                 <Button
                   icon={<SaveOutlined />}
                   onClick={() => {
@@ -400,7 +451,12 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
                 <Background />
                 {!demo && nodes.length === 0 && (
                   <Panel position="top-center" style={{ marginTop: 80 }}>
-                    <Alert type="info" showIcon title="从右上角“＋”选择已注册的任务类开始编排" description="当前仅编辑页面草稿，不会保存到服务器或执行任务。" />
+                    <Alert
+                      type="info"
+                      showIcon
+                      title="从右上角“＋”选择已注册的任务类开始编排"
+                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。执行与调度尚未接入。"
+                    />
                   </Panel>
                 )}
                 <JobFlowAlignmentGuides guides={alignment.guides} />
@@ -474,7 +530,7 @@ function JobFlowEditor({ demo }: { demo: boolean }) {
                         type="info"
                         showIcon
                         title={demo ? '模拟任务 · 仅页面预览' : '真实任务编排 · 尚未发布'}
-                        description="草稿只保留在当前页面，刷新后丢失；不会保存到服务器或执行任务。"
+                        description="草稿只保留在当前页面，刷新后丢失；暂存只保留在当前页面；使用顶部“保存”可存入服务器。执行与调度尚未接入。"
                       />
                       <Space orientation="vertical" style={{ width: '100%' }}>
                         <Button

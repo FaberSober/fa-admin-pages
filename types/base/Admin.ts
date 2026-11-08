@@ -511,6 +511,8 @@ namespace Admin {
   // -------------------------------------------- 系统-系统定时任务 --------------------------------------------
   /** 系统定时任务 */
   export interface Job extends Fa.BaseDelEntity {
+    jobType?: number;
+    flowDefinition?: string;
     /**  */
     id: number;
     /** 任务名称  */

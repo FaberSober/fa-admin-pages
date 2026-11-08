@@ -1,5 +1,5 @@
 import { DownloadOutlined, PauseCircleOutlined, PlayCircleOutlined, SearchOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import { Badge, Button, Form, Input, Popconfirm, Space, Tooltip } from 'antd';
+import { Badge, Button, Form, Input, Popconfirm, Select, Space, Tag, Tooltip } from 'antd';
 import {
   AuthDelBtn,
   BaseBizTable,
@@ -59,11 +59,20 @@ export default function JobList() {
       BaseTableUtils.genSimpleSorterColumn('ID', 'id', 70, sorter),
       {
         ...BaseTableUtils.genSimpleSorterColumn('任务名称', 'jobName', 240, sorter),
-        render: (val, record) => (
-          <BaseDrawer triggerDom={<a>{val}</a>} size={1000}>
-            <JobLogList jobId={record.id} />
-          </BaseDrawer>
-        ),
+        render: (val, record) =>
+          record.jobType === 1 ? (
+            <span>{val}</span>
+          ) : (
+            <BaseDrawer triggerDom={<a>{val}</a>} size={1000}>
+              <JobLogList jobId={record.id} />
+            </BaseDrawer>
+          ),
+      },
+      {
+        title: '任务类型',
+        dataIndex: 'jobType',
+        width: 100,
+        render: (value) => <Tag color={value === 1 ? 'blue' : undefined}>{value === 1 ? '流程任务' : '普通任务'}</Tag>,
       },
       BaseTableUtils.genSimpleSorterColumn('cron表达式', 'cron', 120, sorter),
       {
@@ -76,7 +85,7 @@ export default function JobList() {
       },
       {
         ...BaseTableUtils.genTimeSorterColumn('最近结束时间', 'lastEndTime', 180, sorter),
-        render: (val, record) => record.lastTrackingVersion === 2 ? '—' : FaUtils.getDateFullStr(val) || '—',
+        render: (val, record) => (record.lastTrackingVersion === 2 ? '—' : FaUtils.getDateFullStr(val) || '—'),
       },
       {
         ...BaseTableUtils.genSimpleSorterColumn('最近执行结果', 'lastStatus', 160, sorter),
@@ -93,7 +102,9 @@ export default function JobList() {
       {
         ...BaseTableUtils.genSimpleSorterColumn('累计执行次数', 'executeCount', 120, sorter),
         render: (_, record) => (
-          <Tooltip title={`成功：${formatJobCount(record.successCount)}；失败：${formatJobCount(record.failCount)}。以升级时保留的历史记录初始化，旧成功结果可能仅代表入口返回。`}>
+          <Tooltip
+            title={`成功：${formatJobCount(record.successCount)}；失败：${formatJobCount(record.failCount)}。以升级时保留的历史记录初始化，旧成功结果可能仅代表入口返回。`}
+          >
             <span>{formatJobCount(record.executeCount)}</span>
           </Tooltip>
         ),
@@ -105,7 +116,9 @@ export default function JobList() {
       {
         ...BaseTableUtils.genSimpleSorterColumn('平均总耗时', 'avgDurationMs', 125, false, true, true),
         render: (_, record) => (
-          <Tooltip title={`耗时统计起始时间：${FaUtils.getDateFullStr(record.statsSince) || '尚未开始统计'}；参与平均的执行次数：${formatJobCount(record.durationSampleCount)}。仅统计已确认结束的执行，成功和失败均包含；历史记录、尚未结束及无法确认完成的执行不参与平均。`}>
+          <Tooltip
+            title={`耗时统计起始时间：${FaUtils.getDateFullStr(record.statsSince) || '尚未开始统计'}；参与平均的执行次数：${formatJobCount(record.durationSampleCount)}。仅统计已确认结束的执行，成功和失败均包含；历史记录、尚未结束及无法确认完成的执行不参与平均。`}
+          >
             <span>{formatJobAverage(record.avgDurationMs, record.durationSampleCount)}</span>
           </Tooltip>
         ),
@@ -117,21 +130,40 @@ export default function JobList() {
       {
         title: '操作',
         dataIndex: 'opr',
-        render: (_: string, record: Admin.Job) => (
-          <Space>
-            <Popconfirm title="确定立即执行一次该任务" onConfirm={() => handleRunOneTime(record.id)}>
-              <a><ThunderboltOutlined />执行</a>
-            </Popconfirm>
-            <Popconfirm
-              title={!record.status ? '确定启动任务?' : '确定停止任务?'}
-              onConfirm={() => handleJobStatus(record)}
-            >
-              {!record.status ? <a><PlayCircleOutlined />启动</a> : <a><PauseCircleOutlined />停止</a>}
-            </Popconfirm>
-            {!record.status && <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />}
-            <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
-          </Space>
-        ),
+        render: (_: string, record: Admin.Job) =>
+          record.jobType === 1 ? (
+            <Space>
+              <JobFlowPreview record={record} fetchFinish={fetchPageList} />
+              <Tooltip title="流程执行与调度尚未接入">
+                <span>未接入执行</span>
+              </Tooltip>
+              <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+            </Space>
+          ) : (
+            <Space>
+              <Popconfirm title="确定立即执行一次该任务" onConfirm={() => handleRunOneTime(record.id)}>
+                <a>
+                  <ThunderboltOutlined />
+                  执行
+                </a>
+              </Popconfirm>
+              <Popconfirm title={!record.status ? '确定启动任务?' : '确定停止任务?'} onConfirm={() => handleJobStatus(record)}>
+                {!record.status ? (
+                  <a>
+                    <PlayCircleOutlined />
+                    启动
+                  </a>
+                ) : (
+                  <a>
+                    <PauseCircleOutlined />
+                    停止
+                  </a>
+                )}
+              </Popconfirm>
+              {!record.status && <JobModal editBtn title={`编辑${serviceName}信息`} record={record} fetchFinish={fetchPageList} />}
+              <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
+            </Space>
+          ),
         width: 230,
         fixed: 'right',
         tcRequired: true,
@@ -150,12 +182,23 @@ export default function JobList() {
               <Input placeholder="请输入任务名称" />
             </Form.Item>
 
+            <Form.Item name="jobType" label="任务类型">
+              <Select
+                allowClear
+                placeholder="全部"
+                style={{ width: 110 }}
+                options={[
+                  { value: 0, label: '普通任务' },
+                  { value: 1, label: '流程任务' },
+                ]}
+              />
+            </Form.Item>
             <Space>
               <Button htmlType="submit" loading={loading} icon={<SearchOutlined />}>
                 查询
               </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
-              <JobFlowPreview />
+              <JobFlowPreview fetchFinish={fetchPageList} />
               <JobModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
               <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
                 导出
