@@ -1,10 +1,11 @@
 import { useEffect, useId, useState } from 'react';
-import { CloseOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CloseOutlined, FullscreenOutlined, FullscreenExitOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Alert, Button, Select, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { FaJsonView, FaResizeHorizontal, useApiLoading } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi, jobLogApi } from '@features/fa-admin-pages/services';
 import { startFlowRunPolling } from './flowRunPolling';
+import JobFlowRunCanvas from './JobFlowRunCanvas';
 import JobLogDetailDrawer from '../jobLog/JobLogDetailDrawer';
 
 const nodeStates: Record<number, [string, string]> = {
@@ -22,7 +23,9 @@ const runStates: Record<number, string> = { 1: '执行中', 2: '成功', 8: '未
 
 export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobId: number; initialLogId?: number; onClose: () => void }) {
   const panelId = useId();
-  const [width, setWidth] = useState(420);
+  const [width, setWidth] = useState(540);
+  const [expanded, setExpanded] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [history, setHistory] = useState<Admin.JobLog[]>([]);
   const [selected, setSelected] = useState<number | undefined>(initialLogId);
   const [run, setRun] = useState<Admin.JobFlowRun>();
@@ -49,6 +52,7 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
   useEffect(() => {
     if (!selected) return;
     setRun(undefined);
+    setSelectedNodeId(undefined);
     setFailed(false);
     return startFlowRunPolling({
       read: (signal) => jobApi.flowRun(selected, signal).then((response) => response.data),
@@ -64,12 +68,13 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
   const options = history.map((log) => ({ value: log.id, label: `#${log.id} · ${log.beginTime ?? ''} · ${runStates[log.status] ?? '未知'}` }));
   if (selected && !options.some((option) => option.value === selected)) options.unshift({ value: selected, label: `#${selected} · 本轮执行` });
   return (
-    <div className="job-flow-json-panel">
-      <FaResizeHorizontal domId={panelId} position="left" minWidth={360} maxWidth={800} onWidthChange={setWidth} />
-      <section id={panelId} className="job-flow-json-frame" style={{ width, borderColor: 'var(--fa-border-color)' }} aria-label="流程运行记录">
+    <div className={`job-flow-json-panel${expanded ? ' job-flow-json-panel--expanded' : ''}`}>
+      {!expanded && <FaResizeHorizontal domId={panelId} position="left" minWidth={360} maxWidth={900} onWidthChange={setWidth} />}
+      <section id={panelId} className="job-flow-json-frame job-flow-run-frame" style={{ width: expanded ? '100%' : width, borderColor: 'var(--fa-border-color)' }} aria-label="流程运行记录">
         <header className="job-flow-json-header">
-          <Typography.Text strong>流程运行记录</Typography.Text>
+          <Typography.Text strong>流程运行详情</Typography.Text>
           <Space size={4}>
+            <Button type="text" size="small" icon={expanded ? <FullscreenExitOutlined /> : <FullscreenOutlined />} aria-label={expanded ? '收起运行详情' : '展开运行详情'} onClick={() => setExpanded(value => !value)} />
             <Button type="text" size="small" icon={<ReloadOutlined />} aria-label="刷新运行记录" onClick={() => setRefresh((value) => value + 1)} />
             <Button type="text" size="small" icon={<CloseOutlined />} aria-label="关闭运行记录" onClick={onClose} />
           </Space>
@@ -113,8 +118,19 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                 <Typography.Text type="secondary">
                   开始：{run.log.beginTime ?? '—'}　结束：{run.log.endTime ?? '—'}
                 </Typography.Text>
+                <div className="job-flow-run-split">
+                <div className="job-flow-run-canvas-area">
+                  <JobFlowRunCanvas run={run} selectedNodeId={selectedNodeId} onSelect={setSelectedNodeId} />
+                </div>
+                <div className="job-flow-run-records">
+                <Typography.Text strong>节点记录与日志</Typography.Text>
+                <Space style={{ justifyContent: 'space-between', width: '100%' }}>
+                  <Typography.Text type="secondary">{selectedNodeId ? '选中节点详情' : '点击运行图节点查看详情'} · 总耗时 {run.log.durationMs == null ? '—' : `${run.log.durationMs} ms`}</Typography.Text>
+                  {selectedNodeId && <Button type="link" size="small" onClick={() => setSelectedNodeId(undefined)}>显示全部节点</Button>}
+                </Space>
                 <div className="job-flow-preflight-tasks">
-                  {run.nodes.map((node, index) => (
+                  {selectedNodeId && !run.nodes.some(node => node.nodeId === selectedNodeId) && <Typography.Text type="secondary">该节点暂无运行记录，无法确认执行状态。</Typography.Text>}
+                  {run.nodes.map((node, index) => (!selectedNodeId || node.nodeId === selectedNodeId) && (
                     <article key={node.id} className="job-flow-preflight-task">
                       <span className="job-flow-preflight-task-number">{String(index + 1).padStart(2, '0')}</span>
                       <div className="job-flow-preflight-task-main">
@@ -132,7 +148,7 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                           {node.endTime ? ` → ${node.endTime}` : ''}
                         </Typography.Text>
                         {node.reason && <div style={{ overflowWrap: 'anywhere' }}>{node.reason}</div>}
-                        {node.jobLogId && <NodeBusinessLog id={node.jobLogId} />}
+                        {node.jobLogId && <NodeBusinessLog key={node.jobLogId} id={node.jobLogId} />}
                       </div>
                     </article>
                   ))}
@@ -141,6 +157,8 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                   <summary>本轮定义版本 #{run.log.definitionVersionId}</summary>
                   <FaJsonView data={run.definition} defaultExpandDepth={2} />
                 </details>
+                </div>
+                </div>
               </Space>
             )}
           </Spin>
