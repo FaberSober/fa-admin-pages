@@ -7,7 +7,8 @@ const serviceModule = 'job';
 
 class Job extends BaseApi<Admin.Job, number> {
   runFlow = (id: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`runFlow/${id}`);
-  flowRun = (id: number, signal?: AbortSignal): Promise<Fa.Ret<Admin.JobFlowRun>> => this.get(`flowRun/${id}`, {}, { signal });
+  flowRun = (id: number, signal?: AbortSignal, jobId?: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.get(`flowRun/${id}`, { jobId }, { signal });
+  flowRunsPage = (jobId: number, params: any, signal?: AbortSignal): Promise<Fa.Ret<Fa.Page<Admin.JobLog>>> => this.post(`flowRunsPage/${jobId}`, params, { signal });
   flowRuns = (id: number): Promise<Fa.Ret<Admin.JobLog[]>> => this.get(`flowRuns/${id}`);
   /** 只读检查已保存的流程定义，不执行任务。 */
   preflightFlow = (id: number): Promise<Fa.Ret<Admin.JobFlowPreflight>> => this.get(`preflightFlow/${id}`);

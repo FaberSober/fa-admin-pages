@@ -1,10 +1,11 @@
 import { useEffect, useId, useState } from 'react';
 import { CloseOutlined, FullscreenOutlined, FullscreenExitOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Select, Space, Spin, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Button, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { FaJsonView, FaResizeHorizontal, useApiLoading } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi, jobLogApi } from '@features/fa-admin-pages/services';
 import { startFlowRunPolling } from './flowRunPolling';
+import JobFlowHistoryList from './JobFlowHistoryList';
 import JobFlowRunCanvas from './JobFlowRunCanvas';
 import JobLogDetailDrawer from '../jobLog/JobLogDetailDrawer';
 
@@ -21,58 +22,40 @@ const nodeStates: Record<number, [string, string]> = {
 };
 const runStates: Record<number, string> = { 1: '执行中', 2: '成功', 8: '未确认', 9: '失败' };
 
-export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobId: number; initialLogId?: number; onClose: () => void }) {
+function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: number; initialLogId?: number; onClose: () => void }) {
   const panelId = useId();
   const [width, setWidth] = useState(540);
+  const [historyWidth, setHistoryWidth] = useState(780);
   const [expanded, setExpanded] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
-  const [history, setHistory] = useState<Admin.JobLog[]>([]);
+  const [showHistory, setShowHistory] = useState(initialLogId === undefined);
+  const [historyOpened, setHistoryOpened] = useState(initialLogId === undefined);
   const [selected, setSelected] = useState<number | undefined>(initialLogId);
   const [run, setRun] = useState<Admin.JobFlowRun>();
   const [failed, setFailed] = useState(false);
   const [refresh, setRefresh] = useState(0);
-  const loading = useApiLoading([jobApi.getUrl(`flowRuns/${jobId}`), ...(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : [])]);
+  const loading = useApiLoading(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : []);
   useEffect(() => {
-    let cancelled = false;
-    jobApi
-      .flowRuns(jobId)
-      .then((res) => {
-        if (!cancelled) {
-          setHistory(res.data);
-          setSelected((value) => value ?? res.data[0]?.id);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [jobId, refresh]);
-  useEffect(() => {
-    if (!selected) return;
+    if (!selected || showHistory) return;
     setRun(undefined);
     setSelectedNodeId(undefined);
     setFailed(false);
     return startFlowRunPolling({
-      read: (signal) => jobApi.flowRun(selected, signal).then((response) => response.data),
+      read: (signal) => jobApi.flowRun(selected, signal, jobId).then((response) => response.data),
       onResult: (value) => {
         setRun(value);
-        setHistory((current) => current.map((log) => (log.id === value.log.id ? value.log : log)));
       },
       onError: () => setFailed(true),
     });
-  }, [selected, refresh]);
+  }, [selected, refresh, showHistory, jobId]);
   const active = run?.nodes.filter((node) => node.status === 20 || node.status === 30).length ?? 0;
   const unconfirmed = run?.nodes.filter((node) => node.status === 80).length ?? 0;
-  const options = history.map((log) => ({ value: log.id, label: `#${log.id} · ${log.beginTime ?? ''} · ${runStates[log.status] ?? '未知'}` }));
-  if (selected && !options.some((option) => option.value === selected)) options.unshift({ value: selected, label: `#${selected} · 本轮执行` });
   return (
     <div className={`job-flow-json-panel${expanded ? ' job-flow-json-panel--expanded' : ''}`}>
-      {!expanded && <FaResizeHorizontal domId={panelId} position="left" minWidth={360} maxWidth={900} onWidthChange={setWidth} />}
-      <section id={panelId} className="job-flow-json-frame job-flow-run-frame" style={{ width: expanded ? '100%' : width, borderColor: 'var(--fa-border-color)' }} aria-label="流程运行记录">
+      {!expanded && <FaResizeHorizontal domId={panelId} position="left" minWidth={360} maxWidth={900} onWidthChange={showHistory ? setHistoryWidth : setWidth} />}
+      <section id={panelId} className="job-flow-json-frame job-flow-run-frame" style={{ width: expanded ? '100%' : showHistory ? historyWidth : width, borderColor: 'var(--fa-border-color)' }} aria-label="流程运行记录">
         <header className="job-flow-json-header">
-          <Typography.Text strong>流程运行详情</Typography.Text>
+          <Typography.Text strong>{showHistory ? '流程历史记录' : '流程运行详情'}</Typography.Text>
           <Space size={4}>
             <Button type="text" size="small" icon={expanded ? <FullscreenExitOutlined /> : <FullscreenOutlined />} aria-label={expanded ? '收起运行详情' : '展开运行详情'} onClick={() => setExpanded(value => !value)} />
             <Button type="text" size="small" icon={<ReloadOutlined />} aria-label="刷新运行记录" onClick={() => setRefresh((value) => value + 1)} />
@@ -80,9 +63,16 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
           </Space>
         </header>
         <div className="job-flow-json-body" style={{ overflow: 'auto' }}>
-          <Select aria-label="选择流程运行记录" value={selected} options={options} onChange={setSelected} placeholder="暂无运行记录" />
+          {!showHistory && <Space style={{ justifyContent: 'space-between', width: '100%' }}>
+            <Typography.Text>{selected ? `当前运行 #${selected} · ${run ? runStates[run.log.status] ?? '未知' : '加载中'}` : '暂无运行记录'}</Typography.Text>
+            <Button onClick={() => { setHistoryOpened(true); setShowHistory(true); }}>返回历史列表</Button>
+          </Space>}
+          <div style={{ display: showHistory ? undefined : 'none' }}>
+            {historyOpened && <JobFlowHistoryList active={showHistory} refreshToken={refresh} jobId={jobId} selected={selected} onSelect={id => { setSelected(id); setShowHistory(false); }} />}
+          </div>
+          <div style={{ display: showHistory ? 'none' : undefined }}>
           <Typography.Text type="secondary">按依赖和并发上限运行，同类任务串行；配置使用启动时关联的历史版本。</Typography.Text>
-          {failed && <Alert type="error" title="读取失败，自动刷新已暂停" description="请点击刷新重试。" />}
+          {failed && <Alert type="error" title="读取失败，自动刷新已暂停" description="记录可能不存在或不属于当前流程，也可能是网络异常。请刷新重试或从历史记录重新选择。" />}
           <Spin spinning={loading && !run}>
             {run && (
               <Space orientation="vertical" size={12} style={{ width: '100%' }}>
@@ -162,6 +152,7 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
               </Space>
             )}
           </Spin>
+          </div>
         </div>
       </section>
     </div>
@@ -187,4 +178,8 @@ function NodeBusinessLog({ id }: { id: number }) {
       查看执行日志 #{id}
     </Button>
   );
+}
+
+export default function JobFlowRunPanel(props: { jobId: number; initialLogId?: number; onClose: () => void }) {
+  return <JobFlowRunPanelContent key={props.jobId} {...props} />;
 }
