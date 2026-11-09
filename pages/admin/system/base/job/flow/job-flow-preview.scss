@@ -235,3 +235,37 @@ button.job-flow-preflight-class {
   font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; overflow-wrap: anywhere;
   &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 }
+
+.job-flow-library-search { padding: 14px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--fa-border-color); }
+.job-flow-library-content { display: flex; flex: 1; min-height: 0; }
+.job-flow-library-groups { width: 110px; flex-shrink: 0; overflow: auto; padding: 8px; border-right: 1px solid var(--fa-border-color);
+  button { display: flex; justify-content: space-between; gap: 4px; align-items: center; width: 100%; border: 0; border-radius: 6px; padding: 9px 7px; margin-bottom: 3px; color: var(--fa-text-color); background: transparent; cursor: pointer; text-align: left; }
+  button:hover, .is-active { background: var(--fa-bg-grey); color: var(--primary-color); }
+  button:focus-visible { outline: 2px solid var(--primary-color); }
+}
+.job-flow-library-list { flex: 1; min-width: 0; overflow: auto; padding: 12px; }
+.job-flow-library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.job-flow-library-task {
+  position: relative; min-width: 0; padding: 10px 12px; border: 1px solid var(--fa-border-color); border-radius: 10px;
+  background: var(--fa-bg-white); transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  &:not(.is-disabled):hover, &:focus-within { border-color: var(--primary-color); background: var(--ant-color-primary-bg); box-shadow: 0 3px 12px var(--ant-color-fill-secondary); }
+  &.is-disabled { opacity: .55; }
+}
+.job-flow-library-add { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: inherit; background: transparent; cursor: pointer;
+  &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+  &:disabled { cursor: not-allowed; }
+}
+.job-flow-library-task-main { position: relative; min-width: 0; height: 100%; display: flex; flex-direction: column; gap: 5px; pointer-events: none; }
+.job-flow-library-copy { position: relative; pointer-events: auto; }
+.job-flow-library-task-title { display: flex; align-items: center; gap: 6px; min-width: 0; height: 22px;
+  > .ant-typography { min-width: 0; flex: 1; }
+  .ant-tag { flex-shrink: 0; margin: 0; }
+}
+.job-flow-library-task-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; min-height: 22px;
+  .ant-tag { margin: 0; font-size: 11px; }
+}
+.job-flow-library-added { flex-shrink: 0; white-space: nowrap; font-size: 12px; }
+.job-flow-library-description { color: var(--fa-text-color-light100); font-size: 12px; line-height: 18px; height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.job-flow-library-class { display: block; font-size: 12px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.job-flow-library-deprecated { font-weight: 600; border: 1px solid var(--ant-color-warning-border); }

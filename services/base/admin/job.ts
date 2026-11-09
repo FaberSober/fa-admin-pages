@@ -30,6 +30,8 @@ class Job extends BaseApi<Admin.Job, number> {
       },
     );
 
+  getRegisteredJobs = (): Promise<Fa.Ret<Admin.RegisteredJob[]>> => this.get('getRegisteredJobs');
+
   /** Get All Quartz Job Class List. */
   getAllJobs = (): Promise<Fa.Ret<Fa.Option[]>> => this.get('getAllJobs');
 

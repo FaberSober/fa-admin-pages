@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
-import { Alert, Button, Form, Input, InputNumber, Popover, Popconfirm, Select, Space, Switch, Tooltip, Typography, message, theme } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tooltip, Typography, message, theme } from 'antd';
 import {
   Background,
   Controls,
@@ -37,6 +37,7 @@ import './job-flow-preview.scss';
 import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import { getFlowTaskOptions } from './jobFlowTasks';
+import JobFlowTaskLibrary from './JobFlowTaskLibrary';
 import useJobFlowAlignment from './useJobFlowAlignment';
 import JobFlowAlignmentGuides from './JobFlowAlignmentGuides';
 import JobFlowJsonPanel from './JobFlowJsonPanel';
@@ -110,7 +111,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const [name, setName] = useState(demo ? '示例串行任务流' : '新建任务流');
   const [detailLogEnabled, setDetailLogEnabled] = useState(record?.detailLogEnabled ?? false);
   const [concurrency, setConcurrency] = useState(2);
-  const [clazzPath, setClazzPath] = useState<string | undefined>(demo ? 'demo.DataPrepare' : undefined);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [catalog, setCatalog] = useState<Admin.RegisteredJob[]>([]);
   const [nodes, setNodes] = useNodesState<TaskNode>(demo ? initialNodes : []);
   const alignment = useJobFlowAlignment<TaskNode>(setNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(demo ? initialEdges : []);
@@ -121,17 +123,18 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const [configuredJobs, setConfiguredJobs] = useState<ReturnType<typeof getFlowTaskOptions>>([]);
   const [taskError, setTaskError] = useState(false);
   const [refresh, setRefresh] = useState(0);
-  const tasksLoading = useApiLoading([jobApi.getUrl('getAllJobs')]);
+  const tasksLoading = useApiLoading([jobApi.getUrl('getRegisteredJobs')]);
   const jobs = demo ? demoJobs : configuredJobs;
   useEffect(() => {
     if (!open || demo) return;
     let cancelled = false;
     setTaskError(false);
     setConfiguredJobs([]);
-    Promise.all([jobApi.getAllJobs(), record ? jobApi.getById(record.id) : Promise.resolve(undefined)])
+    Promise.all([jobApi.getRegisteredJobs(), record ? jobApi.getById(record.id) : Promise.resolve(undefined)])
       .then(([res, detail]) => {
         if (cancelled) return;
-        const options = getFlowTaskOptions(res.data);
+        setCatalog(res.data);
+        const options = getFlowTaskOptions(res.data.map(task => ({ value: task.clazzPath, label: task.name })));
         setConfiguredJobs(options);
         if (detail && !loadedRecord.current) {
           loadedRecord.current = true;
@@ -252,54 +255,18 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       setJson(undefined);
                       setShowPreflight(false);
                       setShowRun(false);
+                      setShowLibrary(false);
                       setShowConfig((value) => !value);
                     }}
                   />
                 </Tooltip>
-                <Popover
-                  title="添加注册任务节点"
-                  trigger="click"
-                  content={
-                    <Space orientation="vertical" style={{ width: 320, maxWidth: '80vw' }}>
-                      {!demo && (
-                        <>
-                          <Typography.Text type="secondary">
-                            直接选择后台注册的 Java 任务类，无需在定时任务列表另建记录；同一任务类可添加为多个独立节点。
-                          </Typography.Text>
-                          <Button loading={tasksLoading} onClick={() => setRefresh((value) => value + 1)}>
-                            刷新任务列表
-                          </Button>
-                          {taskError && <Alert type="error" title="任务加载失败，请刷新重试" />}
-                          {!tasksLoading && !taskError && jobs.length === 0 && <Alert type="info" title="暂无已注册任务类，请确认后台任务注册配置后刷新" />}
-                        </>
-                      )}
-                      <Select
-                        aria-label="选择普通任务"
-                        value={clazzPath}
-                        options={jobs}
-                        showSearch
-                        optionFilterProp="label"
-                        loading={tasksLoading}
-                        placeholder="选择已注册的任务类"
-                        onChange={setClazzPath}
-                        style={{ width: '100%' }}
-                      />
-                      <Button
-                        icon={<PlusOutlined />}
-                        disabled={nodes.length >= 100 || tasksLoading || !jobs.some((job) => job.value === clazzPath)}
-                        onClick={() => {
-                          const job = jobs.find((item) => item.value === clazzPath)!;
-                          setNodes((current) => [
-                            ...current,
-                            { id: `node-${crypto.randomUUID()}`, position: { x: 360, y: 40 }, data: { label: job.name, clazzPath: job.value } },
-                          ]);
-                        }}
-                      >
-                        添加节点
-                      </Button>
-                      <Button
-                        icon={<ApartmentOutlined />}
-                        onClick={() => {
+                <Tooltip title="任务库">
+                  <Button type="text" icon={<PlusOutlined />} aria-label="打开任务库" aria-pressed={showLibrary} onClick={() => {
+                    setJson(undefined); setShowConfig(false); setShowPreflight(false); setShowRun(false); setShowLibrary(value => !value);
+                  }} />
+                </Tooltip>
+                <Tooltip title="自动布局">
+                  <Button type="text" icon={<ApartmentOutlined />} aria-label="自动布局" onClick={() => {
                           const error = validateFlow(flowNodes(), edges);
                           if (error) {
                             feedback.warning(error);
@@ -307,17 +274,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                           }
                           const positions = new Map(layoutFlow(flowNodes(), edges).map((node) => [node.id, node.position]));
                           setNodes((current) => current.map((node) => ({ ...node, position: positions.get(node.id)! })));
-                        }}
-                      >
-                        自动布局
-                      </Button>
-                    </Space>
-                  }
-                >
-                  <Tooltip title="节点与布局">
-                    <Button type="text" icon={<PlusOutlined />} aria-label="节点与布局" />
-                  </Tooltip>
-                </Popover>
+                  }} />
+                </Tooltip>
                 <span className="job-flow-toolbar-divider" aria-hidden="true" />
                 <Tooltip title="校验并预览 JSON">
                   <Button
@@ -330,6 +288,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         setShowConfig(false);
                         setShowPreflight(false);
                         setShowRun(false);
+                        setShowLibrary(false);
                         setJson(value);
                       }
                     }}
@@ -339,8 +298,16 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                 {!demo && (
                   <>
                     <Popconfirm
-                      title="执行服务器已保存的流程？"
-                      description="将实际调用全部可执行任务，可能产生业务数据；画布未保存修改不参与本轮。将按已保存的并发上限执行，同类任务串行。"
+                      title="执行已保存的流程？"
+                      description={
+                        <div style={{ width: 280, maxWidth: 'calc(100vw - 96px)', whiteSpace: 'normal' }}>
+                          <div>将实际运行任务，可能产生业务数据。</div>
+                          <Typography.Text type="secondary">未保存的修改不参与本次执行。</Typography.Text>
+                        </div>
+                      }
+                      placement="bottomRight"
+                      okText="执行"
+                      cancelText="取消"
                       disabled={!persistedId || running}
                       onConfirm={async () => {
                         if (!persistedId) return;
@@ -349,6 +316,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         setJson(undefined);
                         setShowConfig(false);
                         setShowPreflight(false);
+                        setShowLibrary(false);
                         setShowRun(true);
                         fetchFinish?.();
                       }}
@@ -368,6 +336,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                           setJson(undefined);
                           setShowConfig(false);
                           setShowPreflight(false);
+                          setShowLibrary(false);
                           setShowRun((value) => !value);
                         }}
                       />
@@ -385,6 +354,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         setJson(undefined);
                         setShowConfig(false);
                         setShowRun(false);
+                        setShowLibrary(false);
                         setShowPreflight((value) => !value);
                       }}
                     >
@@ -428,6 +398,19 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
               </div>
             </section>
 
+            {showLibrary && <JobFlowTaskLibrary
+              tasks={demo ? demoJobs.map(job => ({ clazzPath: job.value, name: job.name ?? job.label, group: '页面示例', description: '', tags: [], sort: 0, deprecated: false })) : catalog}
+              loading={tasksLoading} failed={taskError} full={nodes.length >= 100}
+              counts={Object.fromEntries(jobs.map(job => [job.value, nodes.filter(node => node.data.clazzPath === job.value).length]))}
+              onRefresh={() => setRefresh(value => value + 1)} onClose={() => setShowLibrary(false)}
+              onAdd={task => setNodes(current => {
+                if (current.length >= 100) return current;
+                const origin = flowInstance.current?.screenToFlowPosition({ x: (editorRef.current?.getBoundingClientRect().left ?? 0) + 180, y: (editorRef.current?.getBoundingClientRect().top ?? 0) + 180 }) ?? { x: 100, y: 100 };
+                let position = origin;
+                while (current.some(node => Math.abs(node.position.x - position.x) < 40 && Math.abs(node.position.y - position.y) < 40)) position = { x: position.x + 40, y: position.y + 60 };
+                return [...current, { id: `node-${crypto.randomUUID()}`, position, data: { label: task.name, clazzPath: task.clazzPath } }];
+              })}
+            />}
             {showRun && persistedId && (
               <JobFlowRunPanel key={runLogId ?? 'history'} jobId={persistedId} initialLogId={runLogId} onClose={() => setShowRun(false)} />
             )}
@@ -698,7 +681,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                               setShowConfig(false);
                               setShowPreflight(false);
                               setShowRun(false);
-                              setJson(value);
+                              setShowLibrary(false);
+                        setJson(value);
                             }
                           }}
                         >
