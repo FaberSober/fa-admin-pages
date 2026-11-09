@@ -37,6 +37,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   const [run, setRun] = useState<Admin.JobFlowRun>();
   const [failed, setFailed] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const reconciling = useApiLoading(selected ? [jobApi.getUrl(`reconcileFlow/${selected}`)] : []);
   const stopping = useApiLoading(selected ? [jobApi.getUrl(`stopFlow/${selected}`)] : []);
   const loading = useApiLoading(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : []);
   useEffect(() => { setRecordView('nodes'); }, [selected, jobId]);
@@ -86,6 +87,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                   <Tag>{runStates[run.log.status] ?? '未知'}</Tag>
                   {run.log.status === 1 && <Popconfirm title="停止当前这轮流程？" description={<div style={{ maxWidth: 280 }}>不再启动新节点，已运行任务继续收尾。未来 Cron 仍会触发，如需暂停请返回任务列表。</div>} okText="停止本轮" onConfirm={() => jobApi.stopFlow(run.log.id, jobId).then(() => setRefresh(value => value + 1))}><Button size="small" danger loading={stopping}>停止本轮</Button></Popconfirm>}
                   {run.log.status === 3 && <Typography.Text type="warning">等待已运行任务收尾</Typography.Text>}
+                  {(run.log.status === 1 || run.log.status === 3) && <Tooltip title="同步已保存的节点结果并恢复依赖推进，不重新执行业务；未确认结果不会视为成功。"><Button size="small" loading={reconciling} onClick={() => jobApi.reconcileFlow(run.log.id, jobId).then(() => setRefresh(value => value + 1)).catch(() => {})}>核对状态</Button></Tooltip>}
                   <Typography.Text type="secondary">{run.nodes.length} 个任务</Typography.Text>
                   {unconfirmed > 0 && <Tag color="warning">{unconfirmed} 未确认 · 已暂停新启动</Tag>}
                 </Space>
