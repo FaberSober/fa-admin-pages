@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
-import { FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
+import { CronModal, FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
-import { Alert, Button, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tooltip, Typography, message, theme } from 'antd';
+import { Alert, Button, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tag, Tooltip, Typography, message, theme } from 'antd';
 import {
   Background,
   Controls,
@@ -109,6 +109,8 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   const running = useApiLoading(persistedId ? [jobApi.getUrl(`runFlow/${persistedId}`)] : []);
   const saving = useApiLoading([jobApi.getUrl('save'), jobApi.getUrl('update')]);
   const [name, setName] = useState(demo ? '示例串行任务流' : '新建任务流');
+  const [cron, setCron] = useState(record?.cron ?? '0 * * * * ?');
+  const [scheduleEnabled, setScheduleEnabled] = useState(record?.status ?? false);
   const [detailLogEnabled, setDetailLogEnabled] = useState(record?.detailLogEnabled ?? false);
   const [concurrency, setConcurrency] = useState(2);
   const [showLibrary, setShowLibrary] = useState(false);
@@ -136,6 +138,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
         setCatalog(res.data);
         const options = getFlowTaskOptions(res.data.map(task => ({ value: task.clazzPath, label: task.name })));
         setConfiguredJobs(options);
+        if (detail) setScheduleEnabled(detail.data.status ?? false);
         if (detail && !loadedRecord.current) {
           loadedRecord.current = true;
           const definition = parseFlowDefinition(
@@ -143,6 +146,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
             options.map((job) => job.value),
           );
           setName(detail.data.jobName);
+          setCron(detail.data.cron ?? '0 * * * * ?');
           setDetailLogEnabled(detail.data.detailLogEnabled ?? false);
           setConcurrency(definition.maxConcurrency);
           setNodes(definition.nodes.map((node) => ({ id: node.id, position: node.position, data: { label: node.name, clazzPath: node.clazzPath } })));
@@ -195,13 +199,14 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   async function saveFlow() {
     const source = definition();
     if (!source) return;
-    const values = { detailLogEnabled, jobName: name.trim(), jobType: 1, flowDefinition: source, status: false, cron: '0 * * * * ?', clazzPath: '' };
+    if (!cron.trim()) { feedback.warning('请输入 Cron 表达式'); setShowConfig(true); return; }
+    const values = { detailLogEnabled, jobName: name.trim(), jobType: 1, flowDefinition: source, cron: cron.trim(), clazzPath: '' };
     if (persistedId) await jobApi.update(persistedId, { id: persistedId, ...values });
     else {
-      const res = await jobApi.save(values);
+      const res = await jobApi.save({ ...values, status: false });
       setPersistedId(res.data.id);
     }
-    feedback.success('流程定义已保存，可手动执行；Cron 尚未接入');
+    feedback.success('流程已保存，可返回列表启用定时调度');
     fetchFinish?.();
   }
 
@@ -511,6 +516,15 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         style={{ width: '100%' }}
                       />
                     </Form.Item>
+                    {!demo && <Form.Item
+                      label={<Space>定时调度<Tag color={scheduleEnabled ? 'processing' : undefined}>{scheduleEnabled ? '已启用' : '已暂停'}</Tag></Space>}
+                      htmlFor={`${configPanelId}-cron`}
+                      extra={scheduleEnabled ? '请先在任务列表暂停调度，再修改 Cron；保存编排不会停止当前运行。' : '保存后在任务列表启用调度；暂停调度仅影响未来触发。'}
+                    >
+                      <Input id={`${configPanelId}-cron`} aria-label="流程 Cron 表达式" value={cron} disabled={scheduleEnabled}
+                        onChange={event => setCron(event.target.value)} placeholder="0 * * * * ?" maxLength={100}
+                        addonAfter={!scheduleEnabled && <CronModal key={cron} initialValue={cron} onChange={value => setCron(value ?? '')} />} />
+                    </Form.Item>}
                     <Form.Item
                       label="记录详细日志"
                       htmlFor={`${configPanelId}-detail-log`}
@@ -562,7 +576,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       type="info"
                       showIcon
                       title="从右上角“＋”选择已注册的任务类开始编排"
-                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可从顶部手动执行，Cron 尚未接入。"
+                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可手动执行，也可在任务列表启用 Cron 调度。"
                     />
                   </Panel>
                 )}
@@ -640,7 +654,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         description={
                           demo
                             ? '示例仅用于页面预览，不保存到服务器或执行任务；刷新后草稿丢失。'
-                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动执行。Cron 尚未接入。'
+                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动执行或在列表启用 Cron 调度。'
                         }
                       />
                       <Space orientation="vertical" style={{ width: '100%' }}>

@@ -42,12 +42,12 @@ export default function JobList() {
     if (!record.status) {
       jobApi
         .startJob(record.id)
-        .then((res) => FaUtils.showResponse(res, '启动任务'))
+        .then((res) => FaUtils.showResponse(res, record.jobType === 1 ? '启用调度' : '启动任务'))
         .then(() => fetchPageList());
     } else {
       jobApi
         .endJob(record.id)
-        .then((res) => FaUtils.showResponse(res, '停止任务'))
+        .then((res) => FaUtils.showResponse(res, record.jobType === 1 ? '暂停调度' : '停止任务'))
         .then(() => fetchPageList());
     }
   }
@@ -134,9 +134,11 @@ export default function JobList() {
           record.jobType === 1 ? (
             <Space>
               <JobFlowPreview record={record} fetchFinish={fetchPageList} />
-              <Tooltip title="已支持手动串行执行，Cron 尚未接入">
-                <span>手动串行</span>
-              </Tooltip>
+              <Popconfirm title={record.status ? '暂停定时调度？' : '按已保存的 Cron 启用调度？'}
+                description={record.status ? '仅停止未来触发，当前运行继续完成。' : '将真实执行流程；已有执行中或未确认运行时跳过触发。'}
+                onConfirm={() => handleJobStatus(record)}>
+                <a>{record.status ? <PauseCircleOutlined /> : <PlayCircleOutlined />}{record.status ? '暂停调度' : '启用调度'}</a>
+              </Popconfirm>
               <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
             </Space>
           ) : (
