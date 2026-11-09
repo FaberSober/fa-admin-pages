@@ -41,6 +41,8 @@ describe('定时任务统计展示', () => {
   it('仅展示完整跟踪且已结束的总耗时，不把旧秒数据补成新值', () => {
     expect(formatJobTotalDuration('0', 2, 1)).toBe('0 ms');
     expect(formatJobTotalDuration('1000', 9, 1)).toBe('1 秒');
+    expect(formatJobTotalDuration('1000', 7, 1)).toBe('1 秒');
+    expect(formatJobTotalDuration('1000', 3, 1)).toBe('—');
     expect(formatJobTotalDuration('1000', 1, 1)).toBe('—');
     expect(formatJobTotalDuration('1000', 2, 0)).toBe('—');
     expect(formatJobTotalDuration('1000', 8, 2)).toBe('—');

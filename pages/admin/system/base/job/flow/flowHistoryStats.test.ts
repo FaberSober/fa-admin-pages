@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest';
 import { formatHistoryDuration, normalizeHistoryStats } from './flowHistoryStats';
 
-const baseline = { total: '4', success: '1', failed: '1', doing: '1', unconfirmed: '1', durationSamples: '2', avgDurationMs: '1501' };
+const baseline = { stopping: '0', stopped: '2', total: '4', success: '1', failed: '1', doing: '1', unconfirmed: '1', durationSamples: '2', avgDurationMs: '1501' };
 it('normalizes serialized Long counts and average duration', () => {
-  expect(normalizeHistoryStats(baseline)).toEqual({ total: 4, success: 1, failed: 1, doing: 1, unconfirmed: 1, durationSamples: 2, avgDurationMs: 1501 });
+  expect(normalizeHistoryStats(baseline)).toEqual({ stopping: 0, stopped: 2, total: 4, success: 1, failed: 1, doing: 1, unconfirmed: 1, durationSamples: 2, avgDurationMs: 1501 });
 });
 it('distinguishes empty statistics from a valid zero duration', () => {
   expect(normalizeHistoryStats({ ...baseline, total: 0, durationSamples: 0, avgDurationMs: null }).avgDurationMs).toBeUndefined();

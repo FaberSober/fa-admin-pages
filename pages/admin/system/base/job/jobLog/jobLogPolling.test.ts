@@ -10,7 +10,7 @@ describe('任务日志轮询', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it.each([2, 8, 9] as const)('终态 %s 会补齐剩余日志后停止', async (status) => {
+  it.each([2, 7, 8, 9] as const)('终态 %s 会补齐剩余日志后停止', async (status) => {
     const read = vi.fn().mockResolvedValueOnce(chunk({ status, hasMore: true }))
       .mockResolvedValueOnce(chunk({ status, nextOffset: '12' }));
     const onChunk = vi.fn();

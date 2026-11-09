@@ -8,7 +8,7 @@ export function normalizeHistoryStats(stats: Admin.JobFlowHistoryStats) {
   const samples = count(stats.durationSamples);
   const average = count(stats.avgDurationMs);
   return {
-    total: count(stats.total), doing: count(stats.doing), success: count(stats.success), failed: count(stats.failed), unconfirmed: count(stats.unconfirmed), durationSamples: samples,
+    stopping: count(stats.stopping), stopped: count(stats.stopped), total: count(stats.total), doing: count(stats.doing), success: count(stats.success), failed: count(stats.failed), unconfirmed: count(stats.unconfirmed), durationSamples: samples,
     avgDurationMs: samples !== undefined && samples > 0 && average !== undefined && Number.isFinite(average) && average >= 0 ? average : undefined,
   };
 }

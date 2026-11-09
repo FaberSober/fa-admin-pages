@@ -34,7 +34,7 @@ export function formatJobAverage(duration: LongValue, sampleCount: LongValue) {
 }
 
 export function formatJobTotalDuration(duration: LongValue, status?: number | null, trackingVersion?: number | null) {
-  return trackingVersion === 1 && (status === 2 || status === 9) ? formatJobDuration(duration) : '—';
+  return trackingVersion === 1 && (status === 2 || status === 7 || status === 9) ? formatJobDuration(duration) : '—';
 }
 
 export function getJobExecutionPresentation(status?: number | null, trackingVersion?: number | null) {
@@ -47,6 +47,8 @@ export function getJobExecutionPresentation(status?: number | null, trackingVers
   }
   const states: Record<number, { text: string; color?: string }> = {
     1: { text: '执行中', color: 'processing' },
+    3: { text: '停止中', color: 'processing' },
+    7: { text: '已停止', color: 'default' },
     2: { text: '成功', color: 'success' },
     9: { text: '失败', color: 'error' },
   };

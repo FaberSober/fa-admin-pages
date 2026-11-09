@@ -6,6 +6,7 @@ import type { Admin } from '@/types';
 const serviceModule = 'job';
 
 class Job extends BaseApi<Admin.Job, number> {
+  stopFlow = (id: number, jobId: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`stopFlow/${id}`, {}, { params: { jobId } });
   runFlow = (id: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`runFlow/${id}`);
   flowRun = (id: number, signal?: AbortSignal, jobId?: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.get(`flowRun/${id}`, { jobId }, { signal });
   flowRunsPage = (jobId: number, params: any, signal?: AbortSignal): Promise<Fa.Ret<Fa.Page<Admin.JobLog>>> => this.post(`flowRunsPage/${jobId}`, params, { signal });

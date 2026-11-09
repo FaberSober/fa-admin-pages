@@ -5,9 +5,10 @@ import dayjs from 'dayjs';
 import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import { historyFilters } from './flowHistoryFilters';
+import { formatJobCount, formatJobDuration } from '../jobStatistics';
 import { formatHistoryDuration, normalizeHistoryStats } from './flowHistoryStats';
 import './job-flow-history-stats.scss';
-const states = [{ value: 1, label: '执行中' }, { value: 2, label: '成功' }, { value: 8, label: '未确认' }, { value: 9, label: '失败' }];
+const states = [{ value: 1, label: '执行中' }, { value: 2, label: '成功' }, { value: 3, label: '停止中' }, { value: 7, label: '已停止' }, { value: 8, label: '未确认' }, { value: 9, label: '失败' }];
 const sources = [{ value: 0, label: '历史/未知' }, { value: 1, label: '手动' }, { value: 2, label: '定时' }];
 export default function JobFlowHistoryList({ jobId, selected, onSelect, active, refreshToken }: { active: boolean; refreshToken: number; jobId: number; selected?: number; onSelect: (id: number) => void }) {
   const [form] = Form.useForm();
@@ -54,6 +55,8 @@ export default function JobFlowHistoryList({ jobId, selected, onSelect, active, 
         { label: '成功', value: stats?.success, color: token.colorSuccessText },
         { label: '失败', value: stats?.failed, color: token.colorErrorText },
         { label: '执行中', value: stats?.doing, color: token.colorPrimaryText },
+        { label: '停止中', value: stats?.stopping, color: token.colorWarningText },
+        { label: '已停止', value: stats?.stopped, color: token.colorTextSecondary },
         { label: '未确认', value: stats?.unconfirmed, color: token.colorWarningText },
       ].map(item => <div key={item.label}><strong style={{ color: item.color }}>{item.value ?? '—'}</strong><span>{item.label}</span></div>)}
       <Tooltip title={`仅完整统计口径、成功或失败且耗时有效的运行参与平均；样本 ${stats?.durationSamples ?? '—'} 条。`}><div><strong>{formatHistoryDuration(stats?.avgDurationMs)}</strong><span>平均耗时</span></div></Tooltip>
@@ -64,11 +67,11 @@ export default function JobFlowHistoryList({ jobId, selected, onSelect, active, 
       onRow={record => ({ onClick: () => onSelect(record.id), style: { cursor: 'pointer', background: record.id === selected ? 'var(--ant-color-primary-bg)' : undefined } })}
       columns={[
         { title: '运行 ID', dataIndex: 'id', width: 85 },
-        { title: '状态', dataIndex: 'status', width: 90, render: value => <Tag color={value === 9 ? 'error' : value === 2 ? 'success' : value === 1 ? 'processing' : 'warning'}>{states.find(item => item.value === value)?.label ?? '未知'}</Tag> },
+        { title: '状态', dataIndex: 'status', width: 90, render: value => <Tag color={value === 9 ? 'error' : value === 2 ? 'success' : value === 1 || value === 3 ? 'processing' : value === 7 ? 'default' : 'warning'}>{states.find(item => item.value === value)?.label ?? '未知'}</Tag> },
         { title: '开始时间', dataIndex: 'beginTime', width: 165 },
         { title: '结束时间', dataIndex: 'endTime', width: 165, responsive: ['lg'], render: value => value ?? '—' },
         { title: '来源', dataIndex: 'triggerSource', width: 90, responsive: ['md'], render: value => sources.find(item => item.value === value)?.label ?? '未知' },
-        { title: '耗时(ms)', dataIndex: 'durationMs', width: 100, render: value => value ?? '—' },
+        { title: '耗时', dataIndex: 'durationMs', width: 140, render: value => <Tooltip title={formatJobDuration(value) === '—' ? undefined : `${formatJobCount(value)} ms`}><span style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{formatJobDuration(value)}</span></Tooltip> },
         { title: '版本 ID', dataIndex: 'definitionVersionId', width: 90, responsive: ['lg'] },
         { title: '操作', width: 70, render: (_, record) => <Button type="link" size="small" onClick={event => { event.stopPropagation(); onSelect(record.id); }}>查看</Button> },
       ]} />

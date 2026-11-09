@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { CloseOutlined, FullscreenOutlined, FullscreenExitOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Segmented, Space, Spin, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Button, Popconfirm, Segmented, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { FaJsonView, FaResizeHorizontal, useApiLoading } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi, jobLogApi } from '@features/fa-admin-pages/services';
@@ -22,7 +22,7 @@ const nodeStates: Record<number, [string, string]> = {
   70: ['已停止', 'default'],
   80: ['未确认', 'warning'],
 };
-const runStates: Record<number, string> = { 1: '执行中', 2: '成功', 8: '未确认', 9: '失败' };
+const runStates: Record<number, string> = { 1: '执行中', 2: '成功', 3: '停止中', 7: '已停止', 8: '未确认', 9: '失败' };
 
 function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: number; initialLogId?: number; onClose: () => void }) {
   const panelId = useId();
@@ -37,6 +37,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   const [run, setRun] = useState<Admin.JobFlowRun>();
   const [failed, setFailed] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const stopping = useApiLoading(selected ? [jobApi.getUrl(`stopFlow/${selected}`)] : []);
   const loading = useApiLoading(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : []);
   useEffect(() => { setRecordView('nodes'); }, [selected, jobId]);
   useEffect(() => {
@@ -83,6 +84,8 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                 <Space wrap>
                   <Typography.Text strong>执行 #{run.log.id}</Typography.Text>
                   <Tag>{runStates[run.log.status] ?? '未知'}</Tag>
+                  {run.log.status === 1 && <Popconfirm title="停止当前这轮流程？" description={<div style={{ maxWidth: 280 }}>不再启动新节点，已运行任务继续收尾。未来 Cron 仍会触发，如需暂停请返回任务列表。</div>} okText="停止本轮" onConfirm={() => jobApi.stopFlow(run.log.id, jobId).then(() => setRefresh(value => value + 1))}><Button size="small" danger loading={stopping}>停止本轮</Button></Popconfirm>}
+                  {run.log.status === 3 && <Typography.Text type="warning">等待已运行任务收尾</Typography.Text>}
                   <Typography.Text type="secondary">{run.nodes.length} 个任务</Typography.Text>
                   {unconfirmed > 0 && <Tag color="warning">{unconfirmed} 未确认 · 已暂停新启动</Tag>}
                 </Space>
@@ -108,7 +111,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                 {run.log.status === 8 && (
                   <Alert type="warning" title="结果未确认，不能再次启动" description="仍可能有实际工作，需人工核查；不会自动当作成功或重跑。" />
                 )}
-                {run.log.errMsg && <Alert type="error" title={run.log.errMsg} />}
+                {run.log.errMsg && run.log.status !== 3 && (run.log.status === 7 ? <Typography.Text type="secondary">{run.log.errMsg}</Typography.Text> : <Alert type="error" title={run.log.errMsg} />)}
                 <Typography.Text type="secondary">
                   开始：{run.log.beginTime ?? '—'}　结束：{run.log.endTime ?? '—'}
                 </Typography.Text>

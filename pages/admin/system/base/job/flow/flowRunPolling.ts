@@ -18,7 +18,7 @@ export function startFlowRunPolling({
       const result = await read(controller.signal);
       if (!active) return;
       onResult(result);
-      if (result.log.status === 1) timer = setTimeout(poll, 2000);
+      if ((result.log.status === 1 || result.log.status === 3)) timer = setTimeout(poll, 2000);
     } catch {
       if (active && !controller.signal.aborted) onError();
     }

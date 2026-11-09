@@ -25,7 +25,7 @@ it('does not overlap pending requests and stops at unconfirmed', async () => {
   expect(read).toHaveBeenCalledTimes(2);
   stop();
 });
-it.each([2, 9])('does not poll after terminal %s', async (status) => {
+it.each([2, 7, 9])('does not poll after terminal %s', async (status) => {
   vi.useFakeTimers();
   const read = vi.fn().mockResolvedValue(result(status));
   const stop = startFlowRunPolling({ read, onResult: vi.fn(), onError: vi.fn() });
@@ -60,4 +60,12 @@ it('request failures stop polling', async () => {
   expect(read).toHaveBeenCalledTimes(1);
   expect(onError).toHaveBeenCalledTimes(1);
   stop();
+});
+
+it('keeps polling while stopping until stopped', async () => {
+  vi.useFakeTimers();
+  const read = vi.fn().mockResolvedValueOnce(result(3)).mockResolvedValue(result(7));
+  const stop = startFlowRunPolling({ read, onResult: vi.fn(), onError: vi.fn() });
+  await vi.advanceTimersByTimeAsync(10000);
+  expect(read).toHaveBeenCalledTimes(2); stop();
 });
