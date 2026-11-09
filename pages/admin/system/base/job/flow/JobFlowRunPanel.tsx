@@ -1,12 +1,14 @@
 import { useEffect, useId, useState } from 'react';
 import { CloseOutlined, FullscreenOutlined, FullscreenExitOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Space, Spin, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Button, Segmented, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { FaJsonView, FaResizeHorizontal, useApiLoading } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi, jobLogApi } from '@features/fa-admin-pages/services';
 import { startFlowRunPolling } from './flowRunPolling';
 import JobFlowHistoryList from './JobFlowHistoryList';
 import JobFlowRunCanvas from './JobFlowRunCanvas';
+import JobFlowExecutionTimeline from './JobFlowExecutionTimeline';
+import { getNodeDurationMs } from './flowExecutionTimeline';
 import JobLogDetailDrawer from '../jobLog/JobLogDetailDrawer';
 
 const nodeStates: Record<number, [string, string]> = {
@@ -27,6 +29,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   const [width, setWidth] = useState(540);
   const [historyWidth, setHistoryWidth] = useState(780);
   const [expanded, setExpanded] = useState(false);
+  const [recordView, setRecordView] = useState<string>('nodes');
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [showHistory, setShowHistory] = useState(initialLogId === undefined);
   const [historyOpened, setHistoryOpened] = useState(initialLogId === undefined);
@@ -35,6 +38,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   const [failed, setFailed] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const loading = useApiLoading(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : []);
+  useEffect(() => { setRecordView('nodes'); }, [selected, jobId]);
   useEffect(() => {
     if (!selected || showHistory) return;
     setRun(undefined);
@@ -110,15 +114,16 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                 </Typography.Text>
                 <div className="job-flow-run-split">
                 <div className="job-flow-run-canvas-area">
-                  <JobFlowRunCanvas run={run} selectedNodeId={selectedNodeId} onSelect={setSelectedNodeId} />
+                  <JobFlowRunCanvas run={run} selectedNodeId={selectedNodeId} onSelect={id => { setSelectedNodeId(id); setRecordView('nodes'); }} />
                 </div>
                 <div className="job-flow-run-records">
-                <Typography.Text strong>节点记录与日志</Typography.Text>
+                <Segmented aria-label="运行详情视图" value={recordView} options={[{ label: '节点记录', value: 'nodes' }, { label: '执行时间线', value: 'timeline' }]} onChange={value => setRecordView(String(value))} />
                 <Space style={{ justifyContent: 'space-between', width: '100%' }}>
-                  <Typography.Text type="secondary">{selectedNodeId ? '选中节点详情' : '点击运行图节点查看详情'} · 总耗时 {run.log.durationMs == null ? '—' : `${run.log.durationMs} ms`}</Typography.Text>
+                  <Typography.Text type="secondary">{selectedNodeId ? '选中节点详情' : '点击运行图或时间线查看节点详情'} · 总耗时 {run.log.durationMs == null ? '—' : `${run.log.durationMs} ms`}</Typography.Text>
                   {selectedNodeId && <Button type="link" size="small" onClick={() => setSelectedNodeId(undefined)}>显示全部节点</Button>}
                 </Space>
-                <div className="job-flow-preflight-tasks">
+                {recordView === 'timeline' && <JobFlowExecutionTimeline run={run} selectedNodeId={selectedNodeId} onSelect={id => { setSelectedNodeId(id); setRecordView('nodes'); }} />}
+                <div className="job-flow-preflight-tasks" style={{ display: recordView === 'nodes' ? undefined : 'none' }}>
                   {selectedNodeId && !run.nodes.some(node => node.nodeId === selectedNodeId) && <Typography.Text type="secondary">该节点暂无运行记录，无法确认执行状态。</Typography.Text>}
                   {run.nodes.map((node, index) => (!selectedNodeId || node.nodeId === selectedNodeId) && (
                     <article key={node.id} className="job-flow-preflight-task">
@@ -136,6 +141,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                         <Typography.Text type="secondary">
                           {node.beginTime ?? '未启动'}
                           {node.endTime ? ` → ${node.endTime}` : ''}
+                          {' · 耗时 '}{getNodeDurationMs(node) == null ? (node.status === 80 ? '未确认' : node.status === 20 || node.status === 30 ? '执行中' : '—') : `${getNodeDurationMs(node)} ms`}
                         </Typography.Text>
                         {node.reason && <div style={{ overflowWrap: 'anywhere' }}>{node.reason}</div>}
                         {node.jobLogId && <NodeBusinessLog key={node.jobLogId} id={node.jobLogId} />}

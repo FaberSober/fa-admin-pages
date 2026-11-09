@@ -1,0 +1,16 @@
+.job-flow-time-caption { display: block; font-size: 12px; line-height: 1.6; margin-bottom: 14px; }
+.job-flow-time-axis { margin-left: 6px; border-left: 1px solid var(--fa-border-color); padding-left: 16px; }
+.job-flow-time-item { position: relative; padding-bottom: 12px; }
+.job-flow-time-dot { position: absolute; left: -21px; top: 18px; width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 0 3px var(--fa-bg-color); }
+.job-flow-time-card {
+  display: block; width: 100%; min-width: 0; padding: 12px; text-align: left; color: var(--fa-text-color); background: var(--fa-bg-white);
+  border: 1px solid var(--fa-border-color); border-left-width: 3px; border-radius: 8px; cursor: pointer; transition: background-color .15s, box-shadow .15s;
+  &:hover, &.is-selected { background: var(--ant-color-primary-bg); box-shadow: 0 2px 8px var(--ant-color-fill-secondary); }
+  &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+}
+.job-flow-time-heading { display: flex; align-items: center; gap: 8px; strong { min-width: 0; flex: 1; overflow-wrap: anywhere; font-size: 13px; } .ant-tag { margin: 0; flex-shrink: 0; } }
+.job-flow-time-number { font-size: 11px; color: var(--fa-text-color-light100); font-variant-numeric: tabular-nums; }
+.job-flow-time-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0 10px; div { display: flex; flex-direction: column; gap: 3px; } small { color: var(--fa-text-color-light100); font-size: 11px; } span { font-size: 12px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; } }
+.job-flow-time-track { position: relative; height: 5px; background: var(--ant-color-fill-secondary); border-radius: 3px; overflow: hidden; span { position: absolute; height: 100%; border-radius: inherit; max-width: 100%; } }
+.job-flow-time-foot { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 11px; color: var(--fa-text-color-light100); }
+.job-flow-time-reason { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--fa-border-color); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
