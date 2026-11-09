@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { CloseOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Alert, Button, Select, Space, Spin, Tag, Typography } from 'antd';
+import { Alert, Button, Select, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { FaJsonView, FaResizeHorizontal, useApiLoading } from '@fa/ui';
 import type { Admin } from '@/types';
 import { jobApi, jobLogApi } from '@features/fa-admin-pages/services';
@@ -8,7 +8,7 @@ import { startFlowRunPolling } from './flowRunPolling';
 import JobLogDetailDrawer from '../jobLog/JobLogDetailDrawer';
 
 const nodeStates: Record<number, [string, string]> = {
-  0: ['等待依赖', 'default'],
+  0: ['等待执行', 'default'],
   10: ['待调度', 'default'],
   20: ['启动中', 'processing'],
   30: ['执行中', 'processing'],
@@ -59,6 +59,8 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
       onError: () => setFailed(true),
     });
   }, [selected, refresh]);
+  const active = run?.nodes.filter((node) => node.status === 20 || node.status === 30).length ?? 0;
+  const unconfirmed = run?.nodes.filter((node) => node.status === 80).length ?? 0;
   const options = history.map((log) => ({ value: log.id, label: `#${log.id} · ${log.beginTime ?? ''} · ${runStates[log.status] ?? '未知'}` }));
   if (selected && !options.some((option) => option.value === selected)) options.unshift({ value: selected, label: `#${selected} · 本轮执行` });
   return (
@@ -74,7 +76,7 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
         </header>
         <div className="job-flow-json-body" style={{ overflow: 'auto' }}>
           <Select aria-label="选择流程运行记录" value={selected} options={options} onChange={setSelected} placeholder="暂无运行记录" />
-          <Typography.Text type="secondary">当前阶段按依赖串行执行；运行配置使用启动时关联的历史版本。</Typography.Text>
+          <Typography.Text type="secondary">按依赖和并发上限运行，同类任务串行；配置使用启动时关联的历史版本。</Typography.Text>
           {failed && <Alert type="error" title="读取失败，自动刷新已暂停" description="请点击刷新重试。" />}
           <Spin spinning={loading && !run}>
             {run && (
@@ -82,10 +84,28 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                 <Space wrap>
                   <Typography.Text strong>执行 #{run.log.id}</Typography.Text>
                   <Tag>{runStates[run.log.status] ?? '未知'}</Tag>
-                  <span>
-                    {run.nodes.filter((node) => node.status === 40).length}/{run.nodes.length} 成功
-                  </span>
+                  <Typography.Text type="secondary">{run.nodes.length} 个任务</Typography.Text>
+                  {unconfirmed > 0 && <Tag color="warning">{unconfirmed} 未确认 · 已暂停新启动</Tag>}
                 </Space>
+                <div className="job-flow-preflight-metrics">
+                  <Tooltip title={`启动中或执行中 ${active} 个；未确认 ${unconfirmed} 个仍占用容量。`}>
+                    <div>
+                      <strong>{active + unconfirmed}/{String(run.definition.maxConcurrency ?? '—')}</strong>
+                      <span>并发占用</span>
+                    </div>
+                  </Tooltip>
+                  {[
+                    ['等待', run.nodes.filter((node) => node.status === 0 || node.status === 10).length],
+                    ['成功', run.nodes.filter((node) => node.status === 40).length],
+                    ['失败', run.nodes.filter((node) => node.status === 50).length],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <strong>{value}</strong>
+                      <span>{label}</span>
+                    </div>
+                  ))}
+                </div>
+                {run.nodes.some((node) => node.status === 60) && <Tag>{run.nodes.filter((node) => node.status === 60).length} 已阻断</Tag>}
                 {run.log.status === 8 && (
                   <Alert type="warning" title="结果未确认，不能再次启动" description="仍可能有实际工作，需人工核查；不会自动当作成功或重跑。" />
                 )}
@@ -100,7 +120,9 @@ export default function JobFlowRunPanel({ jobId, initialLogId, onClose }: { jobI
                       <div className="job-flow-preflight-task-main">
                         <Space wrap>
                           <Typography.Text strong>{node.nodeName}</Typography.Text>
-                          <Tag color={nodeStates[node.status]?.[1]}>{nodeStates[node.status]?.[0] ?? '未知'}</Tag>
+                          <Tooltip title={node.status === 0 || node.status === 10 ? '等待前驱成功、并发空位或同类任务结束。' : undefined}>
+                            <Tag color={nodeStates[node.status]?.[1]}>{nodeStates[node.status]?.[0] ?? '未知'}</Tag>
+                          </Tooltip>
                         </Space>
                         <div className="job-flow-preflight-class" title={node.clazzPath}>
                           {node.clazzPath}

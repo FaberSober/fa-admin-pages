@@ -108,7 +108,7 @@ export default function JobFlowPreflightPanel({
                       {result.repeatedClasses.map((path) => (
                         <div key={path}>{path}</div>
                       ))}
-                      <Typography.Text type="secondary">后续执行器需按同类串行规则处理；本次仅检查定义。</Typography.Text>
+                      <Typography.Text type="secondary">执行时同类任务串行，不同任务类可按并发上限运行；本次仅检查定义。</Typography.Text>
                     </div>
                   }
                 >

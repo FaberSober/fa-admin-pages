@@ -198,7 +198,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
       const res = await jobApi.save(values);
       setPersistedId(res.data.id);
     }
-    feedback.success('流程定义已保存，可手动串行执行；Cron 尚未接入');
+    feedback.success('流程定义已保存，可手动执行；Cron 尚未接入');
     fetchFinish?.();
   }
 
@@ -340,7 +340,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                   <>
                     <Popconfirm
                       title="执行服务器已保存的流程？"
-                      description="将实际调用全部可执行任务，可能产生业务数据；画布未保存修改不参与本轮。本阶段串行执行。"
+                      description="将实际调用全部可执行任务，可能产生业务数据；画布未保存修改不参与本轮。将按已保存的并发上限执行，同类任务串行。"
                       disabled={!persistedId || running}
                       onConfirm={async () => {
                         if (!persistedId) return;
@@ -579,7 +579,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       type="info"
                       showIcon
                       title="从右上角“＋”选择已注册的任务类开始编排"
-                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可从顶部手动串行执行，Cron 尚未接入。"
+                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可从顶部手动执行，Cron 尚未接入。"
                     />
                   </Panel>
                 )}
@@ -657,7 +657,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                         description={
                           demo
                             ? '示例仅用于页面预览，不保存到服务器或执行任务；刷新后草稿丢失。'
-                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动串行执行。Cron 尚未接入。'
+                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动执行。Cron 尚未接入。'
                         }
                       />
                       <Space orientation="vertical" style={{ width: '100%' }}>
