@@ -1,5 +1,5 @@
-import { useContext } from 'react';
-import { Background, Controls, Handle, MarkerType, Position, ReactFlow, ReactFlowProvider, type NodeProps } from '@xyflow/react';
+import { useContext, useEffect } from 'react';
+import { Background, Controls, Handle, MarkerType, Position, ReactFlow, ReactFlowProvider, useReactFlow, useNodesInitialized, useStore, type NodeProps } from '@xyflow/react';
 import { theme } from 'antd';
 import { ThemeLayoutContext } from '@fa/ui';
 import type { Admin } from '@/types';
@@ -34,7 +34,26 @@ export default function JobFlowRunCanvas({ run, selectedNodeId, onSelect }: {
       edges={graph.edges.map(edge => ({ ...edge, markerEnd: { type: MarkerType.ArrowClosed, color: token.colorTextSecondary }, style: { stroke: token.colorTextSecondary } }))}
       nodeTypes={nodeTypes} colorMode={themeDark ? 'dark' : 'light'} fitView fitViewOptions={{ padding: 0.25 }}
       nodesDraggable={false} nodesConnectable={false} edgesReconnectable={false} deleteKeyCode={null} minZoom={0.1} maxZoom={2}>
-      <Background /><Controls showInteractive={false} />
+      <SelectedNodeFocus nodeId={selectedNodeId} /><Background /><Controls showInteractive={false} />
     </ReactFlow></ReactFlowProvider>
   </section>;
+}
+
+/** 定位屏幕外节点，保持用户当前缩放。 */
+function SelectedNodeFocus({ nodeId }: { nodeId?: string }) {
+  const { getNode, getViewport, setCenter } = useReactFlow();
+  const initialized = useNodesInitialized();
+  const width = useStore(state => state.width);
+  const height = useStore(state => state.height);
+  useEffect(() => {
+    if (!nodeId || !initialized) return;
+    const node = getNode(nodeId);
+    if (!node) return;
+    const viewport = getViewport();
+    const w = node.measured?.width ?? 180, h = node.measured?.height ?? 60;
+    const x = node.position.x * viewport.zoom + viewport.x, y = node.position.y * viewport.zoom + viewport.y;
+    if (x < 16 || y < 16 || x + w * viewport.zoom > width - 16 || y + h * viewport.zoom > height - 16)
+      void setCenter(node.position.x + w / 2, node.position.y + h / 2, { zoom: viewport.zoom, duration: 250 });
+  }, [nodeId, initialized, width, height, getNode, getViewport, setCenter]);
+  return null;
 }

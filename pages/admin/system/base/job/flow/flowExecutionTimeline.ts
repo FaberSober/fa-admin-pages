@@ -53,3 +53,11 @@ export function buildExecutionSlices(nodes: Admin.JobFlowNodeRun[]) {
   return slices.sort((a, b) => (a.begin ?? Number.POSITIVE_INFINITY) - (b.begin ?? Number.POSITIVE_INFINITY) || a.index - b.index)
     .map(slice => ({ ...slice, offset: slice.begin === undefined ? undefined : (slice.begin - origin) / span * 100, width: slice.duration === undefined ? undefined : slice.duration / span * 100 }));
 }
+
+/** 展示本轮可确认的日期范围，不为缺失时间补造日期。 */
+export function executionDateRange(run: { log: Pick<Admin.JobLog, 'beginTime' | 'endTime'>; nodes: Admin.JobFlowNodeRun[] }) {
+  const values = [run.log.beginTime, run.log.endTime, ...run.nodes.flatMap(node => [node.beginTime, node.endTime])];
+  const dates = values.filter(value => parseExecutionTime(value) !== undefined).map(value => value!.slice(0, 10)).sort();
+  if (!dates.length) return '日期未记录';
+  return dates[0] === dates[dates.length - 1] ? dates[0] : `${dates[0]} ～ ${dates[dates.length - 1]}`;
+}

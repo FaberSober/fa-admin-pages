@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import type { Admin } from '@/types';
-import { buildExecutionSlices, buildExecutionTimeline, getNodeDurationMs, parseExecutionTime } from './flowExecutionTimeline';
+import { buildExecutionSlices, buildExecutionTimeline, executionDateRange, getNodeDurationMs, parseExecutionTime } from './flowExecutionTimeline';
 const node = (id: number, overrides: Partial<Admin.JobFlowNodeRun> = {}): Admin.JobFlowNodeRun => ({ id, flowLogId: 1, nodeId: `node-${id}`, clazzPath: 'example.Task', nodeName: '同名任务', attempt: 1, status: 40, beginTime: '2026-11-09 10:00:00', endTime: '2026-11-09 10:00:02', ...overrides });
 it('sorts parallel records by time, retaining independent IDs without mutation', () => {
   const input = [node(1, { beginTime: '2026-11-09 10:00:01' }), node(2)]; const before = JSON.stringify(input);
@@ -33,4 +33,13 @@ it('groups each node into one slice with shared relative time without inventing 
   expect(slices[1]).toMatchObject({ offset: 50, width: undefined, duration: undefined });
   expect(slices[2].offset).toBeUndefined();
   expect(JSON.stringify(rows)).toBe(before);
+});
+
+it('shows a single date or a multi-day range beside total duration', () => {
+  expect(executionDateRange({ log: {}, nodes: [node(1)] })).toBe('2026-11-09');
+  expect(executionDateRange({ log: {}, nodes: [node(1, { endTime: '2026-11-10 00:00:02' })] })).toBe('2026-11-09 ～ 2026-11-10');
+});
+it('does not invent a date for missing or invalid timestamps', () => {
+  expect(executionDateRange({ log: {}, nodes: [] })).toBe('日期未记录');
+  expect(executionDateRange({ log: { beginTime: 'bad' }, nodes: [node(1, { beginTime: undefined, endTime: '2026-02-30 12:00:00' })] })).toBe('日期未记录');
 });
