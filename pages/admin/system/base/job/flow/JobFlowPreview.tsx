@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { CronModal, FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
-import { Alert, Button, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tag, Tooltip, Typography, message, theme } from 'antd';
+import { Alert, Button, Collapse, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tag, Tooltip, Typography, message, theme } from 'antd';
 import {
   Background,
   Controls,
@@ -604,11 +604,11 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                       onClick={() => setShowMiniMap((value) => !value)}
                     />
                   </Tooltip>
-                  <Tooltip title="测试与操作说明">
+                  <Tooltip title="操作指南">
                     <Button
                       size="small"
                       icon={<InfoCircleOutlined />}
-                      aria-label="测试与操作说明"
+                      aria-label="操作指南"
                       aria-pressed={showTests}
                       onClick={() => setShowTests((value) => !value)}
                     />
@@ -635,7 +635,7 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                   <Panel
                     position="bottom-left"
                     style={{
-                      width: 280,
+                      width: 360,
                       maxWidth: 'calc(100% - 32px)',
                       marginBottom: 70,
                       maxHeight: '45%',
@@ -646,17 +646,24 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                     }}
                   >
                     <Space orientation="vertical" size={12} style={{ padding: 12 }}>
-                      <Typography.Text strong>测试与操作说明</Typography.Text>
+                      <Typography.Text strong>操作指南</Typography.Text>
                       <Alert
                         type="info"
                         showIcon
-                        title={demo ? '模拟任务 · 仅页面预览' : '真实任务编排 · 尚未发布'}
+                        title={demo ? '模拟任务 · 仅页面预览' : '流程编排'}
                         description={
                           demo
                             ? '示例仅用于页面预览，不保存到服务器或执行任务；刷新后草稿丢失。'
                             : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动执行或在列表启用 Cron 调度。'
                         }
                       />
+                      {!demo && <Collapse size="small" ghost style={{ width: '100%' }} defaultActiveKey={['create']} items={[
+                        { key: 'create', label: '1. 添加任务与建立依赖', children: '顶部“＋”打开任务库，可按分组、名称、描述、标签或类名搜索。点击卡片添加；节点直接引用后台注册类，无需另建普通任务。连线从右侧输出到左侧输入，无前驱节点标记为入口。' },
+                        { key: 'save', label: '2. 保存、预检与执行', children: '在配置中设置并发上限与日志开关，然后保存。预检和执行都使用服务器已保存的定义，不包含画布未保存修改；暂存只是当前页面草稿，刷新后丢失。执行会真实调用业务任务，同一轮中的同类任务串行。' },
+                        { key: 'schedule', label: '3. 定时调度与停止', children: '配置 Cron 并保存后，在任务列表启用调度；修改已启用的 Cron 前先暂停。暂停只影响未来触发；运行详情的“停止本轮”禁止新节点启动，已运行任务继续收尾，不撤销业务影响，也不暂停未来 Cron。' },
+                        { key: 'logs', label: '4. 历史记录与日志排查', children: '历史记录支持查询和分页，点击查看运行详情。选择时间线卡片与运行图双向定位；顶部编排日志记录调度过程，卡片日志图标查看该节点业务日志。须在执行前开启并保存详细日志，旧轮次不补生成。' },
+                        { key: 'unknown', label: '5. 失败或未确认怎么办', children: '失败会阻断依赖后代，独立分支可继续。执行中停滞可点击“核对状态”同步已提交结果，不会重跑业务。未确认不能当作成功，仍阻止同一流程再次启动；先核查业务实际结果，目前尚无人工解除入口，不要通过修改数据库状态绕过。' },
+                      ]} />}
                       <Space orientation="vertical" style={{ width: '100%' }}>
                         <Button
                           type="primary"
@@ -701,9 +708,6 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                           }}
                         >
                           校验并预览 JSON
-                        </Button>
-                        <Button disabled title="真实执行请使用顶部带确认的执行入口">
-                          请从顶部执行
                         </Button>
                       </Space>
                       <Typography.Text type="secondary">
