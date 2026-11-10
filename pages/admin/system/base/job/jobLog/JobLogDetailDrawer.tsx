@@ -3,36 +3,74 @@ import { BaseDrawer, useApiLoading } from '@fa/ui';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { Alert, Button, Space, Spin, theme, Tooltip, Typography } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { appendVisibleLog, isLogReadComplete, startJobLogPolling } from './jobLogPolling';
 import JobExecutionStatus from '../JobExecutionStatus';
 
-export default function JobLogDetailDrawer({ record, defaultOpen = false }: { record: Admin.JobLog; defaultOpen?: boolean }) {
+const JobFlowRunPanel = lazy(() => import('../flow/JobFlowRunPanel'));
+
+export default function JobLogDetailDrawer({ record, defaultOpen = false, onLocateFlow }: { record: Admin.JobLog; defaultOpen?: boolean; onLocateFlow?: (origin: Admin.JobFlowLogOrigin) => void }) {
   const [open, setOpen] = useState(defaultOpen);
+  const [flow, setFlow] = useState<Admin.JobFlowLogOrigin>();
   const { pathname, search } = useLocation();
+  useEffect(() => { setFlow(undefined); }, [record.id]);
   const previousLocation = useRef(`${pathname}${search}`);
 
   useEffect(() => {
     const next = `${pathname}${search}`;
-    if (previousLocation.current !== next) setOpen(false);
+    if (previousLocation.current !== next) { setOpen(false); setFlow(undefined); }
     previousLocation.current = next;
   }, [pathname, search]);
 
   return (
     <>
-      <Tooltip title={!record.logPath ? '本次执行未记录详细日志' : undefined}>
+      <Tooltip title={!record.logPath && record.triggerSource !== 3 ? '本次执行未记录详细日志' : undefined}>
         <span>
-          <Button type="link" size="small" disabled={!record.logPath} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>
+          <Button type="link" size="small" disabled={!record.logPath && record.triggerSource !== 3} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>
             查看日志
           </Button>
         </span>
       </Tooltip>
       <BaseDrawer title={`执行日志 #${record.id}`} size={1000} open={open} onClose={() => setOpen(false)}>
-        <JobLogContent key={record.id} record={record} />
+        {open && <div className="fa-flex-column" style={{ height: '100%', minHeight: 0, gap: 12 }}>
+          <JobLogFlowOrigin key={record.id} id={record.id} onLocate={origin => {
+            if (onLocateFlow) { setOpen(false); onLocateFlow(origin); }
+            else setFlow(origin);
+          }} />
+          <div style={{ flex: 1, minHeight: 0 }}><JobLogContent key={record.id} record={record} /></div>
+        </div>}
+      </BaseDrawer>
+      <BaseDrawer title="所属流程运行" size={1100} open={!!flow} onClose={() => setFlow(undefined)}>
+        {flow && <div style={{ position: 'relative', height: '100%', minHeight: 500 }}>
+          <Suspense fallback={<Spin />}><JobFlowRunPanel key={`${flow.jobId}-${flow.flowLogId}-${flow.nodeId}`} jobId={flow.jobId} initialLogId={flow.flowLogId} initialNodeId={flow.nodeId} onClose={() => setFlow(undefined)} /></Suspense>
+        </div>}
       </BaseDrawer>
     </>
   );
+}
+
+function JobLogFlowOrigin({ id, onLocate }: { id: number; onLocate: (origin: Admin.JobFlowLogOrigin) => void }) {
+  const [origin, setOrigin] = useState<Admin.JobFlowLogOrigin | null>();
+  const [failed, setFailed] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const loading = useApiLoading([jobLogApi.getUrl(`flowOrigin/${id}`)]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setOrigin(undefined); setFailed(false);
+    jobLogApi.flowOrigin(id, controller.signal).then(response => {
+      if (!controller.signal.aborted) setOrigin(response.data);
+    }).catch(() => { if (!controller.signal.aborted) setFailed(true); });
+    return () => controller.abort();
+  }, [id, refresh]);
+  if (failed) return <Space><Typography.Text type="secondary">所属流程暂不可用</Typography.Text><Button size="small" type="link" onClick={() => setRefresh(value => value + 1)}>重试</Button></Space>;
+  if (!origin) return loading ? <Typography.Text type="secondary">正在读取所属流程…</Typography.Text> : null;
+  return <Space wrap size={8}>
+    <Typography.Text type="secondary">所属流程</Typography.Text>
+    <Typography.Text strong>{origin.flowName || '流程任务'}</Typography.Text>
+    <Typography.Text type="secondary">#{origin.flowLogId} · {origin.nodeName || origin.nodeId}</Typography.Text>
+    <Button type="link" size="small" onClick={() => onLocate(origin)}>查看流程</Button>
+  </Space>;
 }
 
 function JobLogContent({ record }: { record: Admin.JobLog }) {

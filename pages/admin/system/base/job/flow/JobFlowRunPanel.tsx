@@ -24,7 +24,7 @@ const nodeStates: Record<number, [string, string]> = {
 };
 const runStates: Record<number, string> = { 1: '执行中', 2: '成功', 3: '停止中', 7: '已停止', 8: '未确认', 9: '失败' };
 
-function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: number; initialLogId?: number; onClose: () => void }) {
+function JobFlowRunPanelContent({ jobId, initialLogId, initialNodeId, onClose }: { jobId: number; initialLogId?: number; initialNodeId?: string; onClose: () => void }) {
   const panelId = useId();
   const [width, setWidth] = useState(540);
   const [historyWidth, setHistoryWidth] = useState(780);
@@ -40,11 +40,13 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   const reconciling = useApiLoading(selected ? [jobApi.getUrl(`reconcileFlow/${selected}`)] : []);
   const stopping = useApiLoading(selected ? [jobApi.getUrl(`stopFlow/${selected}`)] : []);
   const loading = useApiLoading(selected ? [jobApi.getUrl(`flowRun/${selected}`)] : []);
-  useEffect(() => { setRecordView('nodes'); }, [selected, jobId]);
+  useEffect(() => {
+    setRecordView('nodes');
+    setSelectedNodeId(selected === initialLogId ? initialNodeId : undefined);
+  }, [selected, jobId, initialLogId, initialNodeId]);
   useEffect(() => {
     if (!selected || showHistory) return;
     setRun(undefined);
-    setSelectedNodeId(undefined);
     setFailed(false);
     return startFlowRunPolling({
       read: (signal) => jobApi.flowRun(selected, signal, jobId).then((response) => response.data),
@@ -149,7 +151,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
                           {' · 耗时 '}{getNodeDurationMs(node) == null ? (node.status === 80 ? '未确认' : node.status === 20 || node.status === 30 ? '执行中' : '—') : `${getNodeDurationMs(node)} ms`}
                         </Typography.Text>
                         {node.reason && <div style={{ overflowWrap: 'anywhere' }}>{node.reason}</div>}
-                        {node.jobLogId && <NodeBusinessLog key={node.jobLogId} id={node.jobLogId} />}
+                        {node.jobLogId && <NodeBusinessLog key={node.jobLogId} id={node.jobLogId} onLocateFlow={origin => { if (origin.jobId === jobId && origin.flowLogId === run.log.id) { setSelectedNodeId(origin.nodeId); setRecordView('nodes'); } }} />}
                       </div>
                     </article>
                   ))}
@@ -170,10 +172,10 @@ function JobFlowRunPanelContent({ jobId, initialLogId, onClose }: { jobId: numbe
   );
 }
 
-function NodeBusinessLog({ id }: { id: number }) {
+function NodeBusinessLog({ id, onLocateFlow }: { id: number; onLocateFlow: (origin: Admin.JobFlowLogOrigin) => void }) {
   const [record, setRecord] = useState<Admin.JobLog>();
   const loading = useApiLoading([jobLogApi.getUrl(`getById/${id}`)]);
-  if (record) return <JobLogDetailDrawer record={record} defaultOpen />;
+  if (record) return <JobLogDetailDrawer record={record} defaultOpen onLocateFlow={onLocateFlow} />;
   return (
     <Button
       type="link"
@@ -191,6 +193,6 @@ function NodeBusinessLog({ id }: { id: number }) {
   );
 }
 
-export default function JobFlowRunPanel(props: { jobId: number; initialLogId?: number; onClose: () => void }) {
+export default function JobFlowRunPanel(props: { jobId: number; initialLogId?: number; initialNodeId?: string; onClose: () => void }) {
   return <JobFlowRunPanelContent key={props.jobId} {...props} />;
 }

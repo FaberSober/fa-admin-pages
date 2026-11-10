@@ -517,6 +517,7 @@ namespace Admin {
   export interface JobFlowHistoryStats { total: number | string; doing: number | string; stopping?: number | string; stopped?: number | string; success: number | string; failed: number | string; unconfirmed: number | string; durationSamples: number | string; avgDurationMs: number | string | null }
   export interface RegisteredJob { clazzPath: string; name: string; group: string; description: string; tags: string[]; sort: number; deprecated: boolean }
 
+  export interface JobFlowLogOrigin { jobId: number; flowLogId: number; nodeId: string; nodeName: string; flowName: string }
   export interface JobFlowRun { log: JobLog; nodes: JobFlowNodeRun[]; definition: Record<string, unknown> }
 
   export interface JobFlowPreflight {
