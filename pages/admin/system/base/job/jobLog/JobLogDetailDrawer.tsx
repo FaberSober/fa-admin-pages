@@ -10,7 +10,7 @@ import JobExecutionStatus from '../JobExecutionStatus';
 
 const JobFlowRunPanel = lazy(() => import('../flow/JobFlowRunPanel'));
 
-export default function JobLogDetailDrawer({ record, defaultOpen = false, iconOnly = false, onLocateFlow }: { record: Admin.JobLog; defaultOpen?: boolean; iconOnly?: boolean; onLocateFlow?: (origin: Admin.JobFlowLogOrigin) => void }) {
+export default function JobLogDetailDrawer({ record, defaultOpen = false, iconOnly = false, buttonText = '查看日志', onLocateFlow }: { record: Admin.JobLog; defaultOpen?: boolean; iconOnly?: boolean; buttonText?: string; onLocateFlow?: (origin: Admin.JobFlowLogOrigin) => void }) {
   const [open, setOpen] = useState(defaultOpen);
   const [flow, setFlow] = useState<Admin.JobFlowLogOrigin>();
   const { pathname, search } = useLocation();
@@ -28,7 +28,7 @@ export default function JobLogDetailDrawer({ record, defaultOpen = false, iconOn
       <Tooltip title={!record.logPath && record.triggerSource !== 3 ? '本次执行未记录详细日志' : undefined}>
         <span>
           <Button type={iconOnly ? "text" : "link"} aria-label={`查看执行日志 #${record.id}`} title={iconOnly ? `查看执行日志 #${record.id}` : undefined} size="small" disabled={!record.logPath && record.triggerSource !== 3} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>
-            {iconOnly ? null : '查看日志'}
+            {iconOnly ? null : buttonText}
           </Button>
         </span>
       </Tooltip>

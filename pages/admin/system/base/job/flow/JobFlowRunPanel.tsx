@@ -83,6 +83,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, initialNodeId, onClose }:
                       <div>开始：{run.log.beginTime ?? '—'}</div><div>结束：{run.log.endTime ?? '—'}</div>
                       <div>未确认 {unconfirmed} 个仍占用容量，不按成功放行。</div>
                     </div>}><Button type="text" size="small" icon={<InfoCircleOutlined />} aria-label="运行说明" /></Popover>
+                    <JobLogDetailDrawer key={`orchestration-${run.log.id}`} record={run.log} buttonText="编排日志" />
                     <Popover key={run.log.id} title={`本轮定义版本 #${run.log.definitionVersionId ?? '—'}`} trigger="click" content={<div style={{ width: 'min(620px, calc(100vw - 80px))', maxHeight: '60vh', overflow: 'auto' }}><FaJsonView data={run.definition} defaultExpandDepth={2} /></div>}><Button size="small" type="text">版本 #{run.log.definitionVersionId ?? '—'}</Button></Popover>
                     <Button size="small" onClick={() => { setHistoryOpened(true); setShowHistory(true); }}>返回历史列表</Button>
                   </Space>
