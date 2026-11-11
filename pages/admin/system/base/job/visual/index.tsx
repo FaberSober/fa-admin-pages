@@ -1,9 +1,10 @@
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { Alert, Button, Calendar, Card, Flex, Input, Select, Tag, Typography, theme } from 'antd';
+import { Alert, Button, Calendar, Card, Flex, Input, Select, Spin, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { jobApi } from '@features/fa-admin-pages/services';
-import { mockExecutions } from './mock';
+import JobTimeline from './components/JobTimeline';
+import type { TimelineResult } from './timeline';
 import { calendarStatus, type CalendarDay } from './calendar';
 import './job-visual-calendar.scss';
 
@@ -11,6 +12,9 @@ export default function JobVisual() {
   const { token } = theme.useToken();
   const [selected, setSelected] = useState(dayjs());
   const month = selected.format('YYYY-MM');
+  const date = selected.format('YYYY-MM-DD');
+  const [timeline, setTimeline] = useState<TimelineResult | null>(null);
+  const [timelineError, setTimelineError] = useState(false);
   const [days, setDays] = useState<Record<string, CalendarDay>>({});
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -23,6 +27,15 @@ export default function JobVisual() {
     }).catch(() => { if (!controller.signal.aborted) setError(true); });
     return () => controller.abort();
   }, [month]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setTimeline(null); setTimelineError(false);
+    jobApi.visualTimeline(date, controller.signal).then((response) => {
+      if (response.status !== 200) throw new Error(response.message);
+      if (!controller.signal.aborted) setTimeline(response.data);
+    }).catch(() => { if (!controller.signal.aborted) setTimelineError(true); });
+    return () => controller.abort();
+  }, [date]);
   return (
     <div className="fa-islands-grid job-visual-page">
         <div className="job-visual-sidebar">
@@ -76,18 +89,8 @@ export default function JobVisual() {
         </div>
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
-          <Flex justify="space-between" style={{ marginLeft: 120 }}><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></Flex>
-          <Flex vertical gap={16} style={{ marginTop: 16 }}>
-            {mockExecutions.map((item) => (
-              <Flex key={item.name} align="center" gap={16} wrap="wrap">
-                <Typography.Text strong style={{ width: 104 }}>{item.name}</Typography.Text>
-                <div style={{ flex: 1, position: 'relative', height: 24, background: token.colorFillSecondary }} title={item.time}>
-                  <div style={{ position: 'absolute', left: `${item.start}%`, width: `${item.width}%`, height: '100%', background: item.status === '成功' ? token.colorSuccess : token.colorError }} />
-                </div>
-                <Tag color={item.status === '成功' ? 'success' : 'error'}>{item.status}</Tag>
-              </Flex>
-            ))}
-          </Flex>
+            {timelineError ? <Alert type="error" message="时间轴加载失败" showIcon />
+              : timeline ? <JobTimeline date={date} result={timeline} /> : <Spin /> }
           </section>
         </div>
     </div>

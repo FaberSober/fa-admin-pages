@@ -6,6 +6,8 @@ import type { Admin } from '@/types';
 const serviceModule = 'job';
 
 class Job extends BaseApi<Admin.Job, number> {
+  visualTimeline = (date: string, signal?: AbortSignal): Promise<Fa.Ret<import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineResult>> =>
+    this.get('visual/timeline', { date }, { signal });
   visualCalendar = (month: string, signal?: AbortSignal): Promise<Fa.Ret<{ date: string; total: number; success: number; failed: number }[]>> =>
     this.get('visual/calendar', { month }, { signal });
   reconcileFlow = (id: number, jobId: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`reconcileFlow/${id}`, {}, { params: { jobId } });

@@ -53,8 +53,46 @@
 }
 
 .job-visual-chart {
-  padding: 24px;
+  overflow: hidden;
+}
+
+.job-timeline-content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.job-timeline-plot {
+  min-height: 0;
+  flex: 1;
   overflow: auto;
+}
+
+.job-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 16px;
+  border-top: 1px solid;
+  font-size: 12px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  i {
+    width: 12px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .job-timeline-current {
+    width: 2px;
+    height: 12px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -131,4 +169,28 @@
   height: 6px;
   flex: none;
   border-radius: 50%;
+}
+
+.job-timeline-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid;
+  font-size: 12px;
+}
+
+.job-timeline-date {
+  margin-bottom: 3px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.job-timeline-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
