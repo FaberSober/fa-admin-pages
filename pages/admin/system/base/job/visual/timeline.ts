@@ -58,9 +58,16 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     }
     return row;
   };
-  fullDay?.entries.forEach((entry) => { rowOf(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
-    entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron); });
-  fullDay?.buckets?.forEach((bucket) => { rowOf(`job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron); });
+  const current = now && dayjs(now).format('YYYY-MM-DD') === date ? dayjs(now).hour() * 3600 + dayjs(now).minute() * 60 + dayjs(now).second() : -1;
+  const activePlans = plans.filter((plan) => plan.end > plan.start ? plan.end > current : plan.start > current);
+  const seeds = [
+    ...(fullDay?.entries ?? entries).map((entry) => ({ id: entry.jobId, key: entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
+      name: entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), jobType: entry.jobType, cron: entry.cron })),
+    ...(fullDay?.buckets ?? buckets).map((bucket) => ({ id: bucket.jobId, key: `job:${bucket.jobId}`, name: bucket.jobName || `任务 #${bucket.jobId}`, jobType: bucket.jobType, cron: bucket.cron })),
+    ...activePlans.map((plan) => ({ id: plan.jobId, key: `job:${plan.jobId}`, name: plan.jobName || `任务 #${plan.jobId}`, jobType: plan.jobType, cron: plan.cron })),
+  ];
+  seeds.sort((a, b) => (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER) || a.key.localeCompare(b.key));
+  seeds.forEach((seed) => { rowOf(seed.key, seed.name, seed.jobType, seed.cron); });
   const rows = entries.map((entry) => {
     const row = rowOf(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
       entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron);
@@ -70,21 +77,21 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     const end = endTime ? Math.max(begin, Math.min(86400, dayjs(endTime).diff(start, 'second'))) : begin;
     return { entry, row, begin, end, running };
   });
-  const bucketRows = buckets.map((bucket) => {
+  const bucketRows = buckets.filter((bucket) => current < 0 || bucket.bucket * BUCKET_SECONDS <= current).map((bucket) => {
     const row = rowOf(`job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron);
     const total = Number(parseJobLong(bucket.total) ?? 0);
     const failed = Number(parseJobLong(bucket.failed) ?? 0);
     const begin = bucket.bucket * BUCKET_SECONDS;
-    return { bucket, row, begin, end: begin + BUCKET_SECONDS, total, failed };
+    const end = current < 0 ? begin + BUCKET_SECONDS : Math.min(begin + BUCKET_SECONDS, current);
+    return { bucket, row, begin, end, total, failed };
   });
-  const current = now && dayjs(now).format('YYYY-MM-DD') === date ? dayjs(now).hour() * 3600 + dayjs(now).minute() * 60 + dayjs(now).second() : -1;
-  const planRows = plans.filter((plan) => plan.end > plan.start ? plan.end > current : plan.start > current).map((plan) => {
+  const planRows = activePlans.map((plan) => {
     const row = rowOf(`job:${plan.jobId}`, plan.jobName || `任务 #${plan.jobId}`, plan.jobType, plan.cron);
     const begin = Math.max(plan.start, current);
     const duration = Math.max(0, Number(plan.durationMs) || 0) / 1000;
     return { plan, row, begin, end: Math.min(86400, plan.end > plan.start ? plan.end : begin + duration) };
   });
-  return { names, meta, rows, bucketRows, planRows };
+  return { names, meta, rows, bucketRows, planRows, jobRows: groups };
 }
 
 export function timelineClickTarget(seriesName: string, dataIndex: number, model: ReturnType<typeof timelineModel>) {

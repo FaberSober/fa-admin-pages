@@ -2,16 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, Button, DatePicker, Form, InputNumber, Select, Space, Table, Tag, Tooltip, Typography, theme } from 'antd';
 import { useApiLoading, useTableQueryParams } from '@fa/ui';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import { historyFilters } from './flowHistoryFilters';
 import { formatJobCount, formatJobDuration } from '../jobStatistics';
 import { formatHistoryDuration, normalizeHistoryStats } from './flowHistoryStats';
+import { historyTimelinePath } from '../visual/historyLink';
 import './job-flow-history-stats.scss';
 const states = [{ value: 1, label: '执行中' }, { value: 2, label: '成功' }, { value: 3, label: '停止中' }, { value: 7, label: '已停止' }, { value: 8, label: '未确认' }, { value: 9, label: '失败' }];
 const sources = [{ value: 0, label: '历史/未知' }, { value: 1, label: '手动' }, { value: 2, label: '定时' }];
 export default function JobFlowHistoryList({ jobId, selected, onSelect, active, refreshToken }: { active: boolean; refreshToken: number; jobId: number; selected?: number; onSelect: (id: number) => void }) {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const pending = useRef<AbortController>();
   const [failed, setFailed] = useState(false);
   const [stats, setStats] = useState<ReturnType<typeof normalizeHistoryStats>>();
@@ -73,7 +76,7 @@ export default function JobFlowHistoryList({ jobId, selected, onSelect, active, 
         { title: '来源', dataIndex: 'triggerSource', width: 90, responsive: ['md'], render: value => sources.find(item => item.value === value)?.label ?? '未知' },
         { title: '耗时', dataIndex: 'durationMs', width: 140, render: value => <Tooltip title={formatJobDuration(value) === '—' ? undefined : `${formatJobCount(value)} ms`}><span style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{formatJobDuration(value)}</span></Tooltip> },
         { title: '版本 ID', dataIndex: 'definitionVersionId', width: 90, responsive: ['lg'] },
-        { title: '操作', width: 70, render: (_, record) => <Button type="link" size="small" onClick={event => { event.stopPropagation(); onSelect(record.id); }}>查看</Button> },
+        { title: '操作', width: 130, render: (_, record) => <Space size={0}><Button type="link" size="small" onClick={event => { event.stopPropagation(); onSelect(record.id); }}>查看</Button><Button type="link" size="small" disabled={!historyTimelinePath(jobId, record.beginTime)} onClick={event => { event.stopPropagation(); const path = historyTimelinePath(jobId, record.beginTime); if (path) navigate(path); }}>时间轴</Button></Space> },
       ]} />
   </Space>;
 }

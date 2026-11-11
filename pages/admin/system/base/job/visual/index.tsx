@@ -1,21 +1,32 @@
 import { LeftOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
-import { PageLoading } from '@fa/ui';
+import { PageLoading, useQs } from '@fa/ui';
 import { Alert, Button, Calendar, Card, Flex, Input, Select, Switch, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { jobApi } from '@features/fa-admin-pages/services';
+import { MenuLayoutContext, TabLeaveContext } from '@features/fa-admin-pages/layout/menu';
 import JobTimeline from './components/JobTimeline';
 import { timelineStatCards, timelineWindow, timelineStatusOptions, timelineTypeOptions, type PlanItem, type TimelineFilter, type TimelineResult } from './timeline';
 import { calendarStatus, type CalendarDay } from './calendar';
+import { parseTimelineLink, scheduleTimelineRefresh } from './historyLink';
+import { loadTimelineSnapshot } from './timelineRefresh';
 import './job-visual-calendar.scss';
 
 export default function JobVisual() {
   const { token } = theme.useToken();
+  const { curTab } = useContext(MenuLayoutContext);
+  const tabKey = useContext(TabLeaveContext);
+  const isActive = tabKey == null || curTab?.key === tabKey;
+  const location = useLocation();
+  const query = useQs();
   const [selected, setSelected] = useState(dayjs());
+  const [highlightJobId, setHighlightJobId] = useState<number>();
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const month = selected.format('YYYY-MM');
   const date = selected.format('YYYY-MM-DD');
-  const [timelineData, setTimelineData] = useState<{ key: string; result: TimelineResult; receivedAt: number } | null>(null);
-  const [fullDayData, setFullDayData] = useState<{ key: string; result: TimelineResult; receivedAt: number } | null>(null);
+  const [timelineData, setTimelineData] = useState<{ key: string; scope: string; result: TimelineResult; receivedAt: number } | null>(null);
+  const [fullDayData, setFullDayData] = useState<{ key: string; scope: string; result: TimelineResult; receivedAt: number } | null>(null);
   const [hours, setHours] = useState(24);
   const [offset, setOffset] = useState(0);
   const win = timelineWindow(hours, offset);
@@ -25,21 +36,43 @@ export default function JobVisual() {
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showPlan, setShowPlan] = useState(true);
-  const [plans, setPlans] = useState<PlanItem[]>([]);
+  const [planData, setPlanData] = useState<{ key: string; items: PlanItem[] } | null>(null);
   const [planDays, setPlanDays] = useState<string[]>([]);
   const [planError, setPlanError] = useState(false);
   const planVisible = showPlan && filter.status == null;
+  const scope = JSON.stringify([date, filter]);
+  const planKey = JSON.stringify([date, filter.type, filter.keyword]);
+  const plans = planData?.key === planKey ? planData.items : [];
   const fullDayKey = `${date}|${JSON.stringify(filter)}|${refreshKey}`;
   const cachedDay = fullDayData?.key === fullDayKey ? fullDayData : null;
+  const shownDay = cachedDay ?? (fullDayData?.scope === scope ? fullDayData : null);
   const useFullDay = !!cachedDay && (hours === 24 || !cachedDay.result.buckets?.length);
   const requestFullDay = !cachedDay || hours === 24;
   const timelineKey = useFullDay || requestFullDay ? fullDayKey : `${fullDayKey}|${hours}|${win.start}`;
   const currentData = useFullDay ? cachedDay : timelineData?.key === timelineKey ? timelineData : null;
   const timeline = currentData?.result ?? null;
   const displayedData = currentData ?? timelineData;
+  const isToday = selected.isSame(dayjs(), 'day');
+  useEffect(() => {
+    if (!isActive || location.pathname !== '/admin/system/base/job/visual') return;
+    const target = parseTimelineLink(query.date, query.jobId);
+    if (target) {
+      setSelected(dayjs(target.date)); setHighlightJobId(target.jobId);
+      setHours(24); setOffset(0); setFilter({});
+    }
+    // useQs 读取当前地址；仅在地址或活动标签改变时应用跳转。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, location.search, isActive]);
+  useEffect(() => {
+    if (!autoRefresh || !isActive || !isToday) return;
+    return scheduleTimelineRefresh(
+      () => ({ date, today: dayjs().format('YYYY-MM-DD'), active: isActive, visible: document.visibilityState === 'visible' }),
+      () => setRefreshKey((key) => key + 1),
+      () => setAutoRefresh(false),
+    );
+  }, [autoRefresh, date, isActive, isToday]);
   useEffect(() => {
     const controller = new AbortController();
-    setDays({});
     setError(false);
     jobApi.visualCalendar(month, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
@@ -49,7 +82,6 @@ export default function JobVisual() {
   }, [month, refreshKey]);
   useEffect(() => {
     const controller = new AbortController();
-    setPlanDays([]);
     if (planVisible) jobApi.visualPlanCalendar(month, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
       if (!controller.signal.aborted) setPlanDays(response.data);
@@ -58,30 +90,40 @@ export default function JobVisual() {
   }, [month, refreshKey, planVisible]);
   useEffect(() => {
     const controller = new AbortController();
-    setPlans([]); setPlanError(false);
+    setPlanError(false);
     if (planVisible) jobApi.visualPlan(date, { type: filter.type, keyword: filter.keyword }, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
-      if (!controller.signal.aborted) setPlans(response.data.items);
+      if (!controller.signal.aborted) setPlanData({ key: planKey, items: response.data.items });
     }).catch(() => { if (!controller.signal.aborted) setPlanError(true); });
     return () => controller.abort();
   }, [date, filter.type, filter.keyword, refreshKey, planVisible]);
   useEffect(() => {
     const controller = new AbortController();
     setTimelineError(false);
-    if (useFullDay) return () => controller.abort();
+    if (useFullDay || timelineData?.key === timelineKey) return () => controller.abort();
     // 全天无聚合时可直接复用明细；存在聚合时按窗口请求以获取更细的数据。
-    const windowParams = requestFullDay ? {} : { windowStart: win.start, windowEnd: win.end };
-    jobApi.visualTimeline(date, { ...filter, ...windowParams }, controller.signal).then((response) => {
+    let dayReceivedAt = 0;
+    let windowReceivedAt = 0;
+    const fetchTimeline = async (windowParams: { windowStart?: number; windowEnd?: number }) => {
+      const response = await jobApi.visualTimeline(date, { ...filter, ...windowParams }, controller.signal);
       if (response.status !== 200) throw new Error(response.message);
-      if (!controller.signal.aborted) {
-        const data = { key: timelineKey, result: response.data, receivedAt: Date.now() };
-        setTimelineData(data);
-        if (requestFullDay) setFullDayData(data);
-      }
+      if (windowParams.windowStart == null) dayReceivedAt = Date.now();
+      else windowReceivedAt = Date.now();
+      return response.data;
+    };
+    const windowParams = { windowStart: win.start, windowEnd: win.end };
+    const load = requestFullDay
+      ? loadTimelineSnapshot(hours, () => fetchTimeline({}), () => fetchTimeline(windowParams))
+      : fetchTimeline(windowParams).then((result) => ({ day: null, window: result }));
+    load.then(({ day, window }) => {
+      if (controller.signal.aborted) return;
+      if (day) setFullDayData({ key: fullDayKey, scope, result: day, receivedAt: dayReceivedAt });
+      const key = day && window !== day ? `${fullDayKey}|${hours}|${win.start}` : timelineKey;
+      setTimelineData({ key, scope, result: window, receivedAt: day && window === day ? dayReceivedAt : windowReceivedAt });
     }).catch(() => { if (!controller.signal.aborted) setTimelineError(true); });
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timelineKey, refreshKey]);
+  }, [timelineKey, refreshKey, hours, win.start, win.end]);
   return (
     <div className="fa-islands-grid job-visual-page">
         <div className="job-visual-sidebar">
@@ -124,6 +166,7 @@ export default function JobVisual() {
         <Card className="fa-islands-panel job-visual-filter-card" aria-label="查询条件">
           <Flex vertical gap={12}>
             <Flex justify="space-between" align="center"><span>显示计划</span><Switch aria-label="显示计划" checked={showPlan} onChange={setShowPlan} /></Flex>
+            <Flex justify="space-between" align="center"><span>自动刷新（30 秒）</span><Switch aria-label="自动刷新" checked={autoRefresh && isToday} disabled={!isToday} onChange={setAutoRefresh} /></Flex>
             {showPlan && filter.status != null && <Typography.Text type="secondary">按执行结果筛选时隐藏计划</Typography.Text>}
             {planError && planVisible && <Alert type="error" showIcon title="计划预览加载失败，请刷新重试" />}
             <Select aria-label="任务类型" placeholder="任务类型" allowClear options={timelineTypeOptions} value={filter.type}
@@ -139,7 +182,7 @@ export default function JobVisual() {
         </Card>
         <Card className="fa-islands-panel job-visual-stats-card" aria-label="当日统计">
           <div className="job-visual-stats">
-            {timelineStatCards(timeline?.stats).map(({ label, value }) => (
+            {timelineStatCards((timeline ?? (displayedData?.scope === scope ? displayedData.result : null))?.stats).map(({ label, value }) => (
               <div className="job-visual-stat" key={label}>
                 <Typography.Text type="secondary">{label}</Typography.Text>
                 <Typography.Text strong>{value}</Typography.Text>
@@ -150,8 +193,10 @@ export default function JobVisual() {
         </div>
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
-            {timelineError ? <Alert type="error" message="时间轴加载失败" showIcon />
-              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={cachedDay?.result} fullDayReceivedAt={cachedDay?.receivedAt} plans={planVisible && displayedData.key.split('|')[0] === date ? plans : []} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <PageLoading tip="正在加载时间轴..." style={{ flex: 1 }} /> }
+            {timelineError && <Alert type="error" message="时间轴加载失败" showIcon />}
+            {(!timelineError || displayedData?.scope === scope) && (displayedData
+              ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline && !timelineError} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={shownDay?.result} fullDayReceivedAt={shownDay?.receivedAt} plans={planVisible && displayedData.key.split('|')[0] === date ? plans : []} hours={hours} offset={offset} highlightJobId={highlightJobId} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} />
+              : !timelineError && <PageLoading tip="正在加载时间轴..." style={{ flex: 1 }} />)}
           </section>
         </div>
     </div>

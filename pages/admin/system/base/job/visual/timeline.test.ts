@@ -53,7 +53,19 @@ it('窗口没有记录时保留全天任务行，并按全天顺序定位窗口�
   const model = timelineModel([{ ...entry, id: 2, jobId: 9, jobName: '高频' }], '2026-11-11', [], undefined, day);
   expect(model.names).toEqual(['低频', '高频']);
   expect(model.rows[0].row).toBe(1);
+  expect(model.jobRows.get('job:9')).toBe(1);
   expect(model.meta[1]).toEqual({ jobType: 1, cron: bucket.cron });
+});
+
+it('任务从明细变为聚合后仍保持相同行顺序', () => {
+  const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '任务5', jobType: 0, cron: null, beginTime: '2026-11-11T12:00:00', endTime: null, durationMs: null, duration: null, status: 2 };
+  const other = { ...entry, id: 2, jobId: 2, jobName: '任务2' };
+  const bucket = { jobId: 2, jobName: '任务2', jobType: 0, cron: null, bucket: 48, total: 41, failed: 0 };
+  const stats = { total: 42, success: 42, failed: 0, finished: 42, avgDurationMs: null, maxDurationMs: null };
+  const before = { serverTime: '2026-11-11T12:00:00', entries: [entry, other], buckets: [], stats };
+  const after = { ...before, entries: [entry], buckets: [bucket] };
+  expect(timelineModel(before.entries, '2026-11-11', before.buckets, undefined, before).names).toEqual(['任务2', '任务5']);
+  expect(timelineModel(after.entries, '2026-11-11', after.buckets, undefined, after).names).toEqual(['任务2', '任务5']);
 });
 
 it('计划任务加入时间轴，并过滤今天已过去的触发点', () => {
@@ -86,6 +98,13 @@ it('聚合块透明度随次数递增且有下限', () => {
   expect(bucketOpacity(1, 100)).toBeGreaterThan(0.25);
   expect(bucketOpacity(100, 100)).toBe(1);
   expect(bucketOpacity(200, 100)).toBe(1);
+});
+
+it('当天的执行聚合块不会延伸到当前时刻之后', () => {
+  const buckets = [48, 49].map((bucket) => ({ jobId: 9, jobName: '任务', jobType: 0, cron: null, bucket, total: 10, failed: 0 }));
+  const rows = timelineModel([], '2026-11-11', buckets, '2026-11-11T12:07:00').bucketRows;
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({ begin: 43200, end: 43620 });
 });
 
 it('点击明细打开对应执行记录，点击聚合块定位到包含该块的一小时窗口', () => {

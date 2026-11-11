@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { CopyOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Modal, Space, theme, Typography } from 'antd';
 import { AuthDelBtn, BaseBizTable, BaseTableUtils, clearForm, type FaberTable, FaUtils, useDelete, useExport, useTableQueryParams } from '@fa/ui';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { Admin } from '@/types';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import JobLogDetailDrawer from './JobLogDetailDrawer';
 import JobExecutionStatus from '../JobExecutionStatus';
 import { formatJobDuration, formatJobTotalDuration } from '../jobStatistics';
+import { historyTimelinePath } from '../visual/historyLink';
 
 const serviceName = '系统定时任务-执行日志';
 const biz = 'base_job_log';
@@ -20,6 +21,7 @@ export default function JobLogList({ jobId }: JobLogListProps) {
   const [form] = Form.useForm();
   const [errorRecord, setErrorRecord] = useState<Admin.JobLog | null>(null);
   const { pathname, search } = useLocation();
+  const navigate = useNavigate();
   const { token } = theme.useToken();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, setExtraParams, fetchPageList, loading, list, paginationProps } =
@@ -86,6 +88,7 @@ export default function JobLogList({ jobId }: JobLogListProps) {
         render: (_, record) => (
           <Space size={4} style={{ whiteSpace: 'nowrap' }}>
             <JobLogDetailDrawer record={record} />
+            <Button type="link" size="small" disabled={!historyTimelinePath(jobId, record.beginTime)} onClick={() => { const path = historyTimelinePath(jobId, record.beginTime); if (path) navigate(path); }}>时间轴</Button>
             <AuthDelBtn handleDelete={() => handleDelete(record.id)} />
           </Space>
         ),

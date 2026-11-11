@@ -5,12 +5,12 @@ import { Segmented, Slider, Spin, theme } from 'antd';
 import { bucketOpacity, timelineClickTarget, timelineModel, timelineRangeOffset, timelineWindow, visiblePlanRows, type PlanItem, type TimelineEntry, type TimelineResult } from '../timeline';
 import JobTimelineDetail from './JobTimelineDetail';
 
-type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; receivedAt: number; fullDayResult?: TimelineResult; fullDayReceivedAt?: number; plans: PlanItem[]; hours: number; offset: number; onWindowChange: (hours: number, offset: number) => void };
+type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; receivedAt: number; fullDayResult?: TimelineResult; fullDayReceivedAt?: number; plans: PlanItem[]; hours: number; offset: number; highlightJobId?: number; onWindowChange: (hours: number, offset: number) => void };
 const rowHeight = 44;
 const timeLabel = (seconds: number) => `${String(Math.floor(seconds / 3600)).padStart(2, '0')}:${String(Math.floor(seconds % 3600 / 60)).padStart(2, '0')}`;
 const statusText: Record<number, string> = { 1: '执行中', 2: '成功', 3: '停止中', 7: '已停止', 8: '未确认', 9: '失败' };
 
-export default function JobTimeline({ date, selectedDate, loading, result, receivedAt, fullDayResult, fullDayReceivedAt, plans, hours, offset, onWindowChange }: Props) {
+export default function JobTimeline({ date, selectedDate, loading, result, receivedAt, fullDayResult, fullDayReceivedAt, plans, hours, offset, highlightJobId, onWindowChange }: Props) {
   const element = useRef<HTMLDivElement>(null);
   const { token } = theme.useToken();
   // 拖动滑块时只更新本地位置，松手后才通知父组件重新请求
@@ -25,7 +25,7 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
   useEffect(() => { setDetail(null); }, [selectedDate]);
   const window = timelineWindow(hours, dragging ?? offset);
   const shown = window.start;
-  const plotResult = (dragging !== null || loading) && fullDayResult ? fullDayResult : result;
+  const plotResult = dragging !== null && fullDayResult ? fullDayResult : result;
   const plotReceivedAt = plotResult === fullDayResult ? fullDayReceivedAt ?? receivedAt : receivedAt;
   const hasRunning = plotResult.entries.some((entry) => entry.status === 1 || entry.status === 3);
   useEffect(() => {
@@ -56,6 +56,7 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
     const chart = echarts.getInstanceByDom(element.current) ?? echarts.init(element.current);
     const model = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult, plans);
     const { names, meta, rows, bucketRows } = model;
+    const highlightedRow = highlightJobId == null ? undefined : model.jobRows.get(`job:${highlightJobId}`);
     const planRows = visiblePlanRows(model.planRows, window);
     const maxBucket = Math.max(0, ...bucketRows.map((item) => item.total));
     const currentTime = dayjs(now);
@@ -75,7 +76,12 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
         shape: { x1: 130 + (width - 130) * index / divisions, y1: top, x2: 130 + (width - 130) * index / divisions, y2: bottom },
         style: { stroke: token.colorSplit, lineWidth: 1, opacity: 0.5 },
       }));
-      return [...horizontal, ...vertical];
+      const highlight = highlightedRow == null ? [] : [{
+        id: 'highlighted-job', type: 'rect', silent: true, z: 0,
+        shape: { x: 0, y: top + highlightedRow * rowHeight, width, height: rowHeight },
+        style: { fill: token.colorPrimaryBg, opacity: 0.55 },
+      }];
+      return [...highlight, ...horizontal, ...vertical];
     };
     chart.setOption({
       animation: false,
@@ -146,7 +152,7 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
     });
     observer.observe(element.current);
     return () => { observer.disconnect(); };
-  }, [date, plotResult, fullDayResult, plans, token, window.start, window.end, hours, loading, dragging, now, reducedMotion]);
+  }, [date, plotResult, fullDayResult, plans, token, window.start, window.end, hours, loading, dragging, now, reducedMotion, highlightJobId]);
   const isToday = dayjs(now).format('YYYY-MM-DD') === date;
   return (
     <div className="job-timeline-content">
