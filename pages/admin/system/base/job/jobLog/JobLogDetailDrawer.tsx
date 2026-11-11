@@ -1,5 +1,5 @@
 import { DownloadOutlined, FileTextOutlined, ReloadOutlined } from '@ant-design/icons';
-import { BaseDrawer, useApiLoading } from '@fa/ui';
+import { BaseDrawer, PageLoading, useApiLoading } from '@fa/ui';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
 import { Alert, Button, Descriptions, Space, Spin, theme, Tooltip, Typography } from 'antd';
@@ -34,7 +34,7 @@ export default function JobLogDetailDrawer({ record, recordId, defaultOpen = fal
         </span>
       </Tooltip>}
       <BaseDrawer title={`执行日志 #${record?.id ?? recordId}`} size={1000} open={open} onClose={() => { setOpen(false); onClose?.(); }}>
-        {open && !record && (loadError ? <Alert type="error" showIcon title="执行详情加载失败或记录已删除" action={<Button size="small" onClick={onRetry}>重试</Button>} /> : <Spin aria-label="正在读取执行详情" />)}
+        {open && !record && (loadError ? <Alert type="error" showIcon title="执行详情加载失败或记录已删除" action={<Button size="small" onClick={onRetry}>重试</Button>} /> : <PageLoading tip="正在读取执行详情..." />)}
         {open && record && <div className="fa-flex-column" style={{ height: '100%', minHeight: 0, gap: 12 }}>
           {hideTrigger && <>
             <Descriptions size="small" column={2} items={[
@@ -157,8 +157,7 @@ function JobLogContent({ record }: { record: Admin.JobLog }) {
       {notice && <Alert type="info" showIcon title={notice} />}
       {error && <Alert type="error" showIcon title={error} />}
       {trimmed && <Alert type="warning" showIcon title="当前仅展示最近约 200 万字符，请下载日志查看完整内容。" />}
-      {!loaded && <Spin aria-label="正在读取日志" />}
-      <textarea
+      {!loaded ? <PageLoading tip="正在读取日志..." style={{ flex: 1 }} /> : <textarea
         ref={scrollRef}
         readOnly
         spellCheck={false}
@@ -179,7 +178,7 @@ function JobLogContent({ record }: { record: Admin.JobLog }) {
           overflowWrap: 'anywhere',
         }}
         value={content || (loaded && available && !error ? '暂无日志输出' : '')}
-      />
+      />}
     </div>
   );
 }

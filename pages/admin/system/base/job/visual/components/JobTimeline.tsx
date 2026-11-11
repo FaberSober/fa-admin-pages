@@ -2,20 +2,22 @@ import * as echarts from 'echarts';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { Segmented, Slider, Spin, theme } from 'antd';
-import { bucketOpacity, timelineClickTarget, timelineModel, timelineWindow, type TimelineEntry, type TimelineResult } from '../timeline';
+import { bucketOpacity, timelineClickTarget, timelineModel, timelineRangeOffset, timelineWindow, visiblePlanRows, type PlanItem, type TimelineEntry, type TimelineResult } from '../timeline';
 import JobTimelineDetail from './JobTimelineDetail';
 
-type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; receivedAt: number; fullDayResult?: TimelineResult; fullDayReceivedAt?: number; hours: number; offset: number; onWindowChange: (hours: number, offset: number) => void };
+type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; receivedAt: number; fullDayResult?: TimelineResult; fullDayReceivedAt?: number; plans: PlanItem[]; hours: number; offset: number; onWindowChange: (hours: number, offset: number) => void };
 const rowHeight = 44;
 const timeLabel = (seconds: number) => `${String(Math.floor(seconds / 3600)).padStart(2, '0')}:${String(Math.floor(seconds % 3600 / 60)).padStart(2, '0')}`;
 const statusText: Record<number, string> = { 1: '执行中', 2: '成功', 3: '停止中', 7: '已停止', 8: '未确认', 9: '失败' };
 
-export default function JobTimeline({ date, selectedDate, loading, result, receivedAt, fullDayResult, fullDayReceivedAt, hours, offset, onWindowChange }: Props) {
+export default function JobTimeline({ date, selectedDate, loading, result, receivedAt, fullDayResult, fullDayReceivedAt, plans, hours, offset, onWindowChange }: Props) {
   const element = useRef<HTMLDivElement>(null);
   const { token } = theme.useToken();
   // 拖动滑块时只更新本地位置，松手后才通知父组件重新请求
   const [dragging, setDragging] = useState<number | null>(null);
   const [detail, setDetail] = useState<TimelineEntry | null>(null);
+  const hovered = useRef(false);
+  const updateClock = useRef<() => void>(() => {});
   const [now, setNow] = useState(result.serverTime);
   const [reducedMotion, setReducedMotion] = useState(false);
   const onWindowChangeRef = useRef(onWindowChange);
@@ -28,12 +30,13 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
   const hasRunning = plotResult.entries.some((entry) => entry.status === 1 || entry.status === 3);
   useEffect(() => {
     const base = dayjs(plotResult.serverTime);
-    const update = () => setNow(base.add(Date.now() - plotReceivedAt, 'millisecond').format('YYYY-MM-DDTHH:mm:ss'));
+    const update = () => { if (!hovered.current) setNow(base.add(Date.now() - plotReceivedAt, 'millisecond').format('YYYY-MM-DDTHH:mm:ss')); };
+    updateClock.current = update;
     update();
-    if (!hasRunning) return;
+    if (!hasRunning && plans.length === 0) return;
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
-  }, [plotResult.serverTime, plotReceivedAt, hasRunning]);
+  }, [plotResult.serverTime, plotReceivedAt, hasRunning, plans.length]);
   useEffect(() => {
     if (!globalThis.matchMedia) return;
     const media = globalThis.matchMedia('(prefers-reduced-motion: reduce)');
@@ -42,7 +45,8 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
     media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
   }, []);
-  const { names } = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult);
+  const { names } = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult, plans);
+  const executionCount = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult).names.length;
   useEffect(() => {
     const target = element.current;
     return () => { if (target) echarts.getInstanceByDom(target)?.dispose(); };
@@ -50,8 +54,9 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
   useEffect(() => {
     if (!element.current) return;
     const chart = echarts.getInstanceByDom(element.current) ?? echarts.init(element.current);
-    const model = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult);
+    const model = timelineModel(plotResult.entries, date, plotResult.buckets, now, fullDayResult, plans);
     const { names, meta, rows, bucketRows } = model;
+    const planRows = visiblePlanRows(model.planRows, window);
     const maxBucket = Math.max(0, ...bucketRows.map((item) => item.total));
     const currentTime = dayjs(now);
     const current = currentTime.format('YYYY-MM-DD') === date ? currentTime.hour() * 3600 + currentTime.minute() * 60 + currentTime.second() : null;
@@ -63,12 +68,12 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
       const horizontal = Array.from({ length: names.length + 1 }, (_, index) => ({
         id: `row-line-${index}`, type: 'line', silent: true,
         shape: { x1: 0, y1: top + index * rowHeight, x2: width, y2: top + index * rowHeight },
-        style: { stroke: token.colorSplit, lineWidth: 1 },
+        style: { stroke: token.colorSplit, lineWidth: 1, opacity: 0.5 },
       }));
       const vertical = Array.from({ length: divisions }, (_, index) => ({
         id: `time-line-${index}`, type: 'line', silent: true,
         shape: { x1: 130 + (width - 130) * index / divisions, y1: top, x2: 130 + (width - 130) * index / divisions, y2: bottom },
-        style: { stroke: token.colorSplit, lineWidth: 1 },
+        style: { stroke: token.colorSplit, lineWidth: 1, opacity: 0.5 },
       }));
       return [...horizontal, ...vertical];
     };
@@ -78,6 +83,12 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
       legend: { show: false },
       graphic: gridLines(),
       tooltip: { trigger: 'item', renderMode: 'richText', backgroundColor: token.colorBgElevated, borderColor: token.colorBorder, textStyle: { color: token.colorText }, formatter: (params: any) => {
+        if (params.seriesName === '计划执行') {
+          const item = planRows[params.dataIndex];
+          if (!item) return '';
+          const plan = item.plan;
+          return `${names[item.row]}${plan.paused ? '（已暂停）' : ''}\n${plan.end > plan.start ? `时段：${timeLabel(item.begin)} – ${timeLabel(item.end)}\n计划：${plan.count} 次` : `计划时间：${timeLabel(item.begin)}`}\nCron：${plan.cron || '未知'}\n预计耗时：${plan.durationMs == null ? '未知' : `${plan.durationMs} 毫秒`}`;
+        }
         if (params.seriesName === '聚合执行') {
           const item = bucketRows[params.dataIndex];
           if (!item) return '';
@@ -104,14 +115,28 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
           const rect = echarts.graphic.clipRectByRect({ x: start[0], y: start[1] - height / 2, width: Math.max(2, end[0] - start[0] - 1), height }, { x: params.coordSys.x, y: params.coordSys.y, width: params.coordSys.width, height: params.coordSys.height });
           return rect ? { type: 'rect', shape: rect, style: api.style() } : null;
         }, data: bucketRows.map((item) => ({ value: [item.row, item.begin, item.end], itemStyle: { color: item.failed > 0 ? token.colorError : token.colorSuccess, opacity: bucketOpacity(item.total, maxBucket) } })) },
+        { name: '计划执行', type: 'custom', renderItem: (params: any, api: any) => {
+          const row = api.value(0); const start = api.coord([api.value(1), row]); const end = api.coord([api.value(2), row]);
+          const height = Math.min(20, api.size([0, 1])[1] * 0.6);
+          const rect = echarts.graphic.clipRectByRect({ x: start[0], y: start[1] - height / 2, width: Math.max(4, end[0] - start[0] - (api.value(3) ? 1 : 0)), height }, { x: params.coordSys.x, y: params.coordSys.y, width: params.coordSys.width, height: params.coordSys.height });
+          return rect ? { type: 'rect', shape: rect, style: api.style({ fill: 'transparent', stroke: token.colorPrimary, lineWidth: 1, lineDash: [4, 3] }) } : null;
+        }, data: planRows.map((item) => ({ value: [item.row, item.begin, item.end, item.plan.end > item.plan.start ? 1 : 0], itemStyle: { opacity: item.plan.paused ? 0.5 : 1 } })) },
         ...[['成功', token.colorSuccess], ['失败', token.colorError], ['其他', token.colorTextTertiary]].map(([name, color]) => ({ name, type: 'scatter', data: [], itemStyle: { color } })),
         ...(current === null ? [] : [{ name: '当前时刻', type: 'scatter', data: [], itemStyle: { color: token.colorError }, markLine: { symbol: 'none', silent: true, label: { show: false }, lineStyle: { color: token.colorError, type: 'solid' }, data: [{ xAxis: current }] } }]),
       ],
     }, { notMerge: true });
     chart.off('click');
+    chart.off('mouseover');
+    chart.off('mouseout');
+    chart.on('mouseover', (params) => {
+      hovered.current = params.seriesIndex != null && params.seriesIndex < 3;
+    });
+    chart.on('mouseout', () => {
+      if (hovered.current) { hovered.current = false; queueMicrotask(() => updateClock.current()); }
+    });
     chart.on('click', (params) => {
       if (loading || dragging !== null) return;
-      const target = timelineClickTarget(params.seriesName, params.dataIndex, model);
+      const target = timelineClickTarget(params.seriesName ?? '', params.dataIndex, model);
       if (target?.type === 'detail') setDetail(target.entry);
       if (target?.type === 'zoom') onWindowChangeRef.current(1, target.start);
     });
@@ -121,19 +146,19 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
     });
     observer.observe(element.current);
     return () => { observer.disconnect(); };
-  }, [date, plotResult, fullDayResult, token, window.start, window.end, hours, loading, dragging, now, reducedMotion]);
+  }, [date, plotResult, fullDayResult, plans, token, window.start, window.end, hours, loading, dragging, now, reducedMotion]);
   const isToday = dayjs(now).format('YYYY-MM-DD') === date;
   return (
     <div className="job-timeline-content">
       <div className="job-timeline-header" style={{ borderColor: token.colorSplit }}>
         <div>
           <div className="job-timeline-date">{dayjs(selectedDate).format('YYYY年M月D日')} 星期{['日', '一', '二', '三', '四', '五', '六'][dayjs(selectedDate).day()]} {loading && <Spin size="small" aria-label="时间轴加载中" />}</div>
-          <div style={{ color: token.colorTextSecondary }}>当日共 {result.stats ? Number(result.stats.total ?? 0) : result.entries.length} 次执行，涉及 {names.length} 个任务</div>
+          <div style={{ color: token.colorTextSecondary }}>当日共 {result.stats ? Number(result.stats.total ?? 0) : result.entries.length} 次执行，涉及 {executionCount} 个任务</div>
         </div>
         <div className="job-timeline-controls">
           <span style={{ color: token.colorTextSecondary }}>时间范围</span>
           <Segmented aria-label="时间范围" value={hours} options={[{ label: '全天', value: 24 }, { label: '6 小时', value: 6 }, { label: '1 小时', value: 1 }]}
-            onChange={(value) => { setDragging(null); onWindowChange(Number(value), 0); }} />
+            onChange={(value) => { const nextHours = Number(value); const nextOffset = timelineRangeOffset(nextHours, dragging ?? offset); setDragging(null); onWindowChange(nextHours, nextOffset); }} />
           {hours !== 24 && <><Slider aria-label="时间窗口起点" min={0} max={86400 - hours * 3600} step={600} value={shown} onChange={setDragging} onChangeComplete={(value) => { setDragging(null); onWindowChange(hours, value); }} tooltip={{ formatter: (value) => timeLabel(value ?? 0) }} style={{ width: 120, marginInline: 4 }} />
             <span style={{ color: token.colorTextSecondary }}>{timeLabel(shown)} – {timeLabel(shown + hours * 3600)}</span></>}
         </div>
@@ -146,6 +171,7 @@ export default function JobTimeline({ date, selectedDate, loading, result, recei
           <span key={label}><i style={{ background: color }} />{label}</span>
         ))}
         {isToday && <span><i className="job-timeline-current" style={{ background: token.colorError }} />当前时刻</span>}
+        {plans.length > 0 && <span><i style={{ border: `1px dashed ${token.colorPrimary}` }} />计划</span>}
       </div>
       {detail && <JobTimelineDetail key={detail.id} id={detail.id} cron={detail.cron} onClose={() => setDetail(null)} />}
     </div>

@@ -131,6 +131,7 @@
 
   .ant-picker-cell .job-visual-calendar-date {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -145,7 +146,33 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
+
+    &.has-plan {
+      transform: translateX(-4px);
+    }
   }
+
+  .job-visual-calendar-plan {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border: 1px solid;
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+
+  .job-visual-calendar-dot + .job-visual-calendar-plan {
+    left: calc(50% + 4px);
+  }
+}
+
+.job-visual-calendar-plan-legend {
+  width: 6px;
+  height: 6px;
+  border: 1px solid;
+  border-radius: 50%;
 }
 
 

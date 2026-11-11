@@ -13,6 +13,7 @@ export type TimelineBucket = { jobId: number; jobName: string | null; jobType: n
 /** entries 为当前窗口内未聚合任务的明细，buckets 为窗口内高频任务的聚合；stats 始终按整天统计。 */
 export type TimelineResult = { serverTime: string; entries: TimelineEntry[]; buckets?: TimelineBucket[]; stats: TimelineStats };
 export type TimelineFilter = { type?: number; status?: number; keyword?: string };
+export type PlanItem = { jobId: number; jobName: string | null; jobType: number | null; cron: string | null; paused: boolean; start: number; end: number; durationMs: number | string | null; count: number };
 /** 时间窗口（当天第几秒）；全天时不传，由后端按整天处理。 */
 export type TimelineWindowParams = { windowStart?: number; windowEnd?: number };
 export const BUCKET_SECONDS = 900;
@@ -41,7 +42,7 @@ export function timelineStatCards(stats?: TimelineStats | null) {
     { label: '最长耗时', value: formatJobDuration(stats?.maxDurationMs) },
   ];
 }
-export function timelineModel(entries: TimelineEntry[], date: string, buckets: TimelineBucket[] = [], now?: string, fullDay?: TimelineResult) {
+export function timelineModel(entries: TimelineEntry[], date: string, buckets: TimelineBucket[] = [], now?: string, fullDay?: TimelineResult, plans: PlanItem[] = []) {
   const start = dayjs(`${date}T00:00:00`);
   const names: string[] = [];
   /** 每个 Y 轴行的类型与 cron，明细行和聚合行共用。 */
@@ -76,7 +77,14 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     const begin = bucket.bucket * BUCKET_SECONDS;
     return { bucket, row, begin, end: begin + BUCKET_SECONDS, total, failed };
   });
-  return { names, meta, rows, bucketRows };
+  const current = now && dayjs(now).format('YYYY-MM-DD') === date ? dayjs(now).hour() * 3600 + dayjs(now).minute() * 60 + dayjs(now).second() : -1;
+  const planRows = plans.filter((plan) => plan.end > plan.start ? plan.end > current : plan.start > current).map((plan) => {
+    const row = rowOf(`job:${plan.jobId}`, plan.jobName || `任务 #${plan.jobId}`, plan.jobType, plan.cron);
+    const begin = Math.max(plan.start, current);
+    const duration = Math.max(0, Number(plan.durationMs) || 0) / 1000;
+    return { plan, row, begin, end: Math.min(86400, plan.end > plan.start ? plan.end : begin + duration) };
+  });
+  return { names, meta, rows, bucketRows, planRows };
 }
 
 export function timelineClickTarget(seriesName: string, dataIndex: number, model: ReturnType<typeof timelineModel>) {
@@ -91,6 +99,37 @@ export function timelineClickTarget(seriesName: string, dataIndex: number, model
   return null;
 }
 
+/** 根据可见窗口聚合密集计划，避免全天计划点相互覆盖。 */
+export function visiblePlanRows(rows: ReturnType<typeof timelineModel>['planRows'], window: { start: number; end: number }) {
+  const visible = rows.filter((row) => row.begin < window.end && row.end >= window.start);
+  const counts = new Map<number, number>();
+  for (const row of visible) {
+    if (row.plan.end === row.plan.start) counts.set(row.plan.jobId, (counts.get(row.plan.jobId) ?? 0) + 1);
+  }
+  const limit = window.end - window.start <= 3600 ? 60 : 40;
+  const result: typeof rows = [];
+  const groups = new Map<string, (typeof rows)[number]>();
+  for (const row of visible) {
+    if (row.plan.end > row.plan.start || (counts.get(row.plan.jobId) ?? 0) <= limit) {
+      result.push(row);
+      continue;
+    }
+    const bucket = Math.floor(row.begin / BUCKET_SECONDS);
+    const key = `${row.plan.jobId}:${bucket}`;
+    const existing = groups.get(key);
+    if (existing) {
+      existing.begin = Math.min(existing.begin, row.begin);
+      existing.plan.start = existing.begin;
+      existing.plan.count += 1;
+    } else {
+      const begin = row.begin;
+      const end = Math.min((bucket + 1) * BUCKET_SECONDS, window.end);
+      groups.set(key, { ...row, begin, end, plan: { ...row.plan, start: begin, end, count: 1 } });
+    }
+  }
+  return [...result, ...groups.values()];
+}
+
 /** 聚合块透明度：次数越多越深，最小 0.25，保证少量记录仍可见。 */
 export function bucketOpacity(total: number, maxTotal: number) {
   return maxTotal > 0 ? 0.25 + 0.75 * Math.min(1, total / maxTotal) : 0.25;
@@ -100,4 +139,8 @@ export function timelineWindow(hours: number, offset: number) {
   const width = hours * 3600;
   const start = Math.max(0, Math.min(86400 - width, offset));
   return { start, end: start + width };
+}
+
+export function timelineRangeOffset(hours: number, offset: number) {
+  return hours === 24 ? offset : timelineWindow(hours, offset).start;
 }

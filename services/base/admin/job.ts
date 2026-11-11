@@ -10,6 +10,10 @@ class Job extends BaseApi<Admin.Job, number> {
     this.get('visual/timeline', { date, ...filter }, { signal });
   visualCalendar = (month: string, signal?: AbortSignal): Promise<Fa.Ret<{ date: string; total: number; success: number; failed: number }[]>> =>
     this.get('visual/calendar', { month }, { signal });
+  visualPlan = (date: string, filter: { type?: number; keyword?: string }, signal?: AbortSignal): Promise<Fa.Ret<{ items: import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').PlanItem[] }>> =>
+    this.get('visual/plan', { date, ...filter }, { signal });
+  visualPlanCalendar = (month: string, signal?: AbortSignal): Promise<Fa.Ret<string[]>> =>
+    this.get('visual/plan/calendar', { month }, { signal });
   reconcileFlow = (id: number, jobId: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`reconcileFlow/${id}`, {}, { params: { jobId } });
   stopFlow = (id: number, jobId: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`stopFlow/${id}`, {}, { params: { jobId } });
   runFlow = (id: number): Promise<Fa.Ret<Admin.JobFlowRun>> => this.post(`runFlow/${id}`);

@@ -1,10 +1,11 @@
 import { LeftOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
-import { Alert, Button, Calendar, Card, Flex, Input, Select, Spin, Typography, theme } from 'antd';
+import { PageLoading } from '@fa/ui';
+import { Alert, Button, Calendar, Card, Flex, Input, Select, Switch, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobTimeline from './components/JobTimeline';
-import { timelineStatCards, timelineWindow, timelineStatusOptions, timelineTypeOptions, type TimelineFilter, type TimelineResult } from './timeline';
+import { timelineStatCards, timelineWindow, timelineStatusOptions, timelineTypeOptions, type PlanItem, type TimelineFilter, type TimelineResult } from './timeline';
 import { calendarStatus, type CalendarDay } from './calendar';
 import './job-visual-calendar.scss';
 
@@ -23,6 +24,11 @@ export default function JobVisual() {
   const [days, setDays] = useState<Record<string, CalendarDay>>({});
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showPlan, setShowPlan] = useState(true);
+  const [plans, setPlans] = useState<PlanItem[]>([]);
+  const [planDays, setPlanDays] = useState<string[]>([]);
+  const [planError, setPlanError] = useState(false);
+  const planVisible = showPlan && filter.status == null;
   const fullDayKey = `${date}|${JSON.stringify(filter)}|${refreshKey}`;
   const cachedDay = fullDayData?.key === fullDayKey ? fullDayData : null;
   const useFullDay = !!cachedDay && (hours === 24 || !cachedDay.result.buckets?.length);
@@ -41,6 +47,24 @@ export default function JobVisual() {
     }).catch(() => { if (!controller.signal.aborted) setError(true); });
     return () => controller.abort();
   }, [month, refreshKey]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setPlanDays([]);
+    if (planVisible) jobApi.visualPlanCalendar(month, controller.signal).then((response) => {
+      if (response.status !== 200) throw new Error(response.message);
+      if (!controller.signal.aborted) setPlanDays(response.data);
+    }).catch(() => { if (!controller.signal.aborted) setPlanError(true); });
+    return () => controller.abort();
+  }, [month, refreshKey, planVisible]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setPlans([]); setPlanError(false);
+    if (planVisible) jobApi.visualPlan(date, { type: filter.type, keyword: filter.keyword }, controller.signal).then((response) => {
+      if (response.status !== 200) throw new Error(response.message);
+      if (!controller.signal.aborted) setPlans(response.data.items);
+    }).catch(() => { if (!controller.signal.aborted) setPlanError(true); });
+    return () => controller.abort();
+  }, [date, filter.type, filter.keyword, refreshKey, planVisible]);
   useEffect(() => {
     const controller = new AbortController();
     setTimelineError(false);
@@ -75,6 +99,7 @@ export default function JobVisual() {
               if (info.type !== 'date') return info.originNode;
               const day = date.format('YYYY-MM') === month ? days[date.format('YYYY-MM-DD')] : undefined;
               const status = calendarStatus(day);
+              const hasPlan = date.isAfter(dayjs(), 'day') && date.format('YYYY-MM') === month && planDays.includes(date.format('YYYY-MM-DD'));
               return (
                 <div className="ant-picker-cell-inner job-visual-calendar-date"
                   style={{
@@ -82,9 +107,10 @@ export default function JobVisual() {
                     ...(date.isSame(dayjs(), 'day') ? { boxShadow: `inset 0 0 0 1px ${token.colorPrimary}` } : {}),
                   }}>
                   <span>{date.date()}</span>
-                  {day && status && <span className="job-visual-calendar-dot" role="img"
+                  {day && status && <span className={`job-visual-calendar-dot${hasPlan ? ' has-plan' : ''}`} role="img"
                     aria-label={day.failed ? `失败 ${day.failed} 次` : `全部成功，共 ${day.total} 次`}
                     style={{ background: status === 'error' ? token.colorError : token.colorSuccess }} />}
+                  {hasPlan && <span className="job-visual-calendar-plan" role="img" aria-label="有计划" style={{ borderColor: date.isSame(selected, 'day') ? token.colorTextLightSolid : token.colorTextSecondary }} />}
                 </div>
               );
             }} />
@@ -92,10 +118,14 @@ export default function JobVisual() {
             <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-legend-dot" style={{ background: token.colorSuccess }} aria-hidden="true" />全部成功</span>
             <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-legend-dot" style={{ background: token.colorError }} aria-hidden="true" />有失败</span>
             <button type="button" aria-label="回到今天" className="job-visual-today-legend job-visual-today-button" style={{ fontSize: 11, color: token.colorTextSecondary }} onClick={() => setSelected(dayjs())}><span className="job-visual-today-mark" aria-hidden="true" />今天</button>
+            {planVisible && <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-calendar-plan-legend" style={{ borderColor: token.colorTextSecondary }} />有计划</span>}
           </Flex>
         </Card>
         <Card className="fa-islands-panel job-visual-filter-card" aria-label="查询条件">
           <Flex vertical gap={12}>
+            <Flex justify="space-between" align="center"><span>显示计划</span><Switch aria-label="显示计划" checked={showPlan} onChange={setShowPlan} /></Flex>
+            {showPlan && filter.status != null && <Typography.Text type="secondary">按执行结果筛选时隐藏计划</Typography.Text>}
+            {planError && planVisible && <Alert type="error" showIcon title="计划预览加载失败，请刷新重试" />}
             <Select aria-label="任务类型" placeholder="任务类型" allowClear options={timelineTypeOptions} value={filter.type}
               onChange={(type) => setFilter((value) => ({ ...value, type }))} />
             <Select aria-label="执行结果" placeholder="执行结果" allowClear options={timelineStatusOptions} value={filter.status}
@@ -121,7 +151,7 @@ export default function JobVisual() {
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
             {timelineError ? <Alert type="error" message="时间轴加载失败" showIcon />
-              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={cachedDay?.result} fullDayReceivedAt={cachedDay?.receivedAt} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <Spin /> }
+              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={cachedDay?.result} fullDayReceivedAt={cachedDay?.receivedAt} plans={planVisible && displayedData.key.split('|')[0] === date ? plans : []} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <PageLoading tip="正在加载时间轴..." style={{ flex: 1 }} /> }
           </section>
         </div>
     </div>

@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { bucketOpacity, timelineClickTarget, timelineModel, timelineStatCards, timelineWindow, type TimelineEntry } from './timeline';
+import { bucketOpacity, timelineClickTarget, timelineModel, timelineRangeOffset, timelineStatCards, timelineWindow, visiblePlanRows, type TimelineEntry } from './timeline';
 
 it('按任务分组并在当天边界截断，缺少结束时间不虚构耗时', () => {
   const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '任务', jobType: 0, cron: '0 * * * * ?', beginTime: '2026-11-11T23:50:00', endTime: '2026-11-12T00:10:00', durationMs: 1200000, duration: 1200, status: 2 };
@@ -22,6 +22,13 @@ it('跨天记录在相邻日期截断，只有执行中和停止中延伸到服�
 it('时间窗口限制在当天范围内', () => {
   expect(timelineWindow(1, 90000)).toEqual({ start: 82800, end: 86400 });
   expect(timelineWindow(6, -1)).toEqual({ start: 0, end: 21600 });
+});
+
+it('切换范围时保留起点，超过当天边界时限制到最晚起点', () => {
+  expect(timelineRangeOffset(1, 4 * 3600)).toBe(4 * 3600);
+  expect(timelineRangeOffset(6, 23 * 3600)).toBe(18 * 3600);
+  expect(timelineRangeOffset(24, 4 * 3600)).toBe(4 * 3600);
+  expect(timelineRangeOffset(6, timelineRangeOffset(24, 4 * 3600))).toBe(4 * 3600);
 });
 
 it('聚合桶与明细按任务合并为同一行，桶按 15 分钟定位，失败数兼容字符串 Long', () => {
@@ -47,6 +54,31 @@ it('窗口没有记录时保留全天任务行，并按全天顺序定位窗口�
   expect(model.names).toEqual(['低频', '高频']);
   expect(model.rows[0].row).toBe(1);
   expect(model.meta[1]).toEqual({ jobType: 1, cron: bucket.cron });
+});
+
+it('计划任务加入时间轴，并过滤今天已过去的触发点', () => {
+  const plan = { jobId: 9, jobName: '计划', jobType: 0, cron: '0 0 * * * ?', paused: true, start: 3600, end: 3600, count: 1, durationMs: 60000 };
+  const today = timelineModel([], '2026-11-11', [], '2026-11-11T00:30:00', undefined, [plan]);
+  expect(today.names).toEqual(['计划']);
+  expect(today.planRows[0]).toMatchObject({ begin: 3600, end: 3660, plan: { paused: true } });
+  expect(timelineModel([], '2026-11-11', [], '2026-11-11T01:30:00', undefined, [plan]).planRows).toEqual([]);
+  expect(timelineModel([], '2026-11-12', [], '2026-11-11T23:00:00', undefined, [{ ...plan, start: 0, end: 0 }]).planRows).toHaveLength(1);
+});
+
+it('每分钟计划在全天及六小时视图分桶，放大到一小时显示明细', () => {
+  const base = { jobId: 9, jobName: '计划', jobType: 0, cron: '0 * * * * ?', paused: false, count: 1, durationMs: 1000 };
+  const plans = Array.from({ length: 1440 }, (_, index) => ({ ...base, start: index * 60, end: index * 60 }));
+  const rows = timelineModel([], '2026-11-12', [], '2026-11-11T23:00:00', undefined, plans).planRows;
+  const allDay = visiblePlanRows(rows, { start: 0, end: 86400 });
+  expect(allDay).toHaveLength(96);
+  expect(allDay[0].plan).toMatchObject({ start: 0, end: 900, count: 15 });
+  const sixHours = visiblePlanRows(rows, { start: 14400, end: 36000 });
+  expect(sixHours).toHaveLength(24);
+  expect(sixHours.reduce((total, row) => total + row.plan.count, 0)).toBe(360);
+  const oneHour = visiblePlanRows(rows, { start: 14400, end: 18000 });
+  expect(oneHour).toHaveLength(60);
+  expect(oneHour.every((row) => row.plan.start === row.plan.end)).toBe(true);
+  expect(rows[0].plan.count).toBe(1);
 });
 
 it('聚合块透明度随次数递增且有下限', () => {
