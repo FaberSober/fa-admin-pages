@@ -17,6 +17,17 @@ export type PlanItem = { jobId: number; jobName: string | null; jobType: number 
 /** 时间窗口（当天第几秒）；全天时不传，由后端按整天处理。 */
 export type TimelineWindowParams = { windowStart?: number; windowEnd?: number };
 export const BUCKET_SECONDS = 900;
+export const TIMELINE_ROW_HEIGHT = 44;
+
+/** 大任务列表只绘制可见行，滚动容器仍保留完整高度。 */
+export function timelineVisibleRows(total: number, scrollTop: number, viewportHeight: number) {
+  if (total <= 300) return { start: 0, end: total, offset: 0, virtual: false };
+  const safeHeight = Math.max(TIMELINE_ROW_HEIGHT, viewportHeight);
+  const safeScroll = Math.max(0, Math.min(scrollTop, Math.max(0, total * TIMELINE_ROW_HEIGHT + 36 - safeHeight)));
+  const start = Math.min(total - 1, Math.floor(safeScroll / TIMELINE_ROW_HEIGHT));
+  const end = Math.min(total, start + Math.ceil(safeHeight / TIMELINE_ROW_HEIGHT) + 2);
+  return { start, end, offset: safeScroll - start * TIMELINE_ROW_HEIGHT, virtual: true };
+}
 
 /** 聚合块居于一小时窗口中，靠近当天边界时限制在有效范围内。 */
 export function bucketDetailWindow(bucket: number) {
@@ -60,12 +71,18 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
   };
   const current = now && dayjs(now).format('YYYY-MM-DD') === date ? dayjs(now).hour() * 3600 + dayjs(now).minute() * 60 + dayjs(now).second() : -1;
   const activePlans = plans.filter((plan) => plan.end > plan.start ? plan.end > current : plan.start > current);
-  const seeds = [
-    ...(fullDay?.entries ?? entries).map((entry) => ({ id: entry.jobId, key: entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
-      name: entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), jobType: entry.jobType, cron: entry.cron })),
-    ...(fullDay?.buckets ?? buckets).map((bucket) => ({ id: bucket.jobId, key: `job:${bucket.jobId}`, name: bucket.jobName || `任务 #${bucket.jobId}`, jobType: bucket.jobType, cron: bucket.cron })),
-    ...activePlans.map((plan) => ({ id: plan.jobId, key: `job:${plan.jobId}`, name: plan.jobName || `任务 #${plan.jobId}`, jobType: plan.jobType, cron: plan.cron })),
-  ];
+  const seedMap = new Map<string, { id: number | null; key: string; name: string; jobType: number | null; cron: string | null }>();
+  const seed = (id: number | null, key: string, name: string, jobType: number | null, cron: string | null) => {
+    if (!seedMap.has(key)) seedMap.set(key, { id, key, name, jobType, cron });
+  };
+  for (const entry of fullDay?.entries ?? entries) seed(entry.jobId, entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
+    entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron);
+  for (const bucket of fullDay?.buckets ?? buckets) seed(bucket.jobId, `job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron);
+  const executionKeys = new Set(seedMap.keys());
+  for (const entry of entries) executionKeys.add(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`);
+  for (const bucket of buckets) if (current < 0 || bucket.bucket * BUCKET_SECONDS <= current) executionKeys.add(`job:${bucket.jobId}`);
+  for (const plan of activePlans) seed(plan.jobId, `job:${plan.jobId}`, plan.jobName || `任务 #${plan.jobId}`, plan.jobType, plan.cron);
+  const seeds = Array.from(seedMap.values());
   seeds.sort((a, b) => (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER) || a.key.localeCompare(b.key));
   seeds.forEach((seed) => { rowOf(seed.key, seed.name, seed.jobType, seed.cron); });
   const rows = entries.map((entry) => {
@@ -91,7 +108,7 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     const duration = Math.max(0, Number(plan.durationMs) || 0) / 1000;
     return { plan, row, begin, end: Math.min(86400, plan.end > plan.start ? plan.end : begin + duration) };
   });
-  return { names, meta, rows, bucketRows, planRows, jobRows: groups };
+  return { names, meta, rows, bucketRows, planRows, jobRows: groups, executionCount: executionKeys.size };
 }
 
 export function timelineClickTarget(seriesName: string, dataIndex: number, model: ReturnType<typeof timelineModel>) {
@@ -104,6 +121,18 @@ export function timelineClickTarget(seriesName: string, dataIndex: number, model
     return bucket ? { type: 'zoom' as const, start: bucketDetailWindow(bucket.bucket).start } : null;
   }
   return null;
+}
+
+export function sliceTimelineModel(model: ReturnType<typeof timelineModel>, start: number, end: number) {
+  const inView = (row: { row: number }) => row.row >= start && row.row < end;
+  return {
+    ...model,
+    names: model.names.slice(start, end),
+    meta: model.meta.slice(start, end),
+    rows: model.rows.filter(inView).map((row) => ({ ...row, row: row.row - start })),
+    bucketRows: model.bucketRows.filter(inView).map((row) => ({ ...row, row: row.row - start })),
+    planRows: model.planRows.filter(inView).map((row) => ({ ...row, row: row.row - start })),
+  };
 }
 
 /** 根据可见窗口聚合密集计划，避免全天计划点相互覆盖。 */

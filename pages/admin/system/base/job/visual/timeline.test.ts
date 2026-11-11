@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { bucketOpacity, timelineClickTarget, timelineModel, timelineRangeOffset, timelineStatCards, timelineWindow, visiblePlanRows, type TimelineEntry } from './timeline';
+import { bucketOpacity, sliceTimelineModel, timelineClickTarget, timelineModel, timelineRangeOffset, timelineStatCards, timelineVisibleRows, timelineWindow, visiblePlanRows, type TimelineEntry } from './timeline';
 
 it('按任务分组并在当天边界截断，缺少结束时间不虚构耗时', () => {
   const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '任务', jobType: 0, cron: '0 * * * * ?', beginTime: '2026-11-11T23:50:00', endTime: '2026-11-12T00:10:00', durationMs: 1200000, duration: 1200, status: 2 };
@@ -22,6 +22,43 @@ it('跨天记录在相邻日期截断，只有执行中和停止中延伸到服�
 it('时间窗口限制在当天范围内', () => {
   expect(timelineWindow(1, 90000)).toEqual({ start: 82800, end: 86400 });
   expect(timelineWindow(6, -1)).toEqual({ start: 0, end: 21600 });
+});
+
+it('大量任务仅绘制可见行，保留滚动末尾及部分行偏移', () => {
+  expect(timelineVisibleRows(300, 0, 440)).toEqual({ start: 0, end: 300, offset: 0, virtual: false });
+  expect(timelineVisibleRows(10000, 4417, 440)).toEqual({ start: 100, end: 112, offset: 17, virtual: true });
+  expect(timelineVisibleRows(10000, 999999, 440)).toEqual({ start: 9990, end: 10000, offset: 36, virtual: true });
+});
+
+it('一万条记录按任务去重并保留全部明细', () => {
+  const entry: TimelineEntry = { id: 1, jobId: 1, jobName: '任务', jobType: 0, cron: null, beginTime: '2026-11-11T12:00:00', endTime: '2026-11-11T12:00:01', durationMs: 1000, duration: 1, status: 2 };
+  const entries = Array.from({ length: 10000 }, (_, index) => ({ ...entry, id: index + 1, jobId: index % 100 + 1 }));
+  const model = timelineModel(entries, '2026-11-11');
+  expect(model.rows).toHaveLength(10000);
+  expect(model.names).toHaveLength(100);
+  expect(model.executionCount).toBe(100);
+  expect(model.jobRows.get('job:100')).toBe(99);
+});
+
+it('大任务列表切片后，点击对应的原始执行记录', () => {
+  const entry: TimelineEntry = { id: 1, jobId: 1, jobName: '任务', jobType: 0, cron: null, beginTime: '2026-11-11T12:00:00', endTime: null, durationMs: null, duration: null, status: 2 };
+  const entries = Array.from({ length: 500 }, (_, index) => ({ ...entry, id: index + 1, jobId: index + 1, jobName: `任务${index + 1}` }));
+  const model = sliceTimelineModel(timelineModel(entries, '2026-11-11'), 300, 310);
+  expect(model.names).toHaveLength(10);
+  expect(model.names[0]).toBe('任务301');
+  expect(model.rows[0].row).toBe(0);
+  expect(timelineClickTarget('执行记录', 0, model)).toMatchObject({ type: 'detail', entry: { id: 301 } });
+});
+
+it('一万个不同任务可定位到末尾并保持可见行数量受限', () => {
+  const entry: TimelineEntry = { id: 1, jobId: 1, jobName: '任务', jobType: 0, cron: null, beginTime: '2026-11-11T12:00:00', endTime: null, durationMs: null, duration: null, status: 2 };
+  const entries = Array.from({ length: 10000 }, (_, index) => ({ ...entry, id: index + 1, jobId: index + 1 }));
+  const model = timelineModel(entries, '2026-11-11');
+  const visible = timelineVisibleRows(model.names.length, 999999, 440);
+  const slice = sliceTimelineModel(model, visible.start, visible.end);
+  expect(model.names).toHaveLength(10000);
+  expect(slice.names.length).toBeLessThanOrEqual(12);
+  expect(timelineClickTarget('执行记录', slice.rows.length - 1, slice)).toMatchObject({ type: 'detail', entry: { id: 10000 } });
 });
 
 it('切换范围时保留起点，超过当天边界时限制到最晚起点', () => {

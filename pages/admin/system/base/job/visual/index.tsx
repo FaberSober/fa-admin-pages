@@ -39,6 +39,8 @@ export default function JobVisual() {
   const [planData, setPlanData] = useState<{ key: string; items: PlanItem[] } | null>(null);
   const [planDays, setPlanDays] = useState<string[]>([]);
   const [planError, setPlanError] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planCalendarError, setPlanCalendarError] = useState(false);
   const planVisible = showPlan && filter.status == null;
   const scope = JSON.stringify([date, filter]);
   const planKey = JSON.stringify([date, filter.type, filter.keyword]);
@@ -82,19 +84,22 @@ export default function JobVisual() {
   }, [month, refreshKey]);
   useEffect(() => {
     const controller = new AbortController();
+    setPlanCalendarError(false);
     if (planVisible) jobApi.visualPlanCalendar(month, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
       if (!controller.signal.aborted) setPlanDays(response.data);
-    }).catch(() => { if (!controller.signal.aborted) setPlanError(true); });
+    }).catch(() => { if (!controller.signal.aborted) setPlanCalendarError(true); });
     return () => controller.abort();
   }, [month, refreshKey, planVisible]);
   useEffect(() => {
     const controller = new AbortController();
     setPlanError(false);
+    setPlanLoading(planVisible);
     if (planVisible) jobApi.visualPlan(date, { type: filter.type, keyword: filter.keyword }, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
       if (!controller.signal.aborted) setPlanData({ key: planKey, items: response.data.items });
-    }).catch(() => { if (!controller.signal.aborted) setPlanError(true); });
+    }).catch(() => { if (!controller.signal.aborted) setPlanError(true); })
+      .finally(() => { if (!controller.signal.aborted) setPlanLoading(false); });
     return () => controller.abort();
   }, [date, filter.type, filter.keyword, refreshKey, planVisible]);
   useEffect(() => {
@@ -128,7 +133,7 @@ export default function JobVisual() {
     <div className="fa-islands-grid job-visual-page">
         <div className="job-visual-sidebar">
         <Card className="fa-islands-panel job-visual-calendar-card" title="定时任务可视化">
-          {error && <Alert type="error" message="日历数据加载失败" showIcon />}
+          {error && <Alert type="error" title="日历数据加载失败" showIcon action={<Button size="small" onClick={() => setRefreshKey((key) => key + 1)}>重试</Button>} />}
           <Calendar className="job-visual-calendar" fullscreen={false} value={selected} onSelect={setSelected} onPanelChange={setSelected}
             headerRender={({ value, onChange }) => (
               <Flex align="center" justify="space-between" style={{ marginBottom: 4 }}>
@@ -168,7 +173,7 @@ export default function JobVisual() {
             <Flex justify="space-between" align="center"><span>显示计划</span><Switch aria-label="显示计划" checked={showPlan} onChange={setShowPlan} /></Flex>
             <Flex justify="space-between" align="center"><span>自动刷新（30 秒）</span><Switch aria-label="自动刷新" checked={autoRefresh && isToday} disabled={!isToday} onChange={setAutoRefresh} /></Flex>
             {showPlan && filter.status != null && <Typography.Text type="secondary">按执行结果筛选时隐藏计划</Typography.Text>}
-            {planError && planVisible && <Alert type="error" showIcon title="计划预览加载失败，请刷新重试" />}
+            {(planError || planCalendarError) && planVisible && <Alert type="error" showIcon title="计划预览加载失败" action={<Button size="small" onClick={() => setRefreshKey((key) => key + 1)}>重试</Button>} />}
             <Select aria-label="任务类型" placeholder="任务类型" allowClear options={timelineTypeOptions} value={filter.type}
               onChange={(type) => setFilter((value) => ({ ...value, type }))} />
             <Select aria-label="执行结果" placeholder="执行结果" allowClear options={timelineStatusOptions} value={filter.status}
@@ -193,9 +198,9 @@ export default function JobVisual() {
         </div>
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
-            {timelineError && <Alert type="error" message="时间轴加载失败" showIcon />}
+            {timelineError && <Alert type="error" title="时间轴加载失败" showIcon action={<Button size="small" onClick={() => setRefreshKey((key) => key + 1)}>重试</Button>} />}
             {(!timelineError || displayedData?.scope === scope) && (displayedData
-              ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline && !timelineError} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={shownDay?.result} fullDayReceivedAt={shownDay?.receivedAt} plans={planVisible && displayedData.key.split('|')[0] === date ? plans : []} hours={hours} offset={offset} highlightJobId={highlightJobId} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} />
+              ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline && !timelineError} emptyPending={planVisible && !planError && (planLoading || planData?.key !== planKey)} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={shownDay?.result} fullDayReceivedAt={shownDay?.receivedAt} plans={planVisible && displayedData.key.split('|')[0] === date ? plans : []} hours={hours} offset={offset} highlightJobId={highlightJobId} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} />
               : !timelineError && <PageLoading tip="正在加载时间轴..." style={{ flex: 1 }} />)}
           </section>
         </div>
