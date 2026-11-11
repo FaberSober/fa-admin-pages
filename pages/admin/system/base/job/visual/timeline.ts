@@ -17,6 +17,11 @@ export type TimelineFilter = { type?: number; status?: number; keyword?: string 
 export type TimelineWindowParams = { windowStart?: number; windowEnd?: number };
 export const BUCKET_SECONDS = 900;
 
+/** 聚合块居于一小时窗口中，靠近当天边界时限制在有效范围内。 */
+export function bucketDetailWindow(bucket: number) {
+  return timelineWindow(1, bucket * BUCKET_SECONDS - 1800 + BUCKET_SECONDS / 2);
+}
+
 export const timelineTypeOptions = [{ label: '普通任务', value: 0 }, { label: '任务流', value: 1 }];
 export const timelineStatusOptions = [
   { label: '成功', value: 2 }, { label: '失败', value: 9 }, { label: '执行中', value: 1 },
@@ -67,6 +72,18 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     return { bucket, row, begin, end: begin + BUCKET_SECONDS, total, failed };
   });
   return { names, meta, rows, bucketRows };
+}
+
+export function timelineClickTarget(seriesName: string, dataIndex: number, model: ReturnType<typeof timelineModel>) {
+  if (seriesName === '执行记录') {
+    const entry = model.rows[dataIndex]?.entry;
+    return entry ? { type: 'detail' as const, entry } : null;
+  }
+  if (seriesName === '聚合执行') {
+    const bucket = model.bucketRows[dataIndex]?.bucket;
+    return bucket ? { type: 'zoom' as const, start: bucketDetailWindow(bucket.bucket).start } : null;
+  }
+  return null;
 }
 
 /** 聚合块透明度：次数越多越深，最小 0.25，保证少量记录仍可见。 */

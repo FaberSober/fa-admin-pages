@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { bucketOpacity, timelineModel, timelineStatCards, timelineWindow, type TimelineEntry } from './timeline';
+import { bucketOpacity, timelineClickTarget, timelineModel, timelineStatCards, timelineWindow, type TimelineEntry } from './timeline';
 
 it('按任务分组并在当天边界截断，缺少结束时间不虚构耗时', () => {
   const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '任务', jobType: 0, cron: '0 * * * * ?', beginTime: '2026-11-11T23:50:00', endTime: '2026-11-12T00:10:00', durationMs: 1200000, duration: 1200, status: 2 };
@@ -31,6 +31,19 @@ it('聚合块透明度随次数递增且有下限', () => {
   expect(bucketOpacity(1, 100)).toBeGreaterThan(0.25);
   expect(bucketOpacity(100, 100)).toBe(1);
   expect(bucketOpacity(200, 100)).toBe(1);
+});
+
+it('点击明细打开对应执行记录，点击聚合块定位到包含该块的一小时窗口', () => {
+  const entry: TimelineEntry = { id: 8, jobId: 5, jobName: '失败任务', jobType: 0, cron: null, beginTime: '2026-11-11T01:00:00', endTime: '2026-11-11T01:00:01', durationMs: 1000, duration: 1, status: 9 };
+  const model = timelineModel([entry], '2026-11-11', [
+    { jobId: 9, jobName: '高频', jobType: 0, cron: null, bucket: 0, total: 41, failed: 1 },
+    { jobId: 9, jobName: '高频', jobType: 0, cron: null, bucket: 95, total: 41, failed: 0 },
+  ]);
+  expect(timelineClickTarget('执行记录', 0, model)).toEqual({ type: 'detail', entry });
+  expect(timelineClickTarget('聚合执行', 0, model)).toEqual({ type: 'zoom', start: 0 });
+  expect(timelineClickTarget('聚合执行', 1, model)).toEqual({ type: 'zoom', start: 82800 });
+  expect(timelineClickTarget('执行记录', 4, model)).toBeNull();
+  expect(timelineClickTarget('当前时刻', 0, model)).toBeNull();
 });
 
 it('统计卡片按已结束执行计算成功率，兼容字符串 Long 与空统计', () => {

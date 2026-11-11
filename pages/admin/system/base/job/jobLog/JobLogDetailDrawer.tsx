@@ -2,19 +2,20 @@ import { DownloadOutlined, FileTextOutlined, ReloadOutlined } from '@ant-design/
 import { BaseDrawer, useApiLoading } from '@fa/ui';
 import { jobLogApi } from '@features/fa-admin-pages/services';
 import type { Admin } from '@features/fa-admin-pages/types';
-import { Alert, Button, Space, Spin, theme, Tooltip, Typography } from 'antd';
+import { Alert, Button, Descriptions, Space, Spin, theme, Tooltip, Typography } from 'antd';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { appendVisibleLog, isLogReadComplete, startJobLogPolling } from './jobLogPolling';
 import JobExecutionStatus from '../JobExecutionStatus';
+import { formatJobDuration } from '../jobStatistics';
 
 const JobFlowRunPanel = lazy(() => import('../flow/JobFlowRunPanel'));
 
-export default function JobLogDetailDrawer({ record, defaultOpen = false, iconOnly = false, buttonText = '查看日志', onLocateFlow }: { record: Admin.JobLog; defaultOpen?: boolean; iconOnly?: boolean; buttonText?: string; onLocateFlow?: (origin: Admin.JobFlowLogOrigin) => void }) {
+export default function JobLogDetailDrawer({ record, recordId, defaultOpen = false, iconOnly = false, buttonText = '查看日志', onLocateFlow, hideTrigger = false, onClose, cron, loadError = false, onRetry }: { record?: Admin.JobLog | null; recordId?: number; defaultOpen?: boolean; iconOnly?: boolean; buttonText?: string; onLocateFlow?: (origin: Admin.JobFlowLogOrigin) => void; hideTrigger?: boolean; onClose?: () => void; cron?: string | null; loadError?: boolean; onRetry?: () => void }) {
   const [open, setOpen] = useState(defaultOpen);
   const [flow, setFlow] = useState<Admin.JobFlowLogOrigin>();
   const { pathname, search } = useLocation();
-  useEffect(() => { setFlow(undefined); }, [record.id]);
+  useEffect(() => { setFlow(undefined); }, [record?.id]);
   const previousLocation = useRef(`${pathname}${search}`);
 
   useEffect(() => {
@@ -25,15 +26,28 @@ export default function JobLogDetailDrawer({ record, defaultOpen = false, iconOn
 
   return (
     <>
-      <Tooltip title={!record.logPath && record.triggerSource !== 3 ? '本次执行未记录详细日志' : undefined}>
+      {!hideTrigger && record && <Tooltip title={!record.logPath && record.triggerSource !== 3 ? '本次执行未记录详细日志' : undefined}>
         <span>
           <Button type={iconOnly ? "text" : "link"} aria-label={`查看执行日志 #${record.id}`} title={iconOnly ? `查看执行日志 #${record.id}` : undefined} size="small" disabled={!record.logPath && record.triggerSource !== 3} icon={<FileTextOutlined />} onClick={() => setOpen(true)}>
             {iconOnly ? null : buttonText}
           </Button>
         </span>
-      </Tooltip>
-      <BaseDrawer title={`执行日志 #${record.id}`} size={1000} open={open} onClose={() => setOpen(false)}>
-        {open && <div className="fa-flex-column" style={{ height: '100%', minHeight: 0, gap: 12 }}>
+      </Tooltip>}
+      <BaseDrawer title={`执行日志 #${record?.id ?? recordId}`} size={1000} open={open} onClose={() => { setOpen(false); onClose?.(); }}>
+        {open && !record && (loadError ? <Alert type="error" showIcon title="执行详情加载失败或记录已删除" action={<Button size="small" onClick={onRetry}>重试</Button>} /> : <Spin aria-label="正在读取执行详情" />)}
+        {open && record && <div className="fa-flex-column" style={{ height: '100%', minHeight: 0, gap: 12 }}>
+          {hideTrigger && <>
+            <Descriptions size="small" column={2} items={[
+              { key: 'name', label: '任务', children: record.jobName || '—' },
+              { key: 'status', label: '执行结果', children: <JobExecutionStatus status={record.status} trackingVersion={record.trackingVersion} legacyDuration={record.duration} /> },
+              { key: 'begin', label: '开始时间', children: record.beginTime || '—' },
+              { key: 'end', label: '结束时间', children: record.endTime || '—' },
+              { key: 'duration', label: '耗时', children: record.durationMs != null ? formatJobDuration(record.durationMs) : record.duration != null ? `${record.duration} 秒` : '—' },
+              { key: 'source', label: '触发方式', children: ({ 0: '历史/未知', 1: '手动', 2: '定时', 3: '流程节点' } as Record<number, string>)[record.triggerSource ?? 0] || '未知' },
+              { key: 'cron', label: 'Cron', children: cron || '—' },
+            ]} />
+            {record.errMsg?.trim() && <Alert type="error" showIcon title="错误信息" description={<span style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{record.errMsg}</span>} />}
+          </>}
           <JobLogFlowOrigin key={record.id} id={record.id} onLocate={origin => {
             if (onLocateFlow) { setOpen(false); onLocateFlow(origin); }
             else setFlow(origin);

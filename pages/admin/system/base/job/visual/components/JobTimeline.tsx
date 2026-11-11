@@ -2,7 +2,8 @@ import * as echarts from 'echarts';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { Segmented, Slider, Spin, theme } from 'antd';
-import { bucketOpacity, timelineModel, timelineWindow, type TimelineResult } from '../timeline';
+import { bucketOpacity, timelineClickTarget, timelineModel, timelineWindow, type TimelineEntry, type TimelineResult } from '../timeline';
+import JobTimelineDetail from './JobTimelineDetail';
 
 type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; fullDayResult?: TimelineResult; hours: number; offset: number; onWindowChange: (hours: number, offset: number) => void };
 const rowHeight = 44;
@@ -14,6 +15,10 @@ export default function JobTimeline({ date, selectedDate, loading, result, fullD
   const { token } = theme.useToken();
   // 拖动滑块时只更新本地位置，松手后才通知父组件重新请求
   const [dragging, setDragging] = useState<number | null>(null);
+  const [detail, setDetail] = useState<TimelineEntry | null>(null);
+  const onWindowChangeRef = useRef(onWindowChange);
+  onWindowChangeRef.current = onWindowChange;
+  useEffect(() => { setDetail(null); }, [selectedDate]);
   const window = timelineWindow(hours, dragging ?? offset);
   const shown = window.start;
   const plotResult = (dragging !== null || loading) && fullDayResult ? fullDayResult : result;
@@ -21,7 +26,8 @@ export default function JobTimeline({ date, selectedDate, loading, result, fullD
   useEffect(() => {
     if (!element.current) return;
     const chart = echarts.init(element.current);
-    const { names, meta, rows, bucketRows } = timelineModel(plotResult.entries, date, plotResult.buckets);
+    const model = timelineModel(plotResult.entries, date, plotResult.buckets);
+    const { names, meta, rows, bucketRows } = model;
     const maxBucket = Math.max(0, ...bucketRows.map((item) => item.total));
     const now = dayjs(plotResult.serverTime);
     const current = now.format('YYYY-MM-DD') === date ? now.hour() * 3600 + now.minute() * 60 + now.second() : null;
@@ -47,11 +53,11 @@ export default function JobTimeline({ date, selectedDate, loading, result, fullD
       grid: { left: 130, right: 0, top: 32, bottom: 4, containLabel: false },
       legend: { show: false },
       graphic: gridLines(),
-      tooltip: { trigger: 'item', renderMode: 'richText', formatter: (params: any) => {
+      tooltip: { trigger: 'item', renderMode: 'richText', backgroundColor: token.colorBgElevated, borderColor: token.colorBorder, textStyle: { color: token.colorText }, formatter: (params: any) => {
         if (params.seriesName === '聚合执行') {
           const item = bucketRows[params.dataIndex];
           if (!item) return '';
-          return `${names[item.row]}\n时段：${timeLabel(item.begin)} – ${timeLabel(item.end)}\n执行：${item.total} 次\n失败：${item.failed} 次\n放大到 1 小时查看每次执行`;
+          return `${names[item.row]}\n时段：${timeLabel(item.begin)} – ${timeLabel(item.end)}\n执行：${item.total} 次\n失败：${item.failed} 次\n点击放大到 1 小时查看明细（高频数据仍可能聚合）`;
         }
         const row = rows[params.dataIndex];
         if (params.seriesName !== '执行记录' || !row) return '';
@@ -78,13 +84,19 @@ export default function JobTimeline({ date, selectedDate, loading, result, fullD
         ...(current === null ? [] : [{ name: '当前时刻', type: 'scatter', data: [], itemStyle: { color: token.colorError }, markLine: { symbol: 'none', silent: true, label: { show: false }, lineStyle: { color: token.colorError, type: 'solid' }, data: [{ xAxis: current }] } }]),
       ],
     });
+    chart.on('click', (params) => {
+      if (loading || dragging !== null) return;
+      const target = timelineClickTarget(params.seriesName, params.dataIndex, model);
+      if (target?.type === 'detail') setDetail(target.entry);
+      if (target?.type === 'zoom') onWindowChangeRef.current(1, target.start);
+    });
     const observer = new ResizeObserver(() => {
       chart.resize();
       chart.setOption({ graphic: gridLines() });
     });
     observer.observe(element.current);
     return () => { observer.disconnect(); chart.dispose(); };
-  }, [date, plotResult, token, window.start, window.end, hours]);
+  }, [date, plotResult, token, window.start, window.end, hours, loading, dragging]);
   const isToday = dayjs(result.serverTime).format('YYYY-MM-DD') === date;
   return (
     <div className="job-timeline-content">
@@ -110,6 +122,7 @@ export default function JobTimeline({ date, selectedDate, loading, result, fullD
         ))}
         {isToday && <span><i className="job-timeline-current" style={{ background: token.colorError }} />当前时刻</span>}
       </div>
+      {detail && <JobTimelineDetail key={detail.id} id={detail.id} cron={detail.cron} onClose={() => setDetail(null)} />}
     </div>
   );
 }
