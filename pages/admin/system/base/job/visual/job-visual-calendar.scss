@@ -1,0 +1,134 @@
+.job-visual-page {
+  --fa-islands-sidebar-width: 300px;
+  overflow: auto;
+}
+
+.job-visual-sidebar {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-self: start;
+  gap: 12px;
+}
+
+.job-visual-page .job-visual-sidebar .ant-card {
+  background: var(--fa-bg-color);
+  border-color: var(--fa-border-color);
+  border-radius: var(--fa-islands-radius, 6px);
+}
+
+.job-visual-calendar-card {
+  .ant-card-head {
+    min-height: 36px;
+    padding: 0 16px;
+    border-bottom: 0;
+  }
+
+  .ant-card-body {
+    padding: 8px 16px 12px;
+  }
+}
+
+.job-visual-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.job-visual-stat {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 8px;
+  background: var(--fa-bg-grey);
+  border-radius: 6px;
+}
+
+.job-visual-timeline {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.job-visual-chart {
+  padding: 24px;
+  overflow: auto;
+}
+
+@media (max-width: 720px) {
+  .job-visual-page {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 100%;
+  }
+
+  .job-visual-chart {
+    min-height: 300px;
+  }
+}
+
+.job-visual-calendar {
+  .ant-picker-panel {
+    border-top: 0;
+  }
+
+  .ant-picker-content {
+    height: auto;
+  }
+
+  .ant-picker-cell {
+    padding: 1px 0;
+  }
+
+  .ant-picker-cell.ant-picker-cell-today .job-visual-calendar-date::before {
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    background: var(--primary-color, #1677ff);
+    border: 0;
+    transform: translateX(-50%);
+  }
+
+  .ant-picker-cell .job-visual-calendar-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 28px;
+    height: 28px;
+    margin-inline: auto;
+    padding-top: 1px;
+    line-height: 18px;
+  }
+
+  .job-visual-calendar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+}
+
+
+.job-visual-today-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.job-visual-today-mark {
+  width: 12px;
+  height: 2px;
+  background: var(--primary-color, #1677ff);
+}
+
+.job-visual-legend-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+}
