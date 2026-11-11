@@ -12,6 +12,7 @@ import {
   useExport,
   useTableQueryParams
 } from '@fa/ui';
+import { useNavigate } from 'react-router-dom';
 import type { Admin } from '@/types';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobModal from './modal/JobModal';
@@ -25,6 +26,7 @@ const biz = 'base_job';
 
 export default function JobList() {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const { queryParams, setFormValues, handleTableChange, setSceneId, setConditionList, fetchPageList, loading, list, paginationProps } =
     useTableQueryParams<Admin.Job>(jobApi.page, { sorter: { field: 'id', order: 'descend' } }, serviceName);
@@ -200,6 +202,7 @@ export default function JobList() {
                 查询
               </Button>
               <Button onClick={() => clearForm(form)}>重置</Button>
+              <Button onClick={() => navigate('/admin/system/base/job/visual')}>可视化视图</Button>
               <JobFlowPreview fetchFinish={fetchPageList} />
               <JobModal addBtn title={`新增${serviceName}信息`} fetchFinish={fetchPageList} />
               <Button loading={exporting} icon={<DownloadOutlined />} onClick={fetchExportExcel}>
