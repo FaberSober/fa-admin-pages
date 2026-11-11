@@ -73,11 +73,6 @@ export default function JobFlowPreview({ record, fetchFinish }: { record?: Admin
       <ReactFlowProvider>
         <JobFlowEditor demo={false} record={record} fetchFinish={fetchFinish} />
       </ReactFlowProvider>
-      {!record && (
-        <ReactFlowProvider>
-          <JobFlowEditor demo />
-        </ReactFlowProvider>
-      )}
     </Space>
   );
 }
@@ -403,6 +398,24 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                 >
                   暂存
                 </Button>
+                <Button
+                  disabled={!saved}
+                  onClick={() => {
+                    const value = JSON.parse(saved!);
+                    setName(value.name);
+                    setConcurrency(value.maxConcurrency);
+                    setNodes(
+                      value.nodes.map((node: FlowNode) => ({
+                        id: node.id,
+                        position: node.position,
+                        data: { label: node.name, clazzPath: node.clazzPath },
+                      })),
+                    );
+                    setEdges(value.edges.map((edge: Connection, index: number) => ({ ...edge, id: `restored-${index}` })));
+                  }}
+                >
+                  恢复暂存草稿
+                </Button>
                 <Tooltip title={fullscreen ? '退出全屏' : '全屏'}>
                   <Button
                     type="text"
@@ -582,13 +595,12 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
               >
                 <Background />
                 {!demo && nodes.length === 0 && (
-                  <Panel position="top-center" style={{ marginTop: 80 }}>
-                    <Alert
-                      type="info"
-                      showIcon
-                      title="从右上角“＋”选择已注册的任务类开始编排"
-                      description="当前仅编辑页面草稿，暂存只保留在当前页面；使用顶部“保存”可存入服务器。已保存流程可手动执行，也可在任务列表启用 Cron 调度。"
-                    />
+                  <Panel position="top-center" className="job-flow-empty">
+                    <div className="job-flow-empty-icon"><ApartmentOutlined /></div>
+                    <strong>开始编排任务流</strong>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => {
+                      setJson(undefined); setShowConfig(false); setShowPreflight(false); setShowRun(false); setShowLibrary(true);
+                    }}>打开任务库</Button>
                   </Panel>
                 )}
                 <JobFlowAlignmentGuides guides={alignment.guides} />
@@ -645,89 +657,30 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
                 {showTests && (
                   <Panel
                     position="bottom-left"
-                    style={{
-                      width: 360,
-                      maxWidth: 'calc(100% - 32px)',
-                      marginBottom: 70,
-                      maxHeight: '45%',
-                      overflow: 'auto',
-                      borderRadius: token.borderRadiusLG,
-                      background: token.colorBgContainer,
-                      boxShadow: token.boxShadowSecondary,
-                    }}
+                    className="job-flow-guide"
                   >
-                    <Space orientation="vertical" size={12} style={{ padding: 12 }}>
+                    <div className="job-flow-guide-header">
                       <Typography.Text strong>操作指南</Typography.Text>
+                      <Button type="text" size="small" icon={<CloseOutlined />} aria-label="关闭操作指南" onClick={() => setShowTests(false)} />
+                    </div>
+                    <div className="job-flow-guide-content">
                       <Alert
                         type="info"
                         showIcon
-                        title={demo ? '模拟任务 · 仅页面预览' : '流程编排'}
-                        description={
+                        title={
                           demo
-                            ? '示例仅用于页面预览，不保存到服务器或执行任务；刷新后草稿丢失。'
-                            : '暂存只保留在当前页面，刷新后丢失；顶部“保存”可存入服务器，已保存流程可手动执行或在列表启用 Cron 调度。'
+                            ? '模拟预览，刷新后草稿丢失。'
+                            : '暂存仅保留在当前页面，刷新后丢失。保存后可执行或启用定时调度。'
                         }
                       />
                       {!demo && <Collapse size="small" ghost style={{ width: '100%' }} defaultActiveKey={['create']} items={[
-                        { key: 'create', label: '1. 添加任务与建立依赖', children: '顶部“＋”打开任务库，可按分组、名称、描述、标签或类名搜索。点击卡片添加；节点直接引用后台注册类，无需另建普通任务。连线从右侧输出到左侧输入，无前驱节点标记为入口。' },
+                        { key: 'create', label: '1. 添加任务与建立依赖', children: '顶部“＋”打开任务库，可按分组、名称、描述、标签或类名搜索。点击卡片添加；节点直接引用后台注册类，无需另建普通任务。连线从右侧输出到左侧输入，无前驱节点标记为入口；选中节点或连线后按 Delete / Backspace 删除。可重复添加同一任务。' },
                         { key: 'save', label: '2. 保存、预检与执行', children: '在配置中设置并发上限与日志开关，然后保存。预检和执行都使用服务器已保存的定义，不包含画布未保存修改；暂存只是当前页面草稿，刷新后丢失。执行会真实调用业务任务，同一轮中的同类任务串行。' },
-                        { key: 'schedule', label: '3. 定时调度与停止', children: '配置 Cron 并保存后，在任务列表启用调度；修改已启用的 Cron 前先暂停。暂停只影响未来触发；运行详情的“停止本轮”禁止新节点启动，已运行任务继续收尾，不撤销业务影响，也不暂停未来 Cron。' },
+                        { key: 'schedule', label: '3. 定时调度与停止', children: '配置 Cron 并保存后，在任务列表启用调度；修改已启用的 Cron 前先暂停。若同一任务类另有 Cron 配置，跨流程与独立调度不保证互斥。暂停只影响未来触发；运行详情的“停止本轮”禁止新节点启动，已运行任务继续收尾，不撤销业务影响，也不暂停未来 Cron。' },
                         { key: 'logs', label: '4. 历史记录与日志排查', children: '历史记录支持查询和分页，点击查看运行详情。选择时间线卡片与运行图双向定位；顶部编排日志记录调度过程，卡片日志图标查看该节点业务日志。须在执行前开启并保存详细日志，旧轮次不补生成。' },
                         { key: 'unknown', label: '5. 失败或未确认怎么办', children: '失败会阻断依赖后代，独立分支可继续。执行中停滞可点击“核对状态”同步已提交结果，不会重跑业务。未确认不能当作成功，仍阻止同一流程再次启动；先核查业务实际结果，目前尚无人工解除入口，不要通过修改数据库状态绕过。' },
                       ]} />}
-                      <Space orientation="vertical" style={{ width: '100%' }}>
-                        <Button
-                          type="primary"
-                          onClick={() => {
-                            const value = definition();
-                            if (value) {
-                              setSaved(value);
-                              feedback.success('草稿已暂存于当前页面');
-                            }
-                          }}
-                        >
-                          暂存页面草稿
-                        </Button>
-                        <Button
-                          disabled={!saved}
-                          onClick={() => {
-                            const value = JSON.parse(saved!);
-                            setName(value.name);
-                            setConcurrency(value.maxConcurrency);
-                            setNodes(
-                              value.nodes.map((node: FlowNode) => ({
-                                id: node.id,
-                                position: node.position,
-                                data: { label: node.name, clazzPath: node.clazzPath },
-                              })),
-                            );
-                            setEdges(value.edges.map((edge: Connection, index: number) => ({ ...edge, id: `restored-${index}` })));
-                          }}
-                        >
-                          恢复暂存草稿
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            const value = definition();
-                            if (value) {
-                              setShowConfig(false);
-                              setShowPreflight(false);
-                              setShowRun(false);
-                              setShowLibrary(false);
-                        setJson(value);
-                            }
-                          }}
-                        >
-                          校验并预览 JSON
-                        </Button>
-                      </Space>
-                      <Typography.Text type="secondary">
-                        从节点右侧拖向下一节点左侧建立依赖；选中节点或连线后按 Delete / Backspace 删除。可重复添加同一任务。
-                      </Typography.Text>
-                      <Typography.Text type="secondary">
-                        流程节点直接引用任务类，不要求创建独立任务配置；若同一任务类另有 Cron 配置，跨流程与独立调度不保证互斥。
-                      </Typography.Text>
-                    </Space>
+                    </div>
                   </Panel>
                 )}
               </ReactFlow>

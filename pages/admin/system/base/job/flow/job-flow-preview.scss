@@ -6,6 +6,71 @@
   &--fullscreen { position: fixed; inset: 0; }
 }
 
+.react-flow__panel.center.job-flow-empty {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  width: min(400px, calc(100% - 32px));
+  box-sizing: border-box;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--fa-text-color);
+  background: var(--fa-bg-color);
+  border: 1px solid var(--fa-border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--fa-text-color) 8%, transparent);
+  strong { font-size: 16px; }
+}
+.job-flow-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  color: var(--ant-color-primary);
+  background: var(--ant-color-primary-bg);
+  font-size: 22px;
+}
+
+.job-flow-guide.react-flow__panel {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100% - 32px);
+  max-height: calc(100% - 150px);
+  margin-bottom: 70px;
+  overflow: hidden;
+  color: var(--fa-text-color);
+  background: var(--fa-bg-color);
+  border: 1px solid var(--fa-border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--fa-text-color) 8%, transparent);
+}
+.job-flow-guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--fa-border-color);
+}
+.job-flow-guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px;
+  font-size: 12px;
+  .ant-alert { border-radius: 8px; }
+  .ant-collapse { background: var(--fa-bg-grey); border-radius: 8px; }
+  .ant-collapse-content-box { color: var(--fa-text-color-light100); line-height: 1.7; }
+}
+
 .job-flow-toolbar {
   position: absolute;
   top: 8px;
@@ -24,11 +89,11 @@
   color: var(--fa-text-color);
   box-shadow: 0 3px 12px color-mix(in srgb, var(--fa-text-color) 5%, transparent);
 
-  .ant-btn { height: 30px; padding-inline: 9px; border-radius: 6px; font-size: 12px; font-weight: 500; box-shadow: none; }
   .ant-btn-text:not(:disabled) { color: var(--fa-text-color-light100); }
   .ant-btn-text:hover:not(:disabled) { color: var(--fa-text-color); background: var(--fa-bg-grey); }
   .ant-btn:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 }
+.job-flow-toolbar .ant-btn, .job-flow-empty .ant-btn { height: 30px; padding-inline: 9px; border-radius: 6px; font-size: 12px; font-weight: 500; box-shadow: none; }
 .job-flow-toolbar-context { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
 .job-flow-toolbar-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
 .job-flow-toolbar-divider { flex-shrink: 0; width: 1px; height: 18px; background: var(--fa-border-color); }
