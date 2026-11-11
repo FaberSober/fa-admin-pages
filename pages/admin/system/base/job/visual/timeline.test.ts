@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { timelineModel, timelineStatCards, timelineWindow, type TimelineEntry } from './timeline';
+import { bucketOpacity, timelineModel, timelineStatCards, timelineWindow, type TimelineEntry } from './timeline';
 
 it('按任务分组并在当天边界截断，缺少结束时间不虚构耗时', () => {
   const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '任务', jobType: 0, cron: '0 * * * * ?', beginTime: '2026-11-11T23:50:00', endTime: '2026-11-12T00:10:00', durationMs: 1200000, duration: 1200, status: 2 };
@@ -12,6 +12,25 @@ it('按任务分组并在当天边界截断，缺少结束时间不虚构耗时'
 it('时间窗口限制在当天范围内', () => {
   expect(timelineWindow(1, 90000)).toEqual({ start: 82800, end: 86400 });
   expect(timelineWindow(6, -1)).toEqual({ start: 0, end: 21600 });
+});
+
+it('聚合桶与明细按任务合并为同一行，桶按 15 分钟定位，失败数兼容字符串 Long', () => {
+  const entry: TimelineEntry = { id: 1, jobId: 5, jobName: '低频', jobType: 0, cron: null, beginTime: '2026-11-11T01:00:00', endTime: '2026-11-11T01:00:01', durationMs: 1000, duration: 1, status: 2 };
+  const model = timelineModel([entry], '2026-11-11', [
+    { jobId: 9, jobName: '高频', jobType: 1, cron: '0 * * * * ?', bucket: 4, total: '15', failed: '1' },
+    { jobId: 5, jobName: '低频', jobType: 0, cron: null, bucket: 5, total: 2, failed: 0 },
+  ]);
+  expect(model.names).toEqual(['低频', '高频']);
+  expect(model.meta[1]).toEqual({ jobType: 1, cron: '0 * * * * ?' });
+  expect(model.bucketRows[0]).toMatchObject({ row: 1, begin: 3600, end: 4500, total: 15, failed: 1 });
+  expect(model.bucketRows[1].row).toBe(0);
+});
+
+it('聚合块透明度随次数递增且有下限', () => {
+  expect(bucketOpacity(0, 0)).toBe(0.25);
+  expect(bucketOpacity(1, 100)).toBeGreaterThan(0.25);
+  expect(bucketOpacity(100, 100)).toBe(1);
+  expect(bucketOpacity(200, 100)).toBe(1);
 });
 
 it('统计卡片按已结束执行计算成功率，兼容字符串 Long 与空统计', () => {

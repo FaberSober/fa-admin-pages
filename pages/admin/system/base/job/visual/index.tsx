@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobTimeline from './components/JobTimeline';
-import { timelineStatCards, timelineStatusOptions, timelineTypeOptions, type TimelineFilter, type TimelineResult } from './timeline';
+import { timelineStatCards, timelineWindow, timelineStatusOptions, timelineTypeOptions, type TimelineFilter, type TimelineResult } from './timeline';
 import { calendarStatus, type CalendarDay } from './calendar';
 import './job-visual-calendar.scss';
 
@@ -13,12 +13,23 @@ export default function JobVisual() {
   const [selected, setSelected] = useState(dayjs());
   const month = selected.format('YYYY-MM');
   const date = selected.format('YYYY-MM-DD');
-  const [timeline, setTimeline] = useState<TimelineResult | null>(null);
+  const [timelineData, setTimelineData] = useState<{ key: string; result: TimelineResult } | null>(null);
+  const [fullDayData, setFullDayData] = useState<{ key: string; result: TimelineResult } | null>(null);
+  const [hours, setHours] = useState(24);
+  const [offset, setOffset] = useState(0);
+  const win = timelineWindow(hours, offset);
+  const [filter, setFilter] = useState<TimelineFilter>({});
   const [timelineError, setTimelineError] = useState(false);
   const [days, setDays] = useState<Record<string, CalendarDay>>({});
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState<TimelineFilter>({});
   const [refreshKey, setRefreshKey] = useState(0);
+  const fullDayKey = `${date}|${JSON.stringify(filter)}|${refreshKey}`;
+  const cachedDay = fullDayData?.key === fullDayKey ? fullDayData : null;
+  const useFullDay = !!cachedDay && (hours === 24 || !cachedDay.result.buckets?.length);
+  const timelineKey = useFullDay || hours === 24 ? fullDayKey : `${fullDayKey}|${hours}|${win.start}`;
+  const currentData = useFullDay ? cachedDay : timelineData?.key === timelineKey ? timelineData : null;
+  const timeline = currentData?.result ?? null;
+  const displayedData = currentData ?? timelineData;
   useEffect(() => {
     const controller = new AbortController();
     setDays({});
@@ -31,13 +42,21 @@ export default function JobVisual() {
   }, [month, refreshKey]);
   useEffect(() => {
     const controller = new AbortController();
-    setTimeline(null); setTimelineError(false);
-    jobApi.visualTimeline(date, filter, controller.signal).then((response) => {
+    setTimelineError(false);
+    if (useFullDay) return () => controller.abort();
+    // 全天无聚合时可直接复用明细；存在聚合时按窗口请求以获取更细的数据。
+    const windowParams = hours === 24 ? {} : { windowStart: win.start, windowEnd: win.end };
+    jobApi.visualTimeline(date, { ...filter, ...windowParams }, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
-      if (!controller.signal.aborted) setTimeline(response.data);
+      if (!controller.signal.aborted) {
+        const data = { key: timelineKey, result: response.data };
+        setTimelineData(data);
+        if (hours === 24) setFullDayData(data);
+      }
     }).catch(() => { if (!controller.signal.aborted) setTimelineError(true); });
     return () => controller.abort();
-  }, [date, filter, refreshKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timelineKey, refreshKey]);
   return (
     <div className="fa-islands-grid job-visual-page">
         <div className="job-visual-sidebar">
@@ -57,7 +76,10 @@ export default function JobVisual() {
               const status = calendarStatus(day);
               return (
                 <div className="ant-picker-cell-inner job-visual-calendar-date"
-                  style={date.isSame(selected, 'day') ? { background: 'transparent', color: token.colorText, boxShadow: `inset 0 0 0 1px ${token.colorPrimary}` } : undefined}>
+                  style={{
+                    ...(date.isSame(selected, 'day') ? { background: token.colorPrimary, color: token.colorTextLightSolid } : {}),
+                    ...(date.isSame(dayjs(), 'day') ? { boxShadow: `inset 0 0 0 1px ${token.colorPrimary}` } : {}),
+                  }}>
                   <span>{date.date()}</span>
                   {day && status && <span className="job-visual-calendar-dot" role="img"
                     aria-label={day.failed ? `失败 ${day.failed} 次` : `全部成功，共 ${day.total} 次`}
@@ -71,7 +93,7 @@ export default function JobVisual() {
             <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-today-mark" aria-hidden="true" />今天</span>
           </Flex>
         </Card>
-        <Card className="fa-islands-panel" aria-label="查询条件">
+        <Card className="fa-islands-panel job-visual-filter-card" aria-label="查询条件">
           <Flex vertical gap={12}>
             <Flex gap={8}>
               <Button block onClick={() => setSelected(dayjs())}>回到今天</Button>
@@ -85,7 +107,7 @@ export default function JobVisual() {
               onSearch={(text) => setFilter((value) => ({ ...value, keyword: text.trim() || undefined }))} />
           </Flex>
         </Card>
-        <Card className="fa-islands-panel" aria-label="当日统计">
+        <Card className="fa-islands-panel job-visual-stats-card" aria-label="当日统计">
           <div className="job-visual-stats">
             {timelineStatCards(timeline?.stats).map(({ label, value }) => (
               <div className="job-visual-stat" key={label}>
@@ -99,7 +121,7 @@ export default function JobVisual() {
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
             {timelineError ? <Alert type="error" message="时间轴加载失败" showIcon />
-              : timeline ? <JobTimeline date={date} result={timeline} /> : <Spin /> }
+              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} fullDayResult={cachedDay?.result} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <Spin /> }
           </section>
         </div>
     </div>

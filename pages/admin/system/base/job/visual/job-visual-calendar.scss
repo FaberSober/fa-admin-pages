@@ -29,6 +29,11 @@
   }
 }
 
+.job-visual-filter-card .ant-card-body,
+.job-visual-stats-card .ant-card-body {
+  padding: 12px;
+}
+
 .job-visual-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -121,15 +126,7 @@
   }
 
   .ant-picker-cell.ant-picker-cell-today .job-visual-calendar-date::before {
-    top: 0;
-    right: auto;
-    bottom: auto;
-    left: 50%;
-    width: 12px;
-    height: 2px;
-    background: var(--primary-color, #1677ff);
-    border: 0;
-    transform: translateX(-50%);
+    display: none;
   }
 
   .ant-picker-cell .job-visual-calendar-date {
@@ -159,9 +156,10 @@
 }
 
 .job-visual-today-mark {
-  width: 12px;
-  height: 2px;
-  background: var(--primary-color, #1677ff);
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--primary-color, #1677ff);
+  border-radius: 2px;
 }
 
 .job-visual-legend-dot {

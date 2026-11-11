@@ -6,7 +6,7 @@ import type { Admin } from '@/types';
 const serviceModule = 'job';
 
 class Job extends BaseApi<Admin.Job, number> {
-  visualTimeline = (date: string, filter: import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineFilter, signal?: AbortSignal): Promise<Fa.Ret<import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineResult>> =>
+  visualTimeline = (date: string, filter: import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineFilter & import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineWindowParams, signal?: AbortSignal): Promise<Fa.Ret<import('@features/fa-admin-pages/pages/admin/system/base/job/visual/timeline').TimelineResult>> =>
     this.get('visual/timeline', { date, ...filter }, { signal });
   visualCalendar = (month: string, signal?: AbortSignal): Promise<Fa.Ret<{ date: string; total: number; success: number; failed: number }[]>> =>
     this.get('visual/calendar', { month }, { signal });

@@ -8,8 +8,14 @@ export type TimelineEntry = {
 };
 /** 后端 Long 可能以字符串传输。finished 为已结束执行数，用作成功率分母。 */
 export type TimelineStats = { total: LongValue; success: LongValue; failed: LongValue; finished: LongValue; avgDurationMs: LongValue; maxDurationMs: LongValue };
-export type TimelineResult = { serverTime: string; entries: TimelineEntry[]; stats: TimelineStats };
+/** 高频任务的 15 分钟聚合桶；bucket 为当天第几个 15 分钟（0–95）。 */
+export type TimelineBucket = { jobId: number; jobName: string | null; jobType: number | null; cron: string | null; bucket: number; total: LongValue; failed: LongValue };
+/** entries 为当前窗口内未聚合任务的明细，buckets 为窗口内高频任务的聚合；stats 始终按整天统计。 */
+export type TimelineResult = { serverTime: string; entries: TimelineEntry[]; buckets?: TimelineBucket[]; stats: TimelineStats };
 export type TimelineFilter = { type?: number; status?: number; keyword?: string };
+/** 时间窗口（当天第几秒）；全天时不传，由后端按整天处理。 */
+export type TimelineWindowParams = { windowStart?: number; windowEnd?: number };
+export const BUCKET_SECONDS = 900;
 
 export const timelineTypeOptions = [{ label: '普通任务', value: 0 }, { label: '任务流', value: 1 }];
 export const timelineStatusOptions = [
@@ -30,23 +36,42 @@ export function timelineStatCards(stats?: TimelineStats | null) {
     { label: '最长耗时', value: formatJobDuration(stats?.maxDurationMs) },
   ];
 }
-export function timelineModel(entries: TimelineEntry[], date: string) {
+export function timelineModel(entries: TimelineEntry[], date: string, buckets: TimelineBucket[] = []) {
   const start = dayjs(`${date}T00:00:00`);
   const names: string[] = [];
+  /** 每个 Y 轴行的类型与 cron，明细行和聚合行共用。 */
+  const meta: { jobType: number | null; cron: string | null }[] = [];
   const groups = new Map<string, number>();
-  const rows = entries.map((entry) => {
-    const key = entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`;
+  const rowOf = (key: string, name: string, jobType: number | null, cron: string | null) => {
     let row = groups.get(key);
     if (row === undefined) {
       row = names.length;
       groups.set(key, row);
-      names.push(entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`));
+      names.push(name);
+      meta.push({ jobType, cron });
     }
+    return row;
+  };
+  const rows = entries.map((entry) => {
+    const row = rowOf(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
+      entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron);
     const begin = Math.max(0, Math.min(86400, dayjs(entry.beginTime).diff(start, 'second')));
     const end = entry.endTime ? Math.max(begin, Math.min(86400, dayjs(entry.endTime).diff(start, 'second'))) : begin;
     return { entry, row, begin, end };
   });
-  return { names, rows };
+  const bucketRows = buckets.map((bucket) => {
+    const row = rowOf(`job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron);
+    const total = Number(parseJobLong(bucket.total) ?? 0);
+    const failed = Number(parseJobLong(bucket.failed) ?? 0);
+    const begin = bucket.bucket * BUCKET_SECONDS;
+    return { bucket, row, begin, end: begin + BUCKET_SECONDS, total, failed };
+  });
+  return { names, meta, rows, bucketRows };
+}
+
+/** 聚合块透明度：次数越多越深，最小 0.25，保证少量记录仍可见。 */
+export function bucketOpacity(total: number, maxTotal: number) {
+  return maxTotal > 0 ? 0.25 + 0.75 * Math.min(1, total / maxTotal) : 0.25;
 }
 
 export function timelineWindow(hours: number, offset: number) {

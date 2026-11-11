@@ -1,26 +1,29 @@
 import * as echarts from 'echarts';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
-import { Segmented, Slider, theme } from 'antd';
-import { timelineModel, timelineWindow, type TimelineResult } from '../timeline';
+import { Segmented, Slider, Spin, theme } from 'antd';
+import { bucketOpacity, timelineModel, timelineWindow, type TimelineResult } from '../timeline';
 
-type Props = { date: string; result: TimelineResult };
+type Props = { date: string; selectedDate: string; loading: boolean; result: TimelineResult; fullDayResult?: TimelineResult; hours: number; offset: number; onWindowChange: (hours: number, offset: number) => void };
 const rowHeight = 44;
 const timeLabel = (seconds: number) => `${String(Math.floor(seconds / 3600)).padStart(2, '0')}:${String(Math.floor(seconds % 3600 / 60)).padStart(2, '0')}`;
 const statusText: Record<number, string> = { 1: '执行中', 2: '成功', 3: '停止中', 7: '已停止', 8: '未确认', 9: '失败' };
 
-export default function JobTimeline({ date, result }: Props) {
+export default function JobTimeline({ date, selectedDate, loading, result, fullDayResult, hours, offset, onWindowChange }: Props) {
   const element = useRef<HTMLDivElement>(null);
   const { token } = theme.useToken();
-  const [hours, setHours] = useState(24);
-  const [offset, setOffset] = useState(0);
-  const window = timelineWindow(hours, offset);
-  const { names } = timelineModel(result.entries, date);
+  // 拖动滑块时只更新本地位置，松手后才通知父组件重新请求
+  const [dragging, setDragging] = useState<number | null>(null);
+  const window = timelineWindow(hours, dragging ?? offset);
+  const shown = window.start;
+  const plotResult = (dragging !== null || loading) && fullDayResult ? fullDayResult : result;
+  const { names } = timelineModel(plotResult.entries, date, plotResult.buckets);
   useEffect(() => {
     if (!element.current) return;
     const chart = echarts.init(element.current);
-    const { names, rows } = timelineModel(result.entries, date);
-    const now = dayjs(result.serverTime);
+    const { names, meta, rows, bucketRows } = timelineModel(plotResult.entries, date, plotResult.buckets);
+    const maxBucket = Math.max(0, ...bucketRows.map((item) => item.total));
+    const now = dayjs(plotResult.serverTime);
     const current = now.format('YYYY-MM-DD') === date ? now.hour() * 3600 + now.minute() * 60 + now.second() : null;
     const gridLines = () => {
       const width = chart.getWidth();
@@ -45,6 +48,11 @@ export default function JobTimeline({ date, result }: Props) {
       legend: { show: false },
       graphic: gridLines(),
       tooltip: { trigger: 'item', renderMode: 'richText', formatter: (params: any) => {
+        if (params.seriesName === '聚合执行') {
+          const item = bucketRows[params.dataIndex];
+          if (!item) return '';
+          return `${names[item.row]}\n时段：${timeLabel(item.begin)} – ${timeLabel(item.end)}\n执行：${item.total} 次\n失败：${item.failed} 次\n放大到 1 小时查看每次执行`;
+        }
         const row = rows[params.dataIndex];
         if (params.seriesName !== '执行记录' || !row) return '';
         const e = row.entry;
@@ -52,7 +60,7 @@ export default function JobTimeline({ date, result }: Props) {
         return `${e.jobName || (e.jobId == null ? `记录 #${e.id}` : `任务 #${e.jobId}`)}\n开始：${e.beginTime.replace('T', ' ')}\n结束：${e.endTime?.replace('T', ' ') || '未结束'}\n耗时：${duration}\n结果：${statusText[e.status] || '未知'}`;
       } },
       xAxis: { type: 'value', min: window.start, max: window.end, interval: hours === 1 ? 600 : hours === 6 ? 3600 : 7200, position: 'top', axisTick: { show: false }, axisLine: { show: false }, axisLabel: { color: token.colorTextSecondary, align: 'center', formatter: (value: number) => value === window.end ? `{last|${timeLabel(value)}}` : timeLabel(value), rich: { last: { padding: [0, 32, 0, 0], color: token.colorTextSecondary } } }, splitLine: { show: false } },
-      yAxis: { type: 'category', data: names, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: token.colorText, width: 110, align: 'left', margin: 120, overflow: 'truncate', lineHeight: 19, formatter: (name: string, index: number) => { const entry = rows.find((row) => row.row === index)?.entry; const clean = (text: string) => text.replace(/[{}|\n\r]/g, ' '); return `{kind|${entry?.jobType === 1 ? '流' : entry?.jobType === 0 ? '任' : '—'}} ${clean(name)}\n{cron|${clean(entry?.cron || '无 Cron 信息')}}`; }, rich: { kind: { color: token.colorPrimary, fontWeight: 'bold' }, cron: { color: token.colorTextSecondary, fontSize: 11 } } }, splitLine: { show: false } },
+      yAxis: { type: 'category', data: names, inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: token.colorText, width: 110, align: 'left', margin: 120, overflow: 'truncate', lineHeight: 19, formatter: (name: string, index: number) => { const entry = meta[index]; const clean = (text: string) => text.replace(/[{}|\n\r]/g, ' '); return `{kind|${entry?.jobType === 1 ? '流' : entry?.jobType === 0 ? '任' : '—'}} ${clean(name)}\n{cron|${clean(entry?.cron || '无 Cron 信息')}}`; }, rich: { kind: { color: token.colorPrimary, fontWeight: 'bold' }, cron: { color: token.colorTextSecondary, fontSize: 11 } } }, splitLine: { show: false } },
       series: [
         { name: '执行记录', type: 'custom', renderItem: (params: any, api: any) => {
           const row = api.value(0); const start = api.coord([api.value(1), row]); const end = api.coord([api.value(2), row]);
@@ -60,6 +68,12 @@ export default function JobTimeline({ date, result }: Props) {
           const rect = echarts.graphic.clipRectByRect({ x: start[0], y: start[1] - height / 2, width: Math.max(2, end[0] - start[0]), height }, { x: params.coordSys.x, y: params.coordSys.y, width: params.coordSys.width, height: params.coordSys.height });
           return rect ? { type: 'rect', shape: rect, style: api.style() } : null;
         }, data: rows.map((row) => ({ value: [row.row, row.begin, row.end], itemStyle: { color: row.entry.status === 2 ? token.colorSuccess : row.entry.status === 9 ? token.colorError : token.colorTextTertiary } })) },
+        { name: '聚合执行', type: 'custom', renderItem: (params: any, api: any) => {
+          const row = api.value(0); const start = api.coord([api.value(1), row]); const end = api.coord([api.value(2), row]);
+          const height = Math.min(20, api.size([0, 1])[1] * 0.6);
+          const rect = echarts.graphic.clipRectByRect({ x: start[0], y: start[1] - height / 2, width: Math.max(2, end[0] - start[0] - 1), height }, { x: params.coordSys.x, y: params.coordSys.y, width: params.coordSys.width, height: params.coordSys.height });
+          return rect ? { type: 'rect', shape: rect, style: api.style() } : null;
+        }, data: bucketRows.map((item) => ({ value: [item.row, item.begin, item.end], itemStyle: { color: item.failed > 0 ? token.colorError : token.colorSuccess, opacity: bucketOpacity(item.total, maxBucket) } })) },
         ...[['成功', token.colorSuccess], ['失败', token.colorError], ['其他', token.colorTextTertiary]].map(([name, color]) => ({ name, type: 'scatter', data: [], itemStyle: { color } })),
         ...(current === null ? [] : [{ name: '当前时刻', type: 'scatter', data: [], itemStyle: { color: token.colorError }, markLine: { symbol: 'none', silent: true, label: { show: false }, lineStyle: { color: token.colorError, type: 'solid' }, data: [{ xAxis: current }] } }]),
       ],
@@ -70,21 +84,21 @@ export default function JobTimeline({ date, result }: Props) {
     });
     observer.observe(element.current);
     return () => { observer.disconnect(); chart.dispose(); };
-  }, [date, result, token, window.start, window.end, hours]);
+  }, [date, plotResult, token, window.start, window.end, hours]);
   const isToday = dayjs(result.serverTime).format('YYYY-MM-DD') === date;
   return (
     <div className="job-timeline-content">
       <div className="job-timeline-header" style={{ borderColor: token.colorSplit }}>
         <div>
-          <div className="job-timeline-date">{dayjs(date).format('YYYY年M月D日')} 星期{['日', '一', '二', '三', '四', '五', '六'][dayjs(date).day()]}</div>
-          <div style={{ color: token.colorTextSecondary }}>当日共 {result.entries.length} 次执行，涉及 {names.length} 个任务</div>
+          <div className="job-timeline-date">{dayjs(selectedDate).format('YYYY年M月D日')} 星期{['日', '一', '二', '三', '四', '五', '六'][dayjs(selectedDate).day()]} {loading && <Spin size="small" aria-label="时间轴加载中" />}</div>
+          <div style={{ color: token.colorTextSecondary }}>当日共 {result.stats ? Number(result.stats.total ?? 0) : result.entries.length} 次执行，涉及 {names.length} 个任务</div>
         </div>
         <div className="job-timeline-controls">
           <span style={{ color: token.colorTextSecondary }}>时间范围</span>
           <Segmented aria-label="时间范围" value={hours} options={[{ label: '全天', value: 24 }, { label: '6 小时', value: 6 }, { label: '1 小时', value: 1 }]}
-            onChange={(value) => { setHours(Number(value)); setOffset(0); }} />
-          {hours !== 24 && <><Slider aria-label="时间窗口起点" min={0} max={86400 - hours * 3600} step={600} value={window.start} onChange={setOffset} tooltip={{ formatter: (value) => timeLabel(value ?? 0) }} style={{ width: 120, marginInline: 4 }} />
-            <span style={{ color: token.colorTextSecondary }}>{timeLabel(window.start)} – {timeLabel(window.end)}</span></>}
+            onChange={(value) => { setDragging(null); onWindowChange(Number(value), 0); }} />
+          {hours !== 24 && <><Slider aria-label="时间窗口起点" min={0} max={86400 - hours * 3600} step={600} value={shown} onChange={setDragging} onChangeComplete={(value) => { setDragging(null); onWindowChange(hours, value); }} tooltip={{ formatter: (value) => timeLabel(value ?? 0) }} style={{ width: 120, marginInline: 4 }} />
+            <span style={{ color: token.colorTextSecondary }}>{timeLabel(shown)} – {timeLabel(shown + hours * 3600)}</span></>}
         </div>
       </div>
       <div className="job-timeline-plot">
