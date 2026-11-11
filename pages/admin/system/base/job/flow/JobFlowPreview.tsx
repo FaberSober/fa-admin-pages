@@ -1,5 +1,5 @@
 import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
-import { CronModal, FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
+import { CronModal, FaHref, FaResizeHorizontal, ThemeLayoutContext, useApiLoading } from '@fa/ui';
 import { createPortal } from 'react-dom';
 import { Alert, Button, Collapse, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Tag, Tooltip, Typography, message, theme } from 'antd';
 import {
@@ -213,14 +213,25 @@ function JobFlowEditor({ demo, record, fetchFinish }: { demo: boolean; record?: 
   return (
     <>
       {contextHolder}
-      <Button
-        onClick={() => {
-          loadedRecord.current = false;
-          setOpen(true);
-        }}
-      >
-        {demo ? '流程编排预览' : record ? '编排' : '新建任务流'}
-      </Button>
+      {!demo && record ? (
+        <FaHref
+          icon={<ApartmentOutlined />}
+          text="编排"
+          onClick={() => {
+            loadedRecord.current = false;
+            setOpen(true);
+          }}
+        />
+      ) : (
+        <Button
+          onClick={() => {
+            loadedRecord.current = false;
+            setOpen(true);
+          }}
+        >
+          {demo ? '流程编排预览' : '新建任务流'}
+        </Button>
+      )}
       <span ref={anchorRef} style={{ display: 'none' }} />
       {open &&
         mountNode &&
