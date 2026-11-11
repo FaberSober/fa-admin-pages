@@ -4,7 +4,7 @@ import { formatJobCount, formatJobDuration, parseJobLong } from '../jobStatistic
 type LongValue = string | number | null | undefined;
 export type TimelineEntry = {
   id: number; jobId: number | null; jobName: string | null; jobType: number | null; cron: string | null; beginTime: string; endTime: string | null;
-  durationMs: number | null; duration: number | null; status: number;
+  durationMs: number | null; duration: number | null; status: number; crossDay?: boolean;
 };
 /** 后端 Long 可能以字符串传输。finished 为已结束执行数，用作成功率分母。 */
 export type TimelineStats = { total: LongValue; success: LongValue; failed: LongValue; finished: LongValue; avgDurationMs: LongValue; maxDurationMs: LongValue };
@@ -41,7 +41,7 @@ export function timelineStatCards(stats?: TimelineStats | null) {
     { label: '最长耗时', value: formatJobDuration(stats?.maxDurationMs) },
   ];
 }
-export function timelineModel(entries: TimelineEntry[], date: string, buckets: TimelineBucket[] = []) {
+export function timelineModel(entries: TimelineEntry[], date: string, buckets: TimelineBucket[] = [], now?: string, fullDay?: TimelineResult) {
   const start = dayjs(`${date}T00:00:00`);
   const names: string[] = [];
   /** 每个 Y 轴行的类型与 cron，明细行和聚合行共用。 */
@@ -57,12 +57,17 @@ export function timelineModel(entries: TimelineEntry[], date: string, buckets: T
     }
     return row;
   };
+  fullDay?.entries.forEach((entry) => { rowOf(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
+    entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron); });
+  fullDay?.buckets?.forEach((bucket) => { rowOf(`job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron); });
   const rows = entries.map((entry) => {
     const row = rowOf(entry.jobId == null ? `log:${entry.id}` : `job:${entry.jobId}`,
       entry.jobName || (entry.jobId == null ? `记录 #${entry.id}` : `任务 #${entry.jobId}`), entry.jobType, entry.cron);
     const begin = Math.max(0, Math.min(86400, dayjs(entry.beginTime).diff(start, 'second')));
-    const end = entry.endTime ? Math.max(begin, Math.min(86400, dayjs(entry.endTime).diff(start, 'second'))) : begin;
-    return { entry, row, begin, end };
+    const running = entry.status === 1 || entry.status === 3;
+    const endTime = running ? now : entry.endTime;
+    const end = endTime ? Math.max(begin, Math.min(86400, dayjs(endTime).diff(start, 'second'))) : begin;
+    return { entry, row, begin, end, running };
   });
   const bucketRows = buckets.map((bucket) => {
     const row = rowOf(`job:${bucket.jobId}`, bucket.jobName || `任务 #${bucket.jobId}`, bucket.jobType, bucket.cron);

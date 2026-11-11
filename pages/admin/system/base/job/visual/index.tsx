@@ -13,8 +13,8 @@ export default function JobVisual() {
   const [selected, setSelected] = useState(dayjs());
   const month = selected.format('YYYY-MM');
   const date = selected.format('YYYY-MM-DD');
-  const [timelineData, setTimelineData] = useState<{ key: string; result: TimelineResult } | null>(null);
-  const [fullDayData, setFullDayData] = useState<{ key: string; result: TimelineResult } | null>(null);
+  const [timelineData, setTimelineData] = useState<{ key: string; result: TimelineResult; receivedAt: number } | null>(null);
+  const [fullDayData, setFullDayData] = useState<{ key: string; result: TimelineResult; receivedAt: number } | null>(null);
   const [hours, setHours] = useState(24);
   const [offset, setOffset] = useState(0);
   const win = timelineWindow(hours, offset);
@@ -26,7 +26,8 @@ export default function JobVisual() {
   const fullDayKey = `${date}|${JSON.stringify(filter)}|${refreshKey}`;
   const cachedDay = fullDayData?.key === fullDayKey ? fullDayData : null;
   const useFullDay = !!cachedDay && (hours === 24 || !cachedDay.result.buckets?.length);
-  const timelineKey = useFullDay || hours === 24 ? fullDayKey : `${fullDayKey}|${hours}|${win.start}`;
+  const requestFullDay = !cachedDay || hours === 24;
+  const timelineKey = useFullDay || requestFullDay ? fullDayKey : `${fullDayKey}|${hours}|${win.start}`;
   const currentData = useFullDay ? cachedDay : timelineData?.key === timelineKey ? timelineData : null;
   const timeline = currentData?.result ?? null;
   const displayedData = currentData ?? timelineData;
@@ -45,13 +46,13 @@ export default function JobVisual() {
     setTimelineError(false);
     if (useFullDay) return () => controller.abort();
     // 全天无聚合时可直接复用明细；存在聚合时按窗口请求以获取更细的数据。
-    const windowParams = hours === 24 ? {} : { windowStart: win.start, windowEnd: win.end };
+    const windowParams = requestFullDay ? {} : { windowStart: win.start, windowEnd: win.end };
     jobApi.visualTimeline(date, { ...filter, ...windowParams }, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
       if (!controller.signal.aborted) {
-        const data = { key: timelineKey, result: response.data };
+        const data = { key: timelineKey, result: response.data, receivedAt: Date.now() };
         setTimelineData(data);
-        if (hours === 24) setFullDayData(data);
+        if (requestFullDay) setFullDayData(data);
       }
     }).catch(() => { if (!controller.signal.aborted) setTimelineError(true); });
     return () => controller.abort();
@@ -90,21 +91,20 @@ export default function JobVisual() {
           <Flex className="job-visual-calendar-legend" gap={16} wrap="wrap" align="center">
             <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-legend-dot" style={{ background: token.colorSuccess }} aria-hidden="true" />全部成功</span>
             <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-legend-dot" style={{ background: token.colorError }} aria-hidden="true" />有失败</span>
-            <span className="job-visual-today-legend" style={{ fontSize: 11, color: token.colorTextSecondary }}><span className="job-visual-today-mark" aria-hidden="true" />今天</span>
+            <button type="button" aria-label="回到今天" className="job-visual-today-legend job-visual-today-button" style={{ fontSize: 11, color: token.colorTextSecondary }} onClick={() => setSelected(dayjs())}><span className="job-visual-today-mark" aria-hidden="true" />今天</button>
           </Flex>
         </Card>
         <Card className="fa-islands-panel job-visual-filter-card" aria-label="查询条件">
           <Flex vertical gap={12}>
-            <Flex gap={8}>
-              <Button block onClick={() => setSelected(dayjs())}>回到今天</Button>
-              <Button block icon={<ReloadOutlined />} onClick={() => setRefreshKey((key) => key + 1)}>刷新</Button>
-            </Flex>
             <Select aria-label="任务类型" placeholder="任务类型" allowClear options={timelineTypeOptions} value={filter.type}
               onChange={(type) => setFilter((value) => ({ ...value, type }))} />
             <Select aria-label="执行结果" placeholder="执行结果" allowClear options={timelineStatusOptions} value={filter.status}
               onChange={(status) => setFilter((value) => ({ ...value, status }))} />
-            <Input.Search aria-label="任务名称" placeholder="任务名称，回车搜索" allowClear
-              onSearch={(text) => setFilter((value) => ({ ...value, keyword: text.trim() || undefined }))} />
+            <Flex gap={8}>
+              <Input.Search aria-label="任务名称" placeholder="任务名称，回车搜索" allowClear style={{ flex: 1, minWidth: 0 }}
+                onSearch={(text) => setFilter((value) => ({ ...value, keyword: text.trim() || undefined }))} />
+              <Button aria-label="刷新" title="刷新" icon={<ReloadOutlined />} onClick={() => setRefreshKey((key) => key + 1)} />
+            </Flex>
           </Flex>
         </Card>
         <Card className="fa-islands-panel job-visual-stats-card" aria-label="当日统计">
@@ -121,7 +121,7 @@ export default function JobVisual() {
         <div className="job-visual-timeline">
           <section className="fa-islands-table job-visual-chart" aria-label="执行时间轴">
             {timelineError ? <Alert type="error" message="时间轴加载失败" showIcon />
-              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} fullDayResult={cachedDay?.result} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <Spin /> }
+              : displayedData ? <JobTimeline date={displayedData.key.split('|')[0]} selectedDate={date} loading={!timeline} result={displayedData.result} receivedAt={displayedData.receivedAt} fullDayResult={cachedDay?.result} fullDayReceivedAt={cachedDay?.receivedAt} hours={hours} offset={offset} onWindowChange={(h, o) => { setHours(h); setOffset(o); }} /> : <Spin /> }
           </section>
         </div>
     </div>
