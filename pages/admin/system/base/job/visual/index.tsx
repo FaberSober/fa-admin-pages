@@ -1,10 +1,10 @@
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, ReloadOutlined, RightOutlined } from '@ant-design/icons';
 import { Alert, Button, Calendar, Card, Flex, Input, Select, Spin, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { jobApi } from '@features/fa-admin-pages/services';
 import JobTimeline from './components/JobTimeline';
-import type { TimelineResult } from './timeline';
+import { timelineStatCards, timelineStatusOptions, timelineTypeOptions, type TimelineFilter, type TimelineResult } from './timeline';
 import { calendarStatus, type CalendarDay } from './calendar';
 import './job-visual-calendar.scss';
 
@@ -17,6 +17,8 @@ export default function JobVisual() {
   const [timelineError, setTimelineError] = useState(false);
   const [days, setDays] = useState<Record<string, CalendarDay>>({});
   const [error, setError] = useState(false);
+  const [filter, setFilter] = useState<TimelineFilter>({});
+  const [refreshKey, setRefreshKey] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
     setDays({});
@@ -26,16 +28,16 @@ export default function JobVisual() {
       if (!controller.signal.aborted) setDays(Object.fromEntries(response.data.map((day: CalendarDay) => [day.date, day])));
     }).catch(() => { if (!controller.signal.aborted) setError(true); });
     return () => controller.abort();
-  }, [month]);
+  }, [month, refreshKey]);
   useEffect(() => {
     const controller = new AbortController();
     setTimeline(null); setTimelineError(false);
-    jobApi.visualTimeline(date, controller.signal).then((response) => {
+    jobApi.visualTimeline(date, filter, controller.signal).then((response) => {
       if (response.status !== 200) throw new Error(response.message);
       if (!controller.signal.aborted) setTimeline(response.data);
     }).catch(() => { if (!controller.signal.aborted) setTimelineError(true); });
     return () => controller.abort();
-  }, [date]);
+  }, [date, filter, refreshKey]);
   return (
     <div className="fa-islands-grid job-visual-page">
         <div className="job-visual-sidebar">
@@ -71,17 +73,24 @@ export default function JobVisual() {
         </Card>
         <Card className="fa-islands-panel" aria-label="查询条件">
           <Flex vertical gap={12}>
-            <Select aria-label="任务类型" placeholder="任务类型" disabled />
-            <Select aria-label="执行结果" placeholder="执行结果" disabled />
-            <Input aria-label="任务名称" placeholder="任务名称" disabled />
+            <Flex gap={8}>
+              <Button block onClick={() => setSelected(dayjs())}>回到今天</Button>
+              <Button block icon={<ReloadOutlined />} onClick={() => setRefreshKey((key) => key + 1)}>刷新</Button>
+            </Flex>
+            <Select aria-label="任务类型" placeholder="任务类型" allowClear options={timelineTypeOptions} value={filter.type}
+              onChange={(type) => setFilter((value) => ({ ...value, type }))} />
+            <Select aria-label="执行结果" placeholder="执行结果" allowClear options={timelineStatusOptions} value={filter.status}
+              onChange={(status) => setFilter((value) => ({ ...value, status }))} />
+            <Input.Search aria-label="任务名称" placeholder="任务名称，回车搜索" allowClear
+              onSearch={(text) => setFilter((value) => ({ ...value, keyword: text.trim() || undefined }))} />
           </Flex>
         </Card>
         <Card className="fa-islands-panel" aria-label="当日统计">
           <div className="job-visual-stats">
-            {['总执行', '成功', '失败', '成功率', '平均耗时', '最长耗时'].map((label) => (
+            {timelineStatCards(timeline?.stats).map(({ label, value }) => (
               <div className="job-visual-stat" key={label}>
                 <Typography.Text type="secondary">{label}</Typography.Text>
-                <Typography.Text strong>—</Typography.Text>
+                <Typography.Text strong>{value}</Typography.Text>
               </div>
             ))}
           </div>
