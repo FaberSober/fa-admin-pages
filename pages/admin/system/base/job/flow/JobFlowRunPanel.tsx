@@ -97,6 +97,7 @@ function JobFlowRunPanelContent({ jobId, initialLogId, initialNodeId, onClose }:
                   {run.nodes.some(node => node.status === 60) && <span>阻断 {run.nodes.filter(node => node.status === 60).length}</span>}
                   {unconfirmed > 0 && <Typography.Text type="warning">未确认 {unconfirmed} · 已暂停新启动</Typography.Text>}
                 </Space>
+                {run.log.status === 8 && <Alert type="warning" showIcon title="本轮结果未确认" description="请查看未确认节点及其业务日志，核查业务是否仍在运行和已产生的影响。同一流程暂不能再次执行；目前尚无人工解除入口，请勿直接修改数据库状态。" />}
                 {run.log.errMsg && run.log.status !== 3 && <Tooltip title={run.log.errMsg}><Typography.Text type={run.log.status === 9 ? 'danger' : run.log.status === 8 ? 'warning' : 'secondary'} ellipsis style={{ maxWidth: '100%' }}>{run.log.errMsg}</Typography.Text></Tooltip>}
                 <div className="job-flow-run-split">
                 <div className="job-flow-run-canvas-area">
